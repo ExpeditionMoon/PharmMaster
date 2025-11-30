@@ -1,11 +1,116 @@
 package com.moon.pharm.ui.screen
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.theme.Primary
+import com.moon.pharm.component_ui.view.BottomAppBarItem
+import com.moon.pharm.component_ui.view.PharmBottomBar
+import com.moon.pharm.component_ui.view.PharmTopBar
+import com.moon.pharm.component_ui.view.TopBarNavigationType
+import com.moon.pharm.component_ui.view.defaultHomeTopBarData
+import com.moon.pharm.component_ui.view.topBarAsRouteName
+import com.moon.pharm.consult.screen.ConsultScreen
 import com.moon.pharm.home.screen.HomeMainScreen
+import com.moon.pharm.prescription.screen.PrescriptionScreen
+import com.moon.pharm.profile.screen.ProfileScreen
+import com.moon.pharm.profile.screen.MedicationScreen
 
 @Preview(showBackground = true)
 @Composable
 fun EntryPointScreen() {
-   HomeMainScreen()
+    val navController = rememberNavController()
+
+    val bottomAppBarItems = remember {
+        BottomAppBarItem.fetchBottomAppBarItems()
+    }
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val baseTopBarData = navBackStackEntry?.topBarAsRouteName ?: defaultHomeTopBarData()
+
+    val topBarData = remember(baseTopBarData, navController) {
+        if (baseTopBarData.navigationType == TopBarNavigationType.Back) {
+            baseTopBarData.copy(onNavigationClick = { navController.popBackStack() })
+        } else {
+            baseTopBarData
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            PharmTopBar(data = topBarData)
+        },
+        bottomBar = {
+            PharmBottomBar(
+                items = bottomAppBarItems,
+                currentRoute = currentRoute,
+                onItemClick = { item ->
+                    if (item.tabName != currentRoute) {
+                        navController.navigate(item.tabName) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                }
+            )
+        },
+        floatingActionButton = {
+            if (currentRoute == "홈") {
+                FloatingActionButton(
+                    onClick = { navController.navigate("처방전") },
+                    shape = RoundedCornerShape(100.dp),
+                    containerColor = Primary
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.prescription_image),
+                        contentDescription = "처방전",
+                        modifier = Modifier.size(30.dp),
+                    )
+                }
+            }
+        }
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            NavHost(navController = navController, startDestination = "홈") {
+                composable("홈") {
+                    HomeMainScreen()
+                }
+                composable("복약관리") {
+                    MedicationScreen()
+                }
+                composable("상담") {
+                    ConsultScreen()
+                }
+                composable("내정보") {
+                    ProfileScreen()
+                }
+                composable("처방전") {
+                    PrescriptionScreen()
+                }
+            }
+        }
+    }
 }

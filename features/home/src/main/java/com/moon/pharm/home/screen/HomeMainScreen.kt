@@ -12,19 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Medication
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.VerifiedUser
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -39,12 +33,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.R
-
-val Primary = Color(0xFF006A60)
-val Secondary = Color(0xFF9ECFD4)
-val SecondFont = Color(0xFF767676)
-val OnSurface = Color(0xFF1F3B58)
-val Tertiary = Color(0xFFFFB300)
+import com.moon.pharm.component_ui.theme.OnSurface
+import com.moon.pharm.component_ui.theme.Primary
+import com.moon.pharm.component_ui.theme.SecondFont
+import com.moon.pharm.component_ui.theme.Secondary
 
 @Preview(showBackground = true)
 @Composable
@@ -56,8 +48,6 @@ fun HomeMainScreen() {
             modifier = Modifier.fillMaxSize()
                 .padding(24.dp),
         ){
-            HomeTopBar()
-
             /* Screen */
             Text(
                 text = "ooo님, 건강 챙기세요!",
@@ -73,50 +63,6 @@ fun HomeMainScreen() {
             PharmSafety()
 
             HealthInfo()
-
-            BottomBar()
-        }
-    }
-}
-
-@Composable
-fun HomeTopBar() {
-    /* Top Bar */
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        Icon(
-            Icons.Default.Menu,
-            contentDescription = "menu",
-            tint = Primary,
-            modifier = Modifier
-                .size(32.dp)
-        )
-        Image(
-            painter = painterResource(R.drawable.logo_image),
-            contentDescription = "logo",
-            modifier = Modifier
-                .size(50.dp)
-        )
-        Row {
-            Icon(
-                Icons.Default.Search,
-                contentDescription = "menu",
-                tint = Primary,
-                modifier = Modifier
-                    .size(32.dp)
-            )
-            Icon(
-                Icons.Default.Notifications,
-                contentDescription = "notifications",
-                tint = Primary,
-                modifier = Modifier
-                    .size(32.dp),
-            )
         }
     }
 }
@@ -158,8 +104,9 @@ fun PharmNotice() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(130.dp)
-                .background(
-                    color = Secondary.copy(alpha = 0.5f),
+                .border(
+                    width = 0.5.dp,
+                    color = Color(118,118,118).copy(alpha = 0.5f),
                     shape = RoundedCornerShape(10.dp)
                 ),
             verticalArrangement = Arrangement.SpaceBetween
@@ -175,7 +122,7 @@ fun PharmNotice() {
                     modifier = Modifier
                         .padding(start = 20.dp, end = 10.dp)
                         .background(
-                            color = Secondary.copy(alpha = 0.8f),
+                            color = Secondary.copy(alpha = 0.2f),
                             shape = RoundedCornerShape(100.dp)
                         )
                 ){
@@ -220,9 +167,8 @@ fun RateOfUse() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp)
-            .border(
-                width = 0.5.dp,
-                color = Color(118,118,118).copy(alpha = 0.5f),
+            .background(
+                color = Secondary.copy(alpha = 0.1f),
                 shape = RoundedCornerShape(10.dp)
             )
             .height(60.dp),
@@ -233,7 +179,7 @@ fun RateOfUse() {
                 .padding(10.dp)
                 .border(
                     width = 1.dp,
-                    color = Color(158,207,212).copy(alpha = 0.5f),
+                    color = Secondary,
                     shape = RoundedCornerShape(10.dp)
                 )
                 .height(40.dp)
@@ -250,7 +196,7 @@ fun RateOfUse() {
                 text = "95%",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(102, 205, 170)
+                color = SecondFont
             )
         }
         Column (
@@ -365,7 +311,7 @@ fun HealthInfo() {
             Text(
                 text = "건강 정보",
                 fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Bold
             )
             TextButton(
                 onClick = {},
@@ -516,31 +462,3 @@ fun HealthInfo() {
         }
     }
 }
-
-@Composable
-fun BottomBar() {
-
-/*    *//* Bottom Bar *//*
-    NavigationBar {
-        bottomAppBarItems.forEachIndexed { _, bottomItem ->
-            NavigationBarItem(
-                selected = bottomItem.tabName == ,
-                label = {
-                    Text(
-                        text = bottomItem.tabName, color = Primary
-                    )
-                },
-                icon = {
-                    Icon(
-                        bottomItem.icon,
-                        contentDescription = bottomItem.tabName,
-                        tint = Primary
-                    )
-                },
-                onClick = {}
-            )
-        }
-    }*/
-}
-
-
