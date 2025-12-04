@@ -114,6 +114,12 @@ fun ConsultTab(
 ) {
     PrimaryTabRow (
         selectedTabIndex = selectedTabIndex,
+        indicator = {
+            TabRowDefaults.SecondaryIndicator(
+                modifier = Modifier.tabIndicatorOffset(selectedTabIndex),
+                color = primaryLight
+            )
+        },
         containerColor = White,
         contentColor = primaryLight,
         divider = {}
