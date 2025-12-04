@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,6 +47,15 @@ fun PharmTopBar(
                     Icon(
                         imageVector = Icons.Filled.Menu,
                         contentDescription = "Menu",
+                        tint = Primary
+                    )
+                }
+            }
+            TopBarNavigationType.Close -> {
+                IconButton(onClick = data.onNavigationClick) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Close",
                         tint = Primary
                     )
                 }

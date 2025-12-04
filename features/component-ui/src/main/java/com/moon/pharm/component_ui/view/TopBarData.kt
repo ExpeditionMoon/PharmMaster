@@ -1,6 +1,8 @@
 package com.moon.pharm.component_ui.view
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -15,7 +17,7 @@ data class TopBarData(
 )
 
 enum class TopBarNavigationType {
-    None, Back, Menu
+    None, Back, Menu, Close // Close(X버튼) 추가
 }
 
 data class TopBarAction(
@@ -49,12 +51,19 @@ val NavBackStackEntry.topBarAsRouteName: TopBarData
                 title = "상담 게시판",
                 navigationType = TopBarNavigationType.Back,
                 actions = listOf(
-                    TopBarAction(text = "+ 글쓰기", onClick = {})
+                    TopBarAction(icon = Icons.Filled.Add, onClick = {})
                 )
             )
             "내정보" -> TopBarData(
                 title = "마이페이지",
                 navigationType = TopBarNavigationType.Back
+            )
+            "상담글작성" -> TopBarData(
+                title = "상담글 작성",
+                navigationType = TopBarNavigationType.Close, // X 버튼
+                actions = listOf(
+                    TopBarAction(text = "다음", onClick = {})
+                )
             )
             else -> TopBarData(title = "PharmMaster")
         }
