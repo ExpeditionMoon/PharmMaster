@@ -37,12 +37,17 @@ import com.moon.pharm.component_ui.theme.OnSurface
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.Secondary
+import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.view.HealthInfoCard
 
 @Preview(showBackground = true)
 @Composable
 fun HomeMainScreen() {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundLight)
     ){
         Column (
             modifier = Modifier.fillMaxSize()
@@ -108,7 +113,8 @@ fun PharmNotice() {
                     width = 0.5.dp,
                     color = Color(118,118,118).copy(alpha = 0.5f),
                     shape = RoundedCornerShape(10.dp)
-                ),
+                )
+                .background(White),
             verticalArrangement = Arrangement.SpaceBetween
         ){
             Row (

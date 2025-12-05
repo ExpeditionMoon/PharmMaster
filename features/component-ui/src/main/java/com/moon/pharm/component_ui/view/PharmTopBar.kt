@@ -14,8 +14,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -23,6 +25,8 @@ import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.theme.OnSurface
 import com.moon.pharm.component_ui.theme.Primary
+import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.backgroundLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,7 +103,12 @@ fun PharmTopBar(
             },
             navigationIcon = navigationIcon,
             actions = actions,
-            modifier = Modifier.fillMaxWidth()
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = backgroundLight
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(elevation = 5.dp)
         )
     } else {
         CenterAlignedTopAppBar(
@@ -113,7 +122,12 @@ fun PharmTopBar(
             },
             navigationIcon = navigationIcon,
             actions = actions,
-            modifier = Modifier.fillMaxWidth()
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = backgroundLight
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(elevation = 5.dp)
         )
     }
 }

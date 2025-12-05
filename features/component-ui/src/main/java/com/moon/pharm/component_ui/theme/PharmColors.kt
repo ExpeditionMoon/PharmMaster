@@ -8,6 +8,7 @@ val Secondary = Color(0xFF5E4B3B)
 val Tertiary = Color(0xFFB1CBDC)
 val White = Color(0xFFFFFFFF) // 기본 흰색 추가
 val Black = Color(0xFF000000) // 기본 검은색 추가
+val Background = Color(0xFFF2F4F7)
 val SecondFont = Color(0xFF767676)
 val OnSurface = Color(0xFF1F3B58)
 
@@ -61,7 +62,7 @@ val errorContainerLight = Color(0xFFFFDAD6)
 val onErrorContainerLight = Color(0xFF410002)
 
 /* Background: 앱의 전체적인 배경색 (Scaffold의 기본 배경) */
-val backgroundLight = White // 깔끔한 흰색 배경
+val backgroundLight = Background // 배경색
 
 /* OnBackground: Background 위에 올라가는 텍스트나 아이콘 색상 (일반 텍스트) */
 val onBackgroundLight = Black
