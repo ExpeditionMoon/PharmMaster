@@ -1,6 +1,5 @@
 package com.moon.pharm.home.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -24,10 +23,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,6 +36,7 @@ import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.view.HealthInfoCard
+import com.moon.pharm.component_ui.view.SectionHeader
 
 @Preview(showBackground = true)
 @Composable
@@ -80,31 +77,9 @@ fun PharmNotice() {
             .fillMaxWidth()
             .padding(top = 10.dp)
     ){
-        Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(0.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Text(
-                text = "나의 알림",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
-            )
-            TextButton (
-                onClick = {},
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = SecondFont
-                )
-            ){
-                Text(
-                    text = "더보기 >",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-        }
+        SectionHeader (
+            title = "나의 알림"
+        )
         Column (
             modifier = Modifier
                 .fillMaxWidth()
@@ -307,164 +282,29 @@ fun HealthInfo() {
             .fillMaxWidth()
             .padding(top = 20.dp),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(0.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "건강 정보",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-            TextButton(
-                onClick = {},
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = SecondFont
-                )
-            ) {
-                Text(
-                    text = "더보기 >",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-        }
+        SectionHeader (
+            title = "건강 정보"
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            /* content */
-            Column(
-                modifier = Modifier
-                    .border(
-                        width = 1.dp,
-                        color = Color(158, 207, 212).copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .height(140.dp)
-                    .width(110.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.health_info1),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .clip(
-                            RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
-                        ),
-                    contentScale = ContentScale.Crop,
-                )
-                Column(
-                    modifier = Modifier.padding(4.dp)
-                ) {
-                    Text(
-                        text = "올바른 복용법",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = "아침/점심/저녁 식후 30분 복용은 약물이 ...",
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = SecondFont
-                    )
-                }
-            }
-
-            /* content */
-            Column(
-                modifier = Modifier
-                    .border(
-                        width = 1.dp,
-                        color = Color(158, 207, 212).copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .height(140.dp)
-                    .width(110.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.health_info2),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .clip(
-                            RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
-                        ),
-                    contentScale = ContentScale.Crop,
-                )
-                Column(
-                    modifier = Modifier.padding(4.dp)
-                ) {
-                    Text(
-                        text = "의약품 보과법",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = "의약품은 직사광선이 닿지 않는 서늘하고 ...",
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = SecondFont
-                    )
-                }
-            }
-
-            /* content */
-            Column(
-                modifier = Modifier
-                    .border(
-                        width = 1.dp,
-                        color = Color(158, 207, 212).copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .height(140.dp)
-                    .width(110.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.health_info3),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .clip(
-                            RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
-                        ),
-                    contentScale = ContentScale.Crop,
-                )
-                Column(
-                    modifier = Modifier.padding(4.dp)
-                ) {
-                    Text(
-                        text = "약물 상호작용 주의",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    Text(
-                        text = "약 먹을 때 피해야 할 음식과 영양제 궁합 ...",
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = SecondFont
-                    )
-                }
-            }
+            HealthInfoCard(
+                imageResId = R.drawable.health_info1,
+                title = "올바른 약 복용법",
+                description = "물과 함께 복용하는 것이 가장 좋습니다."
+            )
+            HealthInfoCard(
+                imageResId = R.drawable.health_info2,
+                title = "의약품 보관법",
+                description = "의약품은 직사광선이 닿지 않는 서늘하고 ..."
+            )
+            HealthInfoCard(
+                imageResId = R.drawable.health_info3,
+                title = "유통기한 확인",
+                description = "유통기한이 지난 약은 폐기해야 합니다."
+            )
         }
     }
 }
