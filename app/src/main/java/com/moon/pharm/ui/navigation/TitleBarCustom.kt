@@ -2,7 +2,6 @@ package com.moon.pharm.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Storage
@@ -23,8 +22,6 @@ fun defaultHomeTopBarData() = TopBarData(
     )
 )
 
-//val NavBackStackEntry.topBarAsRouteName: TopBarData
-//    get() {
 fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
         val routeName = destination.route ?: return TopBarData()
         return when {
@@ -41,7 +38,6 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
                     )
                 )
             }
-            // "상담글작성"을 "상담"보다 먼저 검사해야 합니다.
             routeName.contains("상담글작성") -> {
                 TopBarData(
                     title = "상담글 작성",
@@ -68,6 +64,11 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
             routeName.contains("내정보") -> {
                 TopBarData(
                     title = "내정보"
+                )
+            }
+            routeName.contains("처방전") -> {
+                TopBarData(
+                    title = "처방전"
                 )
             }
             else -> throw IllegalArgumentException("내가 선언하지 않은 Route Screen")

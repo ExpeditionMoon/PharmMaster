@@ -36,7 +36,6 @@ import com.moon.pharm.profile.screen.ProfileScreen
 import com.moon.pharm.profile.screen.MedicationScreen
 import com.moon.pharm.ui.navigation.getTopBarData
 
-//@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun EntryPointScreen() {
@@ -62,7 +61,6 @@ fun EntryPointScreen() {
         }
     }
 
-//    val topBarData = navBackStackEntry?.topBarAsRouteName ?: TopBarData()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
