@@ -15,24 +15,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.model.BottomBarUiModel
 import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.view.BottomAppBarItem
 import com.moon.pharm.component_ui.view.PharmBottomBar
 import com.moon.pharm.component_ui.view.PharmTopBar
+import com.moon.pharm.ui.navigation.BottomAppBarItem
+import com.moon.pharm.component_ui.view.TopBarData
 import com.moon.pharm.component_ui.view.TopBarNavigationType
-import com.moon.pharm.component_ui.view.defaultHomeTopBarData
-import com.moon.pharm.component_ui.view.topBarAsRouteName
 import com.moon.pharm.consult.screen.ConsultScreen
+import com.moon.pharm.consult.screen.ConsultWriteScreen
 import com.moon.pharm.home.screen.HomeMainScreen
 import com.moon.pharm.prescription.screen.PrescriptionScreen
 import com.moon.pharm.profile.screen.ProfileScreen
 import com.moon.pharm.profile.screen.MedicationScreen
+import com.moon.pharm.ui.navigation.getTopBarData
 
+//@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun EntryPointScreen() {
@@ -45,36 +49,44 @@ fun EntryPointScreen() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val baseTopBarData = navBackStackEntry?.topBarAsRouteName ?: defaultHomeTopBarData()
+    val baseTopBarData = navBackStackEntry?.getTopBarData(navController) ?: TopBarData()
 
     val topBarData = remember(baseTopBarData, navController) {
-        if (baseTopBarData.navigationType == TopBarNavigationType.Back) {
-            baseTopBarData.copy(onNavigationClick = { navController.popBackStack() })
-        } else {
-            baseTopBarData
+        when (baseTopBarData.navigationType) {
+            TopBarNavigationType.Back, TopBarNavigationType.Close -> {
+                baseTopBarData.copy(onNavigationClick = { navController.popBackStack() })
+            }
+            else -> {
+                baseTopBarData
+            }
         }
     }
 
+//    val topBarData = navBackStackEntry?.topBarAsRouteName ?: TopBarData()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             PharmTopBar(data = topBarData)
         },
         bottomBar = {
-            PharmBottomBar(
-                items = bottomAppBarItems,
-                currentRoute = currentRoute,
-                onItemClick = { item ->
-                    if (item.tabName != currentRoute) {
-                        navController.navigate(item.tabName) {
-                            popUpTo(navController.graph.startDestinationId) {
+            val uiModels = bottomAppBarItems.map { navItem ->
+                BottomBarUiModel(
+                    tabName = navItem.tabName,
+                    icon = navItem.icon,
+                    onClick = {
+                        navController.navigate(navItem.tabName) {
+                            popUpTo(navController.graph.findStartDestination().id){
                                 saveState = true
                             }
                             launchSingleTop = true
                             restoreState = true
                         }
                     }
-                }
+                )
+            }
+            PharmBottomBar(
+                items = uiModels,
+                currentRoute = currentRoute
             )
         },
         floatingActionButton = {
@@ -109,6 +121,9 @@ fun EntryPointScreen() {
                 }
                 composable("처방전") {
                     PrescriptionScreen()
+                }
+                composable("상담글작성") {
+                    ConsultWriteScreen()
                 }
             }
         }

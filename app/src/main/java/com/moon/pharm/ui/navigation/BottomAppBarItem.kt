@@ -1,4 +1,4 @@
-package com.moon.pharm.component_ui.view
+package com.moon.pharm.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -29,12 +29,12 @@ data class BottomAppBarItem (
             BottomAppBarItem(
                 tabName = "상담",
                 icon = Icons.Filled.MarkChatUnread,
-                destination = ContentNavigationRoute.Consult
+                destination = ContentNavigationRoute.ConsultTab
             ),
             BottomAppBarItem(
                 tabName = "내정보",
                 icon = Icons.Filled.Person,
-                destination = ContentNavigationRoute.Profile
+                destination = ContentNavigationRoute.ProfileTab
             )
         )
     }

@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.theme.OnSurface
 import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,7 +80,6 @@ fun PharmTopBar(
                     )
                 }
             } else if (action.text != null) {
-                // 텍스트 버튼 형태의 액션 (예: +약물 추가, +글쓰기)
                 TextButton(onClick = action.onClick) {
                     Text(
                         text = action.text,

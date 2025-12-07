@@ -10,15 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.moon.pharm.component_ui.model.BottomBarUiModel
 import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 
 @Composable
 fun PharmBottomBar(
-    items: List<BottomAppBarItem>,
-    currentRoute: String?,
-    onItemClick: (BottomAppBarItem) -> Unit
+    items: List<BottomBarUiModel>,
+    currentRoute: String?
 ) {
     NavigationBar (
         containerColor = backgroundLight,
@@ -28,7 +27,7 @@ fun PharmBottomBar(
             val isSelected = item.tabName == currentRoute
             NavigationBarItem(
                 selected = isSelected,
-                onClick = { onItemClick(item) },
+                onClick = item.onClick,
                 icon = {
                     Icon(
                         imageVector = item.icon,
@@ -43,7 +42,7 @@ fun PharmBottomBar(
                     selectedTextColor = Primary,
                     unselectedIconColor = Color.Gray,
                     unselectedTextColor = Color.Gray,
-                    indicatorColor = Color.Transparent // 선택 시 배경색 제거
+                    indicatorColor = Color.Transparent
                 )
             )
         }
