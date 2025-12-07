@@ -11,6 +11,7 @@ val Black = Color(0xFF000000) // 기본 검은색 추가
 val Background = Color(0xFFF2F4F7)
 val SecondFont = Color(0xFF767676)
 val OnSurface = Color(0xFF1F3B58)
+val Placeholder = Color(0xFFBDBDBD)
 
 // Material3 Color Scheme에 맞춘 매핑 (Light Theme 기준)
 /* Primary: 화면에서 가장 많이 쓰이는 주요 색상 (버튼, 활성 탭, 주요 아이콘 등) */
