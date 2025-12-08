@@ -1,6 +1,5 @@
 package com.moon.pharm.consult.screen
 
-import android.R.attr.contentDescription
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +21,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
@@ -50,6 +47,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.moon.pharm.component_ui.theme.Placeholder
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
@@ -59,6 +57,7 @@ import com.moon.pharm.component_ui.theme.tertiaryLight
 @Preview(showBackground = true)
 @Composable
 fun ConsultWriteScreen(
+    navController : NavController? = null,
     onCameraClick: () -> Unit = {},
     onGalleryClick: () -> Unit = {}
 ) {

@@ -25,10 +25,10 @@ fun defaultHomeTopBarData() = TopBarData(
 fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
         val routeName = destination.route ?: return TopBarData()
         return when {
-            routeName.contains("홈") -> {
+            routeName.contains("HomeTab") -> {
                 defaultHomeTopBarData()
             }
-            routeName.contains("복약관리") -> {
+            routeName.contains("MedicationTab") -> {
                 TopBarData(
                     title = "복약 관리",
                     navigationType = TopBarNavigationType.Back,
@@ -38,16 +38,7 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
                     )
                 )
             }
-            routeName.contains("상담글작성") -> {
-                TopBarData(
-                    title = "상담글 작성",
-                    navigationType = TopBarNavigationType.Close,
-                    actions = listOf(
-                        TopBarAction(text = "다음", onClick = {})
-                    )
-                )
-            }
-            routeName.contains("상담") -> {
+            routeName.contains("ConsultTab") -> {
                 TopBarData(
                     title = "상담 게시판",
                     navigationType = TopBarNavigationType.Back,
@@ -61,14 +52,27 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
                     )
                 )
             }
-            routeName.contains("내정보") -> {
+            routeName.contains("ProfileTab") -> {
                 TopBarData(
                     title = "내정보"
                 )
             }
-            routeName.contains("처방전") -> {
+            routeName.contains("PrescriptionCapture") -> {
                 TopBarData(
                     title = "처방전"
+                )
+            }
+
+            routeName.contains("상담글작성") -> {
+                TopBarData(
+                    title = "상담글 작성",
+                    navigationType = TopBarNavigationType.Close,
+                    actions = listOf(
+                        TopBarAction(
+                            text = "다음",
+                            onClick = {}
+                        )
+                    )
                 )
             }
             else -> throw IllegalArgumentException("내가 선언하지 않은 Route Screen")

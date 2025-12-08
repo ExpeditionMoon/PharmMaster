@@ -17,23 +17,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.model.BottomBarUiModel
+import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.view.PharmBottomBar
 import com.moon.pharm.component_ui.view.PharmTopBar
 import com.moon.pharm.ui.navigation.BottomAppBarItem
 import com.moon.pharm.component_ui.view.TopBarData
 import com.moon.pharm.component_ui.view.TopBarNavigationType
-import com.moon.pharm.consult.screen.ConsultScreen
-import com.moon.pharm.consult.screen.ConsultWriteScreen
-import com.moon.pharm.home.screen.HomeMainScreen
-import com.moon.pharm.prescription.screen.PrescriptionScreen
-import com.moon.pharm.profile.screen.ProfileScreen
-import com.moon.pharm.profile.screen.MedicationScreen
+import com.moon.pharm.consult.navigation.consultNavGraph
+import com.moon.pharm.home.navigation.homeNavGraph
+import com.moon.pharm.prescription.navigation.prescriptionNavGraph
+import com.moon.pharm.profile.navigation.profileNavGraph
 import com.moon.pharm.ui.navigation.getTopBarData
 
 @Preview(showBackground = true)
@@ -72,12 +70,12 @@ fun EntryPointScreen() {
                     tabName = navItem.tabName,
                     icon = navItem.icon,
                     onClick = {
-                        navController.navigate(navItem.tabName) {
-                            popUpTo(navController.graph.findStartDestination().id){
+                        navController.navigate(navItem.destination) {
+                            popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }
                             launchSingleTop = true
-                            restoreState = true
+                            restoreState = navItem.destination !is ContentNavigationRoute.HomeTab
                         }
                     }
                 )
@@ -88,9 +86,9 @@ fun EntryPointScreen() {
             )
         },
         floatingActionButton = {
-            if (currentRoute == "홈") {
+            if (currentRoute?.contains("HomeTab") == true) {
                 FloatingActionButton(
-                    onClick = { navController.navigate("처방전") },
+                    onClick = { navController.navigate(ContentNavigationRoute.PrescriptionCapture ) },
                     shape = RoundedCornerShape(100.dp),
                     containerColor = Primary
                 ) {
@@ -104,25 +102,15 @@ fun EntryPointScreen() {
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            NavHost(navController = navController, startDestination = "홈") {
-                composable("홈") {
-                    HomeMainScreen()
-                }
-                composable("복약관리") {
-                    MedicationScreen()
-                }
-                composable("상담") {
-                    ConsultScreen()
-                }
-                composable("내정보") {
-                    ProfileScreen()
-                }
-                composable("처방전") {
-                    PrescriptionScreen()
-                }
-                composable("상담글작성") {
-                    ConsultWriteScreen()
-                }
+            NavHost(
+                navController = navController,
+                startDestination = ContentNavigationRoute.HomeTab,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                homeNavGraph(navController)
+                consultNavGraph(navController)
+                profileNavGraph(navController)
+                prescriptionNavGraph(navController)
             }
         }
     }
