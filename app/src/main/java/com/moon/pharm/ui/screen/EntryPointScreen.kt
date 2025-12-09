@@ -75,7 +75,7 @@ fun EntryPointScreen() {
                                 saveState = true
                             }
                             launchSingleTop = true
-                            restoreState = navItem.destination !is ContentNavigationRoute.HomeTab
+                            restoreState = true
                         }
                     }
                 )
@@ -88,7 +88,13 @@ fun EntryPointScreen() {
         floatingActionButton = {
             if (currentRoute?.contains("HomeTab") == true) {
                 FloatingActionButton(
-                    onClick = { navController.navigate(ContentNavigationRoute.PrescriptionCapture ) },
+                    onClick = {
+                        navController.navigate(ContentNavigationRoute.PrescriptionCapture ) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                        }
+                    },
                     shape = RoundedCornerShape(100.dp),
                     containerColor = Primary
                 ) {
