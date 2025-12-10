@@ -11,8 +11,12 @@ data class ConsultItem(
     val title: String,
     val timeAgo: String,
     val status: ConsultStatus,
-    val isNew: Boolean
-)
+    val isNew: Boolean,
+    val author: String = "",
+    val content: String = ""
+) {
+    companion object {}
+}
 
 enum class ConsultStatus(val label: String, val color: Color, val textColor: Color){
     WAITING("답변 대기", secondaryLight, onSecondaryLight),

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Storage
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.view.TopBarAction
 import com.moon.pharm.component_ui.view.TopBarData
 import com.moon.pharm.component_ui.view.TopBarNavigationType
@@ -38,6 +39,54 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
                     )
                 )
             }
+            routeName.contains("ConsultTabWriteScreen") -> {
+                TopBarData(
+                    title = "상담글 작성",
+                    navigationType = TopBarNavigationType.Close,
+                    actions = listOf(
+                        TopBarAction(
+                            text = "다음",
+                            onClick = {
+                                navController.navigate(ContentNavigationRoute.ConsultTabPharmacistScreen)
+                            }
+                        )
+                    )
+                )
+            }
+            routeName.contains("ConsultTabPharmacistScreen") -> {
+                TopBarData(
+                    title = "상담글 작성",
+                    navigationType = TopBarNavigationType.Close,
+                    actions = listOf(
+                        TopBarAction(
+                            text = "다음",
+                            onClick = {
+                                navController.navigate(ContentNavigationRoute.ConsultTabConfirmScreen)
+                            }
+                        )
+                    )
+                )
+            }
+            routeName.contains("ConsultTabConfirmScreen") -> {
+                TopBarData(
+                    title = "상담글 작성",
+                    navigationType = TopBarNavigationType.Close,
+                    actions = listOf(
+                        TopBarAction(
+                            text = "완료",
+                            onClick = {
+                                navController.navigate(ContentNavigationRoute.ConsultTab)
+                            }
+                        )
+                    )
+                )
+            }
+            routeName.contains("ConsultTabDetailScreen") -> {
+                TopBarData(
+                    title = "상담 게시판", // 혹은 "상담 상세"
+                    navigationType = TopBarNavigationType.Back
+                )
+            }
             routeName.contains("ConsultTab") -> {
                 TopBarData(
                     title = "상담 게시판",
@@ -46,7 +95,7 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
                         TopBarAction(
                             icon = Icons.Filled.Add,
                             onClick = {
-                                navController.navigate("상담글작성")
+                                navController.navigate(ContentNavigationRoute.ConsultTabWriteScreen)
                             }
                         )
                     )
@@ -63,18 +112,6 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
                 )
             }
 
-            routeName.contains("상담글작성") -> {
-                TopBarData(
-                    title = "상담글 작성",
-                    navigationType = TopBarNavigationType.Close,
-                    actions = listOf(
-                        TopBarAction(
-                            text = "다음",
-                            onClick = {}
-                        )
-                    )
-                )
-            }
             else -> throw IllegalArgumentException("내가 선언하지 않은 Route Screen")
         }
     }

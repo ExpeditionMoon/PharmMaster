@@ -61,11 +61,9 @@ fun ConsultWriteScreen(
     onCameraClick: () -> Unit = {},
     onGalleryClick: () -> Unit = {}
 ) {
-    // 상태 관리 (실제 앱에서는 ViewModel로 호이스팅 하는 것이 좋습니다)
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
 
-    // 더미 이미지 리스트 (선택된 이미지들)
     val selectedImages = remember { mutableStateListOf<String>() }
     val focusManager = LocalFocusManager.current
 
@@ -74,10 +72,8 @@ fun ConsultWriteScreen(
             .fillMaxSize()
             .background(backgroundLight)
             .padding(horizontal = 24.dp, vertical = 20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.SpaceAround
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 1. 제목 입력 영역
         TransparentHintTextField(
             value = title,
             onValueChange = { title = it },
@@ -96,7 +92,6 @@ fun ConsultWriteScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // 2. 내용 입력 영역 (남은 공간 차지)
         TransparentHintTextField(
             value = content,
             onValueChange = { content = it },
@@ -108,7 +103,7 @@ fun ConsultWriteScreen(
             ),
             singleLine = false,
             modifier = Modifier
-                .weight(1f) // 버튼 위까지 꽉 채우기
+                .weight(1f)
                 .fillMaxWidth()
         )
 
@@ -143,9 +138,9 @@ fun PhotoAttachmentSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
-            shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(1.dp, Color(0xFF2C3E50)), // 짙은 네이비
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF2C3E50))
+            shape = RoundedCornerShape(10.dp),
+            border = BorderStroke(2.dp, primaryLight),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight)
         ) {
             Icon(
                 Icons.Default.CameraAlt,
@@ -155,7 +150,6 @@ fun PhotoAttachmentSection(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // 이미지 리스트
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
@@ -180,7 +174,6 @@ fun PhotoAttachmentSection(
                 }
             }
 
-            // 선택된 이미지들
             items(images) { imageUrl ->
                 Box(
                     modifier = Modifier.size(60.dp)
@@ -189,10 +182,9 @@ fun PhotoAttachmentSection(
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color.LightGray) // 이미지 대신 회색 배경
+                            .background(Color.LightGray)
                     )
 
-                    // 삭제 버튼
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "삭제",
@@ -253,7 +245,7 @@ fun TransparentHintTextField(
             singleLine = singleLine,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
-            cursorBrush = SolidColor(primaryLight), // 커서 색상
+            cursorBrush = SolidColor(primaryLight),
             modifier = Modifier.fillMaxWidth()
         )
     }

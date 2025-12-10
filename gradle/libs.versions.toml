@@ -3,9 +3,9 @@ agp = "8.13.1"
 kotlin = "2.2.21"
 coreKtx = "1.17.0"
 
-lifecycleRuntimeKtx = "2.9.4"
-activityCompose = "1.11.0"
-composeBom = "2025.11.00"
+lifecycleRuntimeKtx = "2.10.0"
+activityCompose = "1.12.1"
+composeBom = "2025.12.00"
 
 materialIconsExtended = "1.7.8"
 navigationCompose = "2.9.6"

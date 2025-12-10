@@ -11,6 +11,14 @@ sealed interface ContentNavigationRoute : PharmNavigation {
     @Serializable
     data object ConsultTab : ContentNavigationRoute
     @Serializable
+    data object ConsultTabWriteScreen : ContentNavigationRoute
+    @Serializable
+    data object ConsultTabPharmacistScreen : ContentNavigationRoute
+    @Serializable
+    data object ConsultTabConfirmScreen : ContentNavigationRoute
+    @Serializable
+    data class ConsultTabDetailScreen(val id: String) : ContentNavigationRoute
+    @Serializable
     data object ProfileTab : ContentNavigationRoute
     @Serializable
     data object PrescriptionCapture : ContentNavigationRoute

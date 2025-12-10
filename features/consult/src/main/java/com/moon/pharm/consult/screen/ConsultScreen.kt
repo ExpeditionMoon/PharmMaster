@@ -2,7 +2,6 @@ package com.moon.pharm.consult.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,13 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,10 +29,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
+import com.moon.pharm.component_ui.view.PharmPrimaryTabRow
+import com.moon.pharm.component_ui.view.StatusBadge
 import com.moon.pharm.consult.model.ConsultItem
 import com.moon.pharm.consult.model.dummyConsultItems
 
@@ -64,56 +61,22 @@ fun ConsultScreen(
             .fillMaxSize()
             .background(backgroundLight)
     ) {
-        ConsultTab(
+        PharmPrimaryTabRow(
             selectedTabIndex = selectedTabIndex,
             tabs = tabs,
             onTabSelected = { index -> selectedTabIndex = index }
         )
         ConsultList(
+            navController = navController,
             currentList = currentList,
             modifier = Modifier.weight(1f)
         )
     }
 }
 
-/* 탭 레이아웃 */
-@Composable
-fun ConsultTab(
-    selectedTabIndex: Int,
-    tabs: List<String>,
-    onTabSelected: (Int) -> Unit
-) {
-    PrimaryTabRow (
-        selectedTabIndex = selectedTabIndex,
-        indicator = {
-            TabRowDefaults.SecondaryIndicator(
-                modifier = Modifier.tabIndicatorOffset(selectedTabIndex),
-                color = primaryLight
-            )
-        },
-        containerColor = backgroundLight,
-        contentColor = primaryLight,
-        divider = {}
-    ){
-        tabs.forEachIndexed { index, title ->
-            Tab(
-                selected = selectedTabIndex == index,
-                onClick = { onTabSelected(index) },
-                text = {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal,
-                    )
-                },
-                unselectedContentColor = SecondFont
-            )
-        }
-    }
-}
-
 @Composable
 fun ConsultList(
+    navController: NavController?,
     currentList: List<ConsultItem>,
     modifier: Modifier = Modifier
 ) {
@@ -125,15 +88,22 @@ fun ConsultList(
              .background(backgroundLight)
     ) {
         items(currentList) { item ->
-            ConsultItemCard(item = item)
+            ConsultItemCard(
+                item = item,
+                onClick = {
+                    navController?.navigate(
+                        ContentNavigationRoute.ConsultTabDetailScreen(id = item.id)
+                    )
+                }
+            )
         }
     }
 }
 
 @Composable
-fun ConsultItemCard(item: ConsultItem) {
+fun ConsultItemCard(item: ConsultItem, onClick: () -> Unit) {
     ElevatedCard(
-        onClick = { /* TODO: 상세 화면 이동 */ },
+        onClick = onClick,
         colors = CardDefaults.elevatedCardColors(containerColor = White),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
         modifier = Modifier.fillMaxWidth()
@@ -157,7 +127,7 @@ fun ConsultItemCard(item: ConsultItem) {
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "ooo • ${item.timeAgo}",
+                    text = "${item.author} • ${item.timeAgo}",
                     fontSize = 12.sp,
                     color = SecondFont
                 )
@@ -165,18 +135,11 @@ fun ConsultItemCard(item: ConsultItem) {
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            Box(
-                modifier = Modifier
-                    .background(item.status.color, RoundedCornerShape(4.dp))
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                Text(
-                    text = item.status.label,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = item.status.textColor
-                )
-            }
+            StatusBadge(
+                text = item.status.label,
+                statusColor = item.status.color,
+                contentColor = item.status.textColor
+            )
         }
     }
 }
