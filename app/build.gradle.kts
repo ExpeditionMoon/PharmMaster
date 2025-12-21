@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -42,6 +43,8 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":domain"))
+    implementation(project(":data"))
     implementation(project(":features:home"))
     implementation(project(":features:component-ui"))
     implementation(project(":features:consult"))
@@ -53,6 +56,9 @@ dependencies {
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose.libs)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.bundles.firebase.libs)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
