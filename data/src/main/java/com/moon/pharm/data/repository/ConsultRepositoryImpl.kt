@@ -21,7 +21,7 @@ class ConsultRepositoryImpl : ConsultRepository {
     override fun getConsultDetail(id: String): Flow<ConsultItem> =
         _consultItems.map { items -> items.first { it.id == id } }
 
-    override suspend fun consultPost(expertId: String, title: String, content: String, images: List<String>): Result<Unit> {
+    override suspend fun createConsult(expertId: String, title: String, content: String, images: List<String>): Result<Unit> {
         return try {
             val newItem = ConsultItem(
                 id = UUID.randomUUID().toString(),

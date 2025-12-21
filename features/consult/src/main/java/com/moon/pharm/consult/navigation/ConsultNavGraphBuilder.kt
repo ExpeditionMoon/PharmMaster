@@ -21,7 +21,11 @@ fun NavGraphBuilder.consultNavGraph(navController: NavController) {
         ConsultWriteScreen(navController = navController, viewModel = viewModel())
     }
     composable<ContentNavigationRoute.ConsultTabPharmacistScreen> {
-        ConsultPharmacistScreen(navController)
+        ConsultPharmacistScreen(
+            navController = navController,
+            viewModel = viewModel(),
+            onPharmacistSelected = { pharmacist -> navController.popBackStack()}
+        )
     }
     composable<ContentNavigationRoute.ConsultTabConfirmScreen> {
         ConsultConfirmScreen()

@@ -68,7 +68,7 @@ fun ConsultWriteScreen(
         onBackClick = { navController.popBackStack() },
         onPostClick = { title, content, images ->
             viewModel.viewModelScope.launch {
-                val result = viewModel.consultPost("", title, content, images)
+                val result = viewModel.createConsult("", title, content, images)
                 if (result.isSuccess) {
                     navController.popBackStack()
                 }
