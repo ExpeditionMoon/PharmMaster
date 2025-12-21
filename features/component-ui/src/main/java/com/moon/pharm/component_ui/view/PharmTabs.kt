@@ -7,6 +7,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.backgroundLight
@@ -15,7 +16,7 @@ import com.moon.pharm.component_ui.theme.primaryLight
 @Composable
 fun PharmPrimaryTabRow(
     selectedTabIndex: Int,
-    tabs: List<String>,
+    tabs: List<Int>,
     onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -38,7 +39,7 @@ fun PharmPrimaryTabRow(
                 onClick = { onTabSelected(index) },
                 text = {
                     Text(
-                        text = title,
+                        text = stringResource(id = title),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal,
                     )

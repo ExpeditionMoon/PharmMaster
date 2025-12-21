@@ -1,5 +1,6 @@
 package com.moon.pharm.consult.navigation
 
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -14,10 +15,10 @@ import com.moon.pharm.consult.screen.ConsultWriteScreen
 fun NavGraphBuilder.consultNavGraph(navController: NavController) {
 
     composable<ContentNavigationRoute.ConsultTab>{
-        ConsultScreen(navController)
+        ConsultScreen(navController = navController, viewModel = viewModel())
     }
     composable<ContentNavigationRoute.ConsultTabWriteScreen>{
-        ConsultWriteScreen(navController)
+        ConsultWriteScreen(navController = navController, viewModel = viewModel())
     }
     composable<ContentNavigationRoute.ConsultTabPharmacistScreen> {
         ConsultPharmacistScreen(navController)
@@ -27,6 +28,6 @@ fun NavGraphBuilder.consultNavGraph(navController: NavController) {
     }
     composable<ContentNavigationRoute.ConsultTabDetailScreen> { backStackEntry ->
         val detail : ContentNavigationRoute.ConsultTabDetailScreen = backStackEntry.toRoute()
-        ConsultDetailScreen(detail.id)
+        ConsultDetailScreen(detail.id, viewModel())
     }
 }

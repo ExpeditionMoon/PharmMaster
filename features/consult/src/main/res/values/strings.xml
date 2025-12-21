@@ -1,0 +1,16 @@
+<resources>
+    <string name="consult_filter_latest">최신순</string>
+    <string name="consult_tab_my_consult">나의 상담</string>
+
+    <string name="consult_write_placeholder_title">제목을 입력해주세요</string>
+    <string name="consult_write_placeholder_content">구체적인 증상, 복용 중인 다른 약물 정보 등을 자세히 작성해주세요.</string>
+
+    <string name="consult_search_select_pharmacist">약사 선택</string>
+    <string name="consult_search_placeholder">지역, 약국명, 약사 전문 분야 검색</string>
+    <string name="consult_search_nearby">내 주변</string>
+    <string name="consult_search_favorite">단골 약사</string>
+
+    <string name="consult_detail_answer_section">약사 답변</string>
+    <string name="consult_status_waiting_title">약사님의 답변을 기다리고 있어요.</string>
+    <string name="consult_status_waiting_subtitle">답변이 등록되면 알림을 통해 알려드리겠습니다.</string>
+</resources>

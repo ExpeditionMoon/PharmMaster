@@ -17,10 +17,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -36,39 +34,58 @@ import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.component_ui.view.PharmPrimaryTabRow
 import com.moon.pharm.component_ui.view.StatusBadge
-import com.moon.pharm.consult.model.ConsultItem
-import com.moon.pharm.consult.model.dummyConsultItems
+import com.moon.pharm.consult.mapper.toBackgroundColor
+import com.moon.pharm.consult.mapper.toTextColor
+import com.moon.pharm.consult.model.ConsultPrimaryTab
+import com.moon.pharm.consult.viewmodel.ConsultViewModel
+import com.moon.pharm.domain.model.ConsultAnswer
+import com.moon.pharm.domain.model.ConsultItem
+import com.moon.pharm.domain.model.ConsultStatus
 
-
-@Preview(showBackground = true)
 @Composable
 fun ConsultScreen(
-    navController: NavController? = null
+    navController: NavController? = null,
+    viewModel: ConsultViewModel
 ) {
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("최신순", "나의 상담")
+    val uiState by viewModel.uiState.collectAsState()
 
-    // 탭 선택에 따라 리스트 필터링
-    val currentList = if (selectedTabIndex == 0) {
-        dummyConsultItems
-    } else {
-        // TODO: '나의 상담' 필터링 로직 구현 (현재는 임시로 빈 리스트 반환)
-        // dummyConsultItems.filter { it.isMyConsult }
-        emptyList()
+    ConsultContent(
+        selectedTab = uiState.selectedTab,
+        currentList = if (uiState.selectedTab == ConsultPrimaryTab.LATEST) uiState.items else emptyList(),
+        onTabSelected = { viewModel.onTabSelected(it) },
+        onItemClick = { id ->
+            navController?.navigate(ContentNavigationRoute.ConsultTabDetailScreen(id = id))
+        }
+    )
+
+    if (uiState.isLoading) {
+        // TODO: 로딩 화면
     }
+}
+
+@Composable
+fun ConsultContent(
+    selectedTab: ConsultPrimaryTab,
+    currentList: List<ConsultItem>,
+    onTabSelected: (ConsultPrimaryTab) -> Unit,
+    onItemClick: (String) -> Unit
+) {
+    val tabTitles = ConsultPrimaryTab.entries.map { it.title }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundLight)
     ) {
         PharmPrimaryTabRow(
-            selectedTabIndex = selectedTabIndex,
-            tabs = tabs,
-            onTabSelected = { index -> selectedTabIndex = index }
+            selectedTabIndex = selectedTab.index,
+            tabs = tabTitles,
+            onTabSelected = { index -> onTabSelected(ConsultPrimaryTab.fromIndex(index)) }
         )
+
         ConsultList(
-            navController = navController,
             currentList = currentList,
+            onItemClick = onItemClick,
             modifier = Modifier.weight(1f)
         )
     }
@@ -76,8 +93,8 @@ fun ConsultScreen(
 
 @Composable
 fun ConsultList(
-    navController: NavController?,
     currentList: List<ConsultItem>,
+    onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -87,14 +104,13 @@ fun ConsultList(
              .fillMaxSize()
              .background(backgroundLight)
     ) {
-        items(currentList) { item ->
+        items(
+            items = currentList,
+            key = { it.id }
+        ) { item ->
             ConsultItemCard(
                 item = item,
-                onClick = {
-                    navController?.navigate(
-                        ContentNavigationRoute.ConsultTabDetailScreen(id = item.id)
-                    )
-                }
+                onClick = { onItemClick(item.id) }
             )
         }
     }
@@ -127,7 +143,7 @@ fun ConsultItemCard(item: ConsultItem, onClick: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "${item.author} • ${item.timeAgo}",
+                    text = "${item.userId} • ${item.createdAt}",
                     fontSize = 12.sp,
                     color = SecondFont
                 )
@@ -137,9 +153,48 @@ fun ConsultItemCard(item: ConsultItem, onClick: () -> Unit) {
 
             StatusBadge(
                 text = item.status.label,
-                statusColor = item.status.color,
-                contentColor = item.status.textColor
+                statusColor = item.status.toBackgroundColor(),
+                contentColor = item.status.toTextColor()
             )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ConsultContentPreview() {
+    ConsultContent(
+        selectedTab = ConsultPrimaryTab.LATEST,
+        currentList = listOf(
+            ConsultItem(
+                id = "1",
+                userId = "user01",
+                expertId = null,
+                title = "최근 복용 중인 영양제 관련 문의드립니다.",
+                content = "오메가3랑 비타민D를 같이 먹어도 되나요?",
+                status = ConsultStatus.WAITING,
+                images = emptyList(),
+                createdAt = "2025-06-17",
+                answer = null
+            ),
+            ConsultItem(
+                id = "2",
+                userId = "user02",
+                expertId = "expert_kim",
+                title = "위장약 복용법 질문입니다.",
+                content = "식전에 먹어야 하나요, 식후에 먹어야 하나요?",
+                status = ConsultStatus.COMPLETED,
+                images = emptyList(),
+                createdAt = "2025-06-16",
+                answer = ConsultAnswer(
+                    answerId = "ans_01",
+                    expertId = "expert_kim",
+                    content = "식후 30분에 복용하시는 것을 권장합니다.",
+                    createdAt = "2025-06-16"
+                )
+            )
+        ),
+        onTabSelected = {},
+        onItemClick = { id -> println("클릭된 아이템 ID: $id") }
+    )
 }

@@ -41,25 +41,47 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.theme.Placeholder
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.consult.R
+import com.moon.pharm.consult.viewmodel.ConsultViewModel
+import kotlinx.coroutines.launch
 
-@Preview(showBackground = true)
 @Composable
 fun ConsultWriteScreen(
-    navController : NavController? = null,
+    navController : NavController,
+    viewModel: ConsultViewModel
+) {
+    ConsultWriteContent(
+        onBackClick = { navController.popBackStack() },
+        onPostClick = { title, content, images ->
+            viewModel.viewModelScope.launch {
+                val result = viewModel.consultPost("", title, content, images)
+                if (result.isSuccess) {
+                    navController.popBackStack()
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun ConsultWriteContent(
+    onBackClick: () -> Unit = {},
+    onPostClick: (String, String, List<String>) -> Unit = { _, _, _ -> },
     onCameraClick: () -> Unit = {},
-    onGalleryClick: () -> Unit = {}
 ) {
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
@@ -77,7 +99,7 @@ fun ConsultWriteScreen(
         TransparentHintTextField(
             value = title,
             onValueChange = { title = it },
-            placeholder = "제목을 입력해주세요",
+            placeholder = stringResource(R.string.consult_write_placeholder_title),
             textStyle = TextStyle(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Normal,
@@ -85,9 +107,7 @@ fun ConsultWriteScreen(
             ),
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
-            modifier = Modifier
-                .fillMaxWidth()
+            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -95,7 +115,7 @@ fun ConsultWriteScreen(
         TransparentHintTextField(
             value = content,
             onValueChange = { content = it },
-            placeholder = "구체적인 증상, 복용 중인 다른 약물 정보 등을 자세히 작성해주세요.",
+            placeholder = stringResource(R.string.consult_write_placeholder_content),
             textStyle = TextStyle(
                 fontSize = 16.sp,
                 color = primaryLight,
@@ -249,4 +269,13 @@ fun TransparentHintTextField(
             modifier = Modifier.fillMaxWidth()
         )
     }
+}
+
+@Preview(showBackground = true, name = "글쓰기 화면 미리보기")
+@Composable
+private fun ConsultWriteScreenPreview() {
+    ConsultWriteContent(
+        onBackClick = { },
+        onPostClick = { _, _, _ -> }
+    )
 }
