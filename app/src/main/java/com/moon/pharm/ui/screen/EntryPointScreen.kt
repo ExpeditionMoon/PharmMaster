@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -29,14 +28,16 @@ import com.moon.pharm.ui.navigation.BottomAppBarItem
 import com.moon.pharm.component_ui.view.TopBarData
 import com.moon.pharm.component_ui.view.TopBarNavigationType
 import com.moon.pharm.consult.navigation.consultNavGraph
+import com.moon.pharm.consult.viewmodel.ConsultViewModel
 import com.moon.pharm.home.navigation.homeNavGraph
 import com.moon.pharm.prescription.navigation.prescriptionNavGraph
 import com.moon.pharm.profile.navigation.profileNavGraph
 import com.moon.pharm.ui.navigation.getTopBarData
 
-@Preview(showBackground = true)
 @Composable
-fun EntryPointScreen() {
+fun EntryPointScreen(
+    viewModel: ConsultViewModel
+) {
     val navController = rememberNavController()
 
     val bottomAppBarItems = remember {
@@ -114,7 +115,7 @@ fun EntryPointScreen() {
                 modifier = Modifier.fillMaxSize()
             ) {
                 homeNavGraph(navController)
-                consultNavGraph(navController)
+                consultNavGraph(navController, viewModel = viewModel)
                 profileNavGraph(navController)
                 prescriptionNavGraph(navController)
             }

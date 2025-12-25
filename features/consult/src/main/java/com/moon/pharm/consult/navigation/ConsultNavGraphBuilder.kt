@@ -11,27 +11,24 @@ import com.moon.pharm.consult.screen.ConsultDetailScreen
 import com.moon.pharm.consult.screen.ConsultPharmacistScreen
 import com.moon.pharm.consult.screen.ConsultScreen
 import com.moon.pharm.consult.screen.ConsultWriteScreen
+import com.moon.pharm.consult.viewmodel.ConsultViewModel
 
-fun NavGraphBuilder.consultNavGraph(navController: NavController) {
+fun NavGraphBuilder.consultNavGraph(navController: NavController, viewModel: ConsultViewModel) {
 
     composable<ContentNavigationRoute.ConsultTab>{
-        ConsultScreen(navController = navController, viewModel = viewModel())
+        ConsultScreen(navController = navController, viewModel = viewModel)
     }
     composable<ContentNavigationRoute.ConsultTabWriteScreen>{
-        ConsultWriteScreen(navController = navController, viewModel = viewModel())
+        ConsultWriteScreen(navController = navController, viewModel = viewModel)
     }
     composable<ContentNavigationRoute.ConsultTabPharmacistScreen> {
-        ConsultPharmacistScreen(
-            navController = navController,
-            viewModel = viewModel(),
-            onPharmacistSelected = { pharmacist -> navController.popBackStack()}
-        )
+        ConsultPharmacistScreen(navController = navController, viewModel = viewModel)
     }
     composable<ContentNavigationRoute.ConsultTabConfirmScreen> {
-        ConsultConfirmScreen()
+        ConsultConfirmScreen(navController = navController, viewModel = viewModel)
     }
     composable<ContentNavigationRoute.ConsultTabDetailScreen> { backStackEntry ->
         val detail : ContentNavigationRoute.ConsultTabDetailScreen = backStackEntry.toRoute()
-        ConsultDetailScreen(detail.id, viewModel())
+        ConsultDetailScreen(detail.id, viewModel)
     }
 }

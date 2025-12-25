@@ -45,8 +45,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -71,7 +69,6 @@ import kotlinx.coroutines.launch
 fun ConsultPharmacistScreen(
     navController: NavController,
     viewModel: ConsultViewModel,
-    onPharmacistSelected: (Pharmacist) -> Unit = {}
 ) {
     val pharmacists by viewModel.pharmacists.collectAsState()
     var isMapView by remember { mutableStateOf(false) }
@@ -90,8 +87,7 @@ fun ConsultPharmacistScreen(
             viewModel.selectPharmacy(it) },
         onToggleMapView = { isMapView = it },
         onPharmacistSelect = { pharmacist ->
-            onPharmacistSelected(pharmacist)
-            navController.popBackStack()
+            viewModel.updateExpert(pharmacist.id)
         }
     )
 }

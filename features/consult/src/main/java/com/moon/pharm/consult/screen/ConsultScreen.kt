@@ -1,7 +1,9 @@
 package com.moon.pharm.consult.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
@@ -38,9 +41,7 @@ import com.moon.pharm.consult.mapper.toBackgroundColor
 import com.moon.pharm.consult.mapper.toTextColor
 import com.moon.pharm.consult.model.ConsultPrimaryTab
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
-import com.moon.pharm.domain.model.ConsultAnswer
 import com.moon.pharm.domain.model.ConsultItem
-import com.moon.pharm.domain.model.ConsultStatus
 
 @Composable
 fun ConsultScreen(
@@ -48,18 +49,27 @@ fun ConsultScreen(
     viewModel: ConsultViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    Column {
+//        Button(
+//            onClick = { viewModel.testFirestore() },
+//            modifier = Modifier.padding(16.dp)
+//        ) {
+//            Text("Firestore 연결 테스트")
+//        }
 
-    ConsultContent(
-        selectedTab = uiState.selectedTab,
-        currentList = if (uiState.selectedTab == ConsultPrimaryTab.LATEST) uiState.items else emptyList(),
-        onTabSelected = { viewModel.onTabSelected(it) },
-        onItemClick = { id ->
-            navController?.navigate(ContentNavigationRoute.ConsultTabDetailScreen(id = id))
+
+        ConsultContent(
+            selectedTab = uiState.selectedTab,
+            currentList = if (uiState.selectedTab == ConsultPrimaryTab.LATEST) uiState.consultList else emptyList(),
+            onTabSelected = { viewModel.onTabSelected(it) },
+            onItemClick = { id ->
+                navController?.navigate(ContentNavigationRoute.ConsultTabDetailScreen(id = id))
+            }
+        )
+
+        if (uiState.isLoading) {
+            // TODO: 로딩 화면
         }
-    )
-
-    if (uiState.isLoading) {
-        // TODO: 로딩 화면
     }
 }
 
@@ -97,21 +107,46 @@ fun ConsultList(
     onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = modifier
-             .fillMaxSize()
-             .background(backgroundLight)
-    ) {
-        items(
-            items = currentList,
-            key = { it.id }
-        ) { item ->
-            ConsultItemCard(
-                item = item,
-                onClick = { onItemClick(item.id) }
-            )
+    if (currentList.isEmpty()) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(backgroundLight),
+            contentAlignment = Alignment.Center // 중앙 정렬
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // 여기에 아이콘을 추가하면 더 보기 좋습니다.
+                Text(
+                    text = "등록된 상담 게시글이 없습니다.",
+                    fontSize = 16.sp,
+                    color = SecondFont,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "첫 번째 상담을 작성해보세요!",
+                    fontSize = 14.sp,
+                    color = SecondFont.copy(alpha = 0.7f)
+                )
+            }
+        }
+    } else {
+        LazyColumn(
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = modifier
+                .fillMaxSize()
+                .background(backgroundLight)
+        ) {
+            items(
+                items = currentList,
+                key = { it.id }
+            ) { item ->
+                ConsultItemCard(
+                    item = item,
+                    onClick = { onItemClick(item.id) }
+                )
+            }
         }
     }
 }
@@ -158,43 +193,4 @@ fun ConsultItemCard(item: ConsultItem, onClick: () -> Unit) {
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ConsultContentPreview() {
-    ConsultContent(
-        selectedTab = ConsultPrimaryTab.LATEST,
-        currentList = listOf(
-            ConsultItem(
-                id = "1",
-                userId = "user01",
-                expertId = null,
-                title = "최근 복용 중인 영양제 관련 문의드립니다.",
-                content = "오메가3랑 비타민D를 같이 먹어도 되나요?",
-                status = ConsultStatus.WAITING,
-                images = emptyList(),
-                createdAt = "2025-06-17",
-                answer = null
-            ),
-            ConsultItem(
-                id = "2",
-                userId = "user02",
-                expertId = "expert_kim",
-                title = "위장약 복용법 질문입니다.",
-                content = "식전에 먹어야 하나요, 식후에 먹어야 하나요?",
-                status = ConsultStatus.COMPLETED,
-                images = emptyList(),
-                createdAt = "2025-06-16",
-                answer = ConsultAnswer(
-                    answerId = "ans_01",
-                    expertId = "expert_kim",
-                    content = "식후 30분에 복용하시는 것을 권장합니다.",
-                    createdAt = "2025-06-16"
-                )
-            )
-        ),
-        onTabSelected = {},
-        onItemClick = { id -> println("클릭된 아이템 ID: $id") }
-    )
 }

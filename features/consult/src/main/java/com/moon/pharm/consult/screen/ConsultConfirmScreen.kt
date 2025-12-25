@@ -20,6 +20,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,16 +30,51 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.component_ui.theme.secondaryContainerLight
 import com.moon.pharm.component_ui.theme.secondaryLight
+import com.moon.pharm.consult.viewmodel.ConsultViewModel
 
-@Preview(showBackground = true)
 @Composable
-fun ConsultConfirmScreen() {
+fun ConsultConfirmScreen(
+    navController: NavController,
+    viewModel: ConsultViewModel
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val writeState = uiState.writeState
+
+    LaunchedEffect(uiState.isConsultCreated) {
+        if (uiState.isConsultCreated) {
+            viewModel.resetDonationState()
+        }
+    }
+
+    ConsultConfirmContent(
+        title = writeState.title,
+        content = writeState.content,
+        selectedPharmacistName = writeState.pharmacist?.name ?: "선택된 약사 없음",
+        onEditTitleOrContent = {
+            navController.popBackStack(ContentNavigationRoute.ConsultTabWriteScreen, false)
+        },
+        onEditPharmacist = {
+            navController.popBackStack(ContentNavigationRoute.ConsultTabPharmacistScreen, false)
+        }
+    )
+}
+
+@Composable
+fun ConsultConfirmContent(
+    title: String,
+    content: String,
+    selectedPharmacistName: String,
+    onEditTitleOrContent: () -> Unit,
+    onEditPharmacist: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -58,9 +96,21 @@ fun ConsultConfirmScreen() {
                 .padding(10.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            InfoCard(label = "제목", content = "아직 작성되지 않음")
-            InfoCard(label = "상담 내용", content = "아직 작성되지 않음")
-            InfoCard(label = "선택된 약사", content = "아직 선택되지 않음")
+            InfoCard(
+                label = "제목",
+                content = title.ifBlank { "아직 작성되지 않음" },
+                onEditClick = onEditTitleOrContent
+            )
+            InfoCard(
+                label = "상담 내용",
+                content = content.ifBlank { "아직 작성되지 않음" },
+                onEditClick = onEditTitleOrContent
+            )
+            InfoCard(
+                label = "선택된 약사",
+                content = selectedPharmacistName,
+                onEditClick = onEditPharmacist
+            )
         }
 
         Spacer(modifier = Modifier.height(20.dp))

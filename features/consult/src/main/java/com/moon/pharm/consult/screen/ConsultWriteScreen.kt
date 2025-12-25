@@ -29,11 +29,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,10 +42,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.theme.Placeholder
 import com.moon.pharm.component_ui.theme.White
@@ -57,36 +52,36 @@ import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.component_ui.theme.tertiaryLight
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun ConsultWriteScreen(
     navController : NavController,
     viewModel: ConsultViewModel
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val writeState = uiState.writeState
+
     ConsultWriteContent(
-        onBackClick = { navController.popBackStack() },
-        onPostClick = { title, content, images ->
-            viewModel.viewModelScope.launch {
-                val result = viewModel.createConsult("", title, content, images)
-                if (result.isSuccess) {
-                    navController.popBackStack()
-                }
-            }
-        }
+        title = writeState.title,
+        content = writeState.content,
+        images = writeState.images,
+
+        onTitleChange = { viewModel.onTitleChanged(it) },
+        onContentChange = { viewModel.onContentChanged(it) },
+        onImageChange = { viewModel.updateImages(it) },
     )
 }
 
 @Composable
 fun ConsultWriteContent(
-    onBackClick: () -> Unit = {},
-    onPostClick: (String, String, List<String>) -> Unit = { _, _, _ -> },
+    title: String,
+    content: String,
+    images: List<String>,
+    onTitleChange: (String) -> Unit,
+    onContentChange: (String) -> Unit,
+    onImageChange: (List<String>) -> Unit,
     onCameraClick: () -> Unit = {},
 ) {
-    var title by remember { mutableStateOf("") }
-    var content by remember { mutableStateOf("") }
-
-    val selectedImages = remember { mutableStateListOf<String>() }
     val focusManager = LocalFocusManager.current
 
     Column(
@@ -98,7 +93,7 @@ fun ConsultWriteContent(
     ) {
         TransparentHintTextField(
             value = title,
-            onValueChange = { title = it },
+            onValueChange = onTitleChange,
             placeholder = stringResource(R.string.consult_write_placeholder_title),
             textStyle = TextStyle(
                 fontSize = 18.sp,
@@ -114,7 +109,7 @@ fun ConsultWriteContent(
 
         TransparentHintTextField(
             value = content,
-            onValueChange = { content = it },
+            onValueChange = onContentChange,
             placeholder = stringResource(R.string.consult_write_placeholder_content),
             textStyle = TextStyle(
                 fontSize = 16.sp,
@@ -131,9 +126,11 @@ fun ConsultWriteContent(
 
         // 3. 사진 첨부 영역
         PhotoAttachmentSection(
-            images = selectedImages,
+            images = images,
             onCameraClick = onCameraClick,
-            onRemoveImage = { selectedImages.remove(it) }
+            onRemoveImage = { imageUrl ->
+                onImageChange(images.filter { it != imageUrl })
+            }
         )
     }
 }
@@ -269,13 +266,4 @@ fun TransparentHintTextField(
             modifier = Modifier.fillMaxWidth()
         )
     }
-}
-
-@Preview(showBackground = true, name = "글쓰기 화면 미리보기")
-@Composable
-private fun ConsultWriteScreenPreview() {
-    ConsultWriteContent(
-        onBackClick = { },
-        onPostClick = { _, _, _ -> }
-    )
 }

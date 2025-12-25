@@ -18,9 +18,10 @@ espressoCore = "3.7.0"
 appcompat = "1.7.1"
 material = "1.13.0"
 material3 = "1.4.0"
-firebaseBom = "34.7.0"
-firebaseFirestoreKtx = "26.0.2"
-googleGmsGoogleServices = "4.4.4"
+
+firebaseBom = "34.6.0"
+firebaseFirestoreKtx = "25.1.4"
+googleGmsServices = "4.4.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -59,7 +60,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin"}
-google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsServices" }
 
 [bundles]
 compose-libs = [
@@ -73,6 +74,7 @@ compose-libs = [
     "androidx-material-icons-extended",
     "androidx-lifecycle-runtime-ktx"
 ]
+
 firebase-libs = [
     "firebase-firestore-ktx"
 ]
