@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt.plugin)
+    alias(libs.plugins.kotlin.android.ksp)
 }
 
 android {
@@ -41,10 +43,21 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
+    // Hilt Core
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
+    //Firestore
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.libs)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions {
+        freeCompilerArgs.add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+    }
 }

@@ -9,19 +9,17 @@ import com.moon.pharm.domain.model.ConsultImage
 import com.moon.pharm.domain.model.ConsultItem
 import com.moon.pharm.domain.model.ConsultStatus
 import com.moon.pharm.domain.model.Pharmacist
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import kotlin.collections.map
 
-
 fun Timestamp?.toKstString(): String {
-    return this?.toDate()?.toInstant()?.let { instant ->
-        val seoulZone = ZoneId.of("Asia/Seoul")
-        val nowInSeoul = ZonedDateTime.ofInstant(instant, seoulZone)
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        nowInSeoul.format(formatter)
-    } ?: ""
+    if (this == null) return ""
+    val date = this.toDate()
+    val formatter = java.text.SimpleDateFormat(
+        "yyyy-MM-dd HH:mm:ss",
+        java.util.Locale.KOREA
+    )
+    formatter.timeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
+    return formatter.format(date)
 }
 
 fun ConsultItemDTO.toDomainConsult(): ConsultItem {
@@ -48,8 +46,8 @@ fun ConsultItem.toFirestoreConsultDTO(): Map<String, Any?> {
         "expertId" to this.expertId,
         "title" to this.title,
         "content" to this.content,
-        "status" to this.status,
-        "images" to images,
+        "status" to this.status.name,
+        "images" to images.map { it.imageName },
         "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp(),
         "answer" to this.answer?.let {
             mapOf(

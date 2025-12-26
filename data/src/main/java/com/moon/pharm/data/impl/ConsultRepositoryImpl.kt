@@ -17,28 +17,30 @@ class ConsultRepositoryImpl(
 ) : ConsultRepository {
     override fun createConsult(consultInfo: ConsultItem): Flow<DataResourceResult<Unit>> = flow {
         emit(DataResourceResult.Loading)
-            dataSource.create(consultInfo)
-            emit(DataResourceResult.Success(Unit))
-        }.catch { e ->
-            emit(DataResourceResult.Failure(e))
-        }.flowOn(Dispatchers.IO)
+        dataSource.create(consultInfo)
+        emit(DataResourceResult.Success(Unit))
+    }.catch { e ->
+        emit(DataResourceResult.Failure(e))
+    }.flowOn(Dispatchers.IO)
 
     override fun getConsultItems(): Flow<DataResourceResult<List<ConsultItem>>> = flow {
         emit(DataResourceResult.Success(emptyList()))
     }
 
     override fun getConsultDetail(id: String): Flow<ConsultItem> = flow {
-        emit(ConsultItem(
-            id = id,
-            title = "불러오는 중...",
-            userId = "",
-            content = "",
-            expertId = "",
-            status = ConsultStatus.WAITING,
-            createdAt = System.currentTimeMillis().toString(),
-            images = emptyList(),
-            answer = null
-        ))
+        emit(
+            ConsultItem(
+                id = id,
+                title = "불러오는 중...",
+                userId = "",
+                content = "",
+                expertId = "",
+                status = ConsultStatus.WAITING,
+                createdAt = System.currentTimeMillis().toString(),
+                images = emptyList(),
+                answer = null
+            )
+        )
     }
 
     override fun getPharmacistsByPharmacy(pharmacyId: String): List<Pharmacist> {

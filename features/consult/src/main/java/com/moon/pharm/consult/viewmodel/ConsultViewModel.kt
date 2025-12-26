@@ -6,20 +6,22 @@ import androidx.lifecycle.viewModelScope
 import com.moon.pharm.consult.screen.ConsultUiState
 import com.moon.pharm.consult.model.ConsultPrimaryTab
 import com.moon.pharm.consult.screen.ConsultWriteState
-import com.moon.pharm.domain.model.ConsultAnswer
 import com.moon.pharm.domain.model.ConsultImage
 import com.moon.pharm.domain.model.ConsultItem
 import com.moon.pharm.domain.model.ConsultStatus
 import com.moon.pharm.domain.model.Pharmacist
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ConsultViewModel(
+@HiltViewModel
+class ConsultViewModel @Inject constructor(
     private val consultUseCases: ConsultUseCases
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ConsultUiState())
@@ -32,29 +34,24 @@ class ConsultViewModel(
     }
 
     /* 연결 확인 */
-/*    fun testFirestore() {
+    fun testFirestore() {
         viewModelScope.launch {
             consultUseCases.createConsultUseCase(
                 ConsultItem(
                     id = "",
-                    userId = "user_12", expertId = "expert_1",
-                    title = "감기약 복용 후 졸음 증상",
-                    content = "졸리지 않은 감기약은 효과가 떨어지나요?",
-                    status = ConsultStatus.COMPLETED,
+                    userId = "user_9", expertId = null,
+                    title = "오메가3 고르는 법",
+                    content = "rTG 오메가3가 일반 제품보다 흡수율이 훨씬 높은가요?",
+                    status = ConsultStatus.WAITING,
                     createdAt = System.currentTimeMillis().toString(),
                     images = emptyList(),
-                    answer = ConsultAnswer(
-                        "",
-                        "expert_1",
-                        "효과가 떨어지는 것이 아니라 부작용만 뺀 것입니다.",
-                        System.currentTimeMillis().toString()
-                    )
-                )
+                    answer = null
+                ),
             ).collect { result ->
-                Log.d("PHARM_CHECK", "결과: $result")
+                Log.d("FIRESTORE_TEST", "결과: $result")
             }
         }
-    }*/
+    }
 
     fun onTitleChanged(newTitle: String) {
         _uiState.update {

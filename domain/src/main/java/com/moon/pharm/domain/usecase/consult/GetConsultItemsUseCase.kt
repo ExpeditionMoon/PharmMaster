@@ -4,8 +4,11 @@ import com.moon.pharm.domain.model.ConsultItem
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class GetConsultItemsUseCase(private val repository: ConsultRepository) {
+class GetConsultItemsUseCase @Inject constructor(
+    private val repository: ConsultRepository
+) {
     operator fun invoke(): Flow<DataResourceResult<List<ConsultItem>>> {
         return repository.getConsultItems()
     }

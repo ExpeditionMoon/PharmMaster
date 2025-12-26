@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -35,10 +36,9 @@ import com.moon.pharm.profile.navigation.profileNavGraph
 import com.moon.pharm.ui.navigation.getTopBarData
 
 @Composable
-fun EntryPointScreen(
-    viewModel: ConsultViewModel
-) {
+fun EntryPointScreen() {
     val navController = rememberNavController()
+    val viewModel: ConsultViewModel = hiltViewModel()
 
     val bottomAppBarItems = remember {
         BottomAppBarItem.fetchBottomAppBarItems()

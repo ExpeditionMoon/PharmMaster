@@ -1,4 +1,4 @@
-package com.moon.pharm.data.repository
+package com.moon.pharm.data.remote.firebase
 
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.domain.model.ConsultItem
@@ -11,8 +11,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import javax.inject.Inject
 
-class FirestoreConsultRepositoryImpl(
+class FirestoreConsultRepositoryImpl @Inject constructor(
     private val dataSource: ConsultDataSource
 ) : ConsultRepository {
     private fun wrapCUDOperation(
@@ -34,15 +35,17 @@ class FirestoreConsultRepositoryImpl(
     }
 
     override fun getConsultDetail(id: String): Flow<ConsultItem> = flow {
-        emit(ConsultItem(
-            id = id,
-            userId = "사용자",
-            expertId = null,
-            title = "로딩 중...",
-            content = "내용을 불러오고 있습니다.",
-            status = ConsultStatus.WAITING,
-            createdAt = "2023-01-01"
-        ))
+        emit(
+            ConsultItem(
+                id = id,
+                userId = "사용자",
+                expertId = null,
+                title = "로딩 중...",
+                content = "내용을 불러오고 있습니다.",
+                status = ConsultStatus.WAITING,
+                createdAt = "2023-01-01"
+            )
+        )
     }
 
     override fun getPharmacistsByPharmacy(pharmacyId: String): List<Pharmacist> {

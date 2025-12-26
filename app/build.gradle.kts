@@ -2,7 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.hilt.plugin)
+    alias(libs.plugins.kotlin.android.ksp)
 }
 
 android {
@@ -59,6 +62,12 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.libs)
+
+    // Hilt Core
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    // Hilt Navigation
+    implementation(libs.hilt.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
