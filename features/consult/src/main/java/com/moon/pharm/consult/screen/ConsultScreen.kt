@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -35,6 +34,7 @@ import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
+import com.moon.pharm.component_ui.view.CircularProgressIndicatorSample
 import com.moon.pharm.component_ui.view.PharmPrimaryTabRow
 import com.moon.pharm.component_ui.view.StatusBadge
 import com.moon.pharm.consult.mapper.toBackgroundColor
@@ -45,18 +45,16 @@ import com.moon.pharm.domain.model.ConsultItem
 
 @Composable
 fun ConsultScreen(
-    navController: NavController? = null,
-    viewModel: ConsultViewModel
+    navController: NavController? = null, viewModel: ConsultViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
     Column {
-//        Button(
-//            onClick = { viewModel.testFirestore() },
-//            modifier = Modifier.padding(16.dp)
-//        ) {
-//            Text("Firestore 연결 테스트")
-//        }
-
+/*        Button(
+            onClick = { viewModel.testFirestore() },
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text("Firestore 연결 테스트")
+        }*/
 
         ConsultContent(
             selectedTab = uiState.selectedTab,
@@ -64,11 +62,10 @@ fun ConsultScreen(
             onTabSelected = { viewModel.onTabSelected(it) },
             onItemClick = { id ->
                 navController?.navigate(ContentNavigationRoute.ConsultTabDetailScreen(id = id))
-            }
-        )
+            })
 
         if (uiState.isLoading) {
-            // TODO: 로딩 화면
+            CircularProgressIndicatorSample()
         }
     }
 }
@@ -90,32 +87,26 @@ fun ConsultContent(
         PharmPrimaryTabRow(
             selectedTabIndex = selectedTab.index,
             tabs = tabTitles,
-            onTabSelected = { index -> onTabSelected(ConsultPrimaryTab.fromIndex(index)) }
-        )
+            onTabSelected = { index -> onTabSelected(ConsultPrimaryTab.fromIndex(index)) })
 
         ConsultList(
-            currentList = currentList,
-            onItemClick = onItemClick,
-            modifier = Modifier.weight(1f)
+            currentList = currentList, onItemClick = onItemClick, modifier = Modifier.weight(1f)
         )
     }
 }
 
 @Composable
 fun ConsultList(
-    currentList: List<ConsultItem>,
-    onItemClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    currentList: List<ConsultItem>, onItemClick: (String) -> Unit, modifier: Modifier = Modifier
 ) {
     if (currentList.isEmpty()) {
         Box(
             modifier = modifier
                 .fillMaxSize()
                 .background(backgroundLight),
-            contentAlignment = Alignment.Center // 중앙 정렬
+            contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // 여기에 아이콘을 추가하면 더 보기 좋습니다.
                 Text(
                     text = "등록된 상담 게시글이 없습니다.",
                     fontSize = 16.sp,
@@ -139,13 +130,9 @@ fun ConsultList(
                 .background(backgroundLight)
         ) {
             items(
-                items = currentList,
-                key = { it.id }
-            ) { item ->
+                items = currentList, key = { it.id }) { item ->
                 ConsultItemCard(
-                    item = item,
-                    onClick = { onItemClick(item.id) }
-                )
+                    item = item, onClick = { onItemClick(item.id) })
             }
         }
     }

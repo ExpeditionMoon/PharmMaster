@@ -1,6 +1,7 @@
 package com.moon.pharm.consult.viewmodel
 
 import android.util.Log
+import android.util.Log.e
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.consult.screen.ConsultUiState
@@ -16,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,28 +32,27 @@ class ConsultViewModel @Inject constructor(
     val pharmacists: StateFlow<List<Pharmacist>> = _pharmacists.asStateFlow()
 
     init {
-//        fetchConsultList()
+        fetchConsultList()
     }
 
-    /* 연결 확인 */
-    fun testFirestore() {
-        viewModelScope.launch {
-            consultUseCases.createConsultUseCase(
-                ConsultItem(
-                    id = "",
-                    userId = "user_9", expertId = null,
-                    title = "오메가3 고르는 법",
-                    content = "rTG 오메가3가 일반 제품보다 흡수율이 훨씬 높은가요?",
-                    status = ConsultStatus.WAITING,
-                    createdAt = System.currentTimeMillis().toString(),
-                    images = emptyList(),
-                    answer = null
-                ),
-            ).collect { result ->
-                Log.d("FIRESTORE_TEST", "결과: $result")
+    /* 연결 확인 *//*    fun testFirestore() {
+            viewModelScope.launch {
+                consultUseCases.createConsultUseCase(
+                    ConsultItem(
+                        id = "",
+                        userId = "user_9", expertId = null,
+                        title = "오메가3 고르는 법",
+                        content = "rTG 오메가3가 일반 제품보다 흡수율이 훨씬 높은가요?",
+                        status = ConsultStatus.WAITING,
+                        createdAt = System.currentTimeMillis().toString(),
+                        images = emptyList(),
+                        answer = null
+                    ),
+                ).collect { result ->
+                    Log.d("FIRESTORE_TEST", "결과: $result")
+                }
             }
-        }
-    }
+        }*/
 
     fun onTitleChanged(newTitle: String) {
         _uiState.update {
@@ -101,8 +102,7 @@ class ConsultViewModel @Inject constructor(
             content = writeData.content,
             status = ConsultStatus.WAITING,
             createdAt = "",
-            images = writeData.images.map { ConsultImage(it) }
-        )
+            images = writeData.images.map { ConsultImage(it) })
         createConsult(newItem)
     }
 
@@ -117,8 +117,7 @@ class ConsultViewModel @Inject constructor(
 
                         is DataResourceResult.Success -> {
                             currentState.copy(
-                                isLoading = false,
-                                isConsultCreated = true
+                                isLoading = false, isConsultCreated = true
                             )
                         }
 
@@ -147,8 +146,7 @@ class ConsultViewModel @Inject constructor(
 
                         is DataResourceResult.Success -> {
                             currentState.copy(
-                                isLoading = false,
-                                consultList = result.resultData
+                                isLoading = false, consultList = result.resultData
                             )
                         }
 
@@ -178,8 +176,7 @@ class ConsultViewModel @Inject constructor(
                 }
                 _uiState.update {
                     it.copy(
-                        selectedItem = item,
-                        pharmacist = pharmacistInfo
+                        selectedItem = item, pharmacist = pharmacistInfo
                     )
                 }
             }

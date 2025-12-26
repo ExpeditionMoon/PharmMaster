@@ -11,11 +11,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class FirestoreConsultRepositoryImpl @Inject constructor(
     private val dataSource: ConsultDataSource
 ) : ConsultRepository {
+
+    override fun getConsultItems() = dataSource.getConsultItems().map { consultList ->
+            DataResourceResult.Success(consultList) as DataResourceResult<List<ConsultItem>>
+        }.catch { e ->
+            emit(DataResourceResult.Failure(e))
+        }.onStart { emit(DataResourceResult.Loading) }.flowOn(Dispatchers.IO)
+
     private fun wrapCUDOperation(
         operation: suspend () -> Unit
     ): Flow<DataResourceResult<Unit>> = flow {
@@ -26,13 +35,10 @@ class FirestoreConsultRepositoryImpl @Inject constructor(
         emit(DataResourceResult.Failure(e))
     }.flowOn(Dispatchers.IO)
 
-    override fun createConsult(consultInfo: ConsultItem): Flow<DataResourceResult<Unit>> = wrapCUDOperation {
-        dataSource.create(consultInfo)
-    }
-
-    override fun getConsultItems(): Flow<DataResourceResult<List<ConsultItem>>> {
-        return dataSource.getConsultItems()
-    }
+    override fun createConsult(consultInfo: ConsultItem): Flow<DataResourceResult<Unit>> =
+        wrapCUDOperation {
+            dataSource.create(consultInfo)
+        }
 
     override fun getConsultDetail(id: String): Flow<ConsultItem> = flow {
         emit(
