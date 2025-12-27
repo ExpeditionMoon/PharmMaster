@@ -85,8 +85,13 @@ fun ConsultDetailContent(
                 Spacer(modifier = Modifier.height(24.dp))
             }
             item {
-                if (item.status == ConsultStatus.COMPLETED && item.answer != null && pharmacist != null) {
-                    AnswerSection(pharmacist = pharmacist, item = item)
+                if (item.status == ConsultStatus.COMPLETED && item.answer != null
+//                    && pharmacist != null
+                ) {
+                    AnswerSection(
+                        pharmacist = pharmacist,
+                        item = item
+                    )
                 } else if (item.status == ConsultStatus.WAITING) {
                     Spacer(modifier = Modifier.height(20.dp))
                     WaitingForAnswerBox()
@@ -149,7 +154,7 @@ fun QuestionSection(item: ConsultItem) {
 
 @Composable
 fun AnswerSection(
-    pharmacist: Pharmacist,
+    pharmacist: Pharmacist?,
     item: ConsultItem
 ) {
     val answer = item.answer ?: return
@@ -171,21 +176,29 @@ fun AnswerSection(
                 modifier = Modifier.padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(id = pharmacist.imageUrl.toIntOrNull() ?: 0),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                )
+                if (pharmacist != null) {
+                    Image(
+                        painter = painterResource(id = pharmacist.imageUrl.toIntOrNull() ?: 0),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                    )
 
-                Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
 
-                Column {
+                    Column {
+                        Text(
+                            text = pharmacist.name,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                    }
+                } else {
                     Text(
-                        text = pharmacist.name,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                        text = "약사 정보 없음",
+                        fontSize = 13.sp,
+                        color = SecondFont
                     )
                 }
             }
@@ -252,68 +265,14 @@ fun WaitingForAnswerBox() {
 }
 
 @Composable
-private fun ImagePlaceholder(imageUrl: String = "") {
+private fun ImagePlaceholder(imageUrl: String) {
     Box(
         modifier = Modifier
             .size(70.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(Color.LightGray.copy(alpha = 0.3f))
             .border(1.dp, Color.LightGray, RoundedCornerShape(10.dp))
-    ){
+    ) {
         Icon(imageVector = Icons.Default.Info, contentDescription = null, tint = SecondFont)
     }
-}
-
-@Preview(showBackground = true, name = "답변 완료 상태")
-@Composable
-private fun ConsultDetailScreenAnsweredPreview() {
-    val fakeItem = ConsultItem(
-        id = "1",
-        userId = "사용자A",
-        title = "혈압약 복용 질문입니다.",
-        content = "혈압약을 아침에 먹어야 하나요, 저녁에 먹어야 하나요? 가끔 까먹고 안 먹을 때가 있는데 어떻게 하죠?",
-        status = ConsultStatus.COMPLETED,
-        createdAt = "2025-06-21",
-        images = emptyList(),
-        expertId = "p1",
-        answer = com.moon.pharm.domain.model.ConsultAnswer(
-            answerId = "a1",
-            expertId = "p1",
-            content = "안녕하세요. 혈압약은 가급적 일정한 시간에 복용하시는 것이 가장 중요합니다. \n\n보통은 잊지 않기 위해 아침 식사 후 복용을 권장드리지만, 상황에 따라 다를 수 있습니다. \n\n만약 복용을 잊으셨다면 생각난 즉시 복용하시되, 다음 복용 시간이 가깝다면 다음 시간부터 정량 복용하세요.",
-            createdAt = "2025-06-22"
-        )
-    )
-
-    val fakePharmacist = Pharmacist(
-        id = "p1",
-        name = "김약사",
-        imageUrl = "", // 기본 이미지로 대체됨
-        bio = "만성질환 전문 상담 약사입니다."
-    )
-
-    ConsultDetailContent(
-        item = fakeItem,
-        pharmacist = fakePharmacist
-    )
-}
-
-@Preview(showBackground = true, name = "답변 대기 상태")
-@Composable
-private fun ConsultDetailScreenWaitingPreview() {
-    val fakeWaitingItem = ConsultItem(
-        id = "2",
-        userId = "사용자B",
-        title = "비타민 추천 부탁드려요",
-        content = "요즘 너무 피곤해서 비타민을 먹어보려 합니다.",
-        status = ConsultStatus.WAITING,
-        createdAt = "2025-06-21",
-        images = emptyList(),
-        expertId = "",
-        answer = null
-    )
-
-    ConsultDetailContent(
-        item = fakeWaitingItem,
-        pharmacist = null
-    )
 }

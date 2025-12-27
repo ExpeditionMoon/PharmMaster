@@ -1,6 +1,5 @@
 package com.moon.pharm.data.datasource
 
-import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.model.ConsultItem
 import kotlinx.coroutines.flow.Flow
 

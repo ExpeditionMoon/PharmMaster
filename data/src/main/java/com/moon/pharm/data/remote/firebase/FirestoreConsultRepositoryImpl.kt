@@ -40,19 +40,7 @@ class FirestoreConsultRepositoryImpl @Inject constructor(
             dataSource.create(consultInfo)
         }
 
-    override fun getConsultDetail(id: String): Flow<ConsultItem> = flow {
-        emit(
-            ConsultItem(
-                id = id,
-                userId = "사용자",
-                expertId = null,
-                title = "로딩 중...",
-                content = "내용을 불러오고 있습니다.",
-                status = ConsultStatus.WAITING,
-                createdAt = "2023-01-01"
-            )
-        )
-    }
+    override fun getConsultDetail(id: String): Flow<ConsultItem> = dataSource.getConsultDetail(id)
 
     override fun getPharmacistsByPharmacy(pharmacyId: String): List<Pharmacist> {
         return emptyList()
