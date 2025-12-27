@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.theme.tertiaryLight
 
 @Composable
-fun CircularProgressIndicatorSample() {
+fun CircularProgressBar() {
     Column (
         Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,

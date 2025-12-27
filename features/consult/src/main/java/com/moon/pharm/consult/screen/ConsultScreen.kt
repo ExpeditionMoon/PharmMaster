@@ -34,7 +34,7 @@ import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.view.CircularProgressIndicatorSample
+import com.moon.pharm.component_ui.view.CircularProgressBar
 import com.moon.pharm.component_ui.view.PharmPrimaryTabRow
 import com.moon.pharm.component_ui.view.StatusBadge
 import com.moon.pharm.consult.mapper.toBackgroundColor
@@ -65,7 +65,7 @@ fun ConsultScreen(
             })
 
         if (uiState.isLoading) {
-            CircularProgressIndicatorSample()
+            CircularProgressBar()
         }
     }
 }

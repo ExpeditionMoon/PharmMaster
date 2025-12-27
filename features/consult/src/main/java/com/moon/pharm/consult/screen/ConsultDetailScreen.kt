@@ -44,6 +44,7 @@ import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
+import com.moon.pharm.component_ui.view.CircularProgressBar
 import com.moon.pharm.component_ui.view.StatusBadge
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
 import com.moon.pharm.domain.model.ConsultItem
@@ -93,7 +94,7 @@ fun ConsultDetailContent(
             }
         }
     } else {
-        // TODO: 로딩 화면
+        CircularProgressBar()
     }
 }
 
