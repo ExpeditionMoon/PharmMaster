@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
@@ -27,7 +26,6 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -45,11 +42,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.moon.pharm.component_ui.theme.Placeholder
-import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.view.PrimaryTextField
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
 
@@ -91,7 +86,7 @@ fun ConsultWriteContent(
             .padding(horizontal = 24.dp, vertical = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TransparentHintTextField(
+        PrimaryTextField(
             value = title,
             onValueChange = onTitleChange,
             placeholder = stringResource(R.string.consult_write_placeholder_title),
@@ -107,7 +102,7 @@ fun ConsultWriteContent(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        TransparentHintTextField(
+        PrimaryTextField(
             value = content,
             onValueChange = onContentChange,
             placeholder = stringResource(R.string.consult_write_placeholder_content),
@@ -218,52 +213,5 @@ fun PhotoAttachmentSection(
                 }
             }
         }
-    }
-}
-
-/**
- * 기본 TextField의 밑줄이나 배경 없이 깔끔한 텍스트 입력을 위한 컴포저블
- */
-@Composable
-fun TransparentHintTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    modifier: Modifier = Modifier,
-    textStyle: TextStyle = TextStyle.Default,
-    singleLine: Boolean = false,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .border(
-                width = 0.5.dp,
-                color = tertiaryLight,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .background(
-                White,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .padding(10.dp)
-    ) {
-        if (value.isEmpty()) {
-            Text(
-                text = placeholder,
-                style = textStyle.copy(color = Placeholder)
-            )
-        }
-        BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
-            textStyle = textStyle,
-            singleLine = singleLine,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            cursorBrush = SolidColor(primaryLight),
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }

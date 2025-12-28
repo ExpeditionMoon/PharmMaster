@@ -9,7 +9,7 @@ import com.moon.pharm.domain.model.ConsultStatus
 @IgnoreExtraProperties
 data class ConsultItemDTO(
     @DocumentId
-    var _id: String = "",
+    var id: String = "",
 
     var userId: String = "",
     var expertId: String? = null,
@@ -35,7 +35,9 @@ data class ConsultAnswerDTO(
 
 @IgnoreExtraProperties
 data class PharmacistDTO(
-    var _id: String = "",
+    @DocumentId
+    var id: String = "",
+
     var name: String = "",
     var bio: String? = null,
     var pharmacyId: String = "",

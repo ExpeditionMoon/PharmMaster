@@ -24,7 +24,7 @@ fun Timestamp?.toKstString(): String {
 
 fun ConsultItemDTO.toDomainConsult(): ConsultItem {
     return ConsultItem(
-        id = this._id,
+        id = this.id,
         userId = this.userId,
         expertId = this.expertId,
         title = this.title,
@@ -40,21 +40,21 @@ fun ConsultItemDTO.toDomainConsult(): ConsultItem {
     )
 }
 
-fun ConsultItem.toFirestoreConsultDTO(): Map<String, Any?> {
-    return mapOf(
-        "userId" to this.userId,
-        "expertId" to this.expertId,
-        "title" to this.title,
-        "content" to this.content,
-        "status" to this.status.name,
-        "images" to images.map { it.imageName },
-        "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp(),
-        "answer" to this.answer?.let {
-            mapOf(
-                "answerId" to it.answerId,
-                "expertId" to it.expertId,
-                "content" to it.content,
-                "createdAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
+fun ConsultItem.toFirestoreConsultDTO(): ConsultItemDTO {
+    return ConsultItemDTO(
+        userId = this.userId,
+        expertId = this.expertId,
+        title = this.title,
+        content = this.content,
+        status = this.status.name,
+        images = this.images.map { it.imageName },
+        createdAt = null,
+        answer = this.answer?.let {
+            ConsultAnswerDTO(
+                answerId = it.answerId,
+                expertId = it.expertId,
+                content = it.content,
+                createdAt = null
             )
         }
     )
@@ -74,7 +74,7 @@ fun ConsultAnswerDTO.toDomainAnswer(): ConsultAnswer {
 
 fun PharmacistDTO.toDomainPharmacist(): Pharmacist {
     return Pharmacist(
-        id = this._id,
+        id = this.id,
         name = this.name,
         bio = this.bio ?: "",
         pharmacyId = this.pharmacyId,
