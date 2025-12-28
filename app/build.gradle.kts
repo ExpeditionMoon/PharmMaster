@@ -34,6 +34,8 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
@@ -62,6 +64,8 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.libs)
+
+    coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     // Hilt Core
     implementation(libs.hilt.android)

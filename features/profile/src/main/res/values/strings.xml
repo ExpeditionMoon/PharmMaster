@@ -1,0 +1,6 @@
+<resources>
+    <string name="consult_category_all">전체</string>
+    <string name="consult_category_prescription">처방약</string>
+    <string name="consult_category_general">일반약</string>
+    <string name="consult_category_supplements">비타민/영양제</string>
+</resources>

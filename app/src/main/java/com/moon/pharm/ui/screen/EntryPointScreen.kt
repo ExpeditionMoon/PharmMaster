@@ -33,12 +33,14 @@ import com.moon.pharm.consult.viewmodel.ConsultViewModel
 import com.moon.pharm.home.navigation.homeNavGraph
 import com.moon.pharm.prescription.navigation.prescriptionNavGraph
 import com.moon.pharm.profile.navigation.profileNavGraph
+import com.moon.pharm.profile.viewmodel.MedicationViewModel
 import com.moon.pharm.ui.navigation.getTopBarData
 
 @Composable
 fun EntryPointScreen() {
     val navController = rememberNavController()
-    val viewModel: ConsultViewModel = hiltViewModel()
+    val consultViewModel: ConsultViewModel = hiltViewModel()
+    val medicationViewModel: MedicationViewModel = hiltViewModel()
 
     val bottomAppBarItems = remember {
         BottomAppBarItem.fetchBottomAppBarItems()
@@ -115,8 +117,8 @@ fun EntryPointScreen() {
                 modifier = Modifier.fillMaxSize()
             ) {
                 homeNavGraph(navController)
-                consultNavGraph(navController, viewModel = viewModel)
-                profileNavGraph(navController)
+                consultNavGraph(navController, viewModel = consultViewModel)
+                profileNavGraph(navController, viewModel = medicationViewModel)
                 prescriptionNavGraph(navController)
             }
         }

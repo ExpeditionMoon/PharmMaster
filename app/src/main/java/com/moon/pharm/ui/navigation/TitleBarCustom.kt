@@ -29,13 +29,32 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
             routeName.contains("HomeTab") -> {
                 defaultHomeTopBarData()
             }
+            routeName.contains("MedicationTabCreateScreen") -> {
+                TopBarData(
+                    title = "복약 알림 설정",
+                    navigationType = TopBarNavigationType.Close,
+                    actions = listOf(
+                        TopBarAction(
+                            text = "완료",
+                            onClick = {
+                                navController.navigate(ContentNavigationRoute.MedicationTab)
+                            }
+                        )
+                    )
+                )
+            }
             routeName.contains("MedicationTab") -> {
                 TopBarData(
                     title = "복약 관리",
                     navigationType = TopBarNavigationType.Back,
                     actions = listOf(
                         TopBarAction(icon = Icons.Filled.Storage, onClick = {}),
-                        TopBarAction(icon = Icons.Filled.Add, onClick = {})
+                        TopBarAction(
+                            icon = Icons.Filled.Add,
+                            onClick = {
+                                navController.navigate(ContentNavigationRoute.MedicationTabCreateScreen)
+                            }
+                        )
                     )
                 )
             }
