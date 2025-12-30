@@ -3,17 +3,24 @@ package com.moon.pharm.profile.viewmodel
 import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moon.pharm.component_ui.util.toDisplayTimeString
 import com.moon.pharm.component_ui.util.toLocalDate
 import com.moon.pharm.domain.model.MealTiming
 import com.moon.pharm.domain.model.MedicationItem
+import com.moon.pharm.domain.model.MedicationTimeGroup
 import com.moon.pharm.domain.model.MedicationType
 import com.moon.pharm.domain.model.RepeatType
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.medication.MedicationUseCases
+import com.moon.pharm.profile.model.MedicationPrimaryTab
 import com.moon.pharm.profile.screen.medication.MedicationUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -32,6 +39,8 @@ sealed class MedicationIntent {
     data class UpdateRepeatType(val type: RepeatType) : MedicationIntent()
     data class UpdateMealAlarm(val enabled: Boolean) : MedicationIntent()
     object SaveMedication : MedicationIntent()
+
+    data class ToggleTaken(val id: String) : MedicationIntent()
 }
 
 @HiltViewModel
@@ -40,6 +49,41 @@ class MedicationViewModel @Inject constructor(
 ): ViewModel() {
     private val _uiState = MutableStateFlow(MedicationUiState())
     val uiState = _uiState.asStateFlow()
+
+    @SuppressLint("NewApi")
+    val groupedMedications: StateFlow<List<MedicationTimeGroup>> = uiState
+        .map { state ->
+            val filteredList = when (state.selectedTab) {
+                MedicationPrimaryTab.ALL -> state.medicationList
+                else -> state.medicationList
+            }
+
+            filteredList
+                .groupBy { it.alarmTime }
+                .map { (time, items) ->
+                    MedicationTimeGroup(
+                        timeLabel = "${time.toDisplayTimeString()} 복용",
+                        items = items
+                    )
+                }
+                .sortedBy { it.items.firstOrNull()?.alarmTime }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val progress = uiState.map { state ->
+        val total = state.medicationList.size
+        val completed = state.medicationList.count { it.isTaken }
+        if (total == 0) 0f to "0/0"
+        else (completed.toFloat() / total.toFloat()) to "$completed/$total"
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0f to "0/0")
+
+    init {
+        fetchMedicationList()
+    }
 
     @SuppressLint("NewApi")
     fun onIntent(intent: MedicationIntent) {
@@ -75,7 +119,13 @@ class MedicationViewModel @Inject constructor(
                 it.copy(form = it.form.copy(isMealTimeAlarmEnabled = intent.enabled))
             }
             MedicationIntent.SaveMedication -> saveMedication()
+
+            is MedicationIntent.ToggleTaken -> toggleMedicationTaken(intent.id)
         }
+    }
+
+    fun onTabSelected(tab: MedicationPrimaryTab) {
+        _uiState.update { it.copy(selectedTab = tab) }
     }
 
     private fun saveMedication() {
@@ -111,6 +161,44 @@ class MedicationViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun fetchMedicationList() {
+        viewModelScope.launch {
+            medicationUseCases.getMedicationItemsUseCase().collect { result ->
+                _uiState.update { currentState ->
+                    when (result) {
+                        is DataResourceResult.Loading -> {
+                            currentState.copy(isLoading = true, userMessage = null)
+                        }
+
+                        is DataResourceResult.Success -> {
+                            currentState.copy(
+                                isLoading = false, medicationList = result.resultData
+                            )
+                        }
+
+                        is DataResourceResult.Failure -> {
+                            currentState.copy(
+                                isLoading = false,
+                                userMessage = result.exception.message ?: "데이터를 불러오지 못했습니다."
+                            )
+                        }
+
+                        else -> currentState
+                    }
+                }
+            }
+        }
+    }
+
+    private fun toggleMedicationTaken(id: String) {
+        _uiState.update { state ->
+            val newList = state.medicationList.map { item ->
+                if (item.id == id) item.copy(isTaken = !item.isTaken) else item
+            }
+            state.copy(medicationList = newList)
         }
     }
 }

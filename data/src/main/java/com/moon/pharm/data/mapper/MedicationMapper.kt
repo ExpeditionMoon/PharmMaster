@@ -63,3 +63,6 @@ fun MedicationItemDto.toDomainMedication(): MedicationItem {
         isTaken = this.isTaken
     )
 }
+
+fun List<MedicationItemDto>.toDomainMedicationList() =
+    this.map { it.toDomainMedication() }.toList()

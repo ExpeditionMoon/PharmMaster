@@ -1,6 +1,5 @@
 package com.moon.pharm.profile.screen.medication
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,14 +30,13 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,101 +48,43 @@ import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.component_ui.theme.tertiaryLight
 import com.moon.pharm.component_ui.view.PharmPrimaryTabRow
-import com.moon.pharm.component_ui.view.StatusBadge
-import com.moon.pharm.domain.model.MealTiming
 import com.moon.pharm.domain.model.MedicationItem
 import com.moon.pharm.domain.model.MedicationTimeGroup
-import com.moon.pharm.domain.model.MedicationType
-import com.moon.pharm.domain.model.RepeatType
-import com.moon.pharm.profile.R
+import com.moon.pharm.profile.model.MedicationPrimaryTab
+import com.moon.pharm.profile.viewmodel.MedicationIntent
 import com.moon.pharm.profile.viewmodel.MedicationViewModel
-import java.time.LocalDate
-import java.time.LocalTime
+import com.moon.pharm.profile.R
 
 @Composable
 fun MedicationScreen(
     navController: NavController? = null, viewModel: MedicationViewModel
 ) {
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf(
-        R.string.consult_category_all,
-        R.string.consult_category_prescription,
-        R.string.consult_category_general,
-        R.string.consult_category_supplements)
+    val uiState by viewModel.uiState.collectAsState()
+    val groupedList by viewModel.groupedMedications.collectAsState()
 
-    // 더미 데이터
-    @SuppressLint("NewApi")
-    val medicationGroups = remember {
-        listOf(
-            MedicationTimeGroup(
-                timeLabel = "아침 복용 (오전 09:00)",
-                items = listOf(
-                    MedicationItem(
-                        id = "1",
-                        name = "오메가3",
-                        dosage = "2알",
-                        type = MedicationType.SUPPLEMENT,
-                        startDate = LocalDate.now(),
-                        endDate = null,
-                        noEndDate = true,
-                        alarmTime = LocalTime.of(9, 0),
-                        mealTiming = MealTiming.AFTER_MEAL,
-                        repeatType = RepeatType.DAILY,
-                        isTaken = true
-                    ),
-                    MedicationItem(
-                        id = "2",
-                        name = "종합 비타민",
-                        dosage = "1알",
-                        type = MedicationType.SUPPLEMENT,
-                        startDate = LocalDate.now(),
-                        endDate = null,
-                        noEndDate = true,
-                        alarmTime = LocalTime.of(9, 0),
-                        mealTiming = MealTiming.AFTER_MEAL,
-                        repeatType = RepeatType.DAILY,
-                        isTaken = true
-                    )
-                )
-            ),
-            MedicationTimeGroup(
-                timeLabel = "점심 복용 (오후 12:30)",
-                items = listOf(
-                    MedicationItem(
-                        id = "3",
-                        name = "타이레놀",
-                        dosage = "1정",
-                        type = MedicationType.OTC,
-                        startDate = LocalDate.now(),
-                        endDate = null,
-                        noEndDate = false,
-                        alarmTime = LocalTime.of(12, 30),
-                        mealTiming = MealTiming.AFTER_MEAL,
-                        repeatType = RepeatType.DAILY,
-                        isTaken = false
-                    )
-                )
-            ),
-            MedicationTimeGroup(
-                timeLabel = "저녁 복용 (오후 07:00)",
-                items = listOf(
-                    MedicationItem(
-                        id = "4",
-                        name = "칼슘 마그네슘",
-                        dosage = "2캡슐",
-                        type = MedicationType.SUPPLEMENT,
-                        startDate = LocalDate.now(),
-                        endDate = null,
-                        noEndDate = true,
-                        alarmTime = LocalTime.of(19, 0),
-                        mealTiming = MealTiming.AFTER_MEAL,
-                        repeatType = RepeatType.DAILY,
-                        isTaken = false
-                    )
-                )
-            )
-        )
-    }
+    val totalCount = uiState.medicationList.size
+    val completedCount = uiState.medicationList.count { it.isTaken }
+
+    MedicationContent(
+        selectedTab = uiState.selectedTab,
+        currentList = groupedList,
+        totalCount = totalCount,
+        completedCount = completedCount,
+        onTabSelected = { viewModel.onTabSelected(it) },
+        onTakeClick = { item -> viewModel.onIntent(MedicationIntent.ToggleTaken(item.id)) }
+    )
+}
+
+@Composable
+fun MedicationContent(
+    selectedTab: MedicationPrimaryTab,
+    currentList: List<MedicationTimeGroup>,
+    totalCount: Int,
+    completedCount: Int,
+    onTabSelected: (MedicationPrimaryTab) -> Unit,
+    onTakeClick: (MedicationItem) -> Unit
+){
+    val tabTitles = MedicationPrimaryTab.entries.map { it.title }
 
     Column(
         modifier = Modifier
@@ -152,9 +92,9 @@ fun MedicationScreen(
             .background(backgroundLight)
     ) {
         PharmPrimaryTabRow(
-            selectedTabIndex = selectedTabIndex,
-            tabs = tabs,
-            onTabSelected = { index -> selectedTabIndex = index }
+            selectedTabIndex = selectedTab.index,
+            tabs = tabTitles,
+            onTabSelected = { index -> onTabSelected(MedicationPrimaryTab.fromIndex(index)) }
         )
 
         LazyColumn(
@@ -163,16 +103,14 @@ fun MedicationScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             item {
-                ProgressCard(total = 6, completed = 3)
+                ProgressCard(total = totalCount, completed = completedCount)
             }
 
-            items(medicationGroups) { group ->
-                MedicationGroupItem(group)
+            items(items = currentList, key = { it.timeLabel }) { group ->
+                MedicationGroupItem(group = group, onTakeClick = onTakeClick)
             }
 
-            item { 
-                Spacer(modifier = Modifier.height(50.dp))
-            }
+            item { Spacer(modifier = Modifier.height(50.dp)) }
         }
     }
 }
@@ -180,6 +118,8 @@ fun MedicationScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProgressCard(total: Int, completed: Int) {
+    val progressValue = if (total > 0) completed.toFloat() / total.toFloat() else 0f
+
     Card(
         colors = CardDefaults.cardColors(containerColor = White),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -217,6 +157,7 @@ fun ProgressCard(total: Int, completed: Int) {
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
+                // TODO: 실제 데이터 기반 계산으로 변경
                 text = "이번 주 복용 준수율 94%",
                 fontSize = 13.sp,
                 color = SecondFont
@@ -226,7 +167,7 @@ fun ProgressCard(total: Int, completed: Int) {
 }
 
 @Composable
-fun MedicationGroupItem(group: MedicationTimeGroup) {
+fun MedicationGroupItem(group: MedicationTimeGroup, onTakeClick: (MedicationItem) -> Unit) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -251,7 +192,7 @@ fun MedicationGroupItem(group: MedicationTimeGroup) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             group.items.forEach { item ->
-                MedicationCard(item, onTakeClick = {})
+                MedicationCard(item = item, onTakeClick = onTakeClick)
             }
         }
     }
@@ -263,7 +204,10 @@ fun MedicationCard(
     onTakeClick: (MedicationItem) -> Unit
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = White),
+        colors = CardDefaults.cardColors(
+            containerColor = White,
+            contentColor = Primary
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth()
@@ -297,38 +241,32 @@ fun MedicationCard(
                 )
             }
 
-            if (item.isTaken) {
-                StatusBadge(
-                    text = "복용완료",
-                    statusColor = Primary,
-                    contentColor = White,
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.CheckCircle,
-                            contentDescription = null,
-                            tint = White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
+            OutlinedButton(
+                onClick = { onTakeClick(item) },
+                shape = RoundedCornerShape(10.dp),
+                border = if (item.isTaken) null else BorderStroke(1.dp, primaryLight),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = if (item.isTaken) Primary else Color.Transparent,
+                    contentColor = if (item.isTaken) White else primaryLight
+                ),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                modifier = Modifier.height(36.dp)
+            ) {
+                Icon(
+                    imageVector = if (item.isTaken) Icons.Filled.CheckCircle else Icons.Outlined.RadioButtonUnchecked,
+                    contentDescription = null,
+                    tint = if (item.isTaken) White else primaryLight,
+                    modifier = Modifier.size(16.dp)
                 )
-            } else {
-                OutlinedButton(
-                    onClick = { onTakeClick(item) },
-                    shape = RoundedCornerShape(8.dp),
-                    border = BorderStroke(1.dp, primaryLight),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                    modifier = Modifier.height(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.RadioButtonUnchecked,
-                        contentDescription = "복용하기",
-                        tint = primaryLight,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Text(text = "복용하기", fontSize = 12.sp)
-                }
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    text = stringResource(
+                        if (item.isTaken) R.string.medication_take_on
+                        else R.string.medication_take_off
+                    ),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

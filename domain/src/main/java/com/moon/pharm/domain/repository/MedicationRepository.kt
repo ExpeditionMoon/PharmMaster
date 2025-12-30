@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface MedicationRepository {
     fun createMedication(medicationItem: MedicationItem): Flow<DataResourceResult<Unit>>
+    fun getMedicationItems(): Flow<DataResourceResult<List<MedicationItem>>>
 }

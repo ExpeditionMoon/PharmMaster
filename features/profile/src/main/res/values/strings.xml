@@ -1,6 +1,9 @@
 <resources>
-    <string name="consult_category_all">전체</string>
-    <string name="consult_category_prescription">처방약</string>
-    <string name="consult_category_general">일반약</string>
-    <string name="consult_category_supplements">비타민/영양제</string>
+    <string name="medication_category_all">전체</string>
+    <string name="medication_category_prescription">처방약</string>
+    <string name="medication_category_general">일반약</string>
+    <string name="medication_category_supplements">비타민/영양제</string>
+
+    <string name="medication_take_off">복용하기</string>
+    <string name="medication_take_on">복용완료</string>
 </resources>

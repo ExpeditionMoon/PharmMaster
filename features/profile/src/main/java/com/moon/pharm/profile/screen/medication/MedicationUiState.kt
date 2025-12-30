@@ -1,8 +1,10 @@
 package com.moon.pharm.profile.screen.medication
 
 import com.moon.pharm.domain.model.MealTiming
+import com.moon.pharm.domain.model.MedicationItem
 import com.moon.pharm.domain.model.MedicationType
 import com.moon.pharm.domain.model.RepeatType
+import com.moon.pharm.profile.model.MedicationPrimaryTab
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -10,6 +12,9 @@ data class MedicationUiState(
     val isLoading: Boolean = false,
     val userMessage: String? = null,
     val isMedicationCreated: Boolean = false,
+
+    val medicationList: List<MedicationItem> = emptyList(),
+    val selectedTab: MedicationPrimaryTab = MedicationPrimaryTab.ALL,
 
     val form: MedicationForm = MedicationForm()
 )
