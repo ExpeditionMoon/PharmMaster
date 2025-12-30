@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,54 +25,46 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.Black
 import com.moon.pharm.component_ui.theme.Placeholder
 import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.tertiaryContainerLight
 import com.moon.pharm.component_ui.theme.tertiaryLight
 
 @Composable
 fun DateInputBox(
-    label: String,
+    placeholder: String,
     value: String,
     modifier: Modifier = Modifier,
     showCalendarIcon: Boolean = false,
     onClick: () -> Unit
 ) {
-    Column(modifier = modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .background(White, RoundedCornerShape(10.dp))
+            .border(0.5.dp, tertiaryLight, RoundedCornerShape(10.dp))
+            .clickable { onClick() }
+            .padding(horizontal = 12.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
         Text(
-            text = label,
-            fontSize = 13.sp,
-            color = SecondFont,
-            modifier = Modifier.padding(bottom = 4.dp)
+            text = value.ifEmpty { placeholder },
+            fontSize = 15.sp,
+            color = if (value.isEmpty()) Placeholder else Black
         )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(44.dp)
-                .background(White, RoundedCornerShape(10.dp))
-                .border(0.5.dp, tertiaryLight, RoundedCornerShape(10.dp))
-                .clickable { onClick() }
-                .padding(horizontal = 12.dp),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Text(
-                text = value.ifEmpty { "날짜 선택" },
-                fontSize = 15.sp,
-                color = if (value.isEmpty()) Placeholder else Color.Black
-            )
 
-            if (showCalendarIcon) {
-                Icon(
-                    imageVector = Icons.Default.CalendarMonth,
-                    contentDescription = "날짜 선택",
-                    tint = Primary,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .size(24.dp)
-                )
-            }
+        if (showCalendarIcon) {
+            Icon(
+                imageVector = Icons.Default.CalendarMonth,
+                contentDescription = null,
+                tint = Primary,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(24.dp)
+            )
         }
     }
 }
