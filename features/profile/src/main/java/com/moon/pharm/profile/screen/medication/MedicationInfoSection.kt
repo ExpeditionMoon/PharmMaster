@@ -1,5 +1,7 @@
 package com.moon.pharm.profile.screen.medication
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +46,7 @@ import com.moon.pharm.domain.model.MedicationType
 import com.moon.pharm.profile.viewmodel.MedicationIntent
 import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MedicationInfoSection(
     form: MedicationForm,
@@ -122,6 +125,7 @@ fun MedicationTypeSelector(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PeriodInputSection(
     startDate: LocalDate?,

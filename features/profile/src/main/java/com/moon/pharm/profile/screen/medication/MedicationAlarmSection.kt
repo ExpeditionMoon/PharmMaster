@@ -1,6 +1,7 @@
 package com.moon.pharm.profile.screen.medication
 
-import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +44,7 @@ import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.util.toDisplayString
 import com.moon.pharm.component_ui.view.FilterChip
 import com.moon.pharm.component_ui.view.SelectButton
 import com.moon.pharm.component_ui.view.TimePickerDialog
@@ -50,9 +52,8 @@ import com.moon.pharm.component_ui.view.TimeSettingCard
 import com.moon.pharm.domain.model.MealTiming
 import com.moon.pharm.domain.model.RepeatType
 import com.moon.pharm.profile.viewmodel.MedicationIntent
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicationAlarmSection(
@@ -200,9 +201,4 @@ fun AlarmTypeSection(
 
         }
     }
-}
-
-@SuppressLint("NewApi")
-private fun LocalTime?.toDisplayString(): String {
-    return this?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "시간 선택"
 }
