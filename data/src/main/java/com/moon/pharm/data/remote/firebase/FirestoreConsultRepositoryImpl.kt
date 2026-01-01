@@ -1,12 +1,12 @@
 package com.moon.pharm.data.remote.firebase
 
 import com.moon.pharm.data.datasource.ConsultDataSource
+import com.moon.pharm.data.di.IoDispatcher
 import com.moon.pharm.domain.model.ConsultItem
-import com.moon.pharm.domain.model.ConsultStatus
 import com.moon.pharm.domain.model.Pharmacist
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -16,14 +16,15 @@ import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class FirestoreConsultRepositoryImpl @Inject constructor(
-    private val dataSource: ConsultDataSource
+    private val dataSource: ConsultDataSource,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ConsultRepository {
 
     override fun getConsultItems() = dataSource.getConsultItems().map { consultList ->
             DataResourceResult.Success(consultList) as DataResourceResult<List<ConsultItem>>
         }.catch { e ->
             emit(DataResourceResult.Failure(e))
-        }.onStart { emit(DataResourceResult.Loading) }.flowOn(Dispatchers.IO)
+        }.onStart { emit(DataResourceResult.Loading) }.flowOn(ioDispatcher)
 
     private fun wrapCUDOperation(
         operation: suspend () -> Unit
@@ -33,7 +34,7 @@ class FirestoreConsultRepositoryImpl @Inject constructor(
         emit(DataResourceResult.Success(Unit))
     }.catch { e ->
         emit(DataResourceResult.Failure(e))
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(ioDispatcher)
 
     override fun createConsult(consultInfo: ConsultItem): Flow<DataResourceResult<Unit>> =
         wrapCUDOperation {

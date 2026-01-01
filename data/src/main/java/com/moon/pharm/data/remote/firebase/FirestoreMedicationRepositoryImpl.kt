@@ -1,10 +1,11 @@
 package com.moon.pharm.data.remote.firebase
 
 import com.moon.pharm.data.datasource.MedicationDataSource
+import com.moon.pharm.data.di.IoDispatcher
 import com.moon.pharm.domain.model.MedicationItem
 import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -14,14 +15,15 @@ import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class FirestoreMedicationRepositoryImpl @Inject constructor(
-    private val dataSource: MedicationDataSource
+    private val dataSource: MedicationDataSource,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MedicationRepository {
 
     override fun getMedicationItems() = dataSource.getMedicationItems().map { medicationList ->
         DataResourceResult.Success(medicationList) as DataResourceResult<List<MedicationItem>>
     }.catch { e ->
         emit(DataResourceResult.Failure(e))
-    }.onStart { emit(DataResourceResult.Loading) }.flowOn(Dispatchers.IO)
+    }.onStart { emit(DataResourceResult.Loading) }.flowOn(ioDispatcher)
 
 
     private fun wrapCUDOperation(
@@ -32,7 +34,7 @@ class FirestoreMedicationRepositoryImpl @Inject constructor(
         emit(DataResourceResult.Success(Unit))
     }.catch { e ->
         emit(DataResourceResult.Failure(e))
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(ioDispatcher)
 
     override fun createMedication(medicationItem: MedicationItem): Flow<DataResourceResult<Unit>> =
         wrapCUDOperation {
