@@ -1,12 +1,14 @@
 package com.moon.pharm.data.remote.firebase
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.moon.pharm.data.common.CONSULT_COLLECTION
+import com.moon.pharm.data.common.FIELD_CREATED_AT
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.mapper.toDomainConsult
 import com.moon.pharm.data.mapper.toDomainConsultList
 import com.moon.pharm.data.mapper.toFirestoreConsultDTO
 import com.moon.pharm.data.remote.dto.ConsultItemDTO
-import com.moon.pharm.domain.model.ConsultItem
+import com.moon.pharm.domain.model.consult.ConsultItem
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -18,7 +20,7 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
     val firestore: FirebaseFirestore
 ) : ConsultDataSource {
 
-    private val collection = firestore.collection("consult_collec")
+    private val collection = firestore.collection(CONSULT_COLLECTION)
 
     override suspend fun create(consult: ConsultItem) {
         val docRef = if (consult.id.isNotEmpty()) collection.document(consult.id)
@@ -29,7 +31,7 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
     }
 
     override fun getConsultItems(): Flow<List<ConsultItem>> = callbackFlow {
-        val listener = collection.orderBy("createdAt").addSnapshotListener { snapshot, e ->
+        val listener = collection.orderBy(FIELD_CREATED_AT).addSnapshotListener { snapshot, e ->
 
                 if (e != null) {
                     close(e)

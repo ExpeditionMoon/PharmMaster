@@ -1,6 +1,6 @@
 package com.moon.pharm.data.datasource
 
-import com.moon.pharm.domain.model.ConsultItem
+import com.moon.pharm.domain.model.consult.ConsultItem
 import kotlinx.coroutines.flow.Flow
 
 interface ConsultDataSource {

@@ -1,6 +1,6 @@
 package com.moon.pharm.domain.repository
 
-import com.moon.pharm.domain.model.ConsultItem
+import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.Pharmacist
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.flow.Flow

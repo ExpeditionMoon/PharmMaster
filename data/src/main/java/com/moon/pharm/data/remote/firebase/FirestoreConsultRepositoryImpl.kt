@@ -2,7 +2,7 @@ package com.moon.pharm.data.remote.firebase
 
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.di.IoDispatcher
-import com.moon.pharm.domain.model.ConsultItem
+import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.Pharmacist
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.result.DataResourceResult

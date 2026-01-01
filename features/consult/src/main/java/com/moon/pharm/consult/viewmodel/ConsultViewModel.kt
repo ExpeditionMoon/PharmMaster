@@ -1,15 +1,15 @@
 package com.moon.pharm.consult.viewmodel
 
 import android.util.Log
-import android.util.Log.e
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.consult.screen.ConsultUiState
 import com.moon.pharm.consult.model.ConsultPrimaryTab
 import com.moon.pharm.consult.screen.ConsultWriteState
-import com.moon.pharm.domain.model.ConsultImage
-import com.moon.pharm.domain.model.ConsultItem
-import com.moon.pharm.domain.model.ConsultStatus
+import com.moon.pharm.domain.model.consult.ConsultAnswer
+import com.moon.pharm.domain.model.consult.ConsultImage
+import com.moon.pharm.domain.model.consult.ConsultItem
+import com.moon.pharm.domain.model.consult.ConsultStatus
 import com.moon.pharm.domain.model.Pharmacist
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
@@ -17,9 +17,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,24 +36,25 @@ class ConsultViewModel @Inject constructor(
         fetchConsultList()
     }
 
-    /* 연결 확인 *//*    fun testFirestore() {
-            viewModelScope.launch {
-                consultUseCases.createConsultUseCase(
-                    ConsultItem(
-                        id = "",
-                        userId = "user_9", expertId = null,
-                        title = "오메가3 고르는 법",
-                        content = "rTG 오메가3가 일반 제품보다 흡수율이 훨씬 높은가요?",
-                        status = ConsultStatus.WAITING,
-                        createdAt = System.currentTimeMillis().toString(),
-                        images = emptyList(),
-                        answer = null
-                    ),
-                ).collect { result ->
-                    Log.d("FIRESTORE_TEST", "결과: $result")
-                }
+    /* 연결 확인 */
+/*    fun testFirestore() {
+        viewModelScope.launch {
+            consultUseCases.createConsultUseCase(
+                ConsultItem(
+                    id = "",
+                    userId = "user_9", expertId = null,
+                    title = "오메가3 고르는 법",
+                    content = "rTG 오메가3가 일반 제품보다 흡수율이 훨씬 높은가요?",
+                    status = ConsultStatus.WAITING,
+                    createdAt = LocalDateTime.now(),
+                    images = emptyList(),
+                    answer = null
+                ),
+            ).collect { result ->
+                Log.d("FIRESTORE_TEST", "결과: $result")
             }
-        }*/
+        }
+    }*/
 
     fun onTitleChanged(newTitle: String) {
         _uiState.update {
@@ -101,14 +103,14 @@ class ConsultViewModel @Inject constructor(
             title = writeData.title,
             content = writeData.content,
             status = ConsultStatus.WAITING,
-            createdAt = "",
+            createdAt = LocalDateTime.now(),
             images = writeData.images.map { ConsultImage(it) })
         createConsult(newItem)
     }
 
     fun createConsult(consultInfo: ConsultItem) {
         viewModelScope.launch {
-            consultUseCases.createConsultUseCase(consultInfo).collect { result ->
+            consultUseCases.createConsultUseCase(consultInfo).collectLatest { result ->
                 _uiState.update { currentState ->
                     when (result) {
                         is DataResourceResult.Loading -> {

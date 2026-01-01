@@ -35,8 +35,8 @@ import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
-import com.moon.pharm.component_ui.view.HealthInfoCard
-import com.moon.pharm.component_ui.view.SectionHeader
+import com.moon.pharm.component_ui.component.card.HealthInfoCard
+import com.moon.pharm.component_ui.component.SectionHeader
 
 @Preview(showBackground = true)
 @Composable
@@ -153,7 +153,8 @@ fun RateOfUse() {
                 shape = RoundedCornerShape(10.dp)
             )
             .height(60.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ){
         Column (
             modifier = Modifier

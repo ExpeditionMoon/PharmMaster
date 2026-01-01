@@ -4,7 +4,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.ServerTimestamp
-import com.moon.pharm.domain.model.ConsultStatus
+import com.moon.pharm.domain.model.consult.ConsultStatus
 
 @IgnoreExtraProperties
 data class ConsultItemDTO(

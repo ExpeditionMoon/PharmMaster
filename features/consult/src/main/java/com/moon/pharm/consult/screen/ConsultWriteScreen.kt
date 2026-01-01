@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.view.PrimaryTextField
+import com.moon.pharm.component_ui.component.input.PrimaryTextField
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
 

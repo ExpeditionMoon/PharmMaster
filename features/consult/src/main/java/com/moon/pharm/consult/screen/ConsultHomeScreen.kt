@@ -32,14 +32,15 @@ import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.view.CircularProgressBar
-import com.moon.pharm.component_ui.view.PharmPrimaryTabRow
-import com.moon.pharm.component_ui.view.StatusBadge
+import com.moon.pharm.component_ui.component.progress.CircularProgressBar
+import com.moon.pharm.component_ui.component.bar.PharmPrimaryTabRow
+import com.moon.pharm.component_ui.component.StatusBadge
+import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.mapper.toBackgroundColor
 import com.moon.pharm.consult.mapper.toTextColor
 import com.moon.pharm.consult.model.ConsultPrimaryTab
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
-import com.moon.pharm.domain.model.ConsultItem
+import com.moon.pharm.domain.model.consult.ConsultItem
 
 @Composable
 fun ConsultScreen(
@@ -163,7 +164,7 @@ fun ConsultItemCard(item: ConsultItem, onClick: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "${item.userId} • ${item.createdAt}",
+                    text = "${item.userId} • ${item.createdAt.toDisplayDateTimeString()}",
                     fontSize = 12.sp,
                     color = SecondFont
                 )

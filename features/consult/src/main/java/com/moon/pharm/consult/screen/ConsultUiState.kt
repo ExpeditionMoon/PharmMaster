@@ -1,7 +1,7 @@
 package com.moon.pharm.consult.screen
 
 import com.moon.pharm.consult.model.ConsultPrimaryTab
-import com.moon.pharm.domain.model.ConsultItem
+import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.Pharmacist
 
 data class ConsultUiState (

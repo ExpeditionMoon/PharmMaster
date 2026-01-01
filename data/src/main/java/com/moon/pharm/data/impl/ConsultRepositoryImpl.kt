@@ -1,9 +1,9 @@
 package com.moon.pharm.data.impl
 
 import com.moon.pharm.data.datasource.ConsultDataSource
-import com.moon.pharm.domain.model.ConsultItem
-import com.moon.pharm.domain.model.ConsultStatus
+import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.Pharmacist
+import com.moon.pharm.domain.model.consult.ConsultStatus
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.Dispatchers
@@ -11,8 +11,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import java.time.LocalDateTime
+import javax.inject.Inject
 
-class ConsultRepositoryImpl(
+class ConsultRepositoryImpl @Inject constructor(
     private val dataSource: ConsultDataSource
 ) : ConsultRepository {
     override fun createConsult(consultInfo: ConsultItem): Flow<DataResourceResult<Unit>> = flow {
@@ -31,12 +33,12 @@ class ConsultRepositoryImpl(
         emit(
             ConsultItem(
                 id = id,
-                title = "불러오는 중...",
+                title = "",
                 userId = "",
                 content = "",
                 expertId = "",
                 status = ConsultStatus.WAITING,
-                createdAt = System.currentTimeMillis().toString(),
+                createdAt = LocalDateTime.now(),
                 images = emptyList(),
                 answer = null
             )

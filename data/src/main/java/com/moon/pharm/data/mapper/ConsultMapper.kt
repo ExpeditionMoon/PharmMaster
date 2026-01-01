@@ -1,26 +1,16 @@
 package com.moon.pharm.data.mapper
 
-import com.google.firebase.Timestamp
+import com.moon.pharm.data.common.toLocalDateTime
+import com.moon.pharm.data.common.toTimestamp
 import com.moon.pharm.data.remote.dto.ConsultAnswerDTO
 import com.moon.pharm.data.remote.dto.ConsultItemDTO
 import com.moon.pharm.data.remote.dto.PharmacistDTO
 import com.moon.pharm.domain.model.ConsultAnswer
 import com.moon.pharm.domain.model.ConsultImage
-import com.moon.pharm.domain.model.ConsultItem
+import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.ConsultStatus
 import com.moon.pharm.domain.model.Pharmacist
 import kotlin.collections.map
-
-fun Timestamp?.toKstString(): String {
-    if (this == null) return ""
-    val date = this.toDate()
-    val formatter = java.text.SimpleDateFormat(
-        "yyyy-MM-dd HH:mm:ss",
-        java.util.Locale.KOREA
-    )
-    formatter.timeZone = java.util.TimeZone.getTimeZone("Asia/Seoul")
-    return formatter.format(date)
-}
 
 fun ConsultItemDTO.toDomainConsult(): ConsultItem {
     return ConsultItem(
@@ -35,7 +25,7 @@ fun ConsultItemDTO.toDomainConsult(): ConsultItem {
             ConsultStatus.WAITING
         },
         images = this.images?.map { ConsultImage(it) } ?: emptyList(),
-        createdAt = this.createdAt.toKstString(),
+        createdAt = this.createdAt.toLocalDateTime(),
         answer = this.answer?.toDomainAnswer()
     )
 }
@@ -48,7 +38,7 @@ fun ConsultItem.toFirestoreConsultDTO(): ConsultItemDTO {
         content = this.content,
         status = this.status.name,
         images = this.images.map { it.imageName },
-        createdAt = null,
+        createdAt = this.createdAt.toTimestamp(),
         answer = this.answer?.let {
             ConsultAnswerDTO(
                 answerId = it.answerId,
@@ -68,7 +58,7 @@ fun ConsultAnswerDTO.toDomainAnswer(): ConsultAnswer {
         answerId = this.answerId,
         expertId = this.expertId,
         content = this.content,
-        createdAt = this.createdAt.toKstString()
+        createdAt = this.createdAt.toLocalDateTime()
     )
 }
 

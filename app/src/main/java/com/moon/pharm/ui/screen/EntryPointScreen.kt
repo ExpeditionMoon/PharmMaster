@@ -23,17 +23,17 @@ import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.model.BottomBarUiModel
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.view.PharmBottomBar
-import com.moon.pharm.component_ui.view.PharmTopBar
+import com.moon.pharm.component_ui.component.bar.PharmBottomBar
+import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.ui.navigation.BottomAppBarItem
-import com.moon.pharm.component_ui.view.TopBarData
-import com.moon.pharm.component_ui.view.TopBarNavigationType
+import com.moon.pharm.component_ui.model.TopBarData
+import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.consult.navigation.consultNavGraph
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
 import com.moon.pharm.home.navigation.homeNavGraph
 import com.moon.pharm.prescription.navigation.prescriptionNavGraph
 import com.moon.pharm.profile.navigation.profileNavGraph
-import com.moon.pharm.profile.viewmodel.MedicationViewModel
+import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 import com.moon.pharm.ui.navigation.getTopBarData
 
 @Composable

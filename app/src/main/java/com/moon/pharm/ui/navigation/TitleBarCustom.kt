@@ -8,9 +8,9 @@ import androidx.compose.material.icons.filled.Storage
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.component_ui.view.TopBarAction
-import com.moon.pharm.component_ui.view.TopBarData
-import com.moon.pharm.component_ui.view.TopBarNavigationType
+import com.moon.pharm.component_ui.model.TopBarAction
+import com.moon.pharm.component_ui.model.TopBarData
+import com.moon.pharm.component_ui.model.TopBarNavigationType
 
 
 fun defaultHomeTopBarData() = TopBarData(
@@ -33,14 +33,7 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
                 TopBarData(
                     title = "복약 알림 설정",
                     navigationType = TopBarNavigationType.Close,
-                    actions = listOf(
-                        TopBarAction(
-                            text = "완료",
-                            onClick = {
-                                navController.navigate(ContentNavigationRoute.MedicationTab)
-                            }
-                        )
-                    )
+                    actions = emptyList()
                 )
             }
             routeName.contains("MedicationTab") -> {

@@ -1,10 +1,12 @@
 package com.moon.pharm.data.remote.firebase
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.moon.pharm.data.common.FIELD_ALARM_TIME
+import com.moon.pharm.data.common.MEDICATION_COLLECTION
 import com.moon.pharm.data.datasource.MedicationDataSource
 import com.moon.pharm.data.mapper.toDomainMedicationList
 import com.moon.pharm.data.mapper.toFirestoreMedicationDTO
-import com.moon.pharm.data.remote.dto.MedicationItemDto
+import com.moon.pharm.data.remote.dto.MedicationItemDTO
 import com.moon.pharm.domain.model.MedicationItem
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +18,7 @@ class FirestoreMedicationDataSourceImpl @Inject constructor(
     val firestore: FirebaseFirestore
 ) : MedicationDataSource {
 
-    private val collection = firestore.collection("medication_collec")
+    private val collection = firestore.collection(MEDICATION_COLLECTION)
 
     override suspend fun create(medication: MedicationItem) {
         val docRef = if (medication.id.isNotEmpty()) collection.document(medication.id)
@@ -27,14 +29,14 @@ class FirestoreMedicationDataSourceImpl @Inject constructor(
     }
 
     override fun getMedicationItems(): Flow<List<MedicationItem>> = callbackFlow {
-        val listener = collection.orderBy("alarmTime").addSnapshotListener { snapshot, e ->
+        val listener = collection.orderBy(FIELD_ALARM_TIME).addSnapshotListener { snapshot, e ->
 
             if (e != null) {
                 close(e)
                 return@addSnapshotListener
             }
             try {
-                val medicationList = snapshot?.toObjects(MedicationItemDto::class.java) ?: emptyList()
+                val medicationList = snapshot?.toObjects(MedicationItemDTO::class.java) ?: emptyList()
                 trySend(medicationList.toDomainMedicationList())
             } catch (mappingError: Exception) {
                 close(mappingError)

@@ -4,6 +4,19 @@
     <string name="medication_category_general">일반약</string>
     <string name="medication_category_supplements">비타민/영양제</string>
 
+    <string name="medication_start_date">시작일</string>
+    <string name="medication_end_date">종료일</string>
+    <string name="medication_no_end_date">종료일 없음</string>
+    <string name="medication_setting_alarm">알림 설정</string>
+
     <string name="medication_take_off">복용하기</string>
     <string name="medication_take_on">복용완료</string>
+    <string name="medication_add">등록하기</string>
+
+    <string name="medication_name_hint">약물 이름 입력</string>
+    <string name="medication_dosage_hint">복용 용량 입력(예: 2알, 1캡슐)</string>
+
+    <string name="medication_alarm_group_by_meal">묶음 알림 (식사 시간에 따라)</string>
+    <string name="medication_alarm_group_description">식사 시간(식전/식후)이 같은 약들을 한 번의 알림으로 모아줍니다.</string>
+    <string name="medication_info">정보</string>
 </resources>

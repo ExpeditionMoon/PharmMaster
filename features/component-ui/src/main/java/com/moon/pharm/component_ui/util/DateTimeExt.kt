@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -13,9 +14,18 @@ import java.util.Locale
 private val SEOUL_ZONE = ZoneId.of("Asia/Seoul")
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun LocalDate?.toDisplayDateString(): String {
-    return this?.format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) ?: ""
-}
+val yearMonthDayFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd", Locale.KOREAN)
+@RequiresApi(Build.VERSION_CODES.O)
+val hourMinuteFormatter = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREAN)
+@RequiresApi(Build.VERSION_CODES.O)
+val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.KOREAN)
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun LocalDate?.toDisplayDateString() = this?.format(yearMonthDayFormatter) ?: ""
+@RequiresApi(Build.VERSION_CODES.O)
+fun LocalTime?.toDisplayTimeString() = this?.format(hourMinuteFormatter) ?: ""
+@RequiresApi(Build.VERSION_CODES.O)
+fun LocalDateTime?.toDisplayDateTimeString() = this?.format(dateTimeFormatter) ?: ""
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun Long?.toLocalDate(): LocalDate {
@@ -23,15 +33,4 @@ fun Long?.toLocalDate(): LocalDate {
     return Instant.ofEpochMilli(millis)
         .atZone(SEOUL_ZONE)
         .toLocalDate()
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun LocalTime?.toDisplayTimeString(): String {
-    val formatter = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREAN)
-    return this?.format(formatter) ?: "시간 미지정"
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun LocalTime?.toDisplayString(): String {
-    return this?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "시간 선택"
 }

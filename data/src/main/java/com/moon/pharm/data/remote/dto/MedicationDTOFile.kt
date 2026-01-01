@@ -5,7 +5,7 @@ import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.IgnoreExtraProperties
 
 @IgnoreExtraProperties
-data class MedicationItemDto(
+data class MedicationItemDTO(
     @DocumentId
     val id: String = "",
 
