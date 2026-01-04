@@ -45,9 +45,10 @@ import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.component.StatusBadge
+import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
 import com.moon.pharm.domain.model.consult.ConsultItem
-import com.moon.pharm.domain.model.ConsultStatus
+import com.moon.pharm.domain.model.consult.ConsultStatus
 import com.moon.pharm.domain.model.Pharmacist
 
 @Composable
@@ -111,7 +112,7 @@ fun QuestionSection(item: ConsultItem) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${item.userId} • ${item.createdAt}",
+                text = "${item.userId} • ${item.createdAt.toDisplayDateTimeString()}",
                 fontSize = 13.sp,
                 color = SecondFont
             )
@@ -221,7 +222,7 @@ fun AnswerSection(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    text = "답변 일시: ${answer.createdAt}",
+                    text = "답변 일시: ${answer.createdAt.toDisplayDateTimeString()}",
                     fontSize = 12.sp,
                     color = SecondFont
                 )

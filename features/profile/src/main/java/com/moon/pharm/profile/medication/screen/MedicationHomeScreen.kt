@@ -48,6 +48,7 @@ import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.component_ui.theme.tertiaryLight
 import com.moon.pharm.component_ui.component.bar.PharmPrimaryTabRow
+import com.moon.pharm.component_ui.util.toDisplayTimeString
 import com.moon.pharm.domain.model.MedicationItem
 import com.moon.pharm.domain.model.MedicationTimeGroup
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
@@ -106,7 +107,7 @@ fun MedicationContent(
                 ProgressCard(total = totalCount, completed = completedCount)
             }
 
-            items(items = currentList, key = { it.timeLabel }) { group ->
+            items(items = currentList, key = {  it.time ?: "no-time" }) { group ->
                 MedicationGroupItem(group = group, onTakeClick = onTakeClick)
             }
 
@@ -135,7 +136,11 @@ fun ProgressCard(total: Int, completed: Int) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "오늘 복용 $completed/${total}회 완료",
+                    text = stringResource(
+                        R.string.medication_progress_today,
+                        completed,
+                        total
+                    ),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
@@ -145,7 +150,7 @@ fun ProgressCard(total: Int, completed: Int) {
             Spacer(modifier = Modifier.height(12.dp))
 
             LinearProgressIndicator(
-                progress = { completed.toFloat() / total.toFloat() },
+                progress = { if (total > 0) completed.toFloat() / total.toFloat() else 0f },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp),
@@ -181,7 +186,7 @@ fun MedicationGroupItem(group: MedicationTimeGroup, onTakeClick: (MedicationItem
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = group.timeLabel,
+                text = group.time.toDisplayTimeString(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = SecondFont

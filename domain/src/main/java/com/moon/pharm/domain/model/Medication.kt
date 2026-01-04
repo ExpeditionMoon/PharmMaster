@@ -1,24 +1,21 @@
 package com.moon.pharm.domain.model
 
-import java.time.LocalDate
-import java.time.LocalTime
-
 data class MedicationItem(
     val id: String = "",
     val name: String,
     val dosage: String?,
     val type: MedicationType,
-    val startDate: LocalDate?,
-    val endDate: LocalDate?,
+    val startDate: Long?,
+    val endDate: Long?,
     val noEndDate: Boolean,
-    val alarmTime: LocalTime?,
+    val alarmTime: Long?,
     val mealTiming: MealTiming,
     val repeatType: RepeatType,
     val isTaken: Boolean = false
 )
 
 data class MedicationTimeGroup(
-    val timeLabel: String,
+    val time: Long?,
     val items: List<MedicationItem>
 )
 

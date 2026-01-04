@@ -1,7 +1,5 @@
 package com.moon.pharm.profile.medication.screen.section
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +20,6 @@ import com.moon.pharm.profile.medication.screen.component.PeriodInputSection
 import com.moon.pharm.profile.medication.viewmodel.MedicationIntent
 import com.moon.pharm.profile.R
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MedicationInfoSection(
     form: MedicationForm,

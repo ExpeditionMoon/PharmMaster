@@ -1,7 +1,5 @@
 package com.moon.pharm.profile.medication.screen
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,7 +25,6 @@ import com.moon.pharm.profile.medication.viewmodel.MedicationIntent
 import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 import com.moon.pharm.profile.R
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MedicationCreateScreen(
     navController: NavController? = null, viewModel: MedicationViewModel
@@ -46,7 +43,6 @@ fun MedicationCreateScreen(
         onIntent = { intent -> viewModel.onIntent(intent) }
     )
 }
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MedicationCreateContent(
     form: MedicationForm,

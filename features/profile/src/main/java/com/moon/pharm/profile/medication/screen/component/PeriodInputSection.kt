@@ -1,7 +1,5 @@
 package com.moon.pharm.profile.medication.screen.component
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,14 +29,12 @@ import com.moon.pharm.component_ui.util.toDisplayDateString
 import com.moon.pharm.component_ui.component.card.DateSettingCard
 import com.moon.pharm.component_ui.component.dialog.DatePickerModal
 import com.moon.pharm.profile.medication.viewmodel.MedicationIntent
-import java.time.LocalDate
 import com.moon.pharm.profile.R
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PeriodInputSection(
-    startDate: LocalDate?,
-    endDate: LocalDate?,
+    startDate: Long?,
+    endDate: Long?,
     noEndDate: Boolean,
     onIntent: (MedicationIntent) -> Unit
 ) {

@@ -1,16 +1,15 @@
 package com.moon.pharm.profile.medication.screen
 
+import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.domain.model.MealTiming
 import com.moon.pharm.domain.model.MedicationItem
 import com.moon.pharm.domain.model.MedicationType
 import com.moon.pharm.domain.model.RepeatType
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
-import java.time.LocalDate
-import java.time.LocalTime
 
 data class MedicationUiState(
     val isLoading: Boolean = false,
-    val userMessage: String? = null,
+    val userMessage: UiMessage? = null,
     val isMedicationCreated: Boolean = false,
 
     val medicationList: List<MedicationItem> = emptyList(),
@@ -23,11 +22,11 @@ data class MedicationForm(
     val medicationName: String = "",
     val medicationDosage: String? = "",
     val selectedType: MedicationType = MedicationType.PRESCRIPTION,
-    val startDate: LocalDate? = null,
-    val endDate: LocalDate? = null,
+    val startDate: Long? = null,
+    val endDate: Long? = null,
     val noEndDate: Boolean = false,
     val selectedMealTiming: MealTiming = MealTiming.BEFORE_MEAL,
-    val selectedTime: LocalTime? = null,
+    val selectedTime: Long? = null,
     val selectedRepeatType: RepeatType = RepeatType.DAILY,
     val isMealTimeAlarmEnabled: Boolean = false
 )

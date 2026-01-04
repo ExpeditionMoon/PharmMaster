@@ -1,7 +1,5 @@
 package com.moon.pharm.profile.medication.screen.section
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -34,7 +32,6 @@ import com.moon.pharm.profile.medication.screen.component.AlarmTypeSection
 import com.moon.pharm.profile.medication.screen.component.MealTimeChips
 import com.moon.pharm.profile.medication.viewmodel.MedicationIntent
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicationAlarmSection(
@@ -73,6 +70,7 @@ fun MedicationAlarmSection(
 
         if (showTimePicker) {
             TimePickerDialog(
+                title = stringResource(id = R.string.medication_alarm_time_dialog_title),
                 onConfirm = { state ->
                     onIntent(MedicationIntent.UpdateAlarmTime(state.hour, state.minute))
                     showTimePicker = false

@@ -1,7 +1,5 @@
 package com.moon.pharm.domain.model.consult
 
-import java.time.LocalDateTime
-
 data class ConsultItem(
     val id: String,
     val userId: String,
@@ -9,7 +7,7 @@ data class ConsultItem(
     val title: String,
     val content: String,
     val status: ConsultStatus,
-    val createdAt: LocalDateTime,
+    val createdAt: Long,
     val images: List<ConsultImage> = emptyList(),
     val answer: ConsultAnswer? = null
 )

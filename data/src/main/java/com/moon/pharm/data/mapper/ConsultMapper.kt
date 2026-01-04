@@ -1,14 +1,13 @@
 package com.moon.pharm.data.mapper
 
-import com.moon.pharm.data.common.toLocalDateTime
 import com.moon.pharm.data.common.toTimestamp
 import com.moon.pharm.data.remote.dto.ConsultAnswerDTO
 import com.moon.pharm.data.remote.dto.ConsultItemDTO
 import com.moon.pharm.data.remote.dto.PharmacistDTO
-import com.moon.pharm.domain.model.ConsultAnswer
-import com.moon.pharm.domain.model.ConsultImage
+import com.moon.pharm.domain.model.consult.ConsultAnswer
+import com.moon.pharm.domain.model.consult.ConsultImage
 import com.moon.pharm.domain.model.consult.ConsultItem
-import com.moon.pharm.domain.model.ConsultStatus
+import com.moon.pharm.domain.model.consult.ConsultStatus
 import com.moon.pharm.domain.model.Pharmacist
 import kotlin.collections.map
 
@@ -25,7 +24,7 @@ fun ConsultItemDTO.toDomainConsult(): ConsultItem {
             ConsultStatus.WAITING
         },
         images = this.images?.map { ConsultImage(it) } ?: emptyList(),
-        createdAt = this.createdAt.toLocalDateTime(),
+        createdAt = this.createdAt?.toDate()?.time ?: 0L,
         answer = this.answer?.toDomainAnswer()
     )
 }
@@ -58,7 +57,7 @@ fun ConsultAnswerDTO.toDomainAnswer(): ConsultAnswer {
         answerId = this.answerId,
         expertId = this.expertId,
         content = this.content,
-        createdAt = this.createdAt.toLocalDateTime()
+        createdAt = this.createdAt?.toDate()?.time ?: 0L
     )
 }
 

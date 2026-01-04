@@ -1,4 +1,7 @@
 <resources>
+    <string name="error_empty_medication_name">약 이름을 입력해주세요.</string>
+    <string name="error_create_medication">복용 알림 등록 실패</string>
+
     <string name="medication_category_all">전체</string>
     <string name="medication_category_prescription">처방약</string>
     <string name="medication_category_general">일반약</string>
@@ -11,12 +14,17 @@
 
     <string name="medication_take_off">복용하기</string>
     <string name="medication_take_on">복용완료</string>
-    <string name="medication_add">등록하기</string>
 
     <string name="medication_name_hint">약물 이름 입력</string>
     <string name="medication_dosage_hint">복용 용량 입력(예: 2알, 1캡슐)</string>
 
+    <string name="medication_alarm_time_dialog_title">알람 시간 설정</string>
     <string name="medication_alarm_group_by_meal">묶음 알림 (식사 시간에 따라)</string>
     <string name="medication_alarm_group_description">식사 시간(식전/식후)이 같은 약들을 한 번의 알림으로 모아줍니다.</string>
     <string name="medication_info">정보</string>
+    <string name="medication_add">등록하기</string>
+
+
+    <string name="medication_time_label">%1$s 복용</string>
+    <string name="medication_progress_today">오늘 복용 %1$d/%2$d회 완료</string>
 </resources>

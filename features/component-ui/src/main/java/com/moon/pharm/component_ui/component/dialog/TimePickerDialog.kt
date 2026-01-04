@@ -20,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.Tertiary
 import com.moon.pharm.component_ui.theme.White
@@ -28,10 +27,12 @@ import com.moon.pharm.component_ui.theme.onPrimaryContainerLight
 import com.moon.pharm.component_ui.theme.primaryContainerLight
 import com.moon.pharm.component_ui.theme.tertiaryLight
 import java.util.Calendar
+import com.moon.pharm.component_ui.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerDialog(
+    title: String,
     onConfirm: (TimePickerState) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -66,7 +67,7 @@ fun TimePickerDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(R.string.medication_alarm_time_dialog_title),
+                    text = title,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 20.dp)

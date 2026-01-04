@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 class ConsultRepositoryImpl @Inject constructor(
@@ -38,7 +37,7 @@ class ConsultRepositoryImpl @Inject constructor(
                 content = "",
                 expertId = "",
                 status = ConsultStatus.WAITING,
-                createdAt = LocalDateTime.now(),
+                createdAt = System.currentTimeMillis(),
                 images = emptyList(),
                 answer = null
             )

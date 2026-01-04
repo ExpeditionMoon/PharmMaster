@@ -1,12 +1,13 @@
 package com.moon.pharm.consult.screen
 
+import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.model.ConsultPrimaryTab
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.Pharmacist
 
 data class ConsultUiState (
     val isLoading: Boolean = false,
-    val userMessage: String? = null,
+    val userMessage: UiMessage? = null,
     val isConsultCreated: Boolean = false,
 
     val consultList: List<ConsultItem> = emptyList(),

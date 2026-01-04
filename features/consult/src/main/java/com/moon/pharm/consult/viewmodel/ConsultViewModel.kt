@@ -3,6 +3,8 @@ package com.moon.pharm.consult.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.consult.common.ConsultUiMessage
 import com.moon.pharm.consult.screen.ConsultUiState
 import com.moon.pharm.consult.model.ConsultPrimaryTab
 import com.moon.pharm.consult.screen.ConsultWriteState
@@ -20,7 +22,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,7 +47,7 @@ class ConsultViewModel @Inject constructor(
                     title = "오메가3 고르는 법",
                     content = "rTG 오메가3가 일반 제품보다 흡수율이 훨씬 높은가요?",
                     status = ConsultStatus.WAITING,
-                    createdAt = LocalDateTime.now(),
+                    createdAt = System.currentTimeMillis(),
                     images = emptyList(),
                     answer = null
                 ),
@@ -98,38 +99,29 @@ class ConsultViewModel @Inject constructor(
         val writeData = _uiState.value.writeState
         val newItem = ConsultItem(
             id = "",
-            userId = "current_user_id",
+            userId = "",
             expertId = writeData.expertId,
             title = writeData.title,
             content = writeData.content,
             status = ConsultStatus.WAITING,
-            createdAt = LocalDateTime.now(),
+            createdAt = System.currentTimeMillis(),
             images = writeData.images.map { ConsultImage(it) })
-        createConsult(newItem)
+        saveConsult(newItem)
     }
 
-    fun createConsult(consultInfo: ConsultItem) {
+    fun saveConsult(consultInfo: ConsultItem) {
         viewModelScope.launch {
             consultUseCases.createConsultUseCase(consultInfo).collectLatest { result ->
                 _uiState.update { currentState ->
                     when (result) {
-                        is DataResourceResult.Loading -> {
-                            currentState.copy(isLoading = true, userMessage = null)
-                        }
-
-                        is DataResourceResult.Success -> {
-                            currentState.copy(
+                        is DataResourceResult.Loading -> currentState.copy(isLoading = true, userMessage = null)
+                        is DataResourceResult.Success -> currentState.copy(
                                 isLoading = false, isConsultCreated = true
                             )
-                        }
-
-                        is DataResourceResult.Failure -> {
-                            currentState.copy(
+                        is DataResourceResult.Failure -> currentState.copy(
                                 isLoading = false,
-                                userMessage = result.exception.message ?: "상담 등록 실패"
+                                userMessage = ConsultUiMessage.CreateFailed
                             )
-                        }
-
                         else -> currentState
                     }
                 }
@@ -155,7 +147,9 @@ class ConsultViewModel @Inject constructor(
                         is DataResourceResult.Failure -> {
                             currentState.copy(
                                 isLoading = false,
-                                userMessage = result.exception.message ?: "데이터를 불러오지 못했습니다."
+                                userMessage = result.exception.message
+                                    ?.let { UiMessage.Error(it) }
+                                    ?: UiMessage.LoadDataFailed
                             )
                         }
 

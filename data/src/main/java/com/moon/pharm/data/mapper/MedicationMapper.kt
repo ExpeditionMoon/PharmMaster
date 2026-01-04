@@ -1,13 +1,13 @@
 package com.moon.pharm.data.mapper
 
-import com.moon.pharm.data.common.toLocalDate
+import com.moon.pharm.data.common.parseAlarmTimeToLong
+import com.moon.pharm.data.common.toLong
 import com.moon.pharm.data.common.toTimestamp
 import com.moon.pharm.data.remote.dto.MedicationItemDTO
 import com.moon.pharm.domain.model.MealTiming
 import com.moon.pharm.domain.model.MedicationItem
 import com.moon.pharm.domain.model.MedicationType
 import com.moon.pharm.domain.model.RepeatType
-import java.time.LocalTime
 
 fun MedicationItemDTO.toDomainMedication(): MedicationItem {
     return MedicationItem(
@@ -15,10 +15,10 @@ fun MedicationItemDTO.toDomainMedication(): MedicationItem {
         name = this.name,
         dosage = this.dosage,
         type = MedicationType.valueOf(this.type),
-        startDate = this.startDate.toLocalDate(),
-        endDate = this.endDate?.toLocalDate(),
+        startDate = this.startDate.toLong(),
+        endDate = this.endDate?.toLong(),
         noEndDate = this.noEndDate,
-        alarmTime = if (this.alarmTime.isNotEmpty()) LocalTime.parse(this.alarmTime) else null,
+        alarmTime = parseAlarmTimeToLong(this.alarmTime),
         mealTiming = MealTiming.valueOf(this.mealTiming),
         repeatType = RepeatType.valueOf(this.repeatType),
         isTaken = this.isTaken
