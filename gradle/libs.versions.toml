@@ -12,6 +12,9 @@ navigationCompose = "2.9.6"
 
 jetbrainsKotlinJvm = "2.2.0"
 
+#Splash
+coreSplashscreen = "1.0.1"
+
 #kotlin-seriaization
 kotlinxSerialization = "1.9.0"
 
@@ -59,6 +62,9 @@ androidx-material-icons-extended = { group = "androidx.compose.material", name =
 
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
+
+#Spash
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 
 #kotlin-serailization
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }

@@ -63,6 +63,9 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.libs)
 
+    //Splash
+    implementation(libs.androidx.core.splashscreen)
+
     // Hilt Core
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
