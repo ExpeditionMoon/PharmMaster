@@ -33,7 +33,6 @@ javaxInject = "1"
 
 #Firestore
 firebaseBom = "34.6.0"
-firebaseFirestoreKtx = "25.1.4"
 googleGmsServices = "4.4.4"
 
 #Test Toolebox
@@ -81,7 +80,9 @@ javax-inject = { group = "javax.inject", name = "javax.inject", version.ref = "j
 
 #Firebase
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
 
 #Test Box
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
@@ -124,5 +125,5 @@ compose-libs = [
 ]
 
 firebase-libs = [
-    "firebase-firestore-ktx"
+    "firebase-firestore"
 ]

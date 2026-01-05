@@ -43,6 +43,9 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
+    // Auth
+    implementation(libs.firebase.auth)
+
     // Hilt Core
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
