@@ -1,9 +1,9 @@
 package com.moon.pharm.data.mapper
 
 import com.moon.pharm.data.common.toTimestamp
-import com.moon.pharm.data.remote.dto.ConsultAnswerDTO
-import com.moon.pharm.data.remote.dto.ConsultItemDTO
-import com.moon.pharm.data.remote.dto.PharmacistDTO
+import com.moon.pharm.data.datasource.remote.dto.ConsultAnswerDTO
+import com.moon.pharm.data.datasource.remote.dto.ConsultItemDTO
+import com.moon.pharm.data.datasource.remote.dto.PharmacistDTO
 import com.moon.pharm.domain.model.consult.ConsultAnswer
 import com.moon.pharm.domain.model.consult.ConsultImage
 import com.moon.pharm.domain.model.consult.ConsultItem

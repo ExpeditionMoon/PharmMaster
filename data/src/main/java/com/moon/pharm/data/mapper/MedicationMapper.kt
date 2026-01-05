@@ -3,7 +3,7 @@ package com.moon.pharm.data.mapper
 import com.moon.pharm.data.common.parseAlarmTimeToLong
 import com.moon.pharm.data.common.toLong
 import com.moon.pharm.data.common.toTimestamp
-import com.moon.pharm.data.remote.dto.MedicationItemDTO
+import com.moon.pharm.data.datasource.remote.dto.MedicationItemDTO
 import com.moon.pharm.domain.model.MealTiming
 import com.moon.pharm.domain.model.MedicationItem
 import com.moon.pharm.domain.model.MedicationType

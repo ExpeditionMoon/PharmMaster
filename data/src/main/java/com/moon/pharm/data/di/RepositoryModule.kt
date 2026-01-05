@@ -1,7 +1,7 @@
 package com.moon.pharm.data.di
 
-import com.moon.pharm.data.remote.firebase.FirestoreConsultRepositoryImpl
-import com.moon.pharm.data.remote.firebase.FirestoreMedicationRepositoryImpl
+import com.moon.pharm.data.repository.ConsultRepositoryImpl
+import com.moon.pharm.data.repository.MedicationRepositoryImpl
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.repository.MedicationRepository
 import dagger.Binds
@@ -17,12 +17,12 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindConsultRepository(
-        impl: FirestoreConsultRepositoryImpl
+        impl: ConsultRepositoryImpl
     ): ConsultRepository
 
     @Binds
     @Singleton
     abstract fun bindMedicationRepository(
-        impl: FirestoreMedicationRepositoryImpl
+        impl: MedicationRepositoryImpl
     ): MedicationRepository
 }

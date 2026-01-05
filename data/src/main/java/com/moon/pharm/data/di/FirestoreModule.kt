@@ -3,8 +3,8 @@ package com.moon.pharm.data.di
 import com.google.firebase.firestore.FirebaseFirestore
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.MedicationDataSource
-import com.moon.pharm.data.remote.firebase.FirestoreConsultDataSourceImpl
-import com.moon.pharm.data.remote.firebase.FirestoreMedicationDataSourceImpl
+import com.moon.pharm.data.datasource.remote.firebase.FirestoreConsultDataSourceImpl
+import com.moon.pharm.data.datasource.remote.firebase.FirestoreMedicationDataSourceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -1,9 +1,9 @@
-package com.moon.pharm.data.remote.firebase
+package com.moon.pharm.data.repository
 
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.di.IoDispatcher
-import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.Pharmacist
+import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.CoroutineDispatcher
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
-class FirestoreConsultRepositoryImpl @Inject constructor(
+class ConsultRepositoryImpl @Inject constructor(
     private val dataSource: ConsultDataSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ConsultRepository {

@@ -1,4 +1,4 @@
-package com.moon.pharm.data.remote.firebase
+package com.moon.pharm.data.datasource.remote.firebase
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.moon.pharm.data.common.CONSULT_COLLECTION
@@ -7,7 +7,7 @@ import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.mapper.toDomainConsult
 import com.moon.pharm.data.mapper.toDomainConsultList
 import com.moon.pharm.data.mapper.toFirestoreConsultDTO
-import com.moon.pharm.data.remote.dto.ConsultItemDTO
+import com.moon.pharm.data.datasource.remote.dto.ConsultItemDTO
 import com.moon.pharm.domain.model.consult.ConsultItem
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

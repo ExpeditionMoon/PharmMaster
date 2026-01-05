@@ -1,4 +1,4 @@
-package com.moon.pharm.data.remote.firebase
+package com.moon.pharm.data.repository
 
 import com.moon.pharm.data.datasource.MedicationDataSource
 import com.moon.pharm.data.di.IoDispatcher
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
-class FirestoreMedicationRepositoryImpl @Inject constructor(
+class MedicationRepositoryImpl @Inject constructor(
     private val dataSource: MedicationDataSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MedicationRepository {

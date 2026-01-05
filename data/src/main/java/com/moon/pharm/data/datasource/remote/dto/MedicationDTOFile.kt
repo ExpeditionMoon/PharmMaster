@@ -1,4 +1,4 @@
-package com.moon.pharm.data.remote.dto
+package com.moon.pharm.data.datasource.remote.dto
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId

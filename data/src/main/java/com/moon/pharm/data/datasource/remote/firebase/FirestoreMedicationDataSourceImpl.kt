@@ -1,4 +1,4 @@
-package com.moon.pharm.data.remote.firebase
+package com.moon.pharm.data.datasource.remote.firebase
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.moon.pharm.data.common.FIELD_ALARM_TIME
@@ -6,7 +6,7 @@ import com.moon.pharm.data.common.MEDICATION_COLLECTION
 import com.moon.pharm.data.datasource.MedicationDataSource
 import com.moon.pharm.data.mapper.toDomainMedicationList
 import com.moon.pharm.data.mapper.toFirestoreMedicationDTO
-import com.moon.pharm.data.remote.dto.MedicationItemDTO
+import com.moon.pharm.data.datasource.remote.dto.MedicationItemDTO
 import com.moon.pharm.domain.model.MedicationItem
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
