@@ -1,6 +1,6 @@
 package com.moon.pharm.data.datasource
 
-import com.moon.pharm.domain.model.User
+import com.moon.pharm.domain.model.auth.User
 
 interface AuthDataSource{
     suspend fun createUser(user: User)

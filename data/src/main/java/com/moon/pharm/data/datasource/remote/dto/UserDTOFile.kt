@@ -1,7 +1,9 @@
 package com.moon.pharm.data.datasource.remote.dto
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.IgnoreExtraProperties
+import com.google.firebase.firestore.ServerTimestamp
 
 @IgnoreExtraProperties
 data class UserDTO(
@@ -9,7 +11,10 @@ data class UserDTO(
     var id: String = "",
 
     val email: String = "",
-    val nickname: String = "",
+    val nickName: String = "",
     val userType: String = "",
-    val profileImageUrl: String? = null
+    val profileImageUrl: String? = null,
+
+    @ServerTimestamp
+    var createdAt: Timestamp? = null
 )

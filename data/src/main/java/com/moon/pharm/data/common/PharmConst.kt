@@ -11,5 +11,6 @@ const val FIELD_ALARM_TIME = "alarmTime"
 private const val INTERNAL_PW_PREFIX = "auto_pass_"
 
 fun generateInternalPassword(email: String): String {
-    return "$INTERNAL_PW_PREFIX${email.hashCode()}"
+    val hash = email.hashCode().toString().replace("-", "")
+    return (INTERNAL_PW_PREFIX + hash + "000000").take(10)
 }

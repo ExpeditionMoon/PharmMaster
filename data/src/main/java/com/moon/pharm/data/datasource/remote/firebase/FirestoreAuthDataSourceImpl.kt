@@ -8,7 +8,7 @@ import com.moon.pharm.data.common.generateInternalPassword
 import com.moon.pharm.data.datasource.AuthDataSource
 import com.moon.pharm.data.mapper.toFirestoreUserDTO
 import com.moon.pharm.domain.model.AuthError
-import com.moon.pharm.domain.model.User
+import com.moon.pharm.domain.model.auth.User
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 

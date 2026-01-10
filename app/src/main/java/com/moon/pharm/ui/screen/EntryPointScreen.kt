@@ -49,6 +49,9 @@ fun EntryPointScreen() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
+    val isSignUpScreen = currentRoute?.contains("SignUpScreen") == true
+    val shouldShowBars = !isSignUpScreen
+
     val baseTopBarData = navBackStackEntry?.getTopBarData(navController) ?: TopBarData()
 
     val topBarData = remember(baseTopBarData, navController) {
@@ -65,28 +68,29 @@ fun EntryPointScreen() {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            PharmTopBar(data = topBarData)
+            if (shouldShowBars && topBarData.isVisible) {
+                PharmTopBar(data = topBarData)
+            }
         },
         bottomBar = {
-            val uiModels = bottomAppBarItems.map { navItem ->
-                BottomBarUiModel(
-                    tabName = navItem.tabName,
-                    icon = navItem.icon,
-                    onClick = {
-                        navController.navigate(navItem.destination) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+            if (shouldShowBars) {
+                val uiModels = bottomAppBarItems.map { navItem ->
+                    BottomBarUiModel(
+                        tabName = navItem.tabName,
+                        icon = navItem.icon,
+                        onClick = {
+                            navController.navigate(navItem.destination) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
-                    }
-                )
+                    )
+                }
+                PharmBottomBar(items = uiModels, currentRoute = currentRoute)
             }
-            PharmBottomBar(
-                items = uiModels,
-                currentRoute = currentRoute
-            )
         },
         floatingActionButton = {
             if (currentRoute?.contains("HomeTab") == true) {
@@ -110,15 +114,17 @@ fun EntryPointScreen() {
             }
         }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+        val contentPadding = if (shouldShowBars) innerPadding else androidx.compose.foundation.layout.PaddingValues(0.dp)
+
+        Box(modifier = Modifier.padding(contentPadding)) {
             NavHost(
                 navController = navController,
-                startDestination = ContentNavigationRoute.HomeTab,
+                startDestination = ContentNavigationRoute.SignUpScreen,
                 modifier = Modifier.fillMaxSize()
             ) {
                 homeNavGraph(navController)
                 consultNavGraph(navController, viewModel = consultViewModel)
-                profileNavGraph(navController, viewModel = medicationViewModel)
+                profileNavGraph(navController)
                 prescriptionNavGraph(navController)
             }
         }

@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 data class TopBarData(
     val title: String = "",
+    val isVisible: Boolean = true,
     val isLogoTitle: Boolean = false,
     val navigationType: TopBarNavigationType = TopBarNavigationType.None,
     val onNavigationClick: () -> Unit = {},

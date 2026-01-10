@@ -7,11 +7,11 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Storage
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-
 
 fun defaultHomeTopBarData() = TopBarData(
     title = "홈",
@@ -26,7 +26,10 @@ fun defaultHomeTopBarData() = TopBarData(
 fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
         val routeName = destination.route ?: return TopBarData()
         return when {
-            routeName.contains("HomeTab") -> {
+            destination.hasRoute<ContentNavigationRoute.SignUpScreen>() -> {
+                TopBarData(isVisible = false)
+            }
+            destination.hasRoute<ContentNavigationRoute.HomeTab>() -> {
                 defaultHomeTopBarData()
             }
             routeName.contains("MedicationTabCreateScreen") -> {
@@ -95,7 +98,7 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
             }
             routeName.contains("ConsultTabDetailScreen") -> {
                 TopBarData(
-                    title = "상담 게시판", // 혹은 "상담 상세"
+                    title = "상담 게시판",
                     navigationType = TopBarNavigationType.Back
                 )
             }
@@ -123,7 +126,6 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
                     title = "처방전"
                 )
             }
-
             else -> throw IllegalArgumentException("내가 선언하지 않은 Route Screen")
         }
     }
