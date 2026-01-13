@@ -5,8 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ConsultDataSource {
     suspend fun create(consult: ConsultItem)
-
     fun getConsultItems(): Flow<List<ConsultItem>>
-
-    fun getConsultDetail(id: String): Flow<ConsultItem>
+    fun getConsultDetail(id: String): Flow<ConsultItem?>
 }

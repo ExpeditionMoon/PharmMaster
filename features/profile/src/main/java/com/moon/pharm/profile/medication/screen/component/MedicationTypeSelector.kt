@@ -20,7 +20,7 @@ import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.Tertiary
 import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.domain.model.MedicationType
+import com.moon.pharm.domain.model.medication.MedicationType
 
 @Composable
 fun MedicationTypeSelector(

@@ -48,14 +48,14 @@ fun ConsultConfirmScreen(
 
     LaunchedEffect(uiState.isConsultCreated) {
         if (uiState.isConsultCreated) {
-            viewModel.resetDonationState()
+            viewModel.resetConsultState()
         }
     }
 
     ConsultConfirmContent(
         title = writeState.title,
         content = writeState.content,
-        selectedPharmacistName = writeState.pharmacist?.name ?: "선택된 약사 없음",
+        selectedPharmacistName = uiState.answerPharmacist?.name ?: "선택된 약사 없음",
         onEditTitleOrContent = {
             navController.popBackStack(ContentNavigationRoute.ConsultTabWriteScreen, false)
         },

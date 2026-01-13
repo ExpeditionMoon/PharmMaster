@@ -2,20 +2,19 @@ package com.moon.pharm.data.mapper
 
 import com.moon.pharm.data.common.toTimestamp
 import com.moon.pharm.data.datasource.remote.dto.ConsultAnswerDTO
+import com.moon.pharm.data.datasource.remote.dto.ConsultImageDTO
 import com.moon.pharm.data.datasource.remote.dto.ConsultItemDTO
-import com.moon.pharm.data.datasource.remote.dto.PharmacistDTO
 import com.moon.pharm.domain.model.consult.ConsultAnswer
 import com.moon.pharm.domain.model.consult.ConsultImage
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.consult.ConsultStatus
-import com.moon.pharm.domain.model.Pharmacist
 import kotlin.collections.map
 
-fun ConsultItemDTO.toDomainConsult(): ConsultItem {
+fun ConsultItemDTO.toDomain(): ConsultItem {
     return ConsultItem(
         id = this.id,
         userId = this.userId,
-        expertId = this.expertId,
+        pharmacistId = this.pharmacistId,
         title = this.title,
         content = this.content,
         status = try {
@@ -23,52 +22,42 @@ fun ConsultItemDTO.toDomainConsult(): ConsultItem {
         } catch (e: Exception) {
             ConsultStatus.WAITING
         },
-        images = this.images?.map { ConsultImage(it) } ?: emptyList(),
+        images = this.images?.map { ConsultImage(it.imageName, it.imageUrl) } ?: emptyList(),
         createdAt = this.createdAt?.toDate()?.time ?: 0L,
-        answer = this.answer?.toDomainAnswer()
+        answer = this.answer?.toDomain()
     )
 }
 
-fun ConsultItem.toFirestoreConsultDTO(): ConsultItemDTO {
+fun ConsultItem.toDto(): ConsultItemDTO {
     return ConsultItemDTO(
+        id = this.id,
         userId = this.userId,
-        expertId = this.expertId,
+        pharmacistId = this.pharmacistId,
         title = this.title,
         content = this.content,
         status = this.status.name,
-        images = this.images.map { it.imageName },
+        images = this.images.map { ConsultImageDTO(it.imageName, it.imageUrl) },
         createdAt = this.createdAt.toTimestamp(),
         answer = this.answer?.let {
             ConsultAnswerDTO(
                 answerId = it.answerId,
-                expertId = it.expertId,
+                pharmacistId = it.pharmacistId,
+                pharmacistName = it.pharmacistName,
                 content = it.content,
-                createdAt = null
+                createdAt = it.createdAt.toTimestamp()
             )
         }
     )
 }
 
-fun List<ConsultItemDTO>.toDomainConsultList() =
-    this.map { it.toDomainConsult() }.toList()
-
-fun ConsultAnswerDTO.toDomainAnswer(): ConsultAnswer {
+fun ConsultAnswerDTO.toDomain(): ConsultAnswer {
     return ConsultAnswer(
         answerId = this.answerId,
-        expertId = this.expertId,
+        pharmacistId = this.pharmacistId,
+        pharmacistName = this.pharmacistName,
         content = this.content,
         createdAt = this.createdAt?.toDate()?.time ?: 0L
     )
 }
 
-fun PharmacistDTO.toDomainPharmacist(): Pharmacist {
-    return Pharmacist(
-        id = this.id,
-        name = this.name,
-        bio = this.bio ?: "",
-        pharmacyId = this.pharmacyId,
-        pharmacyName = this.pharmacyName,
-        isApproved = this.isApproved,
-        imageUrl = this.imageUrl ?: ""
-    )
-}
+fun List<ConsultItemDTO>.toDomainList() = this.map { it.toDomain() }

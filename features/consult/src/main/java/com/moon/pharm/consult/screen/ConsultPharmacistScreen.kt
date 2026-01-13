@@ -23,16 +23,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,11 +52,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.moon.pharm.consult.R
 import com.moon.pharm.component_ui.theme.Placeholder
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.SecondFont
@@ -60,8 +62,10 @@ import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.consult.R
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
-import com.moon.pharm.domain.model.Pharmacist
+import com.moon.pharm.domain.model.auth.Pharmacist
+import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,51 +74,91 @@ fun ConsultPharmacistScreen(
     navController: NavController,
     viewModel: ConsultViewModel,
 ) {
-    val pharmacists by viewModel.pharmacists.collectAsState()
-    var isMapView by remember { mutableStateOf(false) }
-    var searchText by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
+    val writeState = uiState.writeState
 
-    BackHandler {
-        if (isMapView) isMapView = false else navController.popBackStack()
+    val searchResults = writeState.searchResults
+    val availablePharmacists = writeState.availablePharmacists
+
+    var isMapView by remember { mutableStateOf(false) }
+
+    val scaffoldState = rememberBottomSheetScaffoldState()
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(writeState.selectedPharmacy) {
+        if (writeState.selectedPharmacy != null) {
+            scaffoldState.bottomSheetState.expand()
+        }
     }
 
-    ConsultPharmacistContent(
-        isMapView = isMapView,
-        searchText = searchText,
-        pharmacists = pharmacists,
-        onSearchChange = {
-            searchText = it
-            viewModel.selectPharmacy(it) },
-        onToggleMapView = { isMapView = it },
-        onPharmacistSelect = { pharmacist ->
-            viewModel.updateExpert(pharmacist.id)
+    BackHandler {
+        if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
+            scope.launch { scaffoldState.bottomSheetState.partialExpand() }
+        } else if (isMapView) {
+            isMapView = false
+        } else {
+            navController.popBackStack()
         }
-    )
-}
+    }
 
-@Composable
-fun ConsultPharmacistContent(
-    isMapView: Boolean,
-    searchText: String,
-    pharmacists: List<Pharmacist>,
-    onSearchChange: (String) -> Unit,
-    onToggleMapView: (Boolean) -> Unit,
-    onPharmacistSelect: (Pharmacist) -> Unit
-) {
     if (isMapView) {
         PharmacistMapView(
-            pharmacists = pharmacists,
-            onBack = { onToggleMapView(false) },
-            onPharmacistSelect = onPharmacistSelect
+            scaffoldState = scaffoldState,
+            pharmacists = availablePharmacists,
+            pharmacyName = writeState.selectedPharmacy?.name ?: "약국",
+            onBack = { isMapView = false },
+            onPharmacistSelect = { pharmacist ->
+                viewModel.selectPharmacist(pharmacist.userId)
+                navController.popBackStack()
+            }
         )
     } else {
         PharmacistSearchView(
-            searchText = searchText,
-            pharmacists = pharmacists,
-            onSearchChange = onSearchChange,
-            onNavigateToMap = { onToggleMapView(true) },
-            onPharmacistSelect = onPharmacistSelect
+            searchText = writeState.searchQuery,
+            pharmacies = searchResults,
+            onSearchChange = { viewModel.onSearchQueryChanged(it) },
+            onNavigateToMap = { isMapView = true },
+            onPharmacySelect = { pharmacy ->
+                viewModel.selectPharmacy(pharmacy)
+            }
         )
+    }
+}
+
+@Composable
+fun PharmacyItem(
+    pharmacy: Pharmacy,
+    onSelect: (Pharmacy) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(White, RoundedCornerShape(10.dp))
+            .clickable { onSelect(pharmacy) }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.LocationOn,
+            contentDescription = null,
+            tint = Primary,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Text(
+                text = pharmacy.name,
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp,
+                color = Color.Black
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = pharmacy.address,
+                color = SecondFont,
+                fontSize = 13.sp
+            )
+        }
     }
 }
 
@@ -140,21 +184,21 @@ fun PharmacistItem(
                     .border(1.dp, tertiaryLight, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                if (pharmacist.imageUrl.isNotEmpty()) {
+//                if (pharmacy.imageUrl.isNotEmpty()) {
 //                    Image(
 //                        painter = painterResource(id = pharmacist.imageUrl),
 //                        contentDescription = null,
 //                        contentScale = ContentScale.Crop,
 //                        modifier = Modifier.fillMaxSize()
 //                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Image,
-                        contentDescription = null,
-                        tint = Color.Gray,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
+//                } else {
+                Icon(
+                    imageVector = Icons.Default.Image,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(24.dp)
+                )
+//                }
             }
 
             Spacer(modifier = Modifier.width(10.dp))
@@ -174,7 +218,6 @@ fun PharmacistItem(
                 )
             }
         }
-
         Button(
             onClick = { onSelect(pharmacist) },
             colors = ButtonDefaults.buttonColors(containerColor = Primary),
@@ -196,10 +239,10 @@ fun PharmacistItem(
 @Composable
 fun PharmacistSearchView(
     searchText: String,
-    pharmacists: List<Pharmacist>,
+    pharmacies: List<Pharmacy>,
     onSearchChange: (String) -> Unit,
     onNavigateToMap: () -> Unit,
-    onPharmacistSelect: (Pharmacist) -> Unit
+    onPharmacySelect: (Pharmacy) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -234,10 +277,10 @@ fun PharmacistSearchView(
 
         if (searchText.isNotEmpty()) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items (pharmacists){ pharmacist ->
-                    PharmacistItem(
-                        pharmacist = pharmacist,
-                        onSelect = onPharmacistSelect
+                items (pharmacies){ pharmacy ->
+                    PharmacyItem(
+                        pharmacy = pharmacy,
+                        onSelect = onPharmacySelect
                     )
                 }
             }
@@ -250,12 +293,13 @@ fun PharmacistSearchView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PharmacistMapView(
+    scaffoldState: BottomSheetScaffoldState,
     pharmacists: List<Pharmacist>,
+    pharmacyName: String,
     onBack: () -> Unit,
     onPharmacistSelect: (Pharmacist) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val scaffoldState = rememberBottomSheetScaffoldState()
 
     BackHandler {
         onBack()
@@ -281,24 +325,32 @@ fun PharmacistMapView(
                             .background(tertiaryLight)
                     )
                 }
-                
+
                 Text(
-                    text = "OO약국 약사 목록",
+                    text = "$pharmacyName 약사 목록",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
 
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(bottom = 24.dp)
-                ) {
-                    items(pharmacists) { pharmacist ->
-                        PharmacistItem(
-                            pharmacist = pharmacist,
-                            onSelect = onPharmacistSelect
-                        )
+                if (pharmacists.isEmpty()) {
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp), contentAlignment = Alignment.Center) {
+                        Text("등록된 약사가 없습니다.", color = SecondFont)
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(bottom = 24.dp)
+                    ) {
+                        items(pharmacists) { pharmacist ->
+                            PharmacistItem(
+                                pharmacist = pharmacist,
+                                onSelect = onPharmacistSelect
+                            )
+                        }
                     }
                 }
             }
@@ -312,7 +364,7 @@ fun PharmacistMapView(
 //                contentScale = ContentScale.Crop,
 //                modifier = Modifier.fillMaxSize()
 //            )
-            
+
             Button(
                 onClick = {
                     scope.launch { scaffoldState.bottomSheetState.expand() }
@@ -412,7 +464,7 @@ fun MapFindBanner(
                 brush = Brush.linearGradient(
                     colors = listOf(
                         Color(0xFFE3F2FD),
-                        Color(0xFFF3E5F5)  
+                        Color(0xFFF3E5F5)
                     )
                 )
             )
@@ -437,28 +489,5 @@ fun MapFindBanner(
                 color = Primary
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun PharmacistSearchViewPreview() {
-    val fakePharmacists = listOf(
-        Pharmacist("1", "김약사", "", "만성질환 상담 전문"),
-        Pharmacist("2", "이약사", "", "비타민/영양제 상담 전문")
-    )
-
-    Column(modifier = Modifier.fillMaxSize().background(backgroundLight).padding(20.dp)) {
-        PharmacistSearchView(
-            searchText = "",
-            pharmacists = fakePharmacists,
-            onSearchChange = {},
-            onNavigateToMap = {},
-            onPharmacistSelect = {}
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        PharmacistItem(pharmacist = fakePharmacists[0], onSelect = {})
     }
 }

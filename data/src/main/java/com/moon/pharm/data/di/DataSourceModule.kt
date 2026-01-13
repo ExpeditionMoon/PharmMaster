@@ -3,9 +3,11 @@ package com.moon.pharm.data.di
 import com.moon.pharm.data.datasource.AuthDataSource
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.MedicationDataSource
+import com.moon.pharm.data.datasource.PharmacyDataSource
 import com.moon.pharm.data.datasource.remote.firebase.FirestoreAuthDataSourceImpl
 import com.moon.pharm.data.datasource.remote.firebase.FirestoreConsultDataSourceImpl
 import com.moon.pharm.data.datasource.remote.firebase.FirestoreMedicationDataSourceImpl
+import com.moon.pharm.data.datasource.remote.firebase.FirestorePharmacyDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -27,6 +29,12 @@ abstract class DataSourceModule {
     abstract fun bindConsultDataSource(
         impl: FirestoreConsultDataSourceImpl
     ): ConsultDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindPharmacyDataSource(
+        impl: FirestorePharmacyDataSourceImpl
+    ): PharmacyDataSource
 
     @Binds
     @Singleton

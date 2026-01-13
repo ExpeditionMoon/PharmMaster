@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
@@ -48,12 +49,12 @@ fun ConsultScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     Column {
-/*        Button(
+        Button(
             onClick = { viewModel.testFirestore() },
             modifier = Modifier.padding(16.dp)
         ) {
             Text("Firestore 연결 테스트")
-        }*/
+        }
 
         ConsultContent(
             selectedTab = uiState.selectedTab,

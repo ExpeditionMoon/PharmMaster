@@ -2,17 +2,22 @@ package com.moon.pharm.home.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.outlined.VerifiedUser
@@ -21,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,10 +47,13 @@ import com.moon.pharm.component_ui.component.SectionHeader
 @Preview(showBackground = true)
 @Composable
 fun HomeMainScreen() {
+    val scrollState = rememberScrollState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundLight)
+            .verticalScroll(scrollState)
     ){
         Column (
             modifier = Modifier.fillMaxSize()
@@ -152,7 +161,7 @@ fun RateOfUse() {
                 color = Secondary.copy(alpha = 0.1f),
                 shape = RoundedCornerShape(10.dp)
             )
-            .height(60.dp),
+            .heightIn(min = 60.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
@@ -164,10 +173,10 @@ fun RateOfUse() {
                     color = Secondary,
                     shape = RoundedCornerShape(10.dp)
                 )
-                .height(40.dp)
+//                .height(40.dp)
                 .width(80.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ){
             Text(
                 text = "이번 주 복용률",
@@ -209,7 +218,7 @@ fun PharmSafety() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp)
-            .height(130.dp)
+            .heightIn(min = 140.dp)
             .background(
                 color = Primary,
                 shape = RoundedCornerShape(10.dp)
@@ -246,31 +255,36 @@ fun PharmSafety() {
                 )
             }
         }
-        Column (
+        Box (
             modifier = Modifier
-                .width(325.dp)
-                .height(30.dp)
-                .padding(top = 10.dp, start = 65.dp)
+                .fillMaxWidth()
+                .padding(start = 65.dp, end = 20.dp, top = 12.dp, bottom = 16.dp)
                 .background(
                     color = Color.White,
                     shape = RoundedCornerShape(5.dp)
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                )
+                .padding(vertical = 4.dp),
+            contentAlignment = Alignment.Center
         ){
-            TextButton (
-                onClick = {},
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = Primary
-                ),
-                contentPadding = PaddingValues(0.dp)
-            ){
+//            TextButton(
+//                onClick = {},
+//                modifier = Modifier.defaultMinSize(minHeight = 1.dp),
+//                colors = ButtonDefaults.textButtonColors(
+//                    contentColor = Primary
+//                ),
+//                contentPadding = PaddingValues(0.dp)
+//            ) {
                 Text(
                     text = "안전성 바로 확인하기 >",
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.Normal
+                    fontWeight = FontWeight.Normal,
+                    color = Primary,
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .clickable { }
                 )
-            }
+//            }
+
         }
     }
 }

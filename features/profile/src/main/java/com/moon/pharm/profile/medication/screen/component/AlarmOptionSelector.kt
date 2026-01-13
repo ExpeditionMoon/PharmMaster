@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.button.SelectButton
-import com.moon.pharm.domain.model.RepeatType
+import com.moon.pharm.domain.model.medication.RepeatType
 
 @Composable
 fun AlarmOptionSelector(

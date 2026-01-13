@@ -3,17 +3,20 @@ package com.moon.pharm.profile.medication.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.domain.model.MealTiming
-import com.moon.pharm.domain.model.MedicationProgress
-import com.moon.pharm.domain.model.MedicationTimeGroup
-import com.moon.pharm.domain.model.MedicationType
-import com.moon.pharm.domain.model.RepeatType
+import com.moon.pharm.component_ui.util.toDisplayDateString
+import com.moon.pharm.domain.model.medication.MealTiming
+import com.moon.pharm.domain.model.medication.MedicationProgress
+import com.moon.pharm.domain.model.medication.MedicationTimeGroup
+import com.moon.pharm.domain.model.medication.MedicationType
+import com.moon.pharm.domain.model.medication.RepeatType
+import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.medication.MedicationUseCases
 import com.moon.pharm.profile.medication.common.MedicationUiMessage
+import com.moon.pharm.profile.medication.common.toMedication
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 import com.moon.pharm.profile.medication.screen.MedicationUiState
-import com.moon.pharm.profile.medication.common.toMedicationItem
+import com.moon.pharm.profile.medication.screen.MedicationFormState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,47 +29,39 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class MedicationIntent {
-    data class UpdateType(val type: MedicationType) : MedicationIntent()
-    data class UpdateName(val name: String) : MedicationIntent()
-    data class UpdateDosage(val dosage: String) : MedicationIntent()
-    data class UpdateStartDate(val millis: Long?) : MedicationIntent()
-    data class UpdateEndDate(val millis: Long?) : MedicationIntent()
-    data class UpdatePeriod(val start: Long?, val end: Long?, val noEnd: Boolean) : MedicationIntent()
-    data class UpdateMealTiming(val timing: MealTiming) : MedicationIntent()
-    data class UpdateAlarmTime(val hour: Int, val minute: Int) : MedicationIntent()
-    data class UpdateRepeatType(val type: RepeatType) : MedicationIntent()
-    data class UpdateMealAlarm(val enabled: Boolean) : MedicationIntent()
-    object SaveMedication : MedicationIntent()
-    object ResetNavigation : MedicationIntent()
+sealed interface MedicationUiEvent {
+    data class UpdateType(val type: MedicationType) : MedicationUiEvent
+    data class UpdateName(val name: String) : MedicationUiEvent
+    data class UpdateDosage(val dosage: String) : MedicationUiEvent
+    data class UpdateStartDate(val millis: Long?) : MedicationUiEvent
+    data class UpdateEndDate(val millis: Long?) : MedicationUiEvent
+    data class UpdatePeriod(val start: Long?, val end: Long?, val noEnd: Boolean) : MedicationUiEvent
+    data class UpdateMealTiming(val timing: MealTiming) : MedicationUiEvent
+    data class UpdateAlarmTime(val hour: Int, val minute: Int) : MedicationUiEvent
+    data class UpdateRepeatType(val type: RepeatType) : MedicationUiEvent
+    data class UpdateMealAlarm(val enabled: Boolean) : MedicationUiEvent
+    object SaveMedication : MedicationUiEvent
+    object ResetNavigation : MedicationUiEvent
 
-    data class ToggleTaken(val id: String) : MedicationIntent()
+    data class ToggleTaken(val uniqueId: String) : MedicationUiEvent
 }
 
 @HiltViewModel
 class MedicationViewModel @Inject constructor(
-    private val medicationUseCases: MedicationUseCases
+    private val useCases: MedicationUseCases,
 ): ViewModel() {
+
     private val _uiState = MutableStateFlow(MedicationUiState())
     val uiState = _uiState.asStateFlow()
 
     val groupedMedications: StateFlow<List<MedicationTimeGroup>> = uiState
         .map { state ->
             state.medicationList
-                .groupBy { it.alarmTime }
-                .map { (time, items) ->
-                    MedicationTimeGroup(
-                        time = time,
-                        items = items
-                    )
-                }
+                .groupBy { it.time }
+                .map { (time, items) -> MedicationTimeGroup(time = time, items = items) }
                 .sortedBy { it.time }
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val progress:  StateFlow<MedicationProgress> =
         uiState.map { state ->
@@ -92,50 +87,28 @@ class MedicationViewModel @Inject constructor(
         fetchMedicationList()
     }
 
-    fun onIntent(intent: MedicationIntent) {
-        when (intent) {
-            is MedicationIntent.UpdateType -> _uiState.update {
-                it.copy(form = it.form.copy(selectedType = intent.type))
-            }
-            is MedicationIntent.UpdateName -> _uiState.update {
-                it.copy(form = it.form.copy(medicationName = intent.name))
-            }
-            is MedicationIntent.UpdateDosage -> _uiState.update {
-                it.copy(form = it.form.copy(medicationDosage = intent.dosage))
-            }
-            is MedicationIntent.UpdateStartDate -> _uiState.update {
-                it.copy(form = it.form.copy(startDate = intent.millis))
-            }
-            is MedicationIntent.UpdateEndDate -> _uiState.update {
-                it.copy(form = it.form.copy(endDate = intent.millis))
-            }
-            is MedicationIntent.UpdatePeriod -> _uiState.update {
-                it.copy(form = it.form.copy(
-                    startDate = intent.start,
-                    endDate = intent.end,
-                    noEndDate = intent.noEnd)
-                )
-            }
-            is MedicationIntent.UpdateMealTiming -> _uiState.update {
-                it.copy(form = it.form.copy(selectedMealTiming = intent.timing))
-            }
-            is MedicationIntent.UpdateAlarmTime -> _uiState.update {
-                val totalMinutes = (intent.hour * 60 + intent.minute).toLong()
-                it.copy(form = it.form.copy(selectedTime = totalMinutes))
-            }
-            is MedicationIntent.UpdateRepeatType -> _uiState.update {
-                it.copy(form = it.form.copy(selectedRepeatType = intent.type))
-            }
-            is MedicationIntent.UpdateMealAlarm -> _uiState.update {
-                it.copy(form = it.form.copy(isMealTimeAlarmEnabled = intent.enabled))
-            }
-            MedicationIntent.SaveMedication -> saveMedication()
-            is MedicationIntent.ResetNavigation -> _uiState.update {
-                it.copy(isMedicationCreated = false)
-            }
+    fun onEvent(event: MedicationUiEvent) {
+        when (event) {
+            is MedicationUiEvent.UpdateType -> updateForm { it.copy(selectedType = event.type) }
+            is MedicationUiEvent.UpdateName -> updateForm { it.copy(medicationName = event.name) }
+            is MedicationUiEvent.UpdateDosage -> updateForm { it.copy(medicationDosage = event.dosage) }
+            is MedicationUiEvent.UpdateStartDate -> updateForm { it.copy(startDate = event.millis) }
+            is MedicationUiEvent.UpdateEndDate -> updateForm { it.copy(endDate = event.millis) }
+            is MedicationUiEvent.UpdatePeriod -> updateForm { it.copy(startDate = event.start, endDate = event.end, noEndDate = event.noEnd) }
+            is MedicationUiEvent.UpdateMealTiming -> updateForm { it.copy(selectedMealTiming = event.timing) }
+            is MedicationUiEvent.UpdateAlarmTime -> updateForm { it.copy(selectedTime = (event.hour * 60 + event.minute).toLong()) }
+            is MedicationUiEvent.UpdateRepeatType -> updateForm { it.copy(selectedRepeatType = event.type) }
+            is MedicationUiEvent.UpdateMealAlarm -> updateForm { it.copy(isMealTimeAlarmEnabled = event.enabled) }
 
-            is MedicationIntent.ToggleTaken -> toggleMedicationTaken(intent.id)
+            MedicationUiEvent.SaveMedication -> saveMedication()
+            is MedicationUiEvent.ResetNavigation -> _uiState.update { it.copy(isMedicationCreated = false) }
+
+            is MedicationUiEvent.ToggleTaken -> toggleMedicationTaken(event.uniqueId)
         }
+    }
+
+    private fun updateForm(block: (MedicationFormState) -> MedicationFormState) {
+        _uiState.update { it.copy(form = block(it.form)) }
     }
 
     fun onTabSelected(tab: MedicationPrimaryTab) {
@@ -149,10 +122,17 @@ class MedicationViewModel @Inject constructor(
             return
         }
 
-        val newItem = form.toMedicationItem()
+        val userId = useCases.getCurrentUserId() ?: run {
+            _uiState.update { it.copy(userMessage = UiMessage.Error("로그인이 필요합니다.")) }
+            return
+        }
+
+        val newItem = form.toMedication(userId = userId)
 
         viewModelScope.launch {
-            medicationUseCases.createMedicationUseCase(newItem).collectLatest { result ->
+            _uiState.update { it.copy(isLoading = true) }
+
+            useCases.saveMedication(newItem).collectLatest { result ->
                 _uiState.update { currentState ->
                     when (result) {
                         is DataResourceResult.Loading -> currentState.copy(isLoading = true)
@@ -172,8 +152,11 @@ class MedicationViewModel @Inject constructor(
     }
 
     private fun fetchMedicationList() {
+        val currentUserId = useCases.getCurrentUserId() ?: return
+        val todayDate = System.currentTimeMillis().toDisplayDateString()
+
         viewModelScope.launch {
-            medicationUseCases.getMedicationItemsUseCase().collectLatest { result ->
+            useCases.getMedications(userId = currentUserId).collectLatest { result ->
                 _uiState.update { currentState ->
                     when (result) {
                         is DataResourceResult.Loading -> {
@@ -181,8 +164,25 @@ class MedicationViewModel @Inject constructor(
                         }
 
                         is DataResourceResult.Success -> {
+                            val uiModelList = result.resultData.flatMap { medication ->
+                                medication.schedules.map { schedule ->
+                                    TodayMedicationUiModel(
+                                        medicationId = medication.id,
+                                        scheduleId = schedule.id,
+                                        name = medication.name,
+                                        type = medication.type,
+                                        repeatType = medication.repeatType,
+                                        time = schedule.time,
+                                        dosage = schedule.dosage,
+                                        mealTiming = schedule.mealTiming,
+                                        isTaken = false
+                                    )
+                                }
+                            }
+
                             currentState.copy(
-                                isLoading = false, medicationList = result.resultData
+                                isLoading = false,
+                                medicationList = uiModelList.sortedBy { it.time }
                             )
                         }
 
@@ -194,8 +194,6 @@ class MedicationViewModel @Inject constructor(
                                     ?: UiMessage.LoadDataFailed
                             )
                         }
-
-                        else -> currentState
                     }
                 }
             }
@@ -205,7 +203,7 @@ class MedicationViewModel @Inject constructor(
     private fun toggleMedicationTaken(id: String) {
         _uiState.update { state ->
             val newList = state.medicationList.map { item ->
-                if (item.id == id) item.copy(isTaken = !item.isTaken) else item
+                if (item.medicationId  == id) item.copy(isTaken = !item.isTaken) else item
             }
             state.copy(medicationList = newList)
         }

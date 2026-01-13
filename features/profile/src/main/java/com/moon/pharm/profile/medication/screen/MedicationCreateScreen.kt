@@ -21,7 +21,7 @@ import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.component.button.SelectButton
 import com.moon.pharm.profile.medication.screen.section.MedicationAlarmSection
 import com.moon.pharm.profile.medication.screen.section.MedicationInfoSection
-import com.moon.pharm.profile.medication.viewmodel.MedicationIntent
+import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 import com.moon.pharm.profile.R
 
@@ -33,20 +33,20 @@ fun MedicationCreateScreen(
 
     LaunchedEffect(uiState.isMedicationCreated) {
         if (uiState.isMedicationCreated) {
-            viewModel.onIntent(MedicationIntent.ResetNavigation)
+            viewModel.onEvent(MedicationUiEvent.ResetNavigation)
             navController?.popBackStack()
         }
     }
 
     MedicationCreateContent(
         form = uiState.form,
-        onIntent = { intent -> viewModel.onIntent(intent) }
+        onEvent = { intent -> viewModel.onEvent(intent) }
     )
 }
 @Composable
 fun MedicationCreateContent(
-    form: MedicationForm,
-    onIntent: (MedicationIntent) -> Unit
+    form: MedicationFormState,
+    onEvent: (MedicationUiEvent) -> Unit
 ) {
     val scrollState = rememberScrollState()
 
@@ -59,14 +59,14 @@ fun MedicationCreateContent(
     ) {
         MedicationInfoSection(
             form = form,
-            onIntent = onIntent
+            onEvent = onEvent
         )
 
         Spacer(modifier = Modifier.height(10.dp))
 
         MedicationAlarmSection(
             form = form,
-            onIntent = onIntent
+            onEvent = onEvent
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -74,7 +74,7 @@ fun MedicationCreateContent(
         SelectButton(
             text = stringResource(R.string.medication_add),
             isSelected = form.medicationName.isNotEmpty(),
-            onClick = { onIntent(MedicationIntent.SaveMedication) },
+            onClick = { onEvent(MedicationUiEvent.SaveMedication) },
             modifier = Modifier.fillMaxWidth()
         )
     }

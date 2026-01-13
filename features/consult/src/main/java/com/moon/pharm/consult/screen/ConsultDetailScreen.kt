@@ -49,7 +49,7 @@ import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.consult.ConsultStatus
-import com.moon.pharm.domain.model.Pharmacist
+import com.moon.pharm.domain.model.auth.Pharmacist
 
 @Composable
 fun ConsultDetailScreen(
@@ -64,14 +64,16 @@ fun ConsultDetailScreen(
 
     ConsultDetailContent(
         item = uiState.selectedItem,
-        pharmacist = uiState.pharmacist
+        pharmacist = uiState.answerPharmacist,
+        pharmacistImageUrl = uiState.answerPharmacistProfileUrl
     )
 }
 
 @Composable
 fun ConsultDetailContent(
     item: ConsultItem?,
-    pharmacist: Pharmacist?
+    pharmacist: Pharmacist?,
+    pharmacistImageUrl: String?
 ) {
     if (item != null) {
         LazyColumn(
@@ -90,6 +92,7 @@ fun ConsultDetailContent(
                 ) {
                     AnswerSection(
                         pharmacist = pharmacist,
+                        pharmacistImageUrl = pharmacistImageUrl,
                         item = item
                     )
                 } else if (item.status == ConsultStatus.WAITING) {
@@ -155,6 +158,7 @@ fun QuestionSection(item: ConsultItem) {
 @Composable
 fun AnswerSection(
     pharmacist: Pharmacist?,
+    pharmacistImageUrl: String?,
     item: ConsultItem
 ) {
     val answer = item.answer ?: return
@@ -178,7 +182,7 @@ fun AnswerSection(
             ) {
                 if (pharmacist != null) {
                     Image(
-                        painter = painterResource(id = pharmacist.imageUrl.toIntOrNull() ?: 0),
+                        painter = painterResource(id = pharmacistImageUrl?.toIntOrNull() ?: 0),
                         contentDescription = null,
                         modifier = Modifier
                             .size(40.dp)

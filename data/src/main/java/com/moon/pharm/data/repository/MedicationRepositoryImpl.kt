@@ -2,7 +2,10 @@ package com.moon.pharm.data.repository
 
 import com.moon.pharm.data.datasource.MedicationDataSource
 import com.moon.pharm.data.di.IoDispatcher
-import com.moon.pharm.domain.model.MedicationItem
+import com.moon.pharm.data.mapper.toDomain
+import com.moon.pharm.data.mapper.toDto
+import com.moon.pharm.domain.model.medication.IntakeRecord
+import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,13 +22,6 @@ class MedicationRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MedicationRepository {
 
-    override fun getMedicationItems() = dataSource.getMedicationItems().map { medicationList ->
-        DataResourceResult.Success(medicationList) as DataResourceResult<List<MedicationItem>>
-    }.catch { e ->
-        emit(DataResourceResult.Failure(e))
-    }.onStart { emit(DataResourceResult.Loading) }.flowOn(ioDispatcher)
-
-
     private fun wrapCUDOperation(
         operation: suspend () -> Unit
     ): Flow<DataResourceResult<Unit>> = flow {
@@ -36,9 +32,48 @@ class MedicationRepositoryImpl @Inject constructor(
         emit(DataResourceResult.Failure(e))
     }.flowOn(ioDispatcher)
 
-    override fun createMedication(medicationItem: MedicationItem): Flow<DataResourceResult<Unit>> =
-        wrapCUDOperation {
-            dataSource.create(medicationItem)
+    override fun getMedications(userId: String): Flow<DataResourceResult<List<Medication>>> {
+        return dataSource.getMedications(userId)
+            .map { dto ->
+                val medications = dto.map { it.toDomain() }
+                DataResourceResult.Success(medications) as DataResourceResult<List<Medication>>
+            }
+            .onStart { emit(DataResourceResult.Loading) }
+            .catch { e -> emit(DataResourceResult.Failure(e)) }
+            .flowOn(ioDispatcher)
     }
 
+    override fun saveMedication(medication: Medication): Flow<DataResourceResult<Unit>> =
+        wrapCUDOperation {
+            dataSource.saveMedication(medication.toDto())
+        }
+
+    override fun deleteMedication(medicationId: String): Flow<DataResourceResult<Unit>> =
+        wrapCUDOperation {
+            dataSource.deleteMedication(medicationId)
+        }
+
+    override fun getIntakeRecords(userId: String, date: String): Flow<DataResourceResult<List<IntakeRecord>>> {
+        return dataSource.getIntakeRecords(userId, date)
+            .map { dto ->
+                val records = dto.map { it.toDomain() }
+                DataResourceResult.Success(records) as DataResourceResult<List<IntakeRecord>>
+            }
+            .onStart { emit(DataResourceResult.Loading) }
+            .catch { e -> emit(DataResourceResult.Failure(e)) }
+            .flowOn(ioDispatcher)
+    }
+
+    override fun saveIntakeRecord(record: IntakeRecord): Flow<DataResourceResult<Unit>> =
+        wrapCUDOperation {
+            dataSource.saveIntakeRecord(record.toDto())
+        }
+
+    override fun deleteIntakeRecord(
+        medicationId: String,
+        scheduleId: String,
+        date: String
+    ): Flow<DataResourceResult<Unit>> = wrapCUDOperation {
+        dataSource.deleteIntakeRecord(medicationId, scheduleId, date)
+    }
 }

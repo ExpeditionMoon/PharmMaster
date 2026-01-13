@@ -57,8 +57,27 @@ fun Long?.toDisplayDateString(): String {
 @SuppressLint("NewApi")
 fun Long?.toDisplayTimeString(): String {
     if (this == null) return ""
-    val hour = (this / 60).toInt()
-    val minute = (this % 60).toInt()
+    val totalSeconds = this / 1000
+    val hour = (totalSeconds / 3600).toInt()
+    val minute = ((totalSeconds % 3600) / 60).toInt()
+
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        Instant.ofEpochMilli(this)
+            .atZone(SEOUL_ZONE)
+            .toLocalTime()
+            .format(hourMinuteFormatter)
+    } else {
+        getLegacyFormatter(TIME_PATTERN).format(Date(this))
+    }
+}
+
+@SuppressLint("NewApi")
+fun Long?.toLifeStyleUiString(): String {
+    if (this == null) return ""
+
+    val totalSeconds = this / 1000
+    val hour = (totalSeconds / 3600).toInt()
+    val minute = ((totalSeconds % 3600) / 60).toInt()
 
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         LocalTime.of(hour, minute).format(hourMinuteFormatter)
@@ -69,4 +88,15 @@ fun Long?.toDisplayTimeString(): String {
         }
         getLegacyFormatter(TIME_PATTERN).format(calendar.time)
     }
+}
+
+fun Long.toTodayTimestamp(): Long {
+    val now = java.util.Calendar.getInstance()
+
+    now.set(java.util.Calendar.HOUR_OF_DAY, 0)
+    now.set(java.util.Calendar.MINUTE, 0)
+    now.set(java.util.Calendar.SECOND, 0)
+    now.set(java.util.Calendar.MILLISECOND, 0)
+
+    return now.timeInMillis + this
 }

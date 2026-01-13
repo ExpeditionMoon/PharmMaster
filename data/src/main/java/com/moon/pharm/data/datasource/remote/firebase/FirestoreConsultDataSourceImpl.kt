@@ -1,17 +1,17 @@
 package com.moon.pharm.data.datasource.remote.firebase
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.snapshots
 import com.moon.pharm.data.common.CONSULT_COLLECTION
 import com.moon.pharm.data.common.FIELD_CREATED_AT
 import com.moon.pharm.data.datasource.ConsultDataSource
-import com.moon.pharm.data.mapper.toDomainConsult
-import com.moon.pharm.data.mapper.toDomainConsultList
-import com.moon.pharm.data.mapper.toFirestoreConsultDTO
+import com.moon.pharm.data.mapper.toDomain
+import com.moon.pharm.data.mapper.toDomainList
+import com.moon.pharm.data.mapper.toDto
 import com.moon.pharm.data.datasource.remote.dto.ConsultItemDTO
 import com.moon.pharm.domain.model.consult.ConsultItem
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import kotlin.jvm.java
@@ -26,42 +26,21 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
         val docRef = if (consult.id.isNotEmpty()) collection.document(consult.id)
         else collection.document()
 
-        val dataToSave = consult.toFirestoreConsultDTO()
+        val dataToSave = consult.copy(id = docRef.id).toDto()
         docRef.set(dataToSave).await()
     }
 
-    override fun getConsultItems(): Flow<List<ConsultItem>> = callbackFlow {
-        val listener = collection.orderBy(FIELD_CREATED_AT).addSnapshotListener { snapshot, e ->
-
-                if (e != null) {
-                    close(e)
-                    return@addSnapshotListener
-                }
-                try {
-                    val consultList = snapshot?.toObjects(ConsultItemDTO::class.java) ?: emptyList()
-                    trySend(consultList.toDomainConsultList())
-                } catch (mappingError: Exception) {
-                    close(mappingError)
-                }
+    override fun getConsultItems(): Flow<List<ConsultItem>> =
+        collection.orderBy(FIELD_CREATED_AT)
+            .snapshots()
+            .map { snapshot ->
+                snapshot.toObjects(ConsultItemDTO::class.java).toDomainList()
             }
-        awaitClose { listener.remove() }
-    }
 
-    override fun getConsultDetail(id: String): Flow<ConsultItem> = callbackFlow {
-        val docRef = collection.document(id)
-
-        val subscription = docRef.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                close(error)
-                return@addSnapshotListener
+    override fun getConsultDetail(id: String): Flow<ConsultItem?> =
+        collection.document(id)
+            .snapshots()
+            .map { snapshot ->
+                snapshot.toObject(ConsultItemDTO::class.java)?.toDomain()
             }
-            if (snapshot != null && snapshot.exists()) {
-                val item = snapshot.toObject(ConsultItemDTO::class.java)
-                if (item != null) {
-                    trySend(item.toDomainConsult())
-                }
-            }
-        }
-        awaitClose { subscription.remove() }
-    }
 }

@@ -28,7 +28,7 @@ import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.util.toDisplayDateString
 import com.moon.pharm.component_ui.component.card.DateSettingCard
 import com.moon.pharm.component_ui.component.dialog.DatePickerModal
-import com.moon.pharm.profile.medication.viewmodel.MedicationIntent
+import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 import com.moon.pharm.profile.R
 
 @Composable
@@ -36,7 +36,7 @@ fun PeriodInputSection(
     startDate: Long?,
     endDate: Long?,
     noEndDate: Boolean,
-    onIntent: (MedicationIntent) -> Unit
+    onEvent: (MedicationUiEvent) -> Unit
 ) {
     val endDatePickerState = rememberDatePickerState()
     val startDatePickerState = rememberDatePickerState()
@@ -70,7 +70,7 @@ fun PeriodInputSection(
         DatePickerModal(
             state = startDatePickerState,
             onDateSelected = { millis ->
-                onIntent(MedicationIntent.UpdateStartDate(millis))
+                onEvent(MedicationUiEvent.UpdateStartDate(millis))
                 showStartPicker = false
             },
             onDismiss = { showStartPicker = false }
@@ -81,7 +81,7 @@ fun PeriodInputSection(
         DatePickerModal(
             state = endDatePickerState,
             onDateSelected = { millis ->
-                onIntent(MedicationIntent.UpdateEndDate(millis))
+                onEvent(MedicationUiEvent.UpdateEndDate(millis))
                 showEndPicker = false
             },
             onDismiss = { showEndPicker = false }
@@ -106,7 +106,7 @@ fun PeriodInputSection(
         Switch(
             checked = noEndDate,
             onCheckedChange = { checked ->
-                onIntent(MedicationIntent.UpdatePeriod(startDate, if (checked) null else endDate, checked))
+                onEvent(MedicationUiEvent.UpdatePeriod(startDate, if (checked) null else endDate, checked))
             },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = White,

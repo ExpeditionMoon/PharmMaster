@@ -49,10 +49,11 @@ import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.component_ui.theme.tertiaryLight
 import com.moon.pharm.component_ui.component.bar.PharmPrimaryTabRow
 import com.moon.pharm.component_ui.util.toDisplayTimeString
-import com.moon.pharm.domain.model.MedicationItem
-import com.moon.pharm.domain.model.MedicationTimeGroup
+import com.moon.pharm.domain.model.medication.Medication
+import com.moon.pharm.domain.model.medication.MedicationTimeGroup
+import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
-import com.moon.pharm.profile.medication.viewmodel.MedicationIntent
+import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 import com.moon.pharm.profile.R
 
@@ -72,7 +73,7 @@ fun MedicationScreen(
         totalCount = totalCount,
         completedCount = completedCount,
         onTabSelected = { viewModel.onTabSelected(it) },
-        onTakeClick = { item -> viewModel.onIntent(MedicationIntent.ToggleTaken(item.id)) }
+        onTakeClick = { item -> viewModel.onEvent(MedicationUiEvent.ToggleTaken(item.medicationId)) }
     )
 }
 
@@ -83,7 +84,7 @@ fun MedicationContent(
     totalCount: Int,
     completedCount: Int,
     onTabSelected: (MedicationPrimaryTab) -> Unit,
-    onTakeClick: (MedicationItem) -> Unit
+    onTakeClick: (TodayMedicationUiModel) -> Unit
 ){
     val tabTitles = MedicationPrimaryTab.entries.map { it.title }
 
@@ -172,7 +173,12 @@ fun ProgressCard(total: Int, completed: Int) {
 }
 
 @Composable
-fun MedicationGroupItem(group: MedicationTimeGroup, onTakeClick: (MedicationItem) -> Unit) {
+fun MedicationGroupItem(
+    group: MedicationTimeGroup,
+    onTakeClick: (TodayMedicationUiModel) -> Unit
+) {
+    val displayTime = group.time?.toLongOrNull()?.toDisplayTimeString() ?: group.time
+
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -186,7 +192,7 @@ fun MedicationGroupItem(group: MedicationTimeGroup, onTakeClick: (MedicationItem
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = group.time.toDisplayTimeString(),
+                text = displayTime?: "",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = SecondFont
@@ -205,8 +211,8 @@ fun MedicationGroupItem(group: MedicationTimeGroup, onTakeClick: (MedicationItem
 
 @Composable
 fun MedicationCard(
-    item: MedicationItem,
-    onTakeClick: (MedicationItem) -> Unit
+    item: TodayMedicationUiModel,
+    onTakeClick: (TodayMedicationUiModel) -> Unit
 ) {
     Card(
         colors = CardDefaults.cardColors(

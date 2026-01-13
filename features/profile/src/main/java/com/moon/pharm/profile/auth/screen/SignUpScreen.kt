@@ -71,6 +71,7 @@ fun SignUpScreen(
         onUpdateUserType = { viewModel.updateUserType(it) },
         onUpdateEmail = { viewModel.updateEmail(it) },
         onCheckEmail = { viewModel.checkEmailDuplicate() },
+        onUpdatePassword = { viewModel.updatePassword(it) },
         onUpdateNickName = { viewModel.updateNickName(it) },
         onImageClick = { galleryLauncher.launch("image/*") },
         onNextClick = { viewModel.moveToNextStep(onNavigateToHome) }
@@ -83,6 +84,7 @@ fun SignUpScreenContent(
     onUpdateUserType: (String) -> Unit,
     onUpdateEmail: (String) -> Unit,
     onCheckEmail: () -> Unit,
+    onUpdatePassword: (String) -> Unit,
     onUpdateNickName: (String) -> Unit,
     onImageClick: () -> Unit,
     onNextClick: () -> Unit
@@ -91,9 +93,15 @@ fun SignUpScreenContent(
         containerColor = White,
         bottomBar = {
             val buttonText = when (uiState.currentStep) {
-                SignUpStep.TYPE -> "회원 가입하기"
+                SignUpStep.TYPE -> "다음"
                 SignUpStep.EMAIL -> "다음"
                 SignUpStep.NICKNAME -> "회원가입"
+            }
+
+            val isNextEnabled = !uiState.isLoading && when (uiState.currentStep) {
+                SignUpStep.TYPE -> true
+                SignUpStep.EMAIL -> (uiState.isEmailAvailable == true) && (uiState.password.length >= 6)
+                SignUpStep.NICKNAME -> uiState.nickName.isNotBlank()
             }
 
             Button(
@@ -104,11 +112,7 @@ fun SignUpScreenContent(
                     .height(56.dp),
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Secondary),
-                enabled = !uiState.isLoading && when (uiState.currentStep) {
-                    SignUpStep.TYPE -> true
-                    SignUpStep.EMAIL -> uiState.isEmailAvailable == true
-                    SignUpStep.NICKNAME -> uiState.nickName.isNotBlank()
-                }
+                enabled = isNextEnabled
             ) {
                 if (uiState.isLoading) {
                     CircularProgressBar()
@@ -143,12 +147,14 @@ fun SignUpScreenContent(
             ) { step ->
                 when (step) {
                     SignUpStep.TYPE -> UserTypeSection(uiState.userType, onUpdateUserType)
-                    SignUpStep.EMAIL -> EmailSection(
-                        uiState.email,
-                        uiState.isEmailAvailable,
-                        uiState.isEmailChecking,
-                        onUpdateEmail,
-                        onCheckEmail
+                    SignUpStep.EMAIL -> EmailPasswordSection(
+                        email = uiState.email,
+                        password = uiState.password,
+                        isAvailable = uiState.isEmailAvailable,
+                        isEmailChecking = uiState.isEmailChecking,
+                        onUpdateEmail = onUpdateEmail,
+                        onUpdatePassword = onUpdatePassword,
+                        onCheckClick = onCheckEmail
                     )
 
                     SignUpStep.NICKNAME -> NickNameSection(
@@ -213,17 +219,19 @@ fun UserTypeRow(
 }
 
 @Composable
-fun EmailSection(
+fun EmailPasswordSection(
     email: String,
+    password: String,
     isAvailable: Boolean?,
     isEmailChecking: Boolean,
-    onEmailChange: (String) -> Unit,
+    onUpdateEmail: (String) -> Unit,
+    onUpdatePassword: (String) -> Unit,
     onCheckClick: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = email,
-            onValueChange = onEmailChange,
+            onValueChange = onUpdateEmail,
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text("Enter Your Email") },
             shape = RoundedCornerShape(10.dp),
@@ -258,10 +266,28 @@ fun EmailSection(
                 }
             }
         )
-        when (isAvailable) {
-            true -> Text("사용 가능한 이메일입니다.", color = Primary, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp, start = 8.dp))
-            false -> Text("이미 등록된 이메일입니다.", color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp, start = 8.dp))
-            else -> {}
+        if (isAvailable == true) {
+            Text("사용 가능한 이메일입니다.", color = Primary, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp, start = 8.dp))
+        } else if (isAvailable == false) {
+            Text("이미 등록된 이메일입니다.", color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp, start = 8.dp))
+        }
+
+        // 2. 비밀번호 입력창 (이메일 확인 완료 시에만 등장)
+        if (isAvailable == true) {
+            Spacer(modifier = Modifier.height(20.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = onUpdatePassword,
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("비밀번호 (6자리 이상)") },
+                shape = RoundedCornerShape(10.dp),
+                singleLine = true,
+                visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Password
+                )
+            )
         }
     }
 }
@@ -324,6 +350,7 @@ fun Step1Preview() {
         onUpdateUserType = {},
         onUpdateEmail = {},
         onCheckEmail = {},
+        onUpdatePassword = {},
         onUpdateNickName = {},
         onImageClick = {},
         onNextClick = {}
@@ -342,6 +369,7 @@ fun Step2Preview() {
         onUpdateUserType = {},
         onUpdateEmail = {},
         onCheckEmail = {},
+        onUpdatePassword = {},
         onUpdateNickName = {},
         onImageClick = {},
         onNextClick = {}
@@ -361,6 +389,7 @@ fun Step3Preview() {
         onUpdateUserType = {},
         onUpdateEmail = {},
         onCheckEmail = {},
+        onUpdatePassword = {},
         onUpdateNickName = {},
         onImageClick = {},
         onNextClick = {}
@@ -380,6 +409,7 @@ fun Step3PharmacistPreview() {
         onUpdateUserType = {},
         onUpdateEmail = {},
         onCheckEmail = {},
+        onUpdatePassword = {},
         onUpdateNickName = {},
         onImageClick = {},
         onNextClick = {}

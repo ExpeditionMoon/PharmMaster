@@ -14,16 +14,16 @@ import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.component.input.PrimaryTextField
-import com.moon.pharm.profile.medication.screen.MedicationForm
+import com.moon.pharm.profile.medication.screen.MedicationFormState
 import com.moon.pharm.profile.medication.screen.component.MedicationTypeSelector
 import com.moon.pharm.profile.medication.screen.component.PeriodInputSection
-import com.moon.pharm.profile.medication.viewmodel.MedicationIntent
+import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 import com.moon.pharm.profile.R
 
 @Composable
 fun MedicationInfoSection(
-    form: MedicationForm,
-    onIntent: (MedicationIntent) -> Unit
+    form: MedicationFormState,
+    onEvent: (MedicationUiEvent) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -34,13 +34,13 @@ fun MedicationInfoSection(
     ) {
         MedicationTypeSelector(
             selectedType = form.selectedType,
-            onTypeSelected = { onIntent(MedicationIntent.UpdateType(it)) }
+            onTypeSelected = { onEvent(MedicationUiEvent.UpdateType(it)) }
         )
         Spacer(modifier = Modifier.height(10.dp))
 
         PrimaryTextField(
             value = form.medicationName,
-            onValueChange = { onIntent(MedicationIntent.UpdateName(it)) },
+            onValueChange = { onEvent(MedicationUiEvent.UpdateName(it)) },
             placeholder = stringResource(R.string.medication_name_hint)
         )
 
@@ -48,7 +48,7 @@ fun MedicationInfoSection(
 
         PrimaryTextField(
             value = form.medicationDosage,
-            onValueChange = { onIntent(MedicationIntent.UpdateDosage(it)) },
+            onValueChange = { onEvent(MedicationUiEvent.UpdateDosage(it)) },
             placeholder = stringResource(R.string.medication_dosage_hint)
         )
 
@@ -58,7 +58,7 @@ fun MedicationInfoSection(
             startDate = form.startDate,
             endDate = form.endDate,
             noEndDate = form.noEndDate,
-            onIntent = onIntent
+            onEvent = onEvent
         )
     }
 }

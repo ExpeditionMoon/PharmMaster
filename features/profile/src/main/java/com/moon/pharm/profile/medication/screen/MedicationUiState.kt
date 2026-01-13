@@ -1,10 +1,10 @@
 package com.moon.pharm.profile.medication.screen
 
 import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.domain.model.MealTiming
-import com.moon.pharm.domain.model.MedicationItem
-import com.moon.pharm.domain.model.MedicationType
-import com.moon.pharm.domain.model.RepeatType
+import com.moon.pharm.domain.model.medication.MealTiming
+import com.moon.pharm.domain.model.medication.MedicationType
+import com.moon.pharm.domain.model.medication.RepeatType
+import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 
 data class MedicationUiState(
@@ -12,13 +12,14 @@ data class MedicationUiState(
     val userMessage: UiMessage? = null,
     val isMedicationCreated: Boolean = false,
 
-    val medicationList: List<MedicationItem> = emptyList(),
+    val medicationList: List<TodayMedicationUiModel> = emptyList(),
+
     val selectedTab: MedicationPrimaryTab = MedicationPrimaryTab.ALL,
 
-    val form: MedicationForm = MedicationForm()
+    val form: MedicationFormState = MedicationFormState()
 )
 
-data class MedicationForm(
+data class MedicationFormState(
     val medicationName: String = "",
     val medicationDosage: String? = "",
     val selectedType: MedicationType = MedicationType.PRESCRIPTION,

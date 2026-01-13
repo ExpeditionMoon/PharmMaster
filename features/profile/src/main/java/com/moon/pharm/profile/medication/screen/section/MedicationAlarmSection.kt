@@ -26,17 +26,17 @@ import com.moon.pharm.component_ui.util.toDisplayTimeString
 import com.moon.pharm.component_ui.component.dialog.TimePickerDialog
 import com.moon.pharm.component_ui.component.card.TimeSettingCard
 import com.moon.pharm.profile.R
-import com.moon.pharm.profile.medication.screen.MedicationForm
+import com.moon.pharm.profile.medication.screen.MedicationFormState
 import com.moon.pharm.profile.medication.screen.component.AlarmOptionSelector
 import com.moon.pharm.profile.medication.screen.component.AlarmTypeSection
 import com.moon.pharm.profile.medication.screen.component.MealTimeChips
-import com.moon.pharm.profile.medication.viewmodel.MedicationIntent
+import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicationAlarmSection(
-    form: MedicationForm,
-    onIntent: (MedicationIntent) -> Unit
+    form: MedicationFormState,
+    onEvent: (MedicationUiEvent) -> Unit
 ) {
     var showTimePicker by remember { mutableStateOf(false) }
 
@@ -57,7 +57,7 @@ fun MedicationAlarmSection(
 
         MealTimeChips(
             selectedTimes = form.selectedMealTiming,
-            onTimeClick = { onIntent(MedicationIntent.UpdateMealTiming(it)) }
+            onTimeClick = { onEvent(MedicationUiEvent.UpdateMealTiming(it)) }
         )
 
         Spacer(modifier = Modifier.height(15.dp))
@@ -72,7 +72,7 @@ fun MedicationAlarmSection(
             TimePickerDialog(
                 title = stringResource(id = R.string.medication_alarm_time_dialog_title),
                 onConfirm = { state ->
-                    onIntent(MedicationIntent.UpdateAlarmTime(state.hour, state.minute))
+                    onEvent(MedicationUiEvent.UpdateAlarmTime(state.hour, state.minute))
                     showTimePicker = false
                 },
                 onDismiss = { showTimePicker = false }
@@ -83,14 +83,14 @@ fun MedicationAlarmSection(
 
         AlarmOptionSelector(
             selectedOption = form.selectedRepeatType,
-            onOptionSelected = { onIntent(MedicationIntent.UpdateRepeatType(it)) }
+            onOptionSelected = { onEvent(MedicationUiEvent.UpdateRepeatType(it)) }
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
         AlarmTypeSection(
             isChecked = form.isMealTimeAlarmEnabled,
-            onCheckedChange = { onIntent(MedicationIntent.UpdateMealAlarm(it)) }
+            onCheckedChange = { onEvent(MedicationUiEvent.UpdateMealAlarm(it)) }
         )
     }
 }

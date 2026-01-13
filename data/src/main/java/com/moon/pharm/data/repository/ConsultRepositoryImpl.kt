@@ -2,7 +2,7 @@ package com.moon.pharm.data.repository
 
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.di.IoDispatcher
-import com.moon.pharm.domain.model.Pharmacist
+import com.moon.pharm.domain.model.consult.ConsultError
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.result.DataResourceResult
@@ -20,12 +20,6 @@ class ConsultRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ConsultRepository {
 
-    override fun getConsultItems() = dataSource.getConsultItems().map { consultList ->
-            DataResourceResult.Success(consultList) as DataResourceResult<List<ConsultItem>>
-        }.catch { e ->
-            emit(DataResourceResult.Failure(e))
-        }.onStart { emit(DataResourceResult.Loading) }.flowOn(ioDispatcher)
-
     private fun wrapCUDOperation(
         operation: suspend () -> Unit
     ): Flow<DataResourceResult<Unit>> = flow {
@@ -36,18 +30,28 @@ class ConsultRepositoryImpl @Inject constructor(
         emit(DataResourceResult.Failure(e))
     }.flowOn(ioDispatcher)
 
-    override fun createConsult(consultInfo: ConsultItem): Flow<DataResourceResult<Unit>> =
-        wrapCUDOperation {
-            dataSource.create(consultInfo)
+    override fun getConsultItems() = dataSource.getConsultItems()
+        .map { list ->
+            DataResourceResult.Success(list) as DataResourceResult<List<ConsultItem>>
         }
+        .onStart { emit(DataResourceResult.Loading) }
+        .catch { emit(DataResourceResult.Failure(it)) }
+        .flowOn(ioDispatcher)
 
-    override fun getConsultDetail(id: String): Flow<ConsultItem> = dataSource.getConsultDetail(id)
+    override fun createConsult(consultInfo: ConsultItem) =
+        wrapCUDOperation { dataSource.create(consultInfo) }
 
-    override fun getPharmacistsByPharmacy(pharmacyId: String): List<Pharmacist> {
-        return emptyList()
-    }
-
-    override fun getPharmacistById(id: String): Pharmacist? {
-        return null
+    override fun getConsultDetail(id: String): Flow<DataResourceResult<ConsultItem>> {
+        return dataSource.getConsultDetail(id)
+            .map { item ->
+                if (item != null) {
+                    DataResourceResult.Success(item) as DataResourceResult<ConsultItem>
+                } else {
+                    DataResourceResult.Failure(ConsultError.NotFound())
+                }
+            }
+            .onStart { emit(DataResourceResult.Loading) }
+            .catch { e -> emit(DataResourceResult.Failure(e)) }
+            .flowOn(ioDispatcher)
     }
 }
