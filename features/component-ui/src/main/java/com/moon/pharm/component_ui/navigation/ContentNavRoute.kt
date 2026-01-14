@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface ContentNavigationRoute : PharmNavigation {
     @Serializable
+    data object LoginScreen : ContentNavigationRoute
+    @Serializable
     data object SignUpScreen : ContentNavigationRoute
     @Serializable
     data object HomeTab : ContentNavigationRoute

@@ -2,10 +2,13 @@ package com.moon.pharm.profile.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.auth.AuthUseCases
+import com.moon.pharm.domain.usecase.auth.CheckEmailDuplicateUseCase
+import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
+import com.moon.pharm.domain.usecase.auth.SignUpUseCase
 import com.moon.pharm.profile.auth.model.SignUpStep
 import com.moon.pharm.profile.auth.screen.SignUpUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,28 +20,31 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 sealed interface AuthEvent {
     object NavigateToMain : AuthEvent
 }
+
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val useCases: AuthUseCases
+    private val signUpUseCase: SignUpUseCase,
+    private val checkEmailDuplicateUseCase: CheckEmailDuplicateUseCase,
+    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState = _uiState.asStateFlow()
     private val _eventFlow = MutableSharedFlow<AuthEvent>()
+    val eventFlow = _eventFlow
 
     init {
-        if (useCases.getCurrentUserId() != null) {
+        if (getCurrentUserIdUseCase() != null) {
             viewModelScope.launch {
                 _eventFlow.emit(AuthEvent.NavigateToMain)
             }
         }
     }
 
-    fun updateUserType(type: String) {
+    fun updateUserType(type: UserType) {
         _uiState.update { it.copy(userType = type) }
     }
 
@@ -47,10 +53,13 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun checkEmailDuplicate() {
+        val email = _uiState.value.email
+        if (email.isBlank()) return
+
         viewModelScope.launch {
             _uiState.update { it.copy(isEmailChecking = true) }
 
-            val isDuplicated = useCases.checkEmailDuplicate(_uiState.value.email)
+            val isDuplicated = checkEmailDuplicateUseCase(email)
             _uiState.update { it.copy(isEmailAvailable = !isDuplicated, isEmailChecking = false) }
         }
     }
@@ -67,10 +76,20 @@ class SignUpViewModel @Inject constructor(
         _uiState.update { it.copy(password = password) }
     }
 
+    fun updatePharmacyName(name: String) {
+        _uiState.update { it.copy(pharmacyName = name) }
+    }
+
+    fun updatePharmacistBio(bio: String) {
+        _uiState.update { it.copy(pharmacistBio = bio) }
+    }
+
     fun moveToNextStep(onComplete: () -> Unit) {
         when (_uiState.value.currentStep) {
             SignUpStep.TYPE -> {
-                _uiState.update { it.copy(currentStep = SignUpStep.EMAIL) }
+                if (_uiState.value.userType != null) {
+                    _uiState.update { it.copy(currentStep = SignUpStep.EMAIL) }
+                }
             }
 
             SignUpStep.EMAIL -> {
@@ -80,6 +99,13 @@ class SignUpViewModel @Inject constructor(
             }
 
             SignUpStep.NICKNAME -> {
+                if (_uiState.value.userType == UserType.PHARMACIST) {
+                    _uiState.update { it.copy(currentStep = SignUpStep.PHARMACIST_INFO) }
+                } else {
+                    signUpUser(onComplete)
+                }
+            }
+            SignUpStep.PHARMACIST_INFO -> {
                 signUpUser(onComplete)
             }
         }
@@ -87,10 +113,7 @@ class SignUpViewModel @Inject constructor(
 
     private fun signUpUser(onComplete: () -> Unit) {
         val currentState = _uiState.value
-        val type = when (currentState.userType) {
-            "약사" -> UserType.PHARMACIST
-            else -> UserType.GENERAL
-        }
+        val type = currentState.userType ?: UserType.GENERAL
 
         val user = User(
             id = "",
@@ -101,8 +124,19 @@ class SignUpViewModel @Inject constructor(
             createdAt = System.currentTimeMillis()
         )
 
+        val pharmacist = if (type == UserType.PHARMACIST) {
+            Pharmacist(
+                userId = "",
+                name = currentState.nickName,
+                bio = currentState.pharmacistBio,
+                pharmacyId = "temp_pharmacy_id",
+                pharmacyName = currentState.pharmacyName,
+                isApproved = false
+            )
+        } else null
+
         viewModelScope.launch {
-            useCases.signUp(user, currentState.password).collectLatest { result ->
+            signUpUseCase(user, currentState.password, pharmacist).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Loading -> {
                         _uiState.update { it.copy(isLoading = true) }
@@ -114,12 +148,7 @@ class SignUpViewModel @Inject constructor(
                     }
 
                     is DataResourceResult.Failure -> {
-                        val errorMsg = result.exception.message ?: "알 수 없는 에러"
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false
-                            )
-                        }
+                        _uiState.update { it.copy(isLoading = false) }
                     }
                 }
             }

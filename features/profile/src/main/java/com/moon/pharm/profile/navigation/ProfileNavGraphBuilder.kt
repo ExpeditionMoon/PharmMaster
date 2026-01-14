@@ -5,7 +5,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
+import com.moon.pharm.profile.auth.screen.LoginScreen
 import com.moon.pharm.profile.auth.screen.SignUpScreen
+import com.moon.pharm.profile.auth.viewmodel.LoginViewModel
 import com.moon.pharm.profile.auth.viewmodel.SignUpViewModel
 import com.moon.pharm.profile.medication.screen.MedicationCreateScreen
 import com.moon.pharm.profile.medication.screen.MedicationScreen
@@ -13,6 +15,21 @@ import com.moon.pharm.profile.mypage.screen.MyPageScreen
 import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 
 fun NavGraphBuilder.profileNavGraph(navController: NavController) {
+
+    composable<ContentNavigationRoute.LoginScreen> {
+        val viewModel: LoginViewModel = hiltViewModel()
+        LoginScreen(
+            viewModel = viewModel,
+            onNavigateToHome = {
+                navController.navigate(ContentNavigationRoute.HomeTab) {
+                    popUpTo(ContentNavigationRoute.LoginScreen) { inclusive = true }
+                }
+            },
+            onNavigateToSignUp = {
+                navController.navigate(ContentNavigationRoute.SignUpScreen)
+            }
+        )
+    }
 
     composable<ContentNavigationRoute.SignUpScreen>{
         val viewModel: SignUpViewModel = hiltViewModel()
@@ -25,6 +42,7 @@ fun NavGraphBuilder.profileNavGraph(navController: NavController) {
             }
         )
     }
+
     composable<ContentNavigationRoute.ProfileTab>{
         MyPageScreen()
     }

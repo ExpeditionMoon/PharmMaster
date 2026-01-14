@@ -1,4 +1,42 @@
 <resources>
+<!--  로그인(auth)  -->
+    <string name="login_logo_description">로고 이미지</string>
+
+    <string name="login_app_title">약대장</string>
+
+    <string name="login_email_label">이메일</string>
+    <string name="login_password_label">비밀번호</string>
+
+    <string name="login_button_login">로그인</string>
+
+    <string name="login_prompt_no_account">계정이 없으신가요?</string>
+    <string name="login_action_sign_up">회원가입</string>
+
+<!--  회원가입(auth)  -->
+    <string name="signup_button_next">다음</string>
+    <string name="signup_button_complete">회원가입</string>
+    <string name="signup_logo_description">로고 이미지</string>
+
+    <string name="signup_type_general">일반</string>
+    <string name="signup_type_pharmacist">약사</string>
+
+    <string name="signup_email_placeholder">이메일을 입력하세요</string>
+    <string name="signup_email_check_button">중복 확인</string>
+    <string name="signup_email_check_complete">확인 완료</string>
+    <string name="signup_email_available">사용 가능한 이메일입니다.</string>
+    <string name="signup_email_duplicated">이미 등록된 이메일입니다.</string>
+    <string name="signup_password_label">비밀번호 (6자리 이상)</string>
+
+    <string name="signup_profile_image_description">프로필 이미지 설정</string>
+    <string name="signup_nickname_label">닉네임</string>
+    <string name="signup_nickname_placeholder">닉네임을 입력해주세요</string>
+
+    <string name="signup_pharmacy_name_label">약국 이름</string>
+    <string name="signup_pharmacy_name_placeholder">근무 중인 약국 이름을 입력하세요</string>
+    <string name="signup_bio_label">한줄 소개</string>
+    <string name="signup_bio_placeholder">환자분들에게 보여질 소개글을 적어주세요.</string>
+
+<!--  복약 관리(medication)  -->
     <string name="error_empty_medication_name">약 이름을 입력해주세요.</string>
     <string name="error_create_medication">복용 알림 등록 실패</string>
 

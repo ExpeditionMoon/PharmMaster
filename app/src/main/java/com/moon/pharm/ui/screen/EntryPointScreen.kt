@@ -49,8 +49,11 @@ fun EntryPointScreen() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val isSignUpScreen = currentRoute?.contains("SignUpScreen") == true
-    val shouldShowBars = !isSignUpScreen
+    val isFullScreen = currentRoute?.let { route ->
+        route.contains("SignUpScreen") || route.contains("LoginScreen")
+    } == true
+
+    val shouldShowBars = !isFullScreen
 
     val baseTopBarData = navBackStackEntry?.getTopBarData(navController) ?: TopBarData()
 
@@ -119,7 +122,7 @@ fun EntryPointScreen() {
         Box(modifier = Modifier.padding(contentPadding)) {
             NavHost(
                 navController = navController,
-                startDestination = ContentNavigationRoute.SignUpScreen,
+                startDestination = ContentNavigationRoute.LoginScreen,
                 modifier = Modifier.fillMaxSize()
             ) {
                 homeNavGraph(navController)

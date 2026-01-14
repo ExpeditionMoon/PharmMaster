@@ -1,5 +1,5 @@
 package com.moon.pharm.profile.auth.model
 
 enum class SignUpStep {
-    TYPE, EMAIL, NICKNAME
+    TYPE, EMAIL, NICKNAME, PHARMACIST_INFO
 }

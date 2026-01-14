@@ -14,8 +14,8 @@ fun Long?.toTimestamp(): Timestamp? {
 fun parseAlarmTimeToLong(timeStr: String?): Long? {
     if (timeStr.isNullOrEmpty()) return null
     return try {
-        if (timeStr.contains(":")) {
-            val parts = timeStr.split(":")
+        if (timeStr.contains(TIME_DELIMITER)) {
+            val parts = timeStr.split(TIME_DELIMITER)
             val hours = parts[0].toLong()
             val minutes = parts[1].toLong()
             (hours * 60) + minutes

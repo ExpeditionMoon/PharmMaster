@@ -26,7 +26,9 @@ fun defaultHomeTopBarData() = TopBarData(
 fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
         val routeName = destination.route ?: return TopBarData()
         return when {
-            destination.hasRoute<ContentNavigationRoute.SignUpScreen>() -> {
+            destination.hasRoute<ContentNavigationRoute.LoginScreen>() -> {
+                TopBarData(isVisible = false)
+            }destination.hasRoute<ContentNavigationRoute.SignUpScreen>() -> {
                 TopBarData(isVisible = false)
             }
             destination.hasRoute<ContentNavigationRoute.HomeTab>() -> {

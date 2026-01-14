@@ -1,15 +1,14 @@
 package com.moon.pharm.domain.repository
 
-import com.moon.pharm.domain.model.auth.Pharmacist
-import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
-    fun signUp(user: User, password: String, pharmacist: Pharmacist? = null): Flow<DataResourceResult<Unit>>
-    suspend fun isEmailDuplicated(email: String): Boolean
+    fun createAccount(email: String, password: String): Flow<DataResourceResult<String>>
 
-    fun getPharmacistsByPlaceId(placeId: String): Flow<DataResourceResult<List<Pharmacist>>>
-    fun getPharmacistById(pharmacistId: String): Flow<DataResourceResult<Pharmacist>>
+    fun login(email: String, password: String): Flow<DataResourceResult<String>>
+    fun logout(): Flow<DataResourceResult<Unit>>
+    fun deleteAccount(): Flow<DataResourceResult<Unit>>
     fun getCurrentUserId(): String?
+    suspend fun sendPasswordResetEmail(email: String): DataResourceResult<Unit>
 }
