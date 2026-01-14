@@ -2,6 +2,7 @@ package com.moon.pharm.profile.auth.screen
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
@@ -28,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.common.MIME_TYPE_IMAGE_ALL
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.Secondary
@@ -49,7 +49,7 @@ fun SignUpScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
         uri?.let { viewModel.updateProfileImage(it.toString()) }
     }
@@ -63,7 +63,11 @@ fun SignUpScreen(
         onUpdateNickName = { viewModel.updateNickName(it) },
         onUpdatePharmacyName = { viewModel.updatePharmacyName(it) },
         onUpdatePharmacistBio = { viewModel.updatePharmacistBio(it) },
-        onImageClick = { galleryLauncher.launch(MIME_TYPE_IMAGE_ALL) },
+        onImageClick = {
+            galleryLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        },
         onNextClick = { viewModel.moveToNextStep(onNavigateToHome) }
     )
 }
