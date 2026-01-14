@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -17,17 +15,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Placeholder
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.util.toDisplayDateString
 import com.moon.pharm.component_ui.component.card.DateSettingCard
 import com.moon.pharm.component_ui.component.dialog.DatePickerModal
+import com.moon.pharm.component_ui.component.toggle.CustomSwitch
 import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 import com.moon.pharm.profile.R
 
@@ -103,19 +98,11 @@ fun PeriodInputSection(
             color = Color.Black
         )
         Spacer(modifier = Modifier.width(4.dp))
-        Switch(
+        CustomSwitch(
             checked = noEndDate,
             onCheckedChange = { checked ->
                 onEvent(MedicationUiEvent.UpdatePeriod(startDate, if (checked) null else endDate, checked))
-            },
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = White,
-                checkedTrackColor = Primary,
-                uncheckedThumbColor = White,
-                uncheckedTrackColor = Placeholder,
-                uncheckedBorderColor = Color.Transparent
-            ),
-            modifier = Modifier.scale(0.7f)
+            }
         )
     }
 }

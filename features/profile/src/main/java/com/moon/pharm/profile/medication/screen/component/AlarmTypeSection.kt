@@ -14,19 +14,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Placeholder
-import com.moon.pharm.component_ui.theme.Primary
+import com.moon.pharm.component_ui.component.toggle.CustomSwitch
 import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.tertiaryLight
@@ -63,20 +59,11 @@ fun AlarmTypeSection(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Switch(
+                CustomSwitch(
                     checked = isChecked,
-                    onCheckedChange = onCheckedChange,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = White,
-                        checkedTrackColor = Primary,
-                        uncheckedThumbColor = White,
-                        uncheckedTrackColor = Placeholder,
-                        uncheckedBorderColor = Color.Transparent
-                    ),
-                    modifier = Modifier.scale(0.7f)
+                    onCheckedChange = onCheckedChange
                 )
             }
-
         }
     }
 }
