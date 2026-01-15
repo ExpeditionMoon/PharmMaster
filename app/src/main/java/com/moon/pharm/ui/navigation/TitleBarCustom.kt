@@ -60,42 +60,21 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
                 TopBarData(
                     title = "상담글 작성",
                     navigationType = TopBarNavigationType.Close,
-                    actions = listOf(
-                        TopBarAction(
-                            text = "다음",
-                            onClick = {
-                                navController.navigate(ContentNavigationRoute.ConsultTabPharmacistScreen)
-                            }
-                        )
-                    )
+                    actions = emptyList()
                 )
             }
             routeName.contains("ConsultTabPharmacistScreen") -> {
                 TopBarData(
                     title = "상담글 작성",
                     navigationType = TopBarNavigationType.Close,
-                    actions = listOf(
-                        TopBarAction(
-                            text = "다음",
-                            onClick = {
-                                navController.navigate(ContentNavigationRoute.ConsultTabConfirmScreen)
-                            }
-                        )
-                    )
+                    actions = emptyList()
                 )
             }
             routeName.contains("ConsultTabConfirmScreen") -> {
                 TopBarData(
                     title = "상담글 작성",
                     navigationType = TopBarNavigationType.Close,
-                    actions = listOf(
-                        TopBarAction(
-                            text = "완료",
-                            onClick = {
-                                navController.navigate(ContentNavigationRoute.ConsultTab)
-                            }
-                        )
-                    )
+                    actions = emptyList()
                 )
             }
             routeName.contains("ConsultTabDetailScreen") -> {

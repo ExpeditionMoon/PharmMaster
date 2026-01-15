@@ -7,7 +7,7 @@ import com.moon.pharm.consult.R
 @Composable
 fun ConsultUiMessage.asString(): String {
     return when (this) {
-        ConsultUiMessage.CreateFailed ->
-            stringResource(R.string.error_create_consult)
+        ConsultUiMessage.CreateFailed -> stringResource(R.string.error_create_consult)
+        is ConsultUiMessage.StringResourceError -> stringResource(this.messageId)
     }
 }

@@ -7,6 +7,7 @@ data class ConsultItem(
     val title: String,
     val content: String,
     val status: ConsultStatus,
+    val isPublic: Boolean = true,
     val createdAt: Long,
     val images: List<ConsultImage> = emptyList(),
     val answer: ConsultAnswer? = null

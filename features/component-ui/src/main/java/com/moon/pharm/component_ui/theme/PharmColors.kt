@@ -73,3 +73,13 @@ val surfaceLight = White
 
 /* OnSurface: Surface 위에 올라가는 텍스트나 아이콘 색상 */
 val onSurfaceLight = Black
+
+/* --- 스낵바 및 상태 표시용 추가 색상 --- */
+val Success = Color(0xFF2E7D32)       // 아이콘/텍스트용 진한 녹색
+val SuccessContainer = Color(0xFFE8F5E9) // 배경용 아주 연한 녹색
+
+val InfoContainer = Color(0xFFE3F2FD) // 배경용 아주 연한 하늘색
+val OnInfoContainer = Primary // 텍스트용
+
+val Warning = Color(0xFFF57C00)
+val WarningContainer = Color(0xFFFFF3E0)

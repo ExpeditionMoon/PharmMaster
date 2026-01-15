@@ -22,6 +22,7 @@ fun ConsultItemDTO.toDomain(): ConsultItem {
         } catch (e: Exception) {
             ConsultStatus.WAITING
         },
+        isPublic = this.isPublic,
         images = this.images?.map { ConsultImage(it.imageName, it.imageUrl) } ?: emptyList(),
         createdAt = this.createdAt?.toDate()?.time ?: 0L,
         answer = this.answer?.toDomain()
@@ -36,6 +37,7 @@ fun ConsultItem.toDto(): ConsultItemDTO {
         title = this.title,
         content = this.content,
         status = this.status.name,
+        isPublic = this.isPublic,
         images = this.images.map { ConsultImageDTO(it.imageName, it.imageUrl) },
         createdAt = this.createdAt.toTimestamp(),
         answer = this.answer?.let {

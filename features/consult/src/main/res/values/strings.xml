@@ -1,11 +1,19 @@
 <resources>
     <string name="error_create_consult">상담 등록 실패</string>
+    <string name="consult_error_input_required">제목과 내용을 입력해주세요.</string>
+    <string name="consult_error_pharmacist_required">상담할 약사를 선택해주세요.</string>
+    <string name="consult_error_login_required">로그인이 필요한 서비스입니다.</string>
 
     <string name="consult_filter_latest">최신순</string>
     <string name="consult_tab_my_consult">나의 상담</string>
 
     <string name="consult_write_placeholder_title">제목을 입력해주세요</string>
     <string name="consult_write_placeholder_content">구체적인 증상, 복용 중인 다른 약물 정보 등을 자세히 작성해주세요.</string>
+    <string name="consult_write_public_setting_title">공개 설정</string>
+    <string name="consult_write_public_desc_all">모든 사용자가 볼 수 있습니다.</string>
+    <string name="consult_write_public_desc_private">나와 상담 약사만 볼 수 있습니다.</string>
+
+    <string name="consult_button_next">다음</string>
 
     <string name="consult_search_select_pharmacist">약사 선택</string>
     <string name="consult_search_placeholder">지역, 약국명, 약사 전문 분야 검색</string>

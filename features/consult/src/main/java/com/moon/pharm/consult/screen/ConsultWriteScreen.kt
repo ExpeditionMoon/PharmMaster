@@ -1,39 +1,37 @@
 package com.moon.pharm.consult.screen
 
-import androidx.compose.foundation.BorderStroke
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -45,7 +43,17 @@ import androidx.navigation.NavController
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.component_ui.component.input.PrimaryTextField
+import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
+import com.moon.pharm.component_ui.component.snackbar.SnackbarType
+import com.moon.pharm.component_ui.component.toggle.CustomSwitch
+import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
+import com.moon.pharm.component_ui.theme.Black
+import com.moon.pharm.component_ui.theme.Primary
+import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.consult.R
+import com.moon.pharm.consult.common.ConsultUiMessage
+import com.moon.pharm.consult.common.asString
+import com.moon.pharm.consult.screen.section.PhotoAttachmentSection
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
 
 @Composable
@@ -56,15 +64,62 @@ fun ConsultWriteScreen(
     val uiState by viewModel.uiState.collectAsState()
     val writeState = uiState.writeState
 
-    ConsultWriteContent(
-        title = writeState.title,
-        content = writeState.content,
-        images = writeState.images,
+    val snackbarHostState = remember { SnackbarHostState() }
+    val userMessage = uiState.userMessage
+    val messageText = (userMessage as? ConsultUiMessage)?.asString()
 
-        onTitleChange = { viewModel.onTitleChanged(it) },
-        onContentChange = { viewModel.onContentChanged(it) },
-        onImageChange = { viewModel.updateImages(it) },
-    )
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) {
+            val currentImages = writeState.images
+            viewModel.updateImages(currentImages + uri.toString())
+        }
+    }
+
+    LaunchedEffect(userMessage) {
+        if (userMessage != null && messageText != null) {
+            snackbarHostState.showSnackbar(messageText)
+            viewModel.userMessageShown()
+        }
+    }
+
+    val isFormValid = writeState.title.isNotBlank() && writeState.content.isNotBlank()
+
+    Scaffold(
+        containerColor = backgroundLight,
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                CustomSnackbar(
+                    snackbarData = data, type = SnackbarType.ERROR
+                )
+            }
+        },
+        contentWindowInsets = WindowInsets(0.dp)
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            ConsultWriteContent(
+                title = writeState.title,
+                content = writeState.content,
+                images = writeState.images,
+                isPublic = writeState.isPublic,
+                isButtonEnabled = isFormValid,
+
+                onTitleChange = { viewModel.onTitleChanged(it) },
+                onContentChange = { viewModel.onContentChanged(it) },
+                onImageChange = { viewModel.updateImages(it) },
+                onVisibilityChange = { viewModel.onVisibilityChanged(it) },
+                onCameraClick = {
+                    photoPickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                },
+                onNextClick = {
+                    navController.navigate(ContentNavigationRoute.ConsultTabPharmacistScreen)
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -72,10 +127,14 @@ fun ConsultWriteContent(
     title: String,
     content: String,
     images: List<String>,
+    isPublic: Boolean,
+    isButtonEnabled: Boolean,
     onTitleChange: (String) -> Unit,
     onContentChange: (String) -> Unit,
     onImageChange: (List<String>) -> Unit,
     onCameraClick: () -> Unit = {},
+    onVisibilityChange: (Boolean) -> Unit,
+    onNextClick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -83,8 +142,9 @@ fun ConsultWriteContent(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundLight)
-            .padding(horizontal = 24.dp, vertical = 20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .imePadding()
+            .padding(horizontal = 24.dp)
+            .padding(top = 20.dp, bottom = 10.dp)
     ) {
         PrimaryTextField(
             value = title,
@@ -93,7 +153,7 @@ fun ConsultWriteContent(
             textStyle = TextStyle(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Normal,
-                color = Color.Black
+                color = Black
             ),
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -113,13 +173,12 @@ fun ConsultWriteContent(
             ),
             singleLine = false,
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
+                .height(250.dp)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        // 3. 사진 첨부 영역
         PhotoAttachmentSection(
             images = images,
             onCameraClick = onCameraClick,
@@ -127,90 +186,49 @@ fun ConsultWriteContent(
                 onImageChange(images.filter { it != imageUrl })
             }
         )
-    }
-}
 
-/**
- * 하단 사진 첨부 섹션
- * - 카메라 버튼
- * - 이미지 리스트 (가로 스크롤)
- */
-@Composable
-fun PhotoAttachmentSection(
-    images: List<String>,
-    onCameraClick: () -> Unit,
-    onRemoveImage: (String) -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        // 카메라 버튼 (전체 너비)
-        OutlinedButton(
-            onClick = onCameraClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(10.dp),
-            border = BorderStroke(2.dp, primaryLight),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight)
+        Spacer(modifier = Modifier.weight(1f))
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Icon(
-                Icons.Default.CameraAlt,
-                contentDescription = "카메라 실행"
-            )
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .border(
-                            width = 1.dp,
-                            color = Color(0xFFE0E0E0),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .clickable { /* 갤러리 열기 */ },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "사진 추가",
-                        tint = Color.Gray
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.consult_write_public_setting_title),
+                        color = Primary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        text = if (isPublic) stringResource(R.string.consult_write_public_desc_all)
+                        else stringResource(R.string.consult_write_public_desc_private),
+                        fontSize = 12.sp,
+                        color = SecondFont
                     )
                 }
+                CustomSwitch(
+                    checked = isPublic,
+                    onCheckedChange = onVisibilityChange
+                )
             }
 
-            items(images) { imageUrl ->
-                Box(
-                    modifier = Modifier.size(60.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color.LightGray)
-                    )
+            Spacer(modifier = Modifier.height(10.dp))
 
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "삭제",
-                        modifier = Modifier
-                            .size(20.dp)
-                            .align(Alignment.TopEnd)
-                            .offset(x = 4.dp, y = (-4).dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color.Black)
-                            .clickable { onRemoveImage(imageUrl) }
-                            .padding(2.dp),
-                        tint = Color.White
-                    )
-                }
+            Button(
+                onClick = onNextClick,
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = primaryLight),
+                enabled = isButtonEnabled
+            ) {
+                Text(stringResource(R.string.consult_button_next))
             }
         }
     }

@@ -17,6 +17,7 @@ data class ConsultItemDTO(
     var title: String = EMPTY_STRING,
     var content: String = EMPTY_STRING,
     var status: String = ConsultStatus.WAITING.name,
+    val isPublic: Boolean = true,
     var images: List<ConsultImageDTO>? = null,
 
     @ServerTimestamp

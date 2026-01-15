@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.consult.R
 import com.moon.pharm.consult.common.ConsultUiMessage
 import com.moon.pharm.consult.screen.ConsultUiState
 import com.moon.pharm.consult.model.ConsultPrimaryTab
@@ -68,14 +69,23 @@ class ConsultViewModel @Inject constructor(
 
     private fun fetchConsultList() {
         viewModelScope.launch {
+            val currentUserId = consultUseCases.getCurrentUserId()
+
             consultUseCases.getConsultList().collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
-                        is DataResourceResult.Success -> state.copy(
-                            isLoading = false,
-                            consultList = result.resultData
-                        )
+                        is DataResourceResult.Success -> {
+                            val filteredList = result.resultData.filter { item ->
+                                item.isPublic || (currentUserId != null && item.userId == currentUserId)
+                            }
+
+                            state.copy(
+                                isLoading = false,
+                                consultList = filteredList
+                            )
+                        }
+
                         is DataResourceResult.Failure -> state.copy(
                             isLoading = false,
                             userMessage = UiMessage.LoadDataFailed
@@ -201,22 +211,36 @@ class ConsultViewModel @Inject constructor(
         _uiState.update { it.copy(writeState = it.writeState.copy(images = images)) }
     }
 
-    fun submitConsult() {
+    fun onVisibilityChanged(isPublic: Boolean) {
+        _uiState.update { it.copy(writeState = it.writeState.copy(isPublic = isPublic)) }
+    }
+
+    fun validateConsultInput(): Boolean {
         val writeData = _uiState.value.writeState
 
-        if (writeData.selectedPharmacistId == null) {
-            _uiState.update { it.copy(userMessage = UiMessage.Error("상담할 약사를 선택해주세요.")) }
-            return
-        }
         if (writeData.title.isBlank() || writeData.content.isBlank()) {
-            _uiState.update { it.copy(userMessage = UiMessage.Error("내용을 입력해주세요.")) }
+            _uiState.update {
+                it.copy(userMessage = ConsultUiMessage.StringResourceError(R.string.consult_error_input_required))
+            }
+            return false
+        }
+        return true
+    }
+
+    fun submitConsult() {
+        val writeData = _uiState.value.writeState
+        if (writeData.selectedPharmacistId == null) {
+            _uiState.update {
+                it.copy(userMessage = ConsultUiMessage.StringResourceError(R.string.consult_error_pharmacist_required))
+            }
             return
         }
 
         val currentUserId = consultUseCases.getCurrentUserId()
-
         if (currentUserId == null) {
-            _uiState.update { it.copy(userMessage = UiMessage.Error("로그인이 필요한 서비스입니다.")) }
+            _uiState.update {
+                it.copy(userMessage = ConsultUiMessage.StringResourceError(R.string.consult_error_login_required))
+            }
             return
         }
 
@@ -227,12 +251,10 @@ class ConsultViewModel @Inject constructor(
             title = writeData.title,
             content = writeData.content,
             status = ConsultStatus.WAITING,
+            isPublic = writeData.isPublic,
             createdAt = System.currentTimeMillis(),
             images = writeData.images.map { path ->
-                ConsultImage(
-                    imageName = path.substringAfterLast("/"),
-                    imageUrl = path
-                )
+                ConsultImage(path.substringAfterLast("/"), path)
             }
         )
 
@@ -262,12 +284,10 @@ class ConsultViewModel @Inject constructor(
         _uiState.update { it.copy(writeState = ConsultWriteState()) }
     }
 
-    // Toast 메시지 본 후 초기화
     fun userMessageShown() {
         _uiState.update { it.copy(userMessage = null) }
     }
 
-    // 저장 성공 후 Navigation 등의 처리가 끝났을 때 상태 복구
     fun resetConsultState() {
         _uiState.update { it.copy(isConsultCreated = false) }
     }

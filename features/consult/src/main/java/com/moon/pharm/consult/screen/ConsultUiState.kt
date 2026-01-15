@@ -25,6 +25,7 @@ data class ConsultWriteState(
     val title: String = "",
     val content: String = "",
     val images: List<String> = emptyList(),
+    val isPublic: Boolean = true,
 
     val searchQuery: String = "",
     val searchResults: List<Pharmacy> = emptyList(),
