@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.kotlin.android.ksp)
+    alias(libs.plugins.secrets.gradle.plugin)
 }
 
 android {
@@ -43,6 +44,9 @@ android {
 }
 kotlin {
     jvmToolchain(21)
+}
+secrets {
+    propertiesFileName = "secret.properties"
 }
 
 dependencies {
