@@ -12,7 +12,11 @@ import com.moon.pharm.consult.screen.ConsultScreen
 import com.moon.pharm.consult.screen.ConsultWriteScreen
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
 
-fun NavGraphBuilder.consultNavGraph(navController: NavController, viewModel: ConsultViewModel) {
+fun NavGraphBuilder.consultNavGraph(
+    navController: NavController,
+    viewModel: ConsultViewModel,
+    onMapModeChanged: (Boolean) -> Unit
+) {
 
     composable<ContentNavigationRoute.ConsultTab>{
         ConsultScreen(navController = navController, viewModel = viewModel)
@@ -21,7 +25,7 @@ fun NavGraphBuilder.consultNavGraph(navController: NavController, viewModel: Con
         ConsultWriteScreen(navController = navController, viewModel = viewModel)
     }
     composable<ContentNavigationRoute.ConsultTabPharmacistScreen> {
-        ConsultPharmacistScreen(navController = navController, viewModel = viewModel)
+        ConsultPharmacistScreen(navController = navController, viewModel = viewModel, onMapModeChanged = onMapModeChanged)
     }
     composable<ContentNavigationRoute.ConsultTabConfirmScreen> {
         ConsultConfirmScreen(navController = navController, viewModel = viewModel)

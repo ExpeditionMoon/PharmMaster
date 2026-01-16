@@ -1,6 +1,9 @@
 package com.moon.pharm.consult.screen
 
+import android.Manifest
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -55,6 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.moon.pharm.component_ui.component.map.PharmacyMap
 import com.moon.pharm.component_ui.theme.Placeholder
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.SecondFont
@@ -73,6 +77,7 @@ import kotlinx.coroutines.launch
 fun ConsultPharmacistScreen(
     navController: NavController,
     viewModel: ConsultViewModel,
+    onMapModeChanged: (Boolean) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val writeState = uiState.writeState
@@ -84,6 +89,25 @@ fun ConsultPharmacistScreen(
 
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val isGranted = permissions.values.all { it }
+    }
+
+    LaunchedEffect(Unit) {
+        locationPermissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+    }
+
+    LaunchedEffect(isMapView) {
+        onMapModeChanged(isMapView)
+    }
 
     LaunchedEffect(writeState.selectedPharmacy) {
         if (writeState.selectedPharmacy != null) {
@@ -104,9 +128,14 @@ fun ConsultPharmacistScreen(
     if (isMapView) {
         PharmacistMapView(
             scaffoldState = scaffoldState,
+            pharmacies = searchResults,
+            selectedPharmacy = writeState.selectedPharmacy,
             pharmacists = availablePharmacists,
             pharmacyName = writeState.selectedPharmacy?.name ?: "약국",
             onBack = { isMapView = false },
+            onPharmacySelect = { pharmacy ->
+                viewModel.selectPharmacy(pharmacy)
+            },
             onPharmacistSelect = { pharmacist ->
                 viewModel.selectPharmacist(pharmacist.userId)
                 navController.popBackStack()
@@ -184,21 +213,12 @@ fun PharmacistItem(
                     .border(1.dp, tertiaryLight, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-//                if (pharmacy.imageUrl.isNotEmpty()) {
-//                    Image(
-//                        painter = painterResource(id = pharmacist.imageUrl),
-//                        contentDescription = null,
-//                        contentScale = ContentScale.Crop,
-//                        modifier = Modifier.fillMaxSize()
-//                    )
-//                } else {
                 Icon(
                     imageVector = Icons.Default.Image,
                     contentDescription = null,
                     tint = Color.Gray,
                     modifier = Modifier.size(24.dp)
                 )
-//                }
             }
 
             Spacer(modifier = Modifier.width(10.dp))
@@ -294,9 +314,12 @@ fun PharmacistSearchView(
 @Composable
 fun PharmacistMapView(
     scaffoldState: BottomSheetScaffoldState,
+    pharmacies: List<Pharmacy>,
+    selectedPharmacy: Pharmacy?,
     pharmacists: List<Pharmacist>,
     pharmacyName: String,
     onBack: () -> Unit,
+    onPharmacySelect: (Pharmacy) -> Unit,
     onPharmacistSelect: (Pharmacist) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -355,25 +378,18 @@ fun PharmacistMapView(
                 }
             }
         },
-        sheetPeekHeight = 0.dp
+        sheetPeekHeight = 0.dp,
+        sheetContainerColor = White,
+        sheetShadowElevation = 10.dp
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-//            Image(
-//                painter = painterResource(id = R.drawable.map_image),
-//                contentDescription = "지도",
-//                contentScale = ContentScale.Crop,
-//                modifier = Modifier.fillMaxSize()
-//            )
-
-            Button(
-                onClick = {
-                    scope.launch { scaffoldState.bottomSheetState.expand() }
-                },
-                modifier = Modifier.align(Alignment.Center)
-            ) {
-                Text(text = "약국 선택하기 (시뮬레이션)")
-            }
-        }
+        PharmacyMap(
+            pharmacies = pharmacies,
+            selectedPharmacy = selectedPharmacy,
+            onPharmacyClick = { pharmacy ->
+                onPharmacySelect(pharmacy)
+            },
+            onBackClick = onBack
+        )
     }
 }
 
