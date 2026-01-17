@@ -50,10 +50,13 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    //Firestore
+    // Firestore
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.libs)
 
+    // Map
+    implementation(libs.google.places)
+    
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

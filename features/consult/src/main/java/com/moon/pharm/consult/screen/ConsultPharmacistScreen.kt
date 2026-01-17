@@ -1,6 +1,8 @@
 package com.moon.pharm.consult.screen
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -52,12 +54,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.google.android.gms.location.LocationServices
 import com.moon.pharm.component_ui.component.map.PharmacyMap
 import com.moon.pharm.component_ui.theme.Placeholder
 import com.moon.pharm.component_ui.theme.Primary
@@ -90,10 +95,34 @@ fun ConsultPharmacistScreen(
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
 
+    val context = LocalContext.current
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val isGranted = permissions.values.all { it }
+
+        if (isGranted) {
+            val hasFineLocation = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            val hasCoarseLocation = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            @SuppressLint("MissingPermission")
+            if (hasFineLocation || hasCoarseLocation) {
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        viewModel.fetchNearbyPharmacies(location.latitude, location.longitude)
+                    }
+                }
+            }
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -131,7 +160,7 @@ fun ConsultPharmacistScreen(
             pharmacies = searchResults,
             selectedPharmacy = writeState.selectedPharmacy,
             pharmacists = availablePharmacists,
-            pharmacyName = writeState.selectedPharmacy?.name ?: "약국",
+            pharmacyName = writeState.selectedPharmacy?.name ?: stringResource(R.string.consult_map_pharmacy_default_name),
             onBack = { isMapView = false },
             onPharmacySelect = { pharmacy ->
                 viewModel.selectPharmacy(pharmacy)
@@ -248,7 +277,7 @@ fun PharmacistItem(
             contentPadding = PaddingValues(0.dp)
         ) {
             Text(
-                text = "선택",
+                text = stringResource(R.string.consult_map_select_btn),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -334,23 +363,8 @@ fun PharmacistMapView(
             Column(
                 modifier = Modifier.padding(horizontal = 24.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .width(40.dp)
-                            .height(4.dp)
-                            .clip(RoundedCornerShape(2.dp))
-                            .background(tertiaryLight)
-                    )
-                }
-
                 Text(
-                    text = "$pharmacyName 약사 목록",
+                    text = stringResource(R.string.consult_map_pharmacist_list_format, pharmacyName),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
@@ -361,7 +375,7 @@ fun PharmacistMapView(
                     Box(modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp), contentAlignment = Alignment.Center) {
-                        Text("등록된 약사가 없습니다.", color = SecondFont)
+                        Text(stringResource(R.string.consult_map_no_pharmacist), color = SecondFont)
                     }
                 } else {
                     LazyColumn(
@@ -393,7 +407,6 @@ fun PharmacistMapView(
     }
 }
 
-
 @Composable
 fun SearchBar(
     value: String,
@@ -414,7 +427,7 @@ fun SearchBar(
         ) {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "검색",
+                contentDescription = stringResource(R.string.desc_search_icon),
                 tint = Placeholder,
                 modifier = Modifier.size(20.dp)
             )
@@ -493,13 +506,13 @@ fun MapFindBanner(
         ) {
             Icon(
                 imageVector = Icons.Default.Map,
-                contentDescription = "지도",
+                contentDescription = stringResource(R.string.desc_map_icon),
                 tint = Primary,
                 modifier = Modifier.size(32.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "지도를 열어 약사 찾기",
+                text = stringResource(R.string.consult_map_search_placeholder),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = Primary

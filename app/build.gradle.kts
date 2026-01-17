@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 kotlin {
@@ -75,6 +76,9 @@ dependencies {
     ksp(libs.hilt.compiler)
     // Hilt Navigation
     implementation(libs.hilt.navigation.compose)
+
+    // Map
+    implementation(libs.google.places)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
