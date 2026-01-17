@@ -66,7 +66,6 @@ class ConsultViewModel @Inject constructor(
         }
     }
 
-
     private fun fetchConsultList() {
         viewModelScope.launch {
             val currentUserId = consultUseCases.getCurrentUserId()
@@ -116,14 +115,15 @@ class ConsultViewModel @Inject constructor(
                         }
 
                         item.answer?.let { answer ->
-                            consultUseCases.getPharmacistDetail(answer.pharmacistId).collect { pharmacistResult ->
-                                if (pharmacistResult is DataResourceResult.Success) {
-                                    val pharmacist = pharmacistResult.resultData
-                                    _uiState.update { state ->
-                                        state.copy(answerPharmacist = pharmacist)
+                            consultUseCases.getPharmacistDetail(answer.pharmacistId)
+                                .collect { pharmacistResult ->
+                                    if (pharmacistResult is DataResourceResult.Success) {
+                                        val pharmacist = pharmacistResult.resultData
+                                        _uiState.update { state ->
+                                            state.copy(answerPharmacist = pharmacist)
+                                        }
                                     }
                                 }
-                            }
                         }
                     }
 
@@ -185,6 +185,7 @@ class ConsultViewModel @Inject constructor(
                             isLoading = false,
                             writeState = state.writeState.copy(availablePharmacists = result.resultData)
                         )
+
                         is DataResourceResult.Failure -> state.copy(
                             isLoading = false,
                             userMessage = UiMessage.LoadDataFailed
@@ -192,6 +193,34 @@ class ConsultViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun fetchNearbyPharmacies(currentLat: Double, currentLng: Double) {
+        viewModelScope.launch {
+            consultUseCases.searchNearbyPharmacies(currentLat, currentLng)
+                .collectLatest { result ->
+                    _uiState.update { state ->
+                        when (result) {
+                            is DataResourceResult.Loading -> {
+                                state.copy(isLoading = true)
+                            }
+
+                            is DataResourceResult.Success -> {
+                                state.copy(
+                                    isLoading = false,
+                                    writeState = state.writeState.copy(
+                                        searchResults = result.resultData
+                                    )
+                                )
+                            }
+
+                            is DataResourceResult.Failure -> {
+                                state.copy(isLoading = false)
+                            }
+                        }
+                    }
+                }
         }
     }
 
@@ -260,16 +289,22 @@ class ConsultViewModel @Inject constructor(
 
         createConsult(newItem)
     }
+
     private fun createConsult(consultInfo: ConsultItem) {
         viewModelScope.launch {
             consultUseCases.createConsult(consultInfo).collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
-                        is DataResourceResult.Loading -> state.copy(isLoading = true, userMessage = null)
+                        is DataResourceResult.Loading -> state.copy(
+                            isLoading = true,
+                            userMessage = null
+                        )
+
                         is DataResourceResult.Success -> state.copy(
                             isLoading = false,
                             isConsultCreated = true
                         )
+
                         is DataResourceResult.Failure -> state.copy(
                             isLoading = false,
                             userMessage = ConsultUiMessage.CreateFailed

@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.kotlin.android.ksp)
+    alias(libs.plugins.secrets.gradle.plugin)
 }
 
 android {
@@ -39,10 +40,14 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 kotlin {
     jvmToolchain(21)
+}
+secrets {
+    propertiesFileName = "secret.properties"
 }
 
 dependencies {
@@ -71,6 +76,9 @@ dependencies {
     ksp(libs.hilt.compiler)
     // Hilt Navigation
     implementation(libs.hilt.navigation.compose)
+
+    // Map
+    implementation(libs.google.places)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -40,12 +40,17 @@ kotlin{
 }
 
 dependencies {
+    implementation(project(":domain"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose.libs)
+
+    // Map
+    api(libs.bundles.google.maps.libs)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

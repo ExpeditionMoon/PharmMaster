@@ -1,6 +1,11 @@
 package com.moon.pharm.consult.screen
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -49,12 +54,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.google.android.gms.location.LocationServices
+import com.moon.pharm.component_ui.component.map.PharmacyMap
 import com.moon.pharm.component_ui.theme.Placeholder
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.SecondFont
@@ -73,6 +82,7 @@ import kotlinx.coroutines.launch
 fun ConsultPharmacistScreen(
     navController: NavController,
     viewModel: ConsultViewModel,
+    onMapModeChanged: (Boolean) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val writeState = uiState.writeState
@@ -84,6 +94,49 @@ fun ConsultPharmacistScreen(
 
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val isGranted = permissions.values.all { it }
+
+        if (isGranted) {
+            val hasFineLocation = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            val hasCoarseLocation = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+            @SuppressLint("MissingPermission")
+            if (hasFineLocation || hasCoarseLocation) {
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        viewModel.fetchNearbyPharmacies(location.latitude, location.longitude)
+                    }
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        locationPermissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+    }
+
+    LaunchedEffect(isMapView) {
+        onMapModeChanged(isMapView)
+    }
 
     LaunchedEffect(writeState.selectedPharmacy) {
         if (writeState.selectedPharmacy != null) {
@@ -104,9 +157,14 @@ fun ConsultPharmacistScreen(
     if (isMapView) {
         PharmacistMapView(
             scaffoldState = scaffoldState,
+            pharmacies = searchResults,
+            selectedPharmacy = writeState.selectedPharmacy,
             pharmacists = availablePharmacists,
-            pharmacyName = writeState.selectedPharmacy?.name ?: "약국",
+            pharmacyName = writeState.selectedPharmacy?.name ?: stringResource(R.string.consult_map_pharmacy_default_name),
             onBack = { isMapView = false },
+            onPharmacySelect = { pharmacy ->
+                viewModel.selectPharmacy(pharmacy)
+            },
             onPharmacistSelect = { pharmacist ->
                 viewModel.selectPharmacist(pharmacist.userId)
                 navController.popBackStack()
@@ -184,21 +242,12 @@ fun PharmacistItem(
                     .border(1.dp, tertiaryLight, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-//                if (pharmacy.imageUrl.isNotEmpty()) {
-//                    Image(
-//                        painter = painterResource(id = pharmacist.imageUrl),
-//                        contentDescription = null,
-//                        contentScale = ContentScale.Crop,
-//                        modifier = Modifier.fillMaxSize()
-//                    )
-//                } else {
                 Icon(
                     imageVector = Icons.Default.Image,
                     contentDescription = null,
                     tint = Color.Gray,
                     modifier = Modifier.size(24.dp)
                 )
-//                }
             }
 
             Spacer(modifier = Modifier.width(10.dp))
@@ -228,7 +277,7 @@ fun PharmacistItem(
             contentPadding = PaddingValues(0.dp)
         ) {
             Text(
-                text = "선택",
+                text = stringResource(R.string.consult_map_select_btn),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -294,9 +343,12 @@ fun PharmacistSearchView(
 @Composable
 fun PharmacistMapView(
     scaffoldState: BottomSheetScaffoldState,
+    pharmacies: List<Pharmacy>,
+    selectedPharmacy: Pharmacy?,
     pharmacists: List<Pharmacist>,
     pharmacyName: String,
     onBack: () -> Unit,
+    onPharmacySelect: (Pharmacy) -> Unit,
     onPharmacistSelect: (Pharmacist) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -311,23 +363,8 @@ fun PharmacistMapView(
             Column(
                 modifier = Modifier.padding(horizontal = 24.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .width(40.dp)
-                            .height(4.dp)
-                            .clip(RoundedCornerShape(2.dp))
-                            .background(tertiaryLight)
-                    )
-                }
-
                 Text(
-                    text = "$pharmacyName 약사 목록",
+                    text = stringResource(R.string.consult_map_pharmacist_list_format, pharmacyName),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
@@ -338,7 +375,7 @@ fun PharmacistMapView(
                     Box(modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp), contentAlignment = Alignment.Center) {
-                        Text("등록된 약사가 없습니다.", color = SecondFont)
+                        Text(stringResource(R.string.consult_map_no_pharmacist), color = SecondFont)
                     }
                 } else {
                     LazyColumn(
@@ -355,28 +392,20 @@ fun PharmacistMapView(
                 }
             }
         },
-        sheetPeekHeight = 0.dp
+        sheetPeekHeight = 0.dp,
+        sheetContainerColor = White,
+        sheetShadowElevation = 10.dp
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-//            Image(
-//                painter = painterResource(id = R.drawable.map_image),
-//                contentDescription = "지도",
-//                contentScale = ContentScale.Crop,
-//                modifier = Modifier.fillMaxSize()
-//            )
-
-            Button(
-                onClick = {
-                    scope.launch { scaffoldState.bottomSheetState.expand() }
-                },
-                modifier = Modifier.align(Alignment.Center)
-            ) {
-                Text(text = "약국 선택하기 (시뮬레이션)")
-            }
-        }
+        PharmacyMap(
+            pharmacies = pharmacies,
+            selectedPharmacy = selectedPharmacy,
+            onPharmacyClick = { pharmacy ->
+                onPharmacySelect(pharmacy)
+            },
+            onBackClick = onBack
+        )
     }
 }
-
 
 @Composable
 fun SearchBar(
@@ -398,7 +427,7 @@ fun SearchBar(
         ) {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "검색",
+                contentDescription = stringResource(R.string.desc_search_icon),
                 tint = Placeholder,
                 modifier = Modifier.size(20.dp)
             )
@@ -477,13 +506,13 @@ fun MapFindBanner(
         ) {
             Icon(
                 imageVector = Icons.Default.Map,
-                contentDescription = "지도",
+                contentDescription = stringResource(R.string.desc_map_icon),
                 tint = Primary,
                 modifier = Modifier.size(32.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "지도를 열어 약사 찾기",
+                text = stringResource(R.string.consult_map_search_placeholder),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = Primary
