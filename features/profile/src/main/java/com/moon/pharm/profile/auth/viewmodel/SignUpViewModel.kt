@@ -5,10 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.CheckEmailDuplicateUseCase
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.auth.SignUpUseCase
+import com.moon.pharm.domain.usecase.pharmacy.SearchNearbyPharmaciesUseCase
+import com.moon.pharm.domain.usecase.pharmacy.SearchPharmacyUseCase
 import com.moon.pharm.profile.auth.model.SignUpStep
 import com.moon.pharm.profile.auth.screen.SignUpUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +31,9 @@ sealed interface AuthEvent {
 class SignUpViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase,
     private val checkEmailDuplicateUseCase: CheckEmailDuplicateUseCase,
-    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase
+    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
+    private val searchPharmacyUseCase: SearchPharmacyUseCase,
+    private val searchNearbyPharmaciesUseCase: SearchNearbyPharmaciesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignUpUiState())
@@ -76,8 +81,52 @@ class SignUpViewModel @Inject constructor(
         _uiState.update { it.copy(password = password) }
     }
 
-    fun updatePharmacyName(name: String) {
-        _uiState.update { it.copy(pharmacyName = name) }
+    fun fetchNearbyPharmacies() {
+        val lat = 37.5665
+        val lng = 126.9780
+
+        viewModelScope.launch {
+            searchNearbyPharmaciesUseCase(lat, lng).collectLatest { result ->
+                if (result is DataResourceResult.Success) {
+                    _uiState.update {
+                        it.copy(pharmacySearchResults = result.resultData)
+                    }
+                }
+            }
+        }
+    }
+
+    fun searchPharmacies(query: String) {
+        if (query.isBlank()) return
+
+        viewModelScope.launch {
+            searchPharmacyUseCase(query).collectLatest { result ->
+                when (result) {
+                    is DataResourceResult.Loading -> {}
+                    is DataResourceResult.Success -> {
+                        _uiState.update {
+                            it.copy(pharmacySearchResults = result.resultData)
+                        }
+                    }
+                    is DataResourceResult.Failure -> {
+                        _uiState.update { it.copy(pharmacySearchResults = emptyList()) }
+                    }
+                }
+            }
+        }
+    }
+
+    fun clearSearchResults() {
+        _uiState.update { it.copy(pharmacySearchResults = emptyList()) }
+    }
+
+    fun updatePharmacy(pharmacy: Pharmacy) {
+        _uiState.update {
+            it.copy(
+                pharmacyName = pharmacy.name,
+                selectedPharmacy = pharmacy
+            )
+        }
     }
 
     fun updatePharmacistBio(bio: String) {
@@ -124,19 +173,23 @@ class SignUpViewModel @Inject constructor(
             createdAt = System.currentTimeMillis()
         )
 
+        val selectedPharmacy = if (type == UserType.PHARMACIST) currentState.selectedPharmacy else null
+
+        if (type == UserType.PHARMACIST && selectedPharmacy == null) return
+
         val pharmacist = if (type == UserType.PHARMACIST) {
             Pharmacist(
                 userId = "",
                 name = currentState.nickName,
                 bio = currentState.pharmacistBio,
-                pharmacyId = "temp_pharmacy_id",
-                pharmacyName = currentState.pharmacyName,
+                placeId = selectedPharmacy!!.placeId,
+                pharmacyName = selectedPharmacy.name,
                 isApproved = false
             )
         } else null
 
         viewModelScope.launch {
-            signUpUseCase(user, currentState.password, pharmacist).collectLatest { result ->
+            signUpUseCase(user, currentState.password, pharmacist, selectedPharmacy).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Loading -> {
                         _uiState.update { it.copy(isLoading = true) }

@@ -4,7 +4,7 @@ data class Pharmacist(
     val userId: String,
     val name: String,
     val bio: String,
-    val pharmacyId: String,
+    val placeId: String,
     val pharmacyName: String,
     val isApproved: Boolean = false,
 )

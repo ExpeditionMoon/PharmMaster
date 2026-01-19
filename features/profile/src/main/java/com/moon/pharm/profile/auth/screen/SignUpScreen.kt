@@ -1,6 +1,7 @@
 package com.moon.pharm.profile.auth.screen
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,8 +20,12 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -29,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.component.map.PharmacySelector
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.Secondary
@@ -47,6 +53,7 @@ fun SignUpScreen(
     onNavigateToHome: () -> Unit, viewModel: SignUpViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showPharmacySearch by remember { mutableStateOf(false) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -54,22 +61,49 @@ fun SignUpScreen(
         uri?.let { viewModel.updateProfileImage(it.toString()) }
     }
 
-    SignUpScreenContent(
-        uiState = uiState,
-        onUpdateUserType = { viewModel.updateUserType(it) },
-        onUpdateEmail = { viewModel.updateEmail(it) },
-        onCheckEmail = { viewModel.checkEmailDuplicate() },
-        onUpdatePassword = { viewModel.updatePassword(it) },
-        onUpdateNickName = { viewModel.updateNickName(it) },
-        onUpdatePharmacyName = { viewModel.updatePharmacyName(it) },
-        onUpdatePharmacistBio = { viewModel.updatePharmacistBio(it) },
-        onImageClick = {
-            galleryLauncher.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-            )
-        },
-        onNextClick = { viewModel.moveToNextStep(onNavigateToHome) }
-    )
+    if (showPharmacySearch) {
+        LaunchedEffect(Unit) {
+            viewModel.fetchNearbyPharmacies()
+        }
+
+        PharmacySelector(
+            pharmacies = uiState.pharmacySearchResults,
+            onSearch = { query ->
+                viewModel.searchPharmacies(query)
+            },
+            onBackClick = {
+                viewModel.clearSearchResults()
+                showPharmacySearch = false
+            },
+            onPharmacySelected = { pharmacy ->
+                viewModel.updatePharmacy(pharmacy)
+                viewModel.clearSearchResults()
+                showPharmacySearch = false
+            }
+        )
+
+        BackHandler {
+            viewModel.clearSearchResults()
+            showPharmacySearch = false
+        }
+    } else {
+        SignUpScreenContent(
+            uiState = uiState,
+            onUpdateUserType = { viewModel.updateUserType(it) },
+            onUpdateEmail = { viewModel.updateEmail(it) },
+            onCheckEmail = { viewModel.checkEmailDuplicate() },
+            onUpdatePassword = { viewModel.updatePassword(it) },
+            onUpdateNickName = { viewModel.updateNickName(it) },
+            onSearchPharmacyClick = { showPharmacySearch = true },
+            onUpdatePharmacistBio = { viewModel.updatePharmacistBio(it) },
+            onImageClick = {
+                galleryLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            },
+            onNextClick = { viewModel.moveToNextStep(onNavigateToHome) }
+        )
+    }
 }
 
 @Composable
@@ -80,7 +114,7 @@ fun SignUpScreenContent(
     onCheckEmail: () -> Unit,
     onUpdatePassword: (String) -> Unit,
     onUpdateNickName: (String) -> Unit,
-    onUpdatePharmacyName: (String) -> Unit,
+    onSearchPharmacyClick: () -> Unit,
     onUpdatePharmacistBio: (String) -> Unit,
     onImageClick: () -> Unit,
     onNextClick: () -> Unit
@@ -102,6 +136,7 @@ fun SignUpScreenContent(
                 SignUpStep.EMAIL -> (uiState.isEmailAvailable == true) && (uiState.password.length >= 6)
                 SignUpStep.NICKNAME -> uiState.nickName.isNotBlank()
                 SignUpStep.PHARMACIST_INFO -> uiState.pharmacyName.isNotBlank() && uiState.pharmacistBio.isNotBlank()
+                else -> true
             }
 
             Button(
@@ -167,12 +202,11 @@ fun SignUpScreenContent(
                     SignUpStep.PHARMACIST_INFO -> PharmacistInfoSection(
                         pharmacyName = uiState.pharmacyName,
                         bio = uiState.pharmacistBio,
-                        onUpdateName = onUpdatePharmacyName,
+                        onSearchClick = onSearchPharmacyClick,
                         onUpdateBio = onUpdatePharmacistBio
                     )
                 }
             }
-
             Spacer(modifier = Modifier.weight(1.2f))
         }
     }
@@ -189,7 +223,7 @@ fun Step1Preview() {
         onCheckEmail = {},
         onUpdatePassword = {},
         onUpdateNickName = {},
-        onUpdatePharmacyName = {},
+        onSearchPharmacyClick = {},
         onUpdatePharmacistBio = {},
         onImageClick = {},
         onNextClick = {}
@@ -210,7 +244,7 @@ fun Step2Preview() {
         onCheckEmail = {},
         onUpdatePassword = {},
         onUpdateNickName = {},
-        onUpdatePharmacyName = {},
+        onSearchPharmacyClick = {},
         onUpdatePharmacistBio = {},
         onImageClick = {},
         onNextClick = {}
@@ -232,7 +266,7 @@ fun Step3Preview() {
         onCheckEmail = {},
         onUpdatePassword = {},
         onUpdateNickName = {},
-        onUpdatePharmacyName = {},
+        onSearchPharmacyClick = {},
         onUpdatePharmacistBio = {},
         onImageClick = {},
         onNextClick = {}
@@ -254,7 +288,7 @@ fun Step3PharmacistPreview() {
         onCheckEmail = {},
         onUpdatePassword = {},
         onUpdateNickName = {},
-        onUpdatePharmacyName = {},
+        onSearchPharmacyClick = {},
         onUpdatePharmacistBio = {},
         onImageClick = {},
         onNextClick = {}
@@ -276,7 +310,7 @@ fun Step4Preview() {
         onCheckEmail = {},
         onUpdatePassword = {},
         onUpdateNickName = {},
-        onUpdatePharmacyName = {},
+        onSearchPharmacyClick = {},
         onUpdatePharmacistBio = {},
         onImageClick = {},
         onNextClick = {}

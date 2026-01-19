@@ -2,10 +2,7 @@ package com.moon.pharm.data.datasource.remote.firebase
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.moon.pharm.data.common.FIELD_PLACE_ID
-import com.moon.pharm.data.common.FIELD_USER_TYPE
 import com.moon.pharm.data.common.PHARMACIST_COLLECTION
-import com.moon.pharm.data.common.USER_COLLECTION
-import com.moon.pharm.data.common.USER_TYPE_PHARMACIST
 import com.moon.pharm.data.datasource.PharmacistDataSource
 import com.moon.pharm.data.datasource.remote.dto.PharmacistDTO
 import com.moon.pharm.domain.result.DataResourceResult
@@ -19,7 +16,6 @@ class FirestorePharmacistDataSourceImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : PharmacistDataSource {
     private val pharmacistCollection = firestore.collection(PHARMACIST_COLLECTION)
-    private val userCollection = firestore.collection(USER_COLLECTION)
 
     override suspend fun savePharmacist(pharmacistDto: PharmacistDTO): DataResourceResult<Unit> {
         return try {
@@ -31,7 +27,7 @@ class FirestorePharmacistDataSourceImpl @Inject constructor(
     }
 
     override fun getPharmacistById(pharmacistId: String): Flow<DataResourceResult<PharmacistDTO>> = callbackFlow {
-        val docRef = userCollection.document(pharmacistId)
+        val docRef = pharmacistCollection.document(pharmacistId)
 
         val registration = docRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
@@ -51,8 +47,7 @@ class FirestorePharmacistDataSourceImpl @Inject constructor(
 
     override fun getPharmacistsByPlaceId(placeId: String): Flow<DataResourceResult<List<PharmacistDTO>>> = callbackFlow {
         trySend(DataResourceResult.Loading)
-        val query = userCollection
-            .whereEqualTo(FIELD_USER_TYPE, USER_TYPE_PHARMACIST)
+        val query = pharmacistCollection
             .whereEqualTo(FIELD_PLACE_ID, placeId)
 
         val registration = query.addSnapshotListener { snapshot, error ->

@@ -158,16 +158,15 @@ class FirestorePharmacyDataSourceImpl @Inject constructor(
         awaitClose { registration.remove() }
     }
 
-    override fun savePharmacyToFirestore(pharmacyDTO: PharmacyDTO): Flow<DataResourceResult<Unit>> = flow {
-        emit(DataResourceResult.Loading)
-        try {
+    override suspend fun savePharmacyToFirestore(pharmacyDTO: PharmacyDTO): DataResourceResult<Unit> {
+        return try {
             pharmacyCollection
                 .document(pharmacyDTO.placeId)
                 .set(pharmacyDTO)
                 .await()
-            emit(DataResourceResult.Success(Unit))
+            DataResourceResult.Success(Unit)
         } catch (e: Exception) {
-            emit(DataResourceResult.Failure(e))
+            DataResourceResult.Failure(e)
         }
     }
 }

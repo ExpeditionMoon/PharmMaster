@@ -1,4 +1,4 @@
-package com.moon.pharm.domain.usecase.auth
+package com.moon.pharm.domain.usecase.pharmacist
 
 import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.repository.PharmacistRepository

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -14,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -28,6 +28,8 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
 import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
+import com.moon.pharm.component_ui.theme.Black
+import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import kotlin.collections.first
 import kotlin.collections.isNotEmpty
@@ -38,6 +40,7 @@ fun PharmacyMap(
     selectedPharmacy: Pharmacy? = null,
     onPharmacyClick: (Pharmacy) -> Unit,
     onBackClick: () -> Unit,
+    showBackButton: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     val defaultLocation = LatLng(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
@@ -85,21 +88,25 @@ fun PharmacyMap(
                 )
             }
         }
-        Button(
-            onClick = onBackClick,
-            modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.TopStart),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-            contentPadding = PaddingValues(0.dp),
-            shape = CircleShape
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(R.string.desc_back_button),
-                tint = Color.Black
-            )
+
+        if (showBackButton) {
+            Button(
+                onClick = onBackClick,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .statusBarsPadding()
+                    .align(Alignment.TopStart),
+                colors = ButtonDefaults.buttonColors(containerColor = White),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                contentPadding = PaddingValues(0.dp),
+                shape = CircleShape
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.desc_back_button),
+                    tint = Black
+                )
+            }
         }
     }
 }

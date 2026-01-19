@@ -1,8 +1,8 @@
 package com.moon.pharm.domain.usecase.consult
 
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
-import com.moon.pharm.domain.usecase.auth.GetPharmacistDetailUseCase
-import com.moon.pharm.domain.usecase.auth.GetPharmacistsByPharmacyUseCase
+import com.moon.pharm.domain.usecase.pharmacist.GetPharmacistDetailUseCase
+import com.moon.pharm.domain.usecase.pharmacist.GetPharmacistsByPharmacyUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SearchNearbyPharmaciesUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SearchPharmacyUseCase
 import javax.inject.Inject

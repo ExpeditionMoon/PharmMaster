@@ -8,7 +8,7 @@ fun PharmacistDTO.toDomain(): Pharmacist {
         userId = this.userId,
         name = this.name,
         bio = this.bio ?: "",
-        pharmacyId = this.pharmacyId,
+        placeId = this.placeId,
         pharmacyName = this.pharmacyName,
         isApproved = this.isApproved
     )
@@ -19,7 +19,7 @@ fun Pharmacist.toDto(): PharmacistDTO {
         userId = this.userId,
         name = this.name,
         bio = this.bio,
-        pharmacyId = this.pharmacyId,
+        placeId = this.placeId,
         pharmacyName = this.pharmacyName,
         isApproved = this.isApproved
     )

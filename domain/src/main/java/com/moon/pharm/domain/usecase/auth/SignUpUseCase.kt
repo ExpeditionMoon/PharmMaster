@@ -2,25 +2,28 @@ package com.moon.pharm.domain.usecase.auth
 
 import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.model.auth.User
-import com.moon.pharm.domain.model.auth.UserLifeStyle
 import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.domain.repository.AuthRepository
-import com.moon.pharm.domain.repository.PharmacistRepository
-import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
+import com.moon.pharm.domain.usecase.pharmacist.SavePharmacistUseCase
+import com.moon.pharm.domain.usecase.pharmacy.SavePharmacyUseCase
+import com.moon.pharm.domain.usecase.user.SaveUserUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class SignUpUseCase @Inject constructor(
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository,
-    private val pharmacistRepository: PharmacistRepository
+    private val saveUserUseCase: SaveUserUseCase,
+    private val savePharmacyUseCase: SavePharmacyUseCase,
+    private val savePharmacistUseCase: SavePharmacistUseCase
 ) {
     operator fun invoke(
         user: User,
         password: String,
-        pharmacist: Pharmacist? = null
+        pharmacist: Pharmacist?,
+        pharmacy: Pharmacy?
     ): Flow<DataResourceResult<Unit>> = flow {
 
         emit(DataResourceResult.Loading)
@@ -32,18 +35,21 @@ class SignUpUseCase @Inject constructor(
 
                     try {
                         val userWithId = user.copy(id = uid)
-                        val saveUserResult = userRepository.saveUser(userWithId)
+                        val saveUserResult = saveUserUseCase(userWithId)
 
                         if (saveUserResult is DataResourceResult.Failure) {
                             throw saveUserResult.exception
                         }
 
-                        val defaultLifeStyle = UserLifeStyle(userId = uid)
-                        userRepository.saveUserLifeStyle(uid, defaultLifeStyle)
-
                         if (user.userType == UserType.PHARMACIST && pharmacist != null) {
+                            if (pharmacy != null) {
+                                val savePharmacyResult = savePharmacyUseCase(pharmacy)
+                                if (savePharmacyResult is DataResourceResult.Failure) {
+                                    throw Exception("약국 저장 실패: ${savePharmacyResult.exception.message}")
+                                }
+                            }
                             val pharmacistWithId = pharmacist.copy(userId = uid)
-                            val savePharmResult = pharmacistRepository.savePharmacist(pharmacistWithId)
+                            val savePharmResult = savePharmacistUseCase(pharmacistWithId)
 
                             if (savePharmResult is DataResourceResult.Failure) {
                                 throw savePharmResult.exception
@@ -53,8 +59,7 @@ class SignUpUseCase @Inject constructor(
 
                     } catch (e: Exception) {
                         authRepository.deleteAccount()
-
-                        emit(DataResourceResult.Failure(Exception("회원가입 중 오류가 발생하여 취소되었습니다. (${e.message})")))
+                        emit(DataResourceResult.Failure(Exception("회원가입 실패 및 취소됨: ${e.message}")))
                     }
                 }
 
@@ -62,8 +67,7 @@ class SignUpUseCase @Inject constructor(
                     emit(DataResourceResult.Failure(result.exception))
                 }
 
-                is DataResourceResult.Loading -> {
-                }
+                is DataResourceResult.Loading -> { }
             }
         }
     }

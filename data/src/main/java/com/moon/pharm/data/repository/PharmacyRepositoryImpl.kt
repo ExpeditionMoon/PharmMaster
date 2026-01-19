@@ -2,6 +2,7 @@ package com.moon.pharm.data.repository
 
 import com.moon.pharm.data.datasource.PharmacyDataSource
 import com.moon.pharm.data.mapper.toDomain
+import com.moon.pharm.data.mapper.toDto
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.domain.repository.PharmacyRepository
 import com.moon.pharm.domain.result.DataResourceResult
@@ -28,5 +29,9 @@ class PharmacyRepositoryImpl @Inject constructor(
                 dto.map { it.toDomain() }
             }
         }
+    }
+
+    override suspend fun savePharmacy(pharmacy: Pharmacy): DataResourceResult<Unit> {
+        return pharmacyDataSource.savePharmacyToFirestore(pharmacy.toDto())
     }
 }
