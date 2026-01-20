@@ -18,16 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
 import com.moon.pharm.component_ui.R
-import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
-import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.theme.Black
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
@@ -41,26 +38,14 @@ fun PharmacyMap(
     onPharmacyClick: (Pharmacy) -> Unit,
     onBackClick: () -> Unit,
     showBackButton: Boolean = true,
+    cameraPositionState: CameraPositionState,
     modifier: Modifier = Modifier
 ) {
-    val defaultLocation = LatLng(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
-
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(defaultLocation, 14f)
-    }
-
     LaunchedEffect(selectedPharmacy, pharmacies) {
         if (selectedPharmacy != null) {
             cameraPositionState.animate(
                 CameraUpdateFactory.newLatLngZoom(
                     LatLng(selectedPharmacy.latitude, selectedPharmacy.longitude), 16f
-                )
-            )
-        } else if (pharmacies.isNotEmpty()) {
-            val first = pharmacies.first()
-            cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(first.latitude, first.longitude), 14f
                 )
             )
         }

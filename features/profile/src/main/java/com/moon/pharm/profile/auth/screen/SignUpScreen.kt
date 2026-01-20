@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +41,7 @@ import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.auth.model.SignUpStep
 import com.moon.pharm.profile.auth.screen.section.EmailPasswordSection
@@ -54,6 +56,7 @@ fun SignUpScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showPharmacySearch by remember { mutableStateOf(false) }
+    var tempSelectedPharmacy by remember { mutableStateOf<Pharmacy?>(null) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -68,17 +71,37 @@ fun SignUpScreen(
 
         PharmacySelector(
             pharmacies = uiState.pharmacySearchResults,
-            onSearch = { query ->
-                viewModel.searchPharmacies(query)
-            },
+            selectedPharmacy = tempSelectedPharmacy, // 연결
+            onPharmacyClick = { pharmacy -> tempSelectedPharmacy = pharmacy },
+            onSearch = { query -> viewModel.searchPharmacies(query) },
+            onSearchArea = { lat, lng -> viewModel.fetchNearbyPharmacies(lat, lng) },
             onBackClick = {
                 viewModel.clearSearchResults()
                 showPharmacySearch = false
             },
-            onPharmacySelected = { pharmacy ->
-                viewModel.updatePharmacy(pharmacy)
-                viewModel.clearSearchResults()
-                showPharmacySearch = false
+            bottomContent = {
+                if (tempSelectedPharmacy != null) {
+                    Button(
+                        onClick = {
+                            viewModel.updatePharmacy(tempSelectedPharmacy!!)
+                            viewModel.clearSearchResults()
+                            showPharmacySearch = false
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .navigationBarsPadding()
+                            .padding(bottom = 10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "${tempSelectedPharmacy?.name} 선택 완료",
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            color = White
+                        )
+                    }
+                }
             }
         )
 

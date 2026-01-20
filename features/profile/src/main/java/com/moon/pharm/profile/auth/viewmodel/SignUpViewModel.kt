@@ -2,6 +2,8 @@ package com.moon.pharm.profile.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
+import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.model.auth.UserType
@@ -81,15 +83,28 @@ class SignUpViewModel @Inject constructor(
         _uiState.update { it.copy(password = password) }
     }
 
-    fun fetchNearbyPharmacies() {
-        val lat = 37.5665
-        val lng = 126.9780
-
+    fun fetchNearbyPharmacies(
+        lat: Double = DEFAULT_LAT_SEOUL,
+        lng: Double = DEFAULT_LNG_SEOUL
+    ) {
         viewModelScope.launch {
             searchNearbyPharmaciesUseCase(lat, lng).collectLatest { result ->
-                if (result is DataResourceResult.Success) {
-                    _uiState.update {
-                        it.copy(pharmacySearchResults = result.resultData)
+                _uiState.update { state ->
+                    when (result) {
+                        is DataResourceResult.Loading -> {
+                            state.copy(isLoading = true)
+                        }
+
+                        is DataResourceResult.Success -> {
+                            state.copy(
+                                isLoading = false,
+                                pharmacySearchResults = result.resultData
+                            )
+                        }
+
+                        is DataResourceResult.Failure -> {
+                            state.copy(isLoading = false)
+                        }
                     }
                 }
             }
