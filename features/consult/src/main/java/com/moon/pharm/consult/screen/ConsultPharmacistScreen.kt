@@ -1,8 +1,6 @@
 package com.moon.pharm.consult.screen
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -53,15 +51,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -108,43 +103,22 @@ fun ConsultPharmacistScreen(
         )
     }
 
-    val context = LocalContext.current
-    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
-
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val isGranted = permissions.values.all { it }
-
         if (isGranted) {
-            val hasFineLocation = ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
+            viewModel.fetchCurrentLocationAndPharmacies()
+        } else {
+            viewModel.fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
+        }
+    }
 
-            val hasCoarseLocation = ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-
-            @SuppressLint("MissingPermission")
-            if (hasFineLocation || hasCoarseLocation) {
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    if (location != null) {
-                        viewModel.fetchNearbyPharmacies(location.latitude, location.longitude)
-                        scope.launch {
-                            cameraPositionState.animate(
-                                CameraUpdateFactory.newLatLngZoom(
-                                    LatLng(location.latitude, location.longitude),
-                                    15f
-                                )
-                            )
-                        }
-                    } else {
-                        viewModel.fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
-                    }
-                }
-            }
+    LaunchedEffect(Unit) {
+        viewModel.moveCameraEvent.collect { latLng ->
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(latLng, 15f)
+            )
         }
     }
 

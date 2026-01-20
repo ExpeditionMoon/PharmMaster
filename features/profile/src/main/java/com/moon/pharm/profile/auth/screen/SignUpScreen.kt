@@ -1,5 +1,6 @@
 package com.moon.pharm.profile.auth.screen
 
+import android.Manifest
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -64,14 +65,30 @@ fun SignUpScreen(
         uri?.let { viewModel.updateProfileImage(it.toString()) }
     }
 
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val isGranted = permissions.values.all { it }
+        if (isGranted) {
+            viewModel.fetchCurrentLocationAndSearch()
+        } else {
+            viewModel.fetchNearbyPharmacies()
+        }
+    }
+
     if (showPharmacySearch) {
         LaunchedEffect(Unit) {
-            viewModel.fetchNearbyPharmacies()
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
         }
 
         PharmacySelector(
             pharmacies = uiState.pharmacySearchResults,
-            selectedPharmacy = tempSelectedPharmacy, // 연결
+            selectedPharmacy = tempSelectedPharmacy,
             onPharmacyClick = { pharmacy -> tempSelectedPharmacy = pharmacy },
             onSearch = { query -> viewModel.searchPharmacies(query) },
             onSearchArea = { lat, lng -> viewModel.fetchNearbyPharmacies(lat, lng) },
@@ -159,7 +176,6 @@ fun SignUpScreenContent(
                 SignUpStep.EMAIL -> (uiState.isEmailAvailable == true) && (uiState.password.length >= 6)
                 SignUpStep.NICKNAME -> uiState.nickName.isNotBlank()
                 SignUpStep.PHARMACIST_INFO -> uiState.pharmacyName.isNotBlank() && uiState.pharmacistBio.isNotBlank()
-                else -> true
             }
 
             Button(

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
@@ -28,14 +27,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.moon.pharm.component_ui.component.StatusBadge
+import com.moon.pharm.component_ui.component.bar.PharmPrimaryTabRow
+import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.component.progress.CircularProgressBar
-import com.moon.pharm.component_ui.component.bar.PharmPrimaryTabRow
-import com.moon.pharm.component_ui.component.StatusBadge
 import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.mapper.toBackgroundColor
 import com.moon.pharm.consult.mapper.toTextColor
@@ -49,13 +48,6 @@ fun ConsultScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     Column {
-        Button(
-            onClick = { viewModel.testFirestore() },
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text("Firestore 연결 테스트")
-        }
-
         ConsultContent(
             selectedTab = uiState.selectedTab,
             currentList = if (uiState.selectedTab == ConsultPrimaryTab.LATEST) uiState.consultList else emptyList(),

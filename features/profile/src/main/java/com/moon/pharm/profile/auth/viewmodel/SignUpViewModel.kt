@@ -12,6 +12,7 @@ import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.CheckEmailDuplicateUseCase
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.auth.SignUpUseCase
+import com.moon.pharm.domain.usecase.location.GetCurrentLocationUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SearchNearbyPharmaciesUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SearchPharmacyUseCase
 import com.moon.pharm.profile.auth.model.SignUpStep
@@ -36,6 +37,7 @@ class SignUpViewModel @Inject constructor(
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     private val searchPharmacyUseCase: SearchPharmacyUseCase,
     private val searchNearbyPharmaciesUseCase: SearchNearbyPharmaciesUseCase,
+    private val getCurrentLocationUseCase: GetCurrentLocationUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignUpUiState())
@@ -81,6 +83,24 @@ class SignUpViewModel @Inject constructor(
 
     fun updatePassword(password: String) {
         _uiState.update { it.copy(password = password) }
+    }
+
+    fun fetchCurrentLocationAndSearch() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val locationResult = getCurrentLocationUseCase()
+
+            when(locationResult) {
+                is DataResourceResult.Success -> {
+                    val (lat, lng) = locationResult.resultData
+                    fetchNearbyPharmacies(lat, lng)
+                }
+                is DataResourceResult.Failure -> {
+                    fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
+                }
+                else -> {}
+            }
+        }
     }
 
     fun fetchNearbyPharmacies(
