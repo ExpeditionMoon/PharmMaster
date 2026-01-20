@@ -9,5 +9,5 @@ interface PharmacyDataSource {
     fun fetchPharmacyDetail(placeId: String): Flow<DataResourceResult<PharmacyDTO>>
     fun searchNearbyPharmacies(lat: Double, lng: Double): Flow<DataResourceResult<List<PharmacyDTO>>>
     fun getPharmacyFromFirestore(placeId: String): Flow<DataResourceResult<PharmacyDTO>>
-    fun savePharmacyToFirestore(pharmacyDTO: PharmacyDTO): Flow<DataResourceResult<Unit>>
+    suspend fun savePharmacyToFirestore(pharmacyDTO: PharmacyDTO): DataResourceResult<Unit>
 }

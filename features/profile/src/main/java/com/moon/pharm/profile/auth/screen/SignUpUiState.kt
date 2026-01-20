@@ -2,6 +2,7 @@ package com.moon.pharm.profile.auth.screen
 
 import com.moon.pharm.domain.model.auth.AuthError
 import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.profile.auth.model.SignUpStep
 
 data class SignUpUiState(
@@ -18,6 +19,8 @@ data class SignUpUiState(
 
     val pharmacyName: String = "",
     val pharmacistBio: String = "",
+    val selectedPharmacy: Pharmacy? = null,
+    val pharmacySearchResults: List<Pharmacy> = emptyList(),
 
     val isLoading: Boolean = false,
     val isComplete: Boolean = false,

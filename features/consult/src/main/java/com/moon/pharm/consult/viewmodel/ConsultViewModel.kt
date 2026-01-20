@@ -1,13 +1,15 @@
 package com.moon.pharm.consult.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
+import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
+import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.common.ConsultUiMessage
-import com.moon.pharm.consult.screen.ConsultUiState
 import com.moon.pharm.consult.model.ConsultPrimaryTab
+import com.moon.pharm.consult.screen.ConsultUiState
 import com.moon.pharm.consult.screen.ConsultWriteState
 import com.moon.pharm.domain.model.consult.ConsultImage
 import com.moon.pharm.domain.model.consult.ConsultItem
@@ -15,10 +17,13 @@ import com.moon.pharm.domain.model.consult.ConsultStatus
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
+import com.moon.pharm.domain.usecase.location.GetCurrentLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -27,43 +32,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ConsultViewModel @Inject constructor(
-    private val consultUseCases: ConsultUseCases
+    private val consultUseCases: ConsultUseCases,
+    private val getCurrentLocationUseCase: GetCurrentLocationUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ConsultUiState())
     val uiState = _uiState.asStateFlow()
+
+    private val _moveCameraEvent = MutableSharedFlow<LatLng>()
+    val moveCameraEvent = _moveCameraEvent.asSharedFlow()
 
     private var searchJob: Job? = null
 
     init {
         fetchConsultList()
-    }
-
-    /* 연결 확인 */
-    fun testFirestore() {
-        viewModelScope.launch {
-            val currentUserId = consultUseCases.getCurrentUserId()
-
-            if (currentUserId == null) {
-                Log.e("FIRESTORE_TEST", "로그인 상태가 아닙니다. 테스트를 중단합니다.")
-                return@launch
-            }
-
-            consultUseCases.createConsult(
-                ConsultItem(
-                    id = "",
-                    userId = currentUserId,
-                    pharmacistId = null,
-                    title = "오메가3 고르는 법",
-                    content = "rTG 오메가3가 일반 제품보다 흡수율이 훨씬 높은가요?",
-                    status = ConsultStatus.WAITING,
-                    createdAt = System.currentTimeMillis(),
-                    images = emptyList(),
-                    answer = null
-                ),
-            ).collect { result ->
-                Log.d("FIRESTORE_TEST", "결과: $result")
-            }
-        }
     }
 
     private fun fetchConsultList() {
@@ -192,6 +173,25 @@ class ConsultViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    fun fetchCurrentLocationAndPharmacies() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val locationResult = getCurrentLocationUseCase()
+
+            when (locationResult) {
+                is DataResourceResult.Success -> {
+                    val (lat, lng) = locationResult.resultData
+                    fetchNearbyPharmacies(lat, lng)
+                    _moveCameraEvent.emit(LatLng(lat, lng))
+                }
+                is DataResourceResult.Failure -> {
+                    fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
+                }
+                else -> { /* Loading 등 처리 */ }
             }
         }
     }

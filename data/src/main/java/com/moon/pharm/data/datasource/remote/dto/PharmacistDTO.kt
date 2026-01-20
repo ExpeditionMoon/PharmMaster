@@ -11,7 +11,7 @@ data class PharmacistDTO(
 
     var name: String = EMPTY_STRING,
     var bio: String? = null,
-    var pharmacyId: String = EMPTY_STRING,
+    var placeId: String = EMPTY_STRING,
     var pharmacyName: String = EMPTY_STRING,
     var isApproved: Boolean = false
 )

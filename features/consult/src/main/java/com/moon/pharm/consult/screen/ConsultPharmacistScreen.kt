@@ -1,8 +1,6 @@
 package com.moon.pharm.consult.screen
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -31,8 +30,6 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,16 +51,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import com.google.android.gms.location.LocationServices
-import com.moon.pharm.component_ui.component.map.PharmacyMap
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
+import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
+import com.moon.pharm.component_ui.component.map.PharmacySelector
+import com.moon.pharm.component_ui.theme.Black
 import com.moon.pharm.component_ui.theme.Placeholder
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.SecondFont
@@ -95,33 +96,29 @@ fun ConsultPharmacistScreen(
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
 
-    val context = LocalContext.current
-    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(
+            LatLng(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL),
+            15f
+        )
+    }
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val isGranted = permissions.values.all { it }
-
         if (isGranted) {
-            val hasFineLocation = ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
+            viewModel.fetchCurrentLocationAndPharmacies()
+        } else {
+            viewModel.fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
+        }
+    }
 
-            val hasCoarseLocation = ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-
-            @SuppressLint("MissingPermission")
-            if (hasFineLocation || hasCoarseLocation) {
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    if (location != null) {
-                        viewModel.fetchNearbyPharmacies(location.latitude, location.longitude)
-                    }
-                }
-            }
+    LaunchedEffect(Unit) {
+        viewModel.moveCameraEvent.collect { latLng ->
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(latLng, 15f)
+            )
         }
     }
 
@@ -136,6 +133,15 @@ fun ConsultPharmacistScreen(
 
     LaunchedEffect(isMapView) {
         onMapModeChanged(isMapView)
+
+        if (isMapView) {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
     }
 
     LaunchedEffect(writeState.selectedPharmacy) {
@@ -155,19 +161,27 @@ fun ConsultPharmacistScreen(
     }
 
     if (isMapView) {
-        PharmacistMapView(
-            scaffoldState = scaffoldState,
-            pharmacies = searchResults,
+        PharmacySelector(
+            pharmacies = writeState.searchResults,
             selectedPharmacy = writeState.selectedPharmacy,
-            pharmacists = availablePharmacists,
-            pharmacyName = writeState.selectedPharmacy?.name ?: stringResource(R.string.consult_map_pharmacy_default_name),
-            onBack = { isMapView = false },
-            onPharmacySelect = { pharmacy ->
+            onPharmacyClick = { pharmacy ->
                 viewModel.selectPharmacy(pharmacy)
             },
-            onPharmacistSelect = { pharmacist ->
-                viewModel.selectPharmacist(pharmacist.userId)
-                navController.popBackStack()
+            onSearch = { query -> viewModel.onSearchQueryChanged(query) },
+            onSearchArea = { lat, lng -> viewModel.fetchNearbyPharmacies(lat, lng) },
+            onBackClick = { isMapView = false },
+            cameraPositionState = cameraPositionState,
+            bottomContent = {
+                if (writeState.selectedPharmacy != null) {
+                    PharmacistListPanel(
+                        pharmacyName = writeState.selectedPharmacy!!.name,
+                        pharmacists = writeState.availablePharmacists,
+                        onPharmacistSelect = { pharmacist ->
+                            viewModel.selectPharmacist(pharmacist.userId)
+                            navController.popBackStack()
+                        }
+                    )
+                }
             }
         )
     } else {
@@ -339,71 +353,52 @@ fun PharmacistSearchView(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PharmacistMapView(
-    scaffoldState: BottomSheetScaffoldState,
-    pharmacies: List<Pharmacy>,
-    selectedPharmacy: Pharmacy?,
-    pharmacists: List<Pharmacist>,
+fun PharmacistListPanel(
     pharmacyName: String,
-    onBack: () -> Unit,
-    onPharmacySelect: (Pharmacy) -> Unit,
+    pharmacists: List<Pharmacist>,
     onPharmacistSelect: (Pharmacist) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = White,
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+            )
+            .padding(24.dp)
+            .navigationBarsPadding() // 하단 패딩 필수
+    ) {
+        Text(
+            text = stringResource(R.string.consult_map_pharmacist_list_format, pharmacyName),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Black,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
 
-    BackHandler {
-        onBack()
-    }
-
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetContent = {
-            Column(
-                modifier = Modifier.padding(horizontal = 24.dp)
+        if (pharmacists.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = stringResource(R.string.consult_map_pharmacist_list_format, pharmacyName),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-
-                if (pharmacists.isEmpty()) {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp), contentAlignment = Alignment.Center) {
-                        Text(stringResource(R.string.consult_map_no_pharmacist), color = SecondFont)
-                    }
-                } else {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(bottom = 24.dp)
-                    ) {
-                        items(pharmacists) { pharmacist ->
-                            PharmacistItem(
-                                pharmacist = pharmacist,
-                                onSelect = onPharmacistSelect
-                            )
-                        }
-                    }
+                Text(stringResource(R.string.consult_map_no_pharmacist), color = SecondFont)
+            }
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.height(200.dp) // 높이 제한 (필요시 조정)
+            ) {
+                items(pharmacists) { pharmacist ->
+                    PharmacistItem(
+                        pharmacist = pharmacist,
+                        onSelect = onPharmacistSelect
+                    )
                 }
             }
-        },
-        sheetPeekHeight = 0.dp,
-        sheetContainerColor = White,
-        sheetShadowElevation = 10.dp
-    ) {
-        PharmacyMap(
-            pharmacies = pharmacies,
-            selectedPharmacy = selectedPharmacy,
-            onPharmacyClick = { pharmacy ->
-                onPharmacySelect(pharmacy)
-            },
-            onBackClick = onBack
-        )
+        }
     }
 }
 
