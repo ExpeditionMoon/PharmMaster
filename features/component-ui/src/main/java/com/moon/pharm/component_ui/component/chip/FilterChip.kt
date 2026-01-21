@@ -24,7 +24,7 @@ import com.moon.pharm.component_ui.theme.tertiaryLight
 fun FilterChip(
     text: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
