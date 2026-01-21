@@ -4,7 +4,8 @@ import com.moon.pharm.data.datasource.AuthDataSource
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.MedicationDataSource
 import com.moon.pharm.data.datasource.PharmacistDataSource
-import com.moon.pharm.data.datasource.PharmacyDataSource
+import com.moon.pharm.data.datasource.PharmacyStorageDataSource
+import com.moon.pharm.data.datasource.PharmacySearchDataSource
 import com.moon.pharm.data.datasource.UserDataSource
 import com.moon.pharm.data.datasource.remote.firebase.FirebaseAuthDataSourceImpl
 import com.moon.pharm.data.datasource.remote.firebase.FirestoreConsultDataSourceImpl
@@ -50,7 +51,13 @@ abstract class DataSourceModule {
     @Singleton
     abstract fun bindPharmacyDataSource(
         impl: FirestorePharmacyDataSourceImpl
-    ): PharmacyDataSource
+    ): PharmacyStorageDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindPharmacySearchDataSource(
+        impl: com.moon.pharm.data.datasource.remote.kakao.KakaoPharmacyDataSourceImpl
+    ): PharmacySearchDataSource
 
     @Binds
     @Singleton

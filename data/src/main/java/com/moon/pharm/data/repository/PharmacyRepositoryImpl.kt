@@ -1,6 +1,7 @@
 package com.moon.pharm.data.repository
 
-import com.moon.pharm.data.datasource.PharmacyDataSource
+import com.moon.pharm.data.datasource.PharmacySearchDataSource
+import com.moon.pharm.data.datasource.PharmacyStorageDataSource
 import com.moon.pharm.data.mapper.toDomain
 import com.moon.pharm.data.mapper.toDto
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
@@ -12,26 +13,27 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class PharmacyRepositoryImpl @Inject constructor(
-    private val pharmacyDataSource: PharmacyDataSource
+    private val pharmacyStorageDataSource: PharmacyStorageDataSource,
+    private val pharmacySearchDataSource: PharmacySearchDataSource
 ) : PharmacyRepository {
 
     override fun searchPharmacies(query: String): Flow<DataResourceResult<List<Pharmacy>>> {
-        return pharmacyDataSource.searchExternalPharmacies(query).map { result ->
-            result.mapResult { dto ->
-                dto.map { it.toDomain() }
+        return pharmacySearchDataSource.searchExternalPharmacies(query).map { result ->
+            result.mapResult { dtoList ->
+                dtoList.map { it.toDomain() }
             }
         }
     }
 
     override fun searchNearbyPharmacies(lat: Double, lng: Double): Flow<DataResourceResult<List<Pharmacy>>> {
-        return pharmacyDataSource.searchNearbyPharmacies(lat, lng).map { result ->
-            result.mapResult { dto ->
-                dto.map { it.toDomain() }
+        return pharmacySearchDataSource.searchNearbyPharmacies(lat, lng).map { result ->
+            result.mapResult { dtoList ->
+                dtoList.map { it.toDomain() }
             }
         }
     }
 
     override suspend fun savePharmacy(pharmacy: Pharmacy): DataResourceResult<Unit> {
-        return pharmacyDataSource.savePharmacyToFirestore(pharmacy.toDto())
+        return pharmacyStorageDataSource.savePharmacyToFirestore(pharmacy.toDto())
     }
 }

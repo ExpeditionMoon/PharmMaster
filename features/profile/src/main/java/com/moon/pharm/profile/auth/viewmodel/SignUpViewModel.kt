@@ -2,6 +2,7 @@ package com.moon.pharm.profile.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
 import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.domain.model.auth.Pharmacist
@@ -20,6 +21,7 @@ import com.moon.pharm.profile.auth.screen.SignUpUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -44,6 +46,9 @@ class SignUpViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
     private val _eventFlow = MutableSharedFlow<AuthEvent>()
     val eventFlow = _eventFlow
+
+    private val _moveCameraEvent = MutableSharedFlow<LatLng>()
+    val moveCameraEvent = _moveCameraEvent.asSharedFlow()
 
     init {
         if (getCurrentUserIdUseCase() != null) {
@@ -93,6 +98,7 @@ class SignUpViewModel @Inject constructor(
             when(locationResult) {
                 is DataResourceResult.Success -> {
                     val (lat, lng) = locationResult.resultData
+                    _moveCameraEvent.emit(LatLng(lat, lng))
                     fetchNearbyPharmacies(lat, lng)
                 }
                 is DataResourceResult.Failure -> {

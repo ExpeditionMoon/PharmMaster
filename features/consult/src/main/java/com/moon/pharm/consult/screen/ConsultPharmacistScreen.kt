@@ -57,7 +57,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -114,26 +113,8 @@ fun ConsultPharmacistScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.moveCameraEvent.collect { latLng ->
-            cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngZoom(latLng, 15f)
-            )
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        locationPermissionLauncher.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        )
-    }
-
     LaunchedEffect(isMapView) {
         onMapModeChanged(isMapView)
-
         if (isMapView) {
             locationPermissionLauncher.launch(
                 arrayOf(
@@ -144,17 +125,12 @@ fun ConsultPharmacistScreen(
         }
     }
 
-    LaunchedEffect(writeState.selectedPharmacy) {
-        if (writeState.selectedPharmacy != null) {
-            scaffoldState.bottomSheetState.expand()
-        }
-    }
-
     BackHandler {
         if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
             scope.launch { scaffoldState.bottomSheetState.partialExpand() }
         } else if (isMapView) {
             isMapView = false
+            viewModel.clearWriteState()
         } else {
             navController.popBackStack()
         }
@@ -169,20 +145,28 @@ fun ConsultPharmacistScreen(
             },
             onSearch = { query -> viewModel.onSearchQueryChanged(query) },
             onSearchArea = { lat, lng -> viewModel.fetchNearbyPharmacies(lat, lng) },
-            onBackClick = { isMapView = false },
-            cameraPositionState = cameraPositionState,
-            bottomContent = {
+            onBackClick = {
                 if (writeState.selectedPharmacy != null) {
+                    viewModel.clearSelectedPharmacy()
+                } else {
+                    isMapView = false
+                }
+            },
+            cameraPositionState = cameraPositionState,
+            cameraMoveEvent = viewModel.moveCameraEvent,
+            sheetContent = if (writeState.selectedPharmacy != null) {
+                {
                     PharmacistListPanel(
-                        pharmacyName = writeState.selectedPharmacy!!.name,
+                        pharmacyName = writeState.selectedPharmacy?.name ?: "",
                         pharmacists = writeState.availablePharmacists,
                         onPharmacistSelect = { pharmacist ->
                             viewModel.selectPharmacist(pharmacist.userId)
-                            navController.popBackStack()
+                            onMapModeChanged(false)
+                            isMapView = false
                         }
                     )
                 }
-            }
+            } else null
         )
     } else {
         PharmacistSearchView(
@@ -191,6 +175,7 @@ fun ConsultPharmacistScreen(
             onSearchChange = { viewModel.onSearchQueryChanged(it) },
             onNavigateToMap = { isMapView = true },
             onPharmacySelect = { pharmacy ->
+                isMapView = true
                 viewModel.selectPharmacy(pharmacy)
             }
         )
@@ -367,7 +352,7 @@ fun PharmacistListPanel(
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
             )
             .padding(24.dp)
-            .navigationBarsPadding() // 하단 패딩 필수
+            .navigationBarsPadding()
     ) {
         Text(
             text = stringResource(R.string.consult_map_pharmacist_list_format, pharmacyName),
@@ -389,7 +374,7 @@ fun PharmacistListPanel(
         } else {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.height(200.dp) // 높이 제한 (필요시 조정)
+                modifier = Modifier.height(200.dp)
             ) {
                 items(pharmacists) { pharmacist ->
                     PharmacistItem(

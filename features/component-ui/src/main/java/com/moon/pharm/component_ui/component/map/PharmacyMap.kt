@@ -1,5 +1,6 @@
 package com.moon.pharm.component_ui.component.map
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,12 +13,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
@@ -28,9 +28,8 @@ import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.theme.Black
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
-import kotlin.collections.first
-import kotlin.collections.isNotEmpty
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun PharmacyMap(
     pharmacies: List<Pharmacy>,
@@ -41,16 +40,6 @@ fun PharmacyMap(
     cameraPositionState: CameraPositionState,
     modifier: Modifier = Modifier
 ) {
-    LaunchedEffect(selectedPharmacy, pharmacies) {
-        if (selectedPharmacy != null) {
-            cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(selectedPharmacy.latitude, selectedPharmacy.longitude), 16f
-                )
-            )
-        }
-    }
-
     Box(modifier = modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -62,15 +51,17 @@ fun PharmacyMap(
             )
         ) {
             pharmacies.forEach { pharmacy ->
-                Marker(
-                    state = MarkerState(position = LatLng(pharmacy.latitude, pharmacy.longitude)),
-                    title = pharmacy.name,
-                    snippet = pharmacy.address,
-                    onClick = {
-                        onPharmacyClick(pharmacy)
-                        false
-                    }
-                )
+                key(pharmacy.placeId) {
+                    Marker(
+                        state = MarkerState(position = LatLng(pharmacy.latitude, pharmacy.longitude)),
+                        title = pharmacy.name,
+                        snippet = pharmacy.address,
+                        onClick = {
+                            onPharmacyClick(pharmacy)
+                            true
+                        }
+                    )
+                }
             }
         }
 
