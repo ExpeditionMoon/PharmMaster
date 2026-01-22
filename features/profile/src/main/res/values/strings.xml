@@ -12,6 +12,10 @@
     <string name="login_prompt_no_account">계정이 없으신가요?</string>
     <string name="login_action_sign_up">회원가입</string>
 
+    <string name="login_error_empty_email">이메일을 입력해주세요.</string>
+    <string name="login_error_empty_password">비밀번호를 입력해주세요.</string>
+    <string name="login_failed_default">로그인에 실패했습니다. 다시 시도해주세요.</string>
+
 <!--  회원가입(auth)  -->
     <string name="signup_button_next">다음</string>
     <string name="signup_button_complete">회원가입</string>
