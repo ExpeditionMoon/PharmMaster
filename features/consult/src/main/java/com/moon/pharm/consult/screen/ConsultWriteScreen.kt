@@ -18,15 +18,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -39,9 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.moon.pharm.component_ui.theme.backgroundLight
-import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.component_ui.component.input.PrimaryTextField
 import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
 import com.moon.pharm.component_ui.component.snackbar.SnackbarType
@@ -50,6 +48,8 @@ import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.theme.Black
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.SecondFont
+import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.common.ConsultUiMessage
 import com.moon.pharm.consult.common.asString
@@ -61,7 +61,7 @@ fun ConsultWriteScreen(
     navController : NavController,
     viewModel: ConsultViewModel
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val writeState = uiState.writeState
 
     val snackbarHostState = remember { SnackbarHostState() }

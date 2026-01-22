@@ -24,7 +24,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,7 +34,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.consult.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moon.pharm.component_ui.component.StatusBadge
+import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.theme.Black
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.SecondFont
@@ -43,13 +44,12 @@ import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.component.progress.CircularProgressBar
-import com.moon.pharm.component_ui.component.StatusBadge
 import com.moon.pharm.component_ui.util.toDisplayDateTimeString
+import com.moon.pharm.consult.R
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
+import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.consult.ConsultStatus
-import com.moon.pharm.domain.model.auth.Pharmacist
 
 @Composable
 fun ConsultDetailScreen(
@@ -60,7 +60,7 @@ fun ConsultDetailScreen(
         viewModel.getConsultDetail(consultId)
     }
 
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ConsultDetailContent(
         item = uiState.selectedItem,
