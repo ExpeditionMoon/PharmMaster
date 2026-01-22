@@ -33,9 +33,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
+import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.component.map.PharmacySelector
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.theme.Primary
@@ -59,6 +63,13 @@ fun SignUpScreen(
     var showPharmacySearch by remember { mutableStateOf(false) }
     var tempSelectedPharmacy by remember { mutableStateOf<Pharmacy?>(null) }
 
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(
+            LatLng(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL),
+            15f
+        )
+    }
+
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
@@ -72,7 +83,7 @@ fun SignUpScreen(
         if (isGranted) {
             viewModel.fetchCurrentLocationAndSearch()
         } else {
-            viewModel.fetchNearbyPharmacies()
+            viewModel.fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
         }
     }
 
@@ -90,6 +101,8 @@ fun SignUpScreen(
             pharmacies = uiState.pharmacySearchResults,
             selectedPharmacy = tempSelectedPharmacy,
             onPharmacyClick = { pharmacy -> tempSelectedPharmacy = pharmacy },
+            cameraPositionState = cameraPositionState,
+            cameraMoveEvent = viewModel.moveCameraEvent,
             onSearch = { query -> viewModel.searchPharmacies(query) },
             onSearchArea = { lat, lng -> viewModel.fetchNearbyPharmacies(lat, lng) },
             onBackClick = {
@@ -249,109 +262,4 @@ fun SignUpScreenContent(
             Spacer(modifier = Modifier.weight(1.2f))
         }
     }
-}
-
-
-@Preview(showBackground = true, name = "Step 1: Type")
-@Composable
-fun Step1Preview() {
-    SignUpScreenContent(
-        uiState = SignUpUiState(currentStep = SignUpStep.TYPE),
-        onUpdateUserType = {},
-        onUpdateEmail = {},
-        onCheckEmail = {},
-        onUpdatePassword = {},
-        onUpdateNickName = {},
-        onSearchPharmacyClick = {},
-        onUpdatePharmacistBio = {},
-        onImageClick = {},
-        onNextClick = {}
-    )
-}
-
-@Preview(showBackground = true, name = "Step 2: Email")
-@Composable
-fun Step2Preview() {
-    SignUpScreenContent(
-        uiState = SignUpUiState(
-            currentStep = SignUpStep.EMAIL,
-            email = "example@test.com",
-            isEmailAvailable = true
-        ),
-        onUpdateUserType = {},
-        onUpdateEmail = {},
-        onCheckEmail = {},
-        onUpdatePassword = {},
-        onUpdateNickName = {},
-        onSearchPharmacyClick = {},
-        onUpdatePharmacistBio = {},
-        onImageClick = {},
-        onNextClick = {}
-    )
-}
-
-@Preview(showBackground = true, name = "Step 3: User NickName")
-@Composable
-fun Step3Preview() {
-    SignUpScreenContent(
-        uiState = SignUpUiState(
-            currentStep = SignUpStep.NICKNAME,
-            userType = UserType.GENERAL,
-            nickName = "달리는약사",
-            profileImageUri = null
-        ),
-        onUpdateUserType = {},
-        onUpdateEmail = {},
-        onCheckEmail = {},
-        onUpdatePassword = {},
-        onUpdateNickName = {},
-        onSearchPharmacyClick = {},
-        onUpdatePharmacistBio = {},
-        onImageClick = {},
-        onNextClick = {}
-    )
-}
-
-@Preview(showBackground = true, name = "Step 3: Pharmacist Mode")
-@Composable
-fun Step3PharmacistPreview() {
-    SignUpScreenContent(
-        uiState = SignUpUiState(
-            currentStep = SignUpStep.NICKNAME,
-            userType = UserType.PHARMACIST,
-            nickName = "친절약사",
-            profileImageUri = "https://example.com/image.jpg"
-        ),
-        onUpdateUserType = {},
-        onUpdateEmail = {},
-        onCheckEmail = {},
-        onUpdatePassword = {},
-        onUpdateNickName = {},
-        onSearchPharmacyClick = {},
-        onUpdatePharmacistBio = {},
-        onImageClick = {},
-        onNextClick = {}
-    )
-}
-
-@Preview(showBackground = true, name = "Step 4: Pharmacist Info")
-@Composable
-fun Step4Preview() {
-    SignUpScreenContent(
-        uiState = SignUpUiState(
-            currentStep = SignUpStep.PHARMACIST_INFO,
-            userType = UserType.PHARMACIST,
-            pharmacyName = "행복약국",
-            pharmacistBio = "안녕하세요"
-        ),
-        onUpdateUserType = {},
-        onUpdateEmail = {},
-        onCheckEmail = {},
-        onUpdatePassword = {},
-        onUpdateNickName = {},
-        onSearchPharmacyClick = {},
-        onUpdatePharmacistBio = {},
-        onImageClick = {},
-        onNextClick = {}
-    )
 }

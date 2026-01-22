@@ -19,8 +19,6 @@ import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
 import com.moon.pharm.domain.usecase.location.GetCurrentLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -40,8 +38,6 @@ class ConsultViewModel @Inject constructor(
 
     private val _moveCameraEvent = MutableSharedFlow<LatLng>()
     val moveCameraEvent = _moveCameraEvent.asSharedFlow()
-
-    private var searchJob: Job? = null
 
     init {
         fetchConsultList()
@@ -128,12 +124,8 @@ class ConsultViewModel @Inject constructor(
     }
 
     fun searchPharmacies(query: String) {
-        searchJob?.cancel()
         if (query.isBlank()) return
-
-        searchJob = viewModelScope.launch {
-            delay(500L)
-
+        viewModelScope.launch {
             consultUseCases.searchPharmacy(query).collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
@@ -194,6 +186,10 @@ class ConsultViewModel @Inject constructor(
                 else -> { /* Loading 등 처리 */ }
             }
         }
+    }
+
+    fun clearSelectedPharmacy() {
+        _uiState.update { it.copy(writeState = it.writeState.copy(selectedPharmacy = null)) }
     }
 
     fun fetchNearbyPharmacies(currentLat: Double, currentLng: Double) {

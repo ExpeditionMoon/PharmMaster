@@ -35,6 +35,5 @@
     <string name="consult_map_pharmacist_list_format">%s 약사 목록</string>
     <string name="consult_map_no_pharmacist">등록된 약사가 없습니다.</string>
 
-    <string name="desc_search_icon">검색</string>
     <string name="desc_map_icon">지도</string>
 </resources>
