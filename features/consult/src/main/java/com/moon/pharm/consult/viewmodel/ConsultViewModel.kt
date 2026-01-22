@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.consult.R
 import com.moon.pharm.consult.common.ConsultUiMessage
 import com.moon.pharm.consult.mapper.ConsultUiMapper
 import com.moon.pharm.consult.model.ConsultPrimaryTab
@@ -238,18 +237,17 @@ class ConsultViewModel @Inject constructor(
         )
 
         if (validationResult is ValidateConsultFormUseCase.Result.Invalid) {
-            val errorMessageRes = when (validationResult.error) {
-                ValidateConsultFormUseCase.ErrorType.EMPTY_INPUT -> R.string.consult_error_input_required
+            val errorState = when (validationResult.error) {
+                ValidateConsultFormUseCase.ErrorType.EMPTY_INPUT -> ConsultUiMessage.InputRequired
+                ValidateConsultFormUseCase.ErrorType.TITLE_TOO_SHORT -> ConsultUiMessage.TitleTooShort
             }
-            _uiState.update {
-                it.copy(userMessage = ConsultUiMessage.StringResourceError(errorMessageRes))
-            }
+            _uiState.update { it.copy(userMessage = errorState) }
             return
         }
 
         if (writeData.selectedPharmacistId == null) {
             _uiState.update {
-                it.copy(userMessage = ConsultUiMessage.StringResourceError(R.string.consult_error_pharmacist_required))
+                it.copy(userMessage = ConsultUiMessage.PharmacistRequired)
             }
             return
         }
@@ -257,7 +255,7 @@ class ConsultViewModel @Inject constructor(
         val currentUserId = consultUseCases.getCurrentUserId()
         if (currentUserId == null) {
             _uiState.update {
-                it.copy(userMessage = ConsultUiMessage.StringResourceError(R.string.consult_error_login_required))
+                it.copy(userMessage = ConsultUiMessage.LoginRequired)
             }
             return
         }
