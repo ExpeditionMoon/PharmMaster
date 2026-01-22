@@ -14,9 +14,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.White
 
@@ -44,7 +46,7 @@ fun MapRefreshButton(
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
-            text = "이 위치에서 재검색",
+            text = stringResource(R.string.map_search_here),
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold
         )

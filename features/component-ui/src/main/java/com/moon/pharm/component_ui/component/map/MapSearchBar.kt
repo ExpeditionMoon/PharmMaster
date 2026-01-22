@@ -19,8 +19,10 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.theme.Placeholder
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.White
@@ -46,18 +48,18 @@ fun MapSearchBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(White, RoundedCornerShape(10.dp)),
-            placeholder = { Text("약국 이름 검색") },
+            placeholder = { Text(stringResource(R.string.search_pharmacy_placeholder)) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.desc_back_button),
                     modifier = Modifier.clickable { onBackClick() }
                 )
             },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "Search",
+                    contentDescription = stringResource(R.string.desc_search_icon),
                     modifier = Modifier.clickable {
                         onSearch(value)
                         focusManager.clearFocus()

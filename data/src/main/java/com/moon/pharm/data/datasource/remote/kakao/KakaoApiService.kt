@@ -5,20 +5,20 @@ import retrofit2.http.Header
 import retrofit2.http.Query
 
 interface KakaoApiService {
-    @GET("v2/local/search/category.json")
+    @GET(KakaoApiConst.PATH_SEARCH_CATEGORY)
     suspend fun searchPharmacies(
-        @Header("Authorization") apiKey: String,
-        @Query("category_group_code") categoryCode: String = "PM9",
-        @Query("x") longitude: String,
-        @Query("y") latitude: String,
-        @Query("radius") radius: Int = 2000,
-        @Query("sort") sort: String = "distance"
+        @Header(KakaoApiConst.AUTH_HEADER) apiKey: String,
+        @Query(KakaoApiConst.PARAM_CATEGORY_GROUP_CODE) categoryCode: String = KakaoApiConst.VALUE_CATEGORY_CODE_PHARMACY,
+        @Query(KakaoApiConst.PARAM_X) longitude: String,
+        @Query(KakaoApiConst.PARAM_Y) latitude: String,
+        @Query(KakaoApiConst.PARAM_RADIUS) radius: Int = KakaoApiConst.DEFAULT_RADIUS,
+        @Query(KakaoApiConst.PARAM_SORT) sort: String = KakaoApiConst.VALUE_SORT_DISTANCE
     ): KakaoSearchResponse
 
-    @GET("v2/local/search/keyword.json")
+    @GET(KakaoApiConst.PATH_SEARCH_KEYWORD)
     suspend fun searchPharmaciesByKeyword(
-        @Header("Authorization") apiKey: String,
-        @Query("category_group_code") categoryCode: String = "PM9",
-        @Query("query") query: String
+        @Header(KakaoApiConst.AUTH_HEADER) apiKey: String,
+        @Query(KakaoApiConst.PARAM_CATEGORY_GROUP_CODE) categoryCode: String = KakaoApiConst.VALUE_CATEGORY_CODE_PHARMACY,
+        @Query(KakaoApiConst.PARAM_QUERY) query: String
     ): KakaoSearchResponse
 }

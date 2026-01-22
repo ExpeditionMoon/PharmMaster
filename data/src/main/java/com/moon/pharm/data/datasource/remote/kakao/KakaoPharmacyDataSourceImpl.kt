@@ -13,7 +13,7 @@ class KakaoPharmacyDataSourceImpl @Inject constructor(
     private val kakaoApi: KakaoApiService
 ) : PharmacySearchDataSource {
 
-    private val AUTHORIZATION = "KakaoAK ${BuildConfig.KAKAO_REST_API_KEY}"
+    private val AUTHORIZATION = "${KakaoApiConst.AUTH_PREFIX} ${BuildConfig.KAKAO_REST_API_KEY}"
 
     override fun searchExternalPharmacies(query: String): Flow<DataResourceResult<List<PharmacyDTO>>> = flow {
         emit(DataResourceResult.Loading)

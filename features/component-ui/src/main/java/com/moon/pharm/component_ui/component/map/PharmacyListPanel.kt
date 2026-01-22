@@ -9,10 +9,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.item.PharmacyListItem
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
+import com.moon.pharm.component_ui.R
 
 @Composable
 fun PharmacyListPanel(
@@ -28,7 +30,7 @@ fun PharmacyListPanel(
             .padding(horizontal = 16.dp)
     ) {
         Text(
-            text = "검색 결과 ${pharmacies.size}건",
+            text = stringResource(R.string.search_result_count_format, pharmacies.size),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 12.dp)
         )
@@ -40,7 +42,7 @@ fun PharmacyListPanel(
                     .height(100.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text("검색된 약국이 없습니다.", color = Color.Gray)
+                Text(text = stringResource(R.string.search_result_empty), color = Color.Gray)
             }
         } else {
             LazyColumn(

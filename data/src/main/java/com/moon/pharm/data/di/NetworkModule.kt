@@ -1,5 +1,6 @@
 package com.moon.pharm.data.di
 
+import com.moon.pharm.data.datasource.remote.kakao.KakaoApiConst
 import com.moon.pharm.data.datasource.remote.kakao.KakaoApiService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -43,7 +44,7 @@ object NetworkModule {
         client: OkHttpClient
     ): KakaoApiService {
         return Retrofit.Builder()
-            .baseUrl("https://dapi.kakao.com/")
+            .baseUrl(KakaoApiConst.BASE_URL)
             .client(client)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
