@@ -39,3 +39,7 @@ const val USER_TYPE_PHARMACIST = "PHARMACIST"
 
 // 6. 에러 메시지 (Error Messages)
 const val ERROR_MSG_PHARMACY_NOT_FOUND = "Pharmacy not found"
+const val ERROR_MSG_UPLOAD_FAILED = "Upload failed"
+
+// 7. Firebase Storage 설정 (Storage)
+const val STORAGE_CONSULT_IMAGES = "consult_images"

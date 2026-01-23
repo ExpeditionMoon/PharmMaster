@@ -1,5 +1,7 @@
 package com.moon.pharm.consult.mapper
 
+import com.moon.pharm.component_ui.common.PATH_DELIMITER
+import com.moon.pharm.component_ui.common.QUERY_DELIMITER
 import com.moon.pharm.consult.screen.ConsultWriteState
 import com.moon.pharm.domain.model.consult.ConsultImage
 import com.moon.pharm.domain.model.consult.ConsultItem
@@ -11,7 +13,8 @@ object ConsultUiMapper {
         writeState: ConsultWriteState,
         currentUserId: String,
         currentUserNickname: String,
-        selectedPharmacistId: String
+        selectedPharmacistId: String,
+        uploadedImageUrls: List<String>
     ): ConsultItem {
         return ConsultItem(
             id = "",
@@ -23,8 +26,11 @@ object ConsultUiMapper {
             status = ConsultStatus.WAITING,
             isPublic = writeState.isPublic,
             createdAt = System.currentTimeMillis(),
-            images = writeState.images.map { path ->
-                ConsultImage(path.substringAfterLast("/"), path)
+            images = uploadedImageUrls.map { url ->
+                ConsultImage(
+                    imageName = url.substringAfterLast(PATH_DELIMITER).substringBefore(QUERY_DELIMITER),
+                    imageUrl = url
+                )
             }
         )
     }
