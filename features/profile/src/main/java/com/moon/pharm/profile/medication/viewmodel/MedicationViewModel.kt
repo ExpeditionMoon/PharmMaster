@@ -59,7 +59,7 @@ class MedicationViewModel @Inject constructor(
     init {
         fetchMedicationList()
     }
-    
+
     // region 2. Event Handler
     fun onEvent(event: MedicationUiEvent) {
         when (event) {

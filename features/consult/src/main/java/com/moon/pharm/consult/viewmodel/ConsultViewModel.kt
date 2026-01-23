@@ -6,7 +6,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
 import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.consult.common.ConsultUiMessage
+import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.consult.mapper.ConsultUiMapper
 import com.moon.pharm.consult.model.ConsultPrimaryTab
 import com.moon.pharm.consult.screen.ConsultUiState

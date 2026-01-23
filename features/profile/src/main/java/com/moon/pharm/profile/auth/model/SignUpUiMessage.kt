@@ -1,4 +1,4 @@
-package com.moon.pharm.profile.auth.common
+package com.moon.pharm.profile.auth.model
 
 import com.moon.pharm.component_ui.common.UiMessage
 

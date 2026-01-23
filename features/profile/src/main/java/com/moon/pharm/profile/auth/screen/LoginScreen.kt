@@ -42,8 +42,8 @@ import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.profile.R
-import com.moon.pharm.profile.auth.common.LoginUiMessage
-import com.moon.pharm.profile.auth.common.asString
+import com.moon.pharm.profile.auth.model.LoginUiMessage
+import com.moon.pharm.profile.auth.mapper.asString
 import com.moon.pharm.profile.auth.viewmodel.LoginViewModel
 
 @Composable

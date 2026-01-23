@@ -1,8 +1,9 @@
-package com.moon.pharm.profile.auth.common
+package com.moon.pharm.profile.auth.mapper
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.auth.model.LoginUiMessage
 
 @Composable
 fun LoginUiMessage.asString(): String {

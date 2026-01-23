@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.LoginUseCase
 import com.moon.pharm.domain.usecase.auth.ValidateLoginFormUseCase
-import com.moon.pharm.profile.auth.common.LoginUiMessage
+import com.moon.pharm.profile.auth.model.LoginUiMessage
 import com.moon.pharm.profile.auth.screen.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

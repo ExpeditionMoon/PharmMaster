@@ -3,7 +3,7 @@ package com.moon.pharm.profile.auth.mapper
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.moon.pharm.profile.R
-import com.moon.pharm.profile.auth.common.SignUpUiMessage
+import com.moon.pharm.profile.auth.model.SignUpUiMessage
 
 @Composable
 fun SignUpUiMessage.asString(): String {

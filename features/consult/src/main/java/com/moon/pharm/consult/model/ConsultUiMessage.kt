@@ -1,4 +1,4 @@
-package com.moon.pharm.consult.common
+package com.moon.pharm.consult.model
 
 import com.moon.pharm.component_ui.common.UiMessage
 

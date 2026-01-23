@@ -15,7 +15,7 @@ import com.moon.pharm.domain.usecase.auth.ValidateSignUpFormUseCase
 import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocationUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SearchNearbyPharmaciesUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SearchPharmacyUseCase
-import com.moon.pharm.profile.auth.common.SignUpUiMessage
+import com.moon.pharm.profile.auth.model.SignUpUiMessage
 import com.moon.pharm.profile.auth.mapper.SignUpUiMapper
 import com.moon.pharm.profile.auth.model.SignUpStep
 import com.moon.pharm.profile.auth.screen.SignUpUiState

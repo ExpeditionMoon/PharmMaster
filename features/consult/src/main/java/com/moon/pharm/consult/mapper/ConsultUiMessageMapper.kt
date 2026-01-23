@@ -1,9 +1,10 @@
-package com.moon.pharm.consult.common
+package com.moon.pharm.consult.mapper
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.moon.pharm.component_ui.R as UiR
 import com.moon.pharm.consult.R
+import com.moon.pharm.consult.model.ConsultUiMessage
 
 @Composable
 fun ConsultUiMessage.asString(): String {
