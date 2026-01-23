@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -32,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -183,9 +187,11 @@ fun QuestionSection(item: ConsultItem) {
 
         if (item.images.isNotEmpty()) {
             Spacer(modifier = Modifier.height(10.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                item.images.forEach { image ->
-                    ImagePlaceholder(image.imageName)
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(item.images) { image ->
+                    ConsultImageItem(imageUrl = image.imageUrl)
                 }
             }
         }
@@ -325,14 +331,17 @@ fun WaitingForAnswerBox() {
 }
 
 @Composable
-private fun ImagePlaceholder(imageUrl: String) {
-    Box(
+fun ConsultImageItem(imageUrl: String) {
+    AsyncImage(
+        model = imageUrl,
+        contentDescription = "상담 첨부 이미지",
         modifier = Modifier
-            .size(70.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color.LightGray.copy(alpha = 0.3f))
-            .border(1.dp, Color.LightGray, RoundedCornerShape(10.dp))
-    ) {
-        Icon(imageVector = Icons.Default.Info, contentDescription = null, tint = SecondFont)
-    }
+            .size(100.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.LightGray.copy(alpha = 0.2f))
+            .border(1.dp, Color.LightGray.copy(alpha = 0.5f), RoundedCornerShape(8.dp)),
+        contentScale = ContentScale.Crop,
+        error = rememberVectorPainter(Icons.Default.Image),
+        placeholder = rememberVectorPainter(Icons.Default.Image)
+    )
 }
