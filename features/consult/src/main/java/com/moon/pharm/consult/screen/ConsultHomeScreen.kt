@@ -157,7 +157,7 @@ fun ConsultItemCard(item: ConsultItem, onClick: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "${item.userId} • ${item.createdAt.toDisplayDateTimeString()}",
+                    text = "${item.nickName} • ${item.createdAt.toDisplayDateTimeString()}",
                     fontSize = 12.sp,
                     color = SecondFont
                 )

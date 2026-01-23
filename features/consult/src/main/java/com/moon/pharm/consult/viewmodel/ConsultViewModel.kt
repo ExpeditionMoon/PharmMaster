@@ -6,9 +6,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
 import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.consult.mapper.ConsultUiMapper
 import com.moon.pharm.consult.model.ConsultPrimaryTab
+import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.consult.screen.ConsultUiState
 import com.moon.pharm.consult.screen.ConsultWriteState
 import com.moon.pharm.domain.model.consult.ConsultItem
@@ -17,6 +17,7 @@ import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
 import com.moon.pharm.domain.usecase.consult.ValidateConsultFormUseCase
 import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocationUseCase
+import com.moon.pharm.domain.usecase.user.GetNicknameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,7 +36,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ConsultViewModel @Inject constructor(
     private val consultUseCases: ConsultUseCases,
-    private val getLocationUseCase: GetNearbyPharmaciesCurrentLocationUseCase
+    private val getLocationUseCase: GetNearbyPharmaciesCurrentLocationUseCase,
+    private val getNicknameUseCase: GetNicknameUseCase
 ) : ViewModel() {
 
     // region 1. State & Events
@@ -81,11 +83,7 @@ class ConsultViewModel @Inject constructor(
                                 answerPharmacist = result.resultData.pharmacist
                             )
                         }
-
-                        is DataResourceResult.Failure -> state.copy(
-                            isLoading = false,
-                            userMessage = UiMessage.LoadDataFailed
-                        )
+                        is DataResourceResult.Failure -> { state.copy(isLoading = false, userMessage = UiMessage.LoadDataFailed)}
                     }
                 }
             }
@@ -264,12 +262,17 @@ class ConsultViewModel @Inject constructor(
             return
         }
 
-        val newItem = ConsultUiMapper.toDomainModel(
-            writeState = writeData,
-            currentUserId = currentUserId,
-            selectedPharmacistId = writeData.selectedPharmacistId
-        )
-        createConsult(newItem)
+        viewModelScope.launch {
+            val nickname = getNicknameUseCase.getNickname(currentUserId)
+
+            val newItem = ConsultUiMapper.toDomainModel(
+                writeState = writeData,
+                currentUserId = currentUserId,
+                currentUserNickname = nickname,
+                selectedPharmacistId = writeData.selectedPharmacistId
+            )
+            createConsult(newItem)
+        }
     }
     // endregion
 

@@ -22,6 +22,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
 import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.component.map.PharmacySelector
+import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.consult.screen.component.PharmacistListPanel
 import com.moon.pharm.consult.screen.component.PharmacistSearchView
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
@@ -111,8 +112,8 @@ fun ConsultPharmacistScreen(
                         pharmacists = writeState.availablePharmacists,
                         onPharmacistSelect = { pharmacist ->
                             viewModel.selectPharmacist(pharmacist.userId)
-                            onMapModeChanged(false)
-                            isMapView = false
+                            viewModel.selectPharmacist(pharmacist.userId)
+                            navController.navigate(ContentNavigationRoute.ConsultTabConfirmScreen)
                         }
                     )
                 }
