@@ -51,8 +51,8 @@ import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.consult.R
-import com.moon.pharm.consult.common.ConsultUiMessage
-import com.moon.pharm.consult.common.asString
+import com.moon.pharm.consult.model.ConsultUiMessage
+import com.moon.pharm.consult.mapper.asString
 import com.moon.pharm.consult.screen.section.PhotoAttachmentSection
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
 

@@ -10,6 +10,10 @@ class PharmMasterApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        MapsInitializer.initialize(applicationContext, MapsInitializer.Renderer.LATEST, null)
+        try {
+            MapsInitializer.initialize(applicationContext, MapsInitializer.Renderer.LATEST, null)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

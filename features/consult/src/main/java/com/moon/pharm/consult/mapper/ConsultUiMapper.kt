@@ -1,18 +1,29 @@
 package com.moon.pharm.consult.mapper
 
-import androidx.compose.ui.graphics.Color
-import com.moon.pharm.component_ui.theme.onPrimaryLight
-import com.moon.pharm.component_ui.theme.onSecondaryLight
-import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.theme.secondaryLight
+import com.moon.pharm.consult.screen.ConsultWriteState
+import com.moon.pharm.domain.model.consult.ConsultImage
+import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.consult.ConsultStatus
 
-fun ConsultStatus.toBackgroundColor(): Color = when(this) {
-    ConsultStatus.WAITING -> secondaryLight
-    ConsultStatus.COMPLETED -> primaryLight
-}
+object ConsultUiMapper {
 
-fun ConsultStatus.toTextColor(): Color = when(this) {
-    ConsultStatus.WAITING -> onSecondaryLight
-    ConsultStatus.COMPLETED -> onPrimaryLight
+    fun toDomainModel(
+        writeState: ConsultWriteState,
+        currentUserId: String,
+        selectedPharmacistId: String
+    ): ConsultItem {
+        return ConsultItem(
+            id = "",
+            userId = currentUserId,
+            pharmacistId = selectedPharmacistId,
+            title = writeState.title,
+            content = writeState.content,
+            status = ConsultStatus.WAITING,
+            isPublic = writeState.isPublic,
+            createdAt = System.currentTimeMillis(),
+            images = writeState.images.map { path ->
+                ConsultImage(path.substringAfterLast("/"), path)
+            }
+        )
+    }
 }

@@ -20,6 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,12 +50,16 @@ import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.auth.model.SignUpUiMessage
+import com.moon.pharm.profile.auth.mapper.asString
 import com.moon.pharm.profile.auth.model.SignUpStep
 import com.moon.pharm.profile.auth.screen.section.EmailPasswordSection
 import com.moon.pharm.profile.auth.screen.section.NickNameSection
 import com.moon.pharm.profile.auth.screen.section.PharmacistInfoSection
 import com.moon.pharm.profile.auth.screen.section.UserTypeSection
 import com.moon.pharm.profile.auth.viewmodel.SignUpViewModel
+
+private const val ANIMATION_LABEL_STEP = "SignUpStep"
 
 @Composable
 fun SignUpScreen(
@@ -62,6 +68,24 @@ fun SignUpScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showPharmacySearch by remember { mutableStateOf(false) }
     var tempSelectedPharmacy by remember { mutableStateOf<Pharmacy?>(null) }
+    var isLocationGranted by remember { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val userMessage = uiState.userMessage
+    val messageText = (userMessage as? SignUpUiMessage)?.asString()
+
+    LaunchedEffect(uiState.isComplete) {
+        if (uiState.isComplete) {
+            onNavigateToHome()
+        }
+    }
+
+    LaunchedEffect(userMessage) {
+        if (userMessage != null && messageText != null) {
+            snackbarHostState.showSnackbar(messageText)
+            viewModel.userMessageShown()
+        }
+    }
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
@@ -80,6 +104,8 @@ fun SignUpScreen(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val isGranted = permissions.values.all { it }
+        isLocationGranted = isGranted
+
         if (isGranted) {
             viewModel.fetchCurrentLocationAndSearch()
         } else {
@@ -100,6 +126,7 @@ fun SignUpScreen(
         PharmacySelector(
             pharmacies = uiState.pharmacySearchResults,
             selectedPharmacy = tempSelectedPharmacy,
+            isLocationEnabled = isLocationGranted,
             onPharmacyClick = { pharmacy -> tempSelectedPharmacy = pharmacy },
             cameraPositionState = cameraPositionState,
             cameraMoveEvent = viewModel.moveCameraEvent,
@@ -126,7 +153,10 @@ fun SignUpScreen(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = "${tempSelectedPharmacy?.name} 선택 완료",
+                            text = stringResource(
+                                R.string.signup_pharmacy_selected_format,
+                                tempSelectedPharmacy?.name.orEmpty()
+                            ),
                             modifier = Modifier.padding(vertical = 8.dp),
                             color = White
                         )
@@ -142,6 +172,7 @@ fun SignUpScreen(
     } else {
         SignUpScreenContent(
             uiState = uiState,
+            snackbarHostState = snackbarHostState,
             onUpdateUserType = { viewModel.updateUserType(it) },
             onUpdateEmail = { viewModel.updateEmail(it) },
             onCheckEmail = { viewModel.checkEmailDuplicate() },
@@ -154,7 +185,7 @@ fun SignUpScreen(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
             },
-            onNextClick = { viewModel.moveToNextStep(onNavigateToHome) }
+            onNextClick = { viewModel.moveToNextStep() }
         )
     }
 }
@@ -162,6 +193,7 @@ fun SignUpScreen(
 @Composable
 fun SignUpScreenContent(
     uiState: SignUpUiState,
+    snackbarHostState: SnackbarHostState,
     onUpdateUserType: (UserType) -> Unit,
     onUpdateEmail: (String) -> Unit,
     onCheckEmail: () -> Unit,
@@ -174,6 +206,7 @@ fun SignUpScreenContent(
 ) {
     Scaffold(
         containerColor = White,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             val buttonText = when (uiState.currentStep) {
                 SignUpStep.TYPE -> stringResource(R.string.signup_button_next)
@@ -230,7 +263,7 @@ fun SignUpScreenContent(
 
             AnimatedContent(
                 targetState = uiState.currentStep,
-                label = "SignUpStep"
+                label = ANIMATION_LABEL_STEP
             ) { step ->
                 when (step) {
                     SignUpStep.TYPE -> UserTypeSection(uiState.userType, onUpdateUserType)

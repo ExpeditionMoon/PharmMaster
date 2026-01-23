@@ -1,7 +1,6 @@
 package com.moon.pharm.domain.usecase.consult
 
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
-import com.moon.pharm.domain.usecase.pharmacist.GetPharmacistDetailUseCase
 import com.moon.pharm.domain.usecase.pharmacist.GetPharmacistsByPharmacyUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SearchNearbyPharmaciesUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SearchPharmacyUseCase
@@ -15,6 +14,7 @@ data class ConsultUseCases @Inject constructor(
     val searchPharmacy: SearchPharmacyUseCase,
     val searchNearbyPharmacies: SearchNearbyPharmaciesUseCase,
     val getPharmacists: GetPharmacistsByPharmacyUseCase,
-    val getPharmacistDetail: GetPharmacistDetailUseCase,
-    val getCurrentUserId: GetCurrentUserIdUseCase
+    val getCurrentUserId: GetCurrentUserIdUseCase,
+
+    val validateConsultForm: ValidateConsultFormUseCase
 )

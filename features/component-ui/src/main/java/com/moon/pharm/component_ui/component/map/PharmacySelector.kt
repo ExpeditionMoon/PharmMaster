@@ -1,5 +1,7 @@
 package com.moon.pharm.component_ui.component.map
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +30,7 @@ import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +41,7 @@ fun PharmacySelector(
     onSearch: (String) -> Unit,
     onSearchArea: (Double, Double) -> Unit,
     onBackClick: () -> Unit,
+    isLocationEnabled: Boolean = false,
     sheetContent: (@Composable () -> Unit)? = null,
     bottomContent: @Composable () -> Unit = {},
     cameraMoveEvent: SharedFlow<LatLng>? = null,
@@ -50,8 +54,8 @@ fun PharmacySelector(
     modifier: Modifier = Modifier
 ) {
     var searchText by remember { mutableStateOf("") }
-    val focusManager = LocalFocusManager.current
     val scaffoldState = rememberBottomSheetScaffoldState()
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(pharmacies, selectedPharmacy) {
         if (pharmacies.isNotEmpty() || selectedPharmacy != null) {
@@ -61,7 +65,7 @@ fun PharmacySelector(
 
     if (cameraMoveEvent != null) {
         LaunchedEffect(Unit) {
-            cameraMoveEvent.collect { latLng ->
+            cameraMoveEvent.collectLatest { latLng ->
                 cameraPositionState.animate(
                     CameraUpdateFactory.newLatLngZoom(latLng, 16f)
                 )
@@ -108,7 +112,15 @@ fun PharmacySelector(
                 onBackClick = onBackClick,
                 showBackButton = false,
                 cameraPositionState = cameraPositionState,
-                modifier = Modifier.fillMaxSize()
+                isLocationEnabled = isLocationEnabled,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        focusManager.clearFocus()
+                    }
             )
 
             MapSearchBar(

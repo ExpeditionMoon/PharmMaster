@@ -4,60 +4,75 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.LoginUseCase
+import com.moon.pharm.domain.usecase.auth.ValidateLoginFormUseCase
+import com.moon.pharm.profile.auth.model.LoginUiMessage
+import com.moon.pharm.profile.auth.screen.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private val validateLoginFormUseCase: ValidateLoginFormUseCase
 ) : ViewModel() {
 
-    private val _email = MutableStateFlow("")
-    val email = _email.asStateFlow()
+    // region 1. State
+    private val _uiState = MutableStateFlow(LoginUiState())
+    val uiState = _uiState.asStateFlow()
+    // endregion
 
-    private val _password = MutableStateFlow("")
-    val password = _password.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
-    private val _loginEvent = MutableSharedFlow<Boolean>()
-    val loginEvent = _loginEvent.asSharedFlow()
-
-    private val _errorMessage = MutableSharedFlow<String>()
-    val errorMessage = _errorMessage.asSharedFlow()
-
+    // region 2. User Actions
     fun updateEmail(input: String) {
-        _email.value = input
+        _uiState.update { it.copy(email = input) }
     }
 
     fun updatePassword(input: String) {
-        _password.value = input
+        _uiState.update { it.copy(password = input) }
     }
 
     fun login() {
-        if (_email.value.isBlank() || _password.value.isBlank()) return
+        val currentState = _uiState.value
+        val validationResult = validateLoginFormUseCase(currentState.email, currentState.password)
+
+        if (validationResult is ValidateLoginFormUseCase.Result.Invalid) {
+            val errorState = when(validationResult.error) {
+                ValidateLoginFormUseCase.ErrorType.EMPTY_EMAIL -> LoginUiMessage.EmptyEmail
+                ValidateLoginFormUseCase.ErrorType.EMPTY_PASSWORD -> LoginUiMessage.EmptyPassword
+            }
+
+            _uiState.update { it.copy(userMessage = errorState) }
+            return
+        }
 
         viewModelScope.launch {
-            loginUseCase(_email.value, _password.value).collectLatest { result ->
-                when (result) {
-                    is DataResourceResult.Loading -> _isLoading.value = true
-                    is DataResourceResult.Success -> {
-                        _isLoading.value = false
-                        _loginEvent.emit(true)
-                    }
-                    is DataResourceResult.Failure -> {
-                        _isLoading.value = false
-                        _errorMessage.emit(result.exception.message ?: "로그인 실패")
+            loginUseCase(currentState.email, currentState.password).collectLatest { result ->
+                _uiState.update { state ->
+                    when (result) {
+                        is DataResourceResult.Loading -> state.copy(isLoading = true)
+                        is DataResourceResult.Success -> state.copy(
+                            isLoading = false,
+                            isLoginSuccess = true,
+                            userMessage = null
+                        )
+                        is DataResourceResult.Failure -> state.copy(
+                            isLoading = false,
+                            userMessage = LoginUiMessage.LoginFailed
+                        )
                     }
                 }
             }
         }
     }
+    // endregion
+
+    // region 3. System Actions
+    fun userMessageShown() {
+        _uiState.update { it.copy(userMessage = null) }
+    }
+    // endregion
 }
