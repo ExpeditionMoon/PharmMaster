@@ -3,6 +3,8 @@ package com.moon.pharm.consult.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
+import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.common.ConsultUiMessage
 import com.moon.pharm.consult.mapper.ConsultUiMapper
@@ -130,9 +132,11 @@ class ConsultViewModel @Inject constructor(
                     }
 
                     is DataResourceResult.Failure -> {
+                        result.exception.printStackTrace()
                         _uiState.update {
                             it.copy(isLoading = false, userMessage = UiMessage.LoadDataFailed)
                         }
+                        fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
                     }
                 }
             }
