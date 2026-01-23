@@ -5,6 +5,8 @@ import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.location.GetCurrentLocationUseCase
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -26,17 +28,22 @@ class GetNearbyPharmaciesCurrentLocationUseCase @Inject constructor(
             GeoLocation.DEFAULT
         }
 
-        searchNearbyPharmaciesUseCase(myLocation.lat, myLocation.lng).collect { searchResult ->
+        searchNearbyPharmaciesUseCase(
+            myLocation.lat,
+            myLocation.lng
+        ).collectLatest { searchResult ->
             if (searchResult is DataResourceResult.Success) {
-                emit(DataResourceResult.Success(
-                    Result(
-                        location = myLocation,
-                        pharmacies = searchResult.resultData
+                emit(
+                    DataResourceResult.Success(
+                        Result(location = myLocation, pharmacies = searchResult.resultData)
                     )
-                ))
+                )
             } else if (searchResult is DataResourceResult.Failure) {
                 emit(DataResourceResult.Failure(searchResult.exception))
             }
         }
+    }.catch { e ->
+        e.printStackTrace()
+        emit(DataResourceResult.Failure(e))
     }
 }

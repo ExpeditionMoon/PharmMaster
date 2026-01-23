@@ -10,6 +10,7 @@ import com.moon.pharm.domain.usecase.pharmacist.SavePharmacistUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SavePharmacyUseCase
 import com.moon.pharm.domain.usecase.user.SaveUserUseCase
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -28,7 +29,7 @@ class SignUpUseCase @Inject constructor(
 
         emit(DataResourceResult.Loading)
 
-        authRepository.createAccount(user.email, password).collect { result ->
+        authRepository.createAccount(user.email, password).collectLatest { result ->
             when (result) {
                 is DataResourceResult.Success -> {
                     val uid = result.resultData
