@@ -349,20 +349,12 @@ class ConsultViewModel @Inject constructor(
             consultUseCases.createConsult(consultInfo).collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
-                        is DataResourceResult.Loading -> state.copy(
-                            isLoading = true,
-                            userMessage = null
-                        )
-
-                        is DataResourceResult.Success -> state.copy(
-                            isLoading = false,
-                            isConsultCreated = true
-                        )
-
-                        is DataResourceResult.Failure -> state.copy(
-                            isLoading = false,
-                            userMessage = ConsultUiMessage.CreateFailed
-                        )
+                        is DataResourceResult.Loading -> state.copy(isLoading = true, userMessage = null)
+                        is DataResourceResult.Success -> {
+                            fetchConsultList()
+                            state.copy(isLoading = false, isConsultCreated = true)
+                        }
+                        is DataResourceResult.Failure -> state.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed)
                     }
                 }
             }

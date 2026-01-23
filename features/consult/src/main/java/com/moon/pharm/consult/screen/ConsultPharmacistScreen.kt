@@ -113,6 +113,7 @@ fun ConsultPharmacistScreen(
                         onPharmacistSelect = { pharmacist ->
                             viewModel.selectPharmacist(pharmacist.userId)
                             viewModel.selectPharmacist(pharmacist.userId)
+                            isMapView = false
                             navController.navigate(ContentNavigationRoute.ConsultTabConfirmScreen)
                         }
                     )
