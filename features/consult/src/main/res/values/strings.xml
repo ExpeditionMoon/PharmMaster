@@ -3,7 +3,6 @@
     <string name="error_create_consult">상담 등록 실패</string>
     <string name="consult_error_input_required">제목과 내용을 입력해주세요.</string>
     <string name="consult_error_pharmacist_required">상담할 약사를 선택해주세요.</string>
-    <string name="consult_error_login_required">로그인이 필요한 서비스입니다.</string>
     <string name="consult_error_title_short">제목은 최소 5자 이상 입력해주세요.</string>
     <string name="consult_create_failed">상담 등록에 실패했습니다. 다시 시도해주세요.</string>
 
