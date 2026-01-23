@@ -1,6 +1,7 @@
 package com.moon.pharm.data.repository
 
 import com.moon.pharm.data.datasource.ConsultDataSource
+import com.moon.pharm.data.datasource.ImageDataSource
 import com.moon.pharm.data.di.IoDispatcher
 import com.moon.pharm.domain.model.consult.ConsultError
 import com.moon.pharm.domain.model.consult.ConsultItem
@@ -17,6 +18,7 @@ import javax.inject.Inject
 
 class ConsultRepositoryImpl @Inject constructor(
     private val dataSource: ConsultDataSource,
+    private val imageDataSource: ImageDataSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ConsultRepository {
 
@@ -53,5 +55,9 @@ class ConsultRepositoryImpl @Inject constructor(
             .onStart { emit(DataResourceResult.Loading) }
             .catch { e -> emit(DataResourceResult.Failure(e)) }
             .flowOn(ioDispatcher)
+    }
+
+    override suspend fun uploadImage(uri: String, userId: String): String {
+        return imageDataSource.uploadImage(uri, userId)
     }
 }

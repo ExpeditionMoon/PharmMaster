@@ -15,6 +15,7 @@ import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
+import com.moon.pharm.domain.usecase.consult.UploadConsultImagesUseCase
 import com.moon.pharm.domain.usecase.consult.ValidateConsultFormUseCase
 import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocationUseCase
 import com.moon.pharm.domain.usecase.user.GetNicknameUseCase
@@ -37,7 +38,8 @@ import javax.inject.Inject
 class ConsultViewModel @Inject constructor(
     private val consultUseCases: ConsultUseCases,
     private val getLocationUseCase: GetNearbyPharmaciesCurrentLocationUseCase,
-    private val getNicknameUseCase: GetNicknameUseCase
+    private val getNicknameUseCase: GetNicknameUseCase,
+    private val uploadImagesUseCase: UploadConsultImagesUseCase
 ) : ViewModel() {
 
     // region 1. State & Events
@@ -230,48 +232,61 @@ class ConsultViewModel @Inject constructor(
         _uiState.update { it.copy(writeState = ConsultWriteState()) }
     }
 
-    fun submitConsult() {
-        val writeData = _uiState.value.writeState
-
-        val validationResult = consultUseCases.validateConsultForm(
-            title = writeData.title,
-            content = writeData.content
-        )
-
+    private fun validateAndGetUserId(writeData: ConsultWriteState): String? {
+        val validationResult = consultUseCases.validateConsultForm(writeData.title, writeData.content)
         if (validationResult is ValidateConsultFormUseCase.Result.Invalid) {
             val errorState = when (validationResult.error) {
                 ValidateConsultFormUseCase.ErrorType.EMPTY_INPUT -> ConsultUiMessage.InputRequired
                 ValidateConsultFormUseCase.ErrorType.TITLE_TOO_SHORT -> ConsultUiMessage.TitleTooShort
             }
             _uiState.update { it.copy(userMessage = errorState) }
-            return
+            return null
         }
 
         if (writeData.selectedPharmacistId == null) {
-            _uiState.update {
-                it.copy(userMessage = ConsultUiMessage.PharmacistRequired)
-            }
-            return
+            _uiState.update { it.copy(userMessage = ConsultUiMessage.PharmacistRequired) }
+            return null
         }
 
-        val currentUserId = consultUseCases.getCurrentUserId()
-        if (currentUserId == null) {
-            _uiState.update {
-                it.copy(userMessage = ConsultUiMessage.LoginRequired)
-            }
-            return
+        val userId = consultUseCases.getCurrentUserId()
+        if (userId == null) {
+            _uiState.update { it.copy(userMessage = ConsultUiMessage.LoginRequired) }
+            return null
         }
 
+        return userId
+    }
+
+    fun submitConsult() {
+        val writeData = _uiState.value.writeState
+
+        val currentUserId = validateAndGetUserId(writeData) ?: return
         viewModelScope.launch {
-            val nickname = getNicknameUseCase.getNickname(currentUserId)
+            _uiState.update { it.copy(isLoading = true) }
 
-            val newItem = ConsultUiMapper.toDomainModel(
-                writeState = writeData,
-                currentUserId = currentUserId,
-                currentUserNickname = nickname,
-                selectedPharmacistId = writeData.selectedPharmacistId
-            )
-            createConsult(newItem)
+            try {
+                val nickname = getNicknameUseCase.getNickname(currentUserId)
+                val localImages = writeData.images
+                val uploadedUrls = if (localImages.isNotEmpty()) {
+                    uploadImagesUseCase(localImages, currentUserId)
+                } else {
+                    emptyList()
+                }
+
+                val newItem = ConsultUiMapper.toDomainModel(
+                    writeState = writeData,
+                    currentUserId = currentUserId,
+                    currentUserNickname = nickname,
+                    selectedPharmacistId = writeData.selectedPharmacistId!!,
+                    uploadedImageUrls = uploadedUrls
+                )
+                createConsult(newItem)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _uiState.update {
+                    it.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed)
+                }
+            }
         }
     }
     // endregion

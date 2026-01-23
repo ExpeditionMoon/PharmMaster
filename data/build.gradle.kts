@@ -61,6 +61,7 @@ dependencies {
     // Firestore
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.libs)
+    implementation(libs.firebase.storage)
 
     // Map
     implementation(libs.bundles.google.maps.libs)

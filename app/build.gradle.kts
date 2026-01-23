@@ -65,8 +65,10 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose.libs)
 
+    // Firestore
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.libs)
+    implementation(libs.firebase.storage)
 
     // Splash
     implementation(libs.androidx.core.splashscreen)
