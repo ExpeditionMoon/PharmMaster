@@ -13,6 +13,7 @@ data class ConsultItemDTO(
     var id: String = EMPTY_STRING,
 
     var userId: String = EMPTY_STRING,
+    var nickName: String = EMPTY_STRING,
     var pharmacistId: String? = null,
     var title: String = EMPTY_STRING,
     var content: String = EMPTY_STRING,

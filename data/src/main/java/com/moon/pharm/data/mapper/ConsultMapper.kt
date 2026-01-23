@@ -14,6 +14,7 @@ fun ConsultItemDTO.toDomain(): ConsultItem {
     return ConsultItem(
         id = this.id,
         userId = this.userId,
+        nickName = this.nickName,
         pharmacistId = this.pharmacistId,
         title = this.title,
         content = this.content,
@@ -33,6 +34,7 @@ fun ConsultItem.toDto(): ConsultItemDTO {
     return ConsultItemDTO(
         id = this.id,
         userId = this.userId,
+        nickName = this.nickName,
         pharmacistId = this.pharmacistId,
         title = this.title,
         content = this.content,

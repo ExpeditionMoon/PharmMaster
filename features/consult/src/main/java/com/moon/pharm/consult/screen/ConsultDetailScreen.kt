@@ -1,6 +1,5 @@
 package com.moon.pharm.consult.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -19,22 +18,27 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.moon.pharm.component_ui.component.StatusBadge
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.theme.Black
@@ -46,6 +50,8 @@ import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.theme.primaryLight
 import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.R
+import com.moon.pharm.consult.mapper.asString
+import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.consult.viewmodel.ConsultViewModel
 import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.model.consult.ConsultItem
@@ -56,13 +62,27 @@ fun ConsultDetailScreen(
     consultId: String,
     viewModel: ConsultViewModel
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val userMessage = uiState.userMessage
+    val messageText = (userMessage as? ConsultUiMessage)?.asString()
+
     LaunchedEffect(consultId) {
-        viewModel.getConsultDetail(consultId)
+        if (consultId.isNotBlank()) {
+            viewModel.getConsultDetail(consultId)
+        }
     }
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(userMessage) {
+        if (userMessage != null && messageText != null) {
+            snackbarHostState.showSnackbar(messageText)
+            viewModel.userMessageShown()
+        }
+    }
 
     ConsultDetailContent(
+        isLoading = uiState.isLoading,
         item = uiState.selectedItem,
         pharmacist = uiState.answerPharmacist,
         pharmacistImageUrl = uiState.answerPharmacistProfileUrl
@@ -71,6 +91,7 @@ fun ConsultDetailScreen(
 
 @Composable
 fun ConsultDetailContent(
+    isLoading: Boolean,
     item: ConsultItem?,
     pharmacist: Pharmacist?,
     pharmacistImageUrl: String?
@@ -87,9 +108,7 @@ fun ConsultDetailContent(
                 Spacer(modifier = Modifier.height(24.dp))
             }
             item {
-                if (item.status == ConsultStatus.COMPLETED && item.answer != null
-//                    && pharmacist != null
-                ) {
+                if (item.status == ConsultStatus.COMPLETED && item.answer != null) {
                     AnswerSection(
                         pharmacist = pharmacist,
                         pharmacistImageUrl = pharmacistImageUrl,
@@ -101,7 +120,20 @@ fun ConsultDetailContent(
                 }
             }
         }
-    } else {
+    } else if (!isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "상담 내역을 불러올 수 없습니다.",
+                color = SecondFont,
+                fontSize = 16.sp
+            )
+        }
+    }
+
+    if (isLoading) {
         CircularProgressBar()
     }
 }
@@ -115,9 +147,14 @@ fun QuestionSection(item: ConsultItem) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${item.userId} • ${item.createdAt.toDisplayDateTimeString()}",
+                text = "${item.nickName} • ${item.createdAt.toDisplayDateTimeString()}",
                 fontSize = 13.sp,
-                color = SecondFont
+                color = SecondFont,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             StatusBadge(
                 text = item.status.label,
@@ -181,13 +218,32 @@ fun AnswerSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (pharmacist != null) {
-                    Image(
-                        painter = painterResource(id = pharmacistImageUrl?.toIntOrNull() ?: 0),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                    )
+                    if (!pharmacistImageUrl.isNullOrBlank()) {
+                        AsyncImage(
+                            model = pharmacistImageUrl,
+                            contentDescription = "약사 프로필",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                            error = rememberVectorPainter(Icons.Default.Person),
+                            placeholder = rememberVectorPainter(Icons.Default.Person)
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(Color.LightGray),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                        }
+                    }
 
                     Spacer(modifier = Modifier.width(10.dp))
 

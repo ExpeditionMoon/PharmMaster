@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -46,21 +48,31 @@ fun ConsultConfirmScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val writeState = uiState.writeState
 
+    val selectedPharmacist = remember(writeState.selectedPharmacistId, writeState.availablePharmacists) {
+        writeState.availablePharmacists.find { it.userId == writeState.selectedPharmacistId }
+    }
+
     LaunchedEffect(uiState.isConsultCreated) {
         if (uiState.isConsultCreated) {
             viewModel.resetConsultState()
+            navController.navigate(ContentNavigationRoute.ConsultTab) {
+                popUpTo(ContentNavigationRoute.ConsultTab) { inclusive = true }
+            }
         }
     }
 
     ConsultConfirmContent(
         title = writeState.title,
         content = writeState.content,
-        selectedPharmacistName = uiState.answerPharmacist?.name ?: "선택된 약사 없음",
+        selectedPharmacistName = selectedPharmacist?.name ?: "선택된 약사 없음",
         onEditTitleOrContent = {
             navController.popBackStack(ContentNavigationRoute.ConsultTabWriteScreen, false)
         },
         onEditPharmacist = {
             navController.popBackStack(ContentNavigationRoute.ConsultTabPharmacistScreen, false)
+        },
+        onSubmit = {
+            viewModel.submitConsult()
         }
     )
 }
@@ -71,7 +83,8 @@ fun ConsultConfirmContent(
     content: String,
     selectedPharmacistName: String,
     onEditTitleOrContent: () -> Unit,
-    onEditPharmacist: () -> Unit
+    onEditPharmacist: () -> Unit,
+    onSubmit: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -116,6 +129,24 @@ fun ConsultConfirmContent(
         GuidanceBox(
             text = "상담 요청 전에 모든 내용을 다시 한번 확인해주세요. 요청이 완료되면 약사에게 실시간으로 연결됩니다."
         )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Button(
+            onClick = onSubmit,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = primaryLight)
+        ) {
+            Text(
+                text = "상담 요청하기",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = White
+            )
+        }
     }
 }
 
@@ -125,14 +156,14 @@ fun InfoCard(label: String, content: String, onEditClick: () -> Unit = {}) {
         modifier = Modifier
             .fillMaxWidth()
             .background(White, RoundedCornerShape(10.dp))
-            .padding(8.dp)
+            .padding(12.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = label,
                     fontSize = 12.sp,
@@ -143,10 +174,11 @@ fun InfoCard(label: String, content: String, onEditClick: () -> Unit = {}) {
                     text = content,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = primaryLight
+                    color = primaryLight,
+                    maxLines = 2
                 )
             }
-            
+
             Button(
                 onClick = onEditClick,
                 colors = ButtonDefaults.buttonColors(
@@ -154,8 +186,10 @@ fun InfoCard(label: String, content: String, onEditClick: () -> Unit = {}) {
                     contentColor = White
                 ),
                 shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.size(width = 56.dp, height = 30.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                modifier = Modifier
+                    .size(width = 56.dp, height = 30.dp)
+                    .padding(start = 8.dp),
+                contentPadding = PaddingValues(0.dp)
             ) {
                 Text(text = "수정", fontSize = 13.sp)
             }

@@ -10,11 +10,13 @@ object ConsultUiMapper {
     fun toDomainModel(
         writeState: ConsultWriteState,
         currentUserId: String,
+        currentUserNickname: String,
         selectedPharmacistId: String
     ): ConsultItem {
         return ConsultItem(
             id = "",
             userId = currentUserId,
+            nickName = currentUserNickname,
             pharmacistId = selectedPharmacistId,
             title = writeState.title,
             content = writeState.content,
