@@ -153,18 +153,18 @@ class MedicationViewModel @Inject constructor(
         }
     }
 
-    private fun toggleMedicationTaken(scheduleId: String) {
+    private fun toggleMedicationTaken(medicationId: String) {
         val userId = getCurrentUserIdUseCase() ?: return
 
         _uiState.update { state ->
             val newList = state.medicationList.map { item ->
-                if (item.scheduleId == scheduleId) item.copy(isTaken = !item.isTaken) else item
+                if (item.medicationId == medicationId) item.copy(isTaken = !item.isTaken) else item
             }
             state.copy(medicationList = newList)
         }
 
         viewModelScope.launch {
-            val updatedItem = _uiState.value.medicationList.find { it.scheduleId == scheduleId } ?: return@launch
+            val updatedItem = _uiState.value.medicationList.find { it.medicationId == medicationId } ?: return@launch
 
             val record = MedicationUiMapper.toIntakeRecord(updatedItem, userId)
             toggleIntakeCheckUseCase(
