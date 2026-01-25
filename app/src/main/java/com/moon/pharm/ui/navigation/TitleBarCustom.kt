@@ -35,47 +35,6 @@ fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
                     )
                 )
             }
-            routeName.contains("ConsultTabWriteScreen") -> {
-                TopBarData(
-                    title = "상담글 작성",
-                    navigationType = TopBarNavigationType.Close,
-                    actions = emptyList()
-                )
-            }
-            routeName.contains("ConsultTabPharmacistScreen") -> {
-                TopBarData(
-                    title = "상담글 작성",
-                    navigationType = TopBarNavigationType.Close,
-                    actions = emptyList()
-                )
-            }
-            routeName.contains("ConsultTabConfirmScreen") -> {
-                TopBarData(
-                    title = "상담글 작성",
-                    navigationType = TopBarNavigationType.Close,
-                    actions = emptyList()
-                )
-            }
-            routeName.contains("ConsultTabDetailScreen") -> {
-                TopBarData(
-                    title = "상담 게시판",
-                    navigationType = TopBarNavigationType.Back
-                )
-            }
-            routeName.contains("ConsultTab") -> {
-                TopBarData(
-                    title = "상담 게시판",
-                    navigationType = TopBarNavigationType.Back,
-                    actions = listOf(
-                        TopBarAction(
-                            icon = Icons.Filled.Add,
-                            onClick = {
-                                navController.navigate(ContentNavigationRoute.ConsultTabWriteScreen)
-                            }
-                        )
-                    )
-                )
-            }
             routeName.contains("ProfileTab") -> {
                 TopBarData(
                     title = "내정보"
