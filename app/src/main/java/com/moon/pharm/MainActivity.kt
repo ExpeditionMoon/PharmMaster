@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.moon.pharm.ui.screen.EntryPointScreen
 import com.moon.pharm.ui.screen.MainViewModel
-import com.moon.pharm.ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
