@@ -2,7 +2,6 @@ package com.moon.pharm.component_ui.component.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +22,7 @@ import com.moon.pharm.component_ui.theme.Placeholder
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.util.clickableSingle
 
 @Composable
 fun DateSettingCard(
@@ -38,7 +38,7 @@ fun DateSettingCard(
             .height(50.dp)
             .background(White, RoundedCornerShape(10.dp))
             .border(0.5.dp, tertiaryLight, RoundedCornerShape(10.dp))
-            .clickable { onClick() }
+            .clickableSingle { onClick() }
             .padding(horizontal = 12.dp),
         contentAlignment = Alignment.CenterStart
     ) {

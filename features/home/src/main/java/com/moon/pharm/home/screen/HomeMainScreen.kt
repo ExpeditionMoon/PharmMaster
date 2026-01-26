@@ -6,9 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,60 +18,92 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Medication
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.VerifiedUser
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.component.SectionHeader
+import com.moon.pharm.component_ui.component.bar.PharmTopBar
+import com.moon.pharm.component_ui.component.card.HealthInfoCard
+import com.moon.pharm.component_ui.component.fab.PharmPrescriptionFAB
+import com.moon.pharm.component_ui.model.TopBarAction
+import com.moon.pharm.component_ui.model.TopBarData
+import com.moon.pharm.component_ui.model.TopBarNavigationType
+import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.theme.OnSurface
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
-import com.moon.pharm.component_ui.component.card.HealthInfoCard
-import com.moon.pharm.component_ui.component.SectionHeader
 
-@Preview(showBackground = true)
 @Composable
-fun HomeMainScreen() {
+fun HomeMainScreen(
+    navController: NavController
+) {
     val scrollState = rememberScrollState()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundLight)
-            .verticalScroll(scrollState)
-    ){
-        Column (
-            modifier = Modifier.fillMaxSize()
-                .padding(24.dp),
-        ){
-            /* Screen */
-            Text(
-                text = "ooo님, 건강 챙기세요!",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = OnSurface
+    Scaffold(
+        topBar = {
+            PharmTopBar(
+                data = TopBarData(
+                    title = "홈",
+                    navigationType = TopBarNavigationType.Menu,
+                    isLogoTitle = true,
+                    actions = listOf(
+                        TopBarAction(icon = Icons.Filled.Search, onClick = {}),
+                        TopBarAction(icon = Icons.Filled.Notifications, onClick = {})
+                    )
+                )
             )
+        },
+        floatingActionButton = {
+            PharmPrescriptionFAB(
+                onClick = {
+                    navController.navigate(ContentNavigationRoute.PrescriptionCapture)
+                }
+            )
+        }
 
-            PharmNotice()
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(backgroundLight)
+                .verticalScroll(scrollState)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+            ) {
+                Text(
+                    text = "ooo님, 건강 챙기세요!",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = OnSurface
+                )
 
-            RateOfUse()
+                PharmNotice()
 
-            PharmSafety()
+                RateOfUse()
 
-            HealthInfo()
+                PharmSafety()
+
+                HealthInfo()
+            }
         }
     }
 }
@@ -81,41 +111,41 @@ fun HomeMainScreen() {
 @Composable
 fun PharmNotice() {
     /* 나의 알림 */
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 10.dp)
-    ){
-        SectionHeader (
+    ) {
+        SectionHeader(
             title = "나의 알림"
         )
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(130.dp)
                 .border(
                     width = 0.5.dp,
-                    color = Color(118,118,118).copy(alpha = 0.5f),
+                    color = Color(118, 118, 118).copy(alpha = 0.5f),
                     shape = RoundedCornerShape(10.dp)
                 )
                 .background(White),
             verticalArrangement = Arrangement.SpaceBetween
-        ){
-            Row (
+        ) {
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
-            ){
-                Column (
+            ) {
+                Column(
                     modifier = Modifier
                         .padding(start = 20.dp, end = 10.dp)
                         .background(
                             color = Secondary.copy(alpha = 0.2f),
                             shape = RoundedCornerShape(100.dp)
                         )
-                ){
+                ) {
                     Icon(
                         Icons.Filled.Medication,
                         contentDescription = "medication",
@@ -153,7 +183,7 @@ fun PharmNotice() {
 @Composable
 fun RateOfUse() {
     /* 복용률 */
-    Row (
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp)
@@ -164,8 +194,8 @@ fun RateOfUse() {
             .heightIn(min = 60.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
-    ){
-        Column (
+    ) {
+        Column(
             modifier = Modifier
                 .padding(10.dp)
                 .border(
@@ -177,7 +207,7 @@ fun RateOfUse() {
                 .width(80.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp)
-        ){
+        ) {
             Text(
                 text = "이번 주 복용률",
                 fontSize = 10.sp,
@@ -190,11 +220,11 @@ fun RateOfUse() {
                 color = SecondFont
             )
         }
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 10.dp)
-        ){
+        ) {
             Text(
                 text = "남은 약물 3일분 💊",
                 fontSize = 14.sp,
@@ -214,7 +244,7 @@ fun RateOfUse() {
 @Composable
 fun PharmSafety() {
     /* DDI / ADR */
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp)
@@ -223,23 +253,23 @@ fun PharmSafety() {
                 color = Primary,
                 shape = RoundedCornerShape(10.dp)
             ),
-    ){
-        Row (
+    ) {
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 20.dp),
             horizontalArrangement = Arrangement.Start
-        ){
+        ) {
             Icon(
                 Icons.Outlined.VerifiedUser,
                 contentDescription = "verifiedUser",
                 tint = Color.White,
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp)
             )
-            Column (
+            Column(
                 modifier = Modifier
                     .padding(end = 20.dp),
-            ){
+            ) {
                 Text(
                     text = "복용 전 약물 안전성을 확인하세요!",
                     fontSize = 14.sp,
@@ -255,7 +285,7 @@ fun PharmSafety() {
                 )
             }
         }
-        Box (
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 65.dp, end = 20.dp, top = 12.dp, bottom = 16.dp)
@@ -265,7 +295,7 @@ fun PharmSafety() {
                 )
                 .padding(vertical = 4.dp),
             contentAlignment = Alignment.Center
-        ){
+        ) {
 //            TextButton(
 //                onClick = {},
 //                modifier = Modifier.defaultMinSize(minHeight = 1.dp),
@@ -274,15 +304,15 @@ fun PharmSafety() {
 //                ),
 //                contentPadding = PaddingValues(0.dp)
 //            ) {
-                Text(
-                    text = "안전성 바로 확인하기 >",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Primary,
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .clickable { }
-                )
+            Text(
+                text = "안전성 바로 확인하기 >",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal,
+                color = Primary,
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .clickable { }
+            )
 //            }
 
         }
@@ -292,12 +322,12 @@ fun PharmSafety() {
 @Composable
 fun HealthInfo() {
     /* 건강 정보 */
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp),
     ) {
-        SectionHeader (
+        SectionHeader(
             title = "건강 정보"
         )
         Row(

@@ -1,7 +1,6 @@
 package com.moon.pharm.profile.auth.screen.section
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.moon.pharm.component_ui.util.clickableSingle
 import com.moon.pharm.profile.R
 
 @Composable
@@ -43,7 +43,7 @@ fun NickNameSection(
                 .size(100.dp)
                 .clip(CircleShape)
                 .background(Color.LightGray)
-                .clickable { onImageClick() },
+                .clickableSingle { onImageClick() },
             contentAlignment = Alignment.Center
         ) {
             if (!profileImageUri.isNullOrEmpty()) {

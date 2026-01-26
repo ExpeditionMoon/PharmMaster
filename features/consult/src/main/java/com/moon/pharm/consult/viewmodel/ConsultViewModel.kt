@@ -352,6 +352,7 @@ class ConsultViewModel @Inject constructor(
                         is DataResourceResult.Loading -> state.copy(isLoading = true, userMessage = null)
                         is DataResourceResult.Success -> {
                             fetchConsultList()
+                            clearWriteState()
                             state.copy(isLoading = false, isConsultCreated = true)
                         }
                         is DataResourceResult.Failure -> state.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed)

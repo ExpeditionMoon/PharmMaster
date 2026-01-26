@@ -1,7 +1,6 @@
 package com.moon.pharm.profile.auth.screen.section
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.util.clickableSingle
 import com.moon.pharm.profile.R
 
 @Composable
@@ -42,14 +42,14 @@ fun EmailPasswordSection(
             placeholder = { Text(stringResource(R.string.signup_email_placeholder)) },
             shape = RoundedCornerShape(10.dp),
             trailingIcon = {
-                Box (
+                Box(
                     modifier = Modifier
                         .padding(10.dp)
                         .background(
                             color = if (isEmailChecking || isAvailable == true) Color.Gray else Primary,
                             shape = RoundedCornerShape(5.dp)
                         )
-                        .clickable(enabled = !isEmailChecking && isAvailable != true) {
+                        .clickableSingle(enabled = !isEmailChecking && isAvailable != true) {
                             onCheckClick()
                         }
                         .padding(4.dp),
@@ -75,9 +75,19 @@ fun EmailPasswordSection(
             }
         )
         if (isAvailable == true) {
-            Text(stringResource(R.string.signup_email_available), color = Primary, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp, start = 8.dp))
+            Text(
+                stringResource(R.string.signup_email_available),
+                color = Primary,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 8.dp, start = 8.dp)
+            )
         } else if (isAvailable == false) {
-            Text(stringResource(R.string.signup_email_duplicated), color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp, start = 8.dp))
+            Text(
+                stringResource(R.string.signup_email_duplicated),
+                color = Color.Red,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 8.dp, start = 8.dp)
+            )
         }
 
         if (isAvailable == true) {

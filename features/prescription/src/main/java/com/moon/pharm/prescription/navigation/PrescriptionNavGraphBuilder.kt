@@ -9,6 +9,6 @@ import com.moon.pharm.prescription.screen.PrescriptionScreen
 fun NavGraphBuilder.prescriptionNavGraph(navController: NavController) {
 
     composable<ContentNavigationRoute.PrescriptionCapture>{
-        PrescriptionScreen()
+        PrescriptionScreen(navController = navController)
     }
 }

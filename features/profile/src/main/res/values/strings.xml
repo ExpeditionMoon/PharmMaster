@@ -56,6 +56,9 @@
     <string name="medication_category_general">일반약</string>
     <string name="medication_category_supplements">비타민/영양제</string>
 
+    <string name="medication_board_title">복약 관리</string>
+    <string name="medication_create_title">복약 알림 설정</string>
+
     <string name="medication_start_date">시작일</string>
     <string name="medication_end_date">종료일</string>
     <string name="medication_no_end_date">종료일 없음</string>

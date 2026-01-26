@@ -1,102 +1,12 @@
 package com.moon.pharm.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Storage
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination.Companion.hasRoute
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
-import com.moon.pharm.component_ui.model.TopBarNavigationType
-
-fun defaultHomeTopBarData() = TopBarData(
-    title = "홈",
-    navigationType = TopBarNavigationType.Menu,
-    isLogoTitle = true,
-    actions = listOf(
-        TopBarAction(icon = Icons.Filled.Search, onClick = {}),
-        TopBarAction(icon = Icons.Filled.Notifications, onClick = {})
-    )
-)
 
 fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
         val routeName = destination.route ?: return TopBarData()
         return when {
-            destination.hasRoute<ContentNavigationRoute.LoginScreen>() -> {
-                TopBarData(isVisible = false)
-            }destination.hasRoute<ContentNavigationRoute.SignUpScreen>() -> {
-                TopBarData(isVisible = false)
-            }
-            destination.hasRoute<ContentNavigationRoute.HomeTab>() -> {
-                defaultHomeTopBarData()
-            }
-            routeName.contains("MedicationTabCreateScreen") -> {
-                TopBarData(
-                    title = "복약 알림 설정",
-                    navigationType = TopBarNavigationType.Close,
-                    actions = emptyList()
-                )
-            }
-            routeName.contains("MedicationTab") -> {
-                TopBarData(
-                    title = "복약 관리",
-                    navigationType = TopBarNavigationType.Back,
-                    actions = listOf(
-                        TopBarAction(icon = Icons.Filled.Storage, onClick = {}),
-                        TopBarAction(
-                            icon = Icons.Filled.Add,
-                            onClick = {
-                                navController.navigate(ContentNavigationRoute.MedicationTabCreateScreen)
-                            }
-                        )
-                    )
-                )
-            }
-            routeName.contains("ConsultTabWriteScreen") -> {
-                TopBarData(
-                    title = "상담글 작성",
-                    navigationType = TopBarNavigationType.Close,
-                    actions = emptyList()
-                )
-            }
-            routeName.contains("ConsultTabPharmacistScreen") -> {
-                TopBarData(
-                    title = "상담글 작성",
-                    navigationType = TopBarNavigationType.Close,
-                    actions = emptyList()
-                )
-            }
-            routeName.contains("ConsultTabConfirmScreen") -> {
-                TopBarData(
-                    title = "상담글 작성",
-                    navigationType = TopBarNavigationType.Close,
-                    actions = emptyList()
-                )
-            }
-            routeName.contains("ConsultTabDetailScreen") -> {
-                TopBarData(
-                    title = "상담 게시판",
-                    navigationType = TopBarNavigationType.Back
-                )
-            }
-            routeName.contains("ConsultTab") -> {
-                TopBarData(
-                    title = "상담 게시판",
-                    navigationType = TopBarNavigationType.Back,
-                    actions = listOf(
-                        TopBarAction(
-                            icon = Icons.Filled.Add,
-                            onClick = {
-                                navController.navigate(ContentNavigationRoute.ConsultTabWriteScreen)
-                            }
-                        )
-                    )
-                )
-            }
             routeName.contains("ProfileTab") -> {
                 TopBarData(
                     title = "내정보"

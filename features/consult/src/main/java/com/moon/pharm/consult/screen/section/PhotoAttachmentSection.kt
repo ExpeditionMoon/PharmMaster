@@ -1,6 +1,5 @@
 package com.moon.pharm.consult.screen.section
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,9 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,13 +25,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.moon.pharm.component_ui.component.button.PharmOutlinedButton
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.primaryLight
+import com.moon.pharm.consult.R
 
 @Composable
 fun PhotoAttachmentSection(
@@ -45,18 +44,12 @@ fun PhotoAttachmentSection(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        OutlinedButton(
-            onClick = onCameraClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(10.dp),
-            border = BorderStroke(1.dp, primaryLight),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight)
+        PharmOutlinedButton(
+            onClick = onCameraClick
         ) {
             Icon(
                 Icons.Default.CameraAlt,
-                contentDescription = "카메라 실행"
+                contentDescription = stringResource(R.string.consult_photo_camera_desc)
             )
         }
 
@@ -75,7 +68,7 @@ fun PhotoAttachmentSection(
                                 .data(imageUrl)
                                 .crossfade(true)
                                 .build(),
-                            contentDescription = "첨부 이미지",
+                            contentDescription = stringResource(R.string.consult_photo_attached_desc),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .align(Alignment.BottomStart)
@@ -85,7 +78,7 @@ fun PhotoAttachmentSection(
                         )
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "삭제",
+                            contentDescription = stringResource(R.string.consult_photo_delete_desc),
                             tint = White,
                             modifier = Modifier
                                 .align(Alignment.TopEnd)

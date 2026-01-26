@@ -15,7 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.moon.pharm.component_ui.util.clickableSingle
 import com.moon.pharm.profile.R
+import com.moon.pharm.component_ui.R as UiR
 
 @Composable
 fun PharmacistInfoSection(
@@ -30,7 +32,7 @@ fun PharmacistInfoSection(
             onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onSearchClick() },
+                .clickableSingle { onSearchClick() },
             enabled = false,
             readOnly = true,
             label = { Text(stringResource(R.string.signup_pharmacy_name_label)) },
@@ -38,7 +40,7 @@ fun PharmacistInfoSection(
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "검색",
+                    contentDescription = stringResource(UiR.string.desc_search_icon),
                     modifier = Modifier.clickable { onSearchClick() }
                 )
             },

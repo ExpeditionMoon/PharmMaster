@@ -9,6 +9,6 @@ import com.moon.pharm.home.screen.HomeMainScreen
 fun NavGraphBuilder.homeNavGraph(navController: NavController) {
 
     composable<ContentNavigationRoute.HomeTab>{
-        HomeMainScreen()
+        HomeMainScreen(navController = navController)
     }
 }
