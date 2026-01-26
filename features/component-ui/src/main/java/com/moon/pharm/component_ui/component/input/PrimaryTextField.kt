@@ -36,7 +36,8 @@ fun PrimaryTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     height: Dp = 50.dp,
-    shape: Shape = RoundedCornerShape(10.dp)
+    shape: Shape = RoundedCornerShape(10.dp),
+    contentAlignment: Alignment = Alignment.CenterStart
 ) {
     if (value != null) {
         BasicTextField(
@@ -55,7 +56,7 @@ fun PrimaryTextField(
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    contentAlignment = Alignment.CenterStart
+                    contentAlignment = contentAlignment
                 ) {
                     if (value.isEmpty()) {
                         Text(

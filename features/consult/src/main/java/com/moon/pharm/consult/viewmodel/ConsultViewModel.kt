@@ -42,17 +42,19 @@ class ConsultViewModel @Inject constructor(
     private val uploadImagesUseCase: UploadConsultImagesUseCase
 ) : ViewModel() {
 
-    // region 1. State & Events
+    // region State & Events
     private val _searchQuery = MutableStateFlow("")
+    private val _answerContent = MutableStateFlow("")
 
     private val _uiState = MutableStateFlow(ConsultUiState())
     val uiState = _uiState.asStateFlow()
+    val answerContent = _answerContent.asStateFlow()
 
     private val _moveCameraEvent = MutableSharedFlow<LatLng>()
     val moveCameraEvent = _moveCameraEvent.asSharedFlow()
     // endregion
 
-    // region 2. Init
+    // region Init
     init {
         viewModelScope.launch {
             _searchQuery
@@ -67,7 +69,7 @@ class ConsultViewModel @Inject constructor(
     }
     // endregion
 
-    // region 3. User Actions (Consult List & Detail)
+    // region User Actions (Consult List & Detail)
     fun onTabSelected(tab: ConsultPrimaryTab) {
         _uiState.update { it.copy(selectedTab = tab) }
     }
@@ -82,7 +84,8 @@ class ConsultViewModel @Inject constructor(
                             state.copy(
                                 isLoading = false,
                                 selectedItem = result.resultData.consult,
-                                answerPharmacist = result.resultData.pharmacist
+                                answerPharmacist = result.resultData.pharmacist,
+                                canAnswer = result.resultData.isMyConsultToAnswer
                             )
                         }
                         is DataResourceResult.Failure -> { state.copy(isLoading = false, userMessage = UiMessage.LoadDataFailed)}
@@ -93,7 +96,7 @@ class ConsultViewModel @Inject constructor(
     }
     // endregion
 
-    // region 4. User Actions (Search & Map)
+    // region User Actions (Search & Map)
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
 
@@ -207,7 +210,7 @@ class ConsultViewModel @Inject constructor(
     }
     // endregion
 
-    // region 5. User Actions (Write Form)
+    // region User Actions (Write Consult)
     fun onTitleChanged(newTitle: String) {
         _uiState.update { it.copy(writeState = it.writeState.copy(title = newTitle)) }
     }
@@ -230,31 +233,6 @@ class ConsultViewModel @Inject constructor(
 
     fun clearWriteState() {
         _uiState.update { it.copy(writeState = ConsultWriteState()) }
-    }
-
-    private fun validateAndGetUserId(writeData: ConsultWriteState): String? {
-        val validationResult = consultUseCases.validateConsultForm(writeData.title, writeData.content)
-        if (validationResult is ValidateConsultFormUseCase.Result.Invalid) {
-            val errorState = when (validationResult.error) {
-                ValidateConsultFormUseCase.ErrorType.EMPTY_INPUT -> ConsultUiMessage.InputRequired
-                ValidateConsultFormUseCase.ErrorType.TITLE_TOO_SHORT -> ConsultUiMessage.TitleTooShort
-            }
-            _uiState.update { it.copy(userMessage = errorState) }
-            return null
-        }
-
-        if (writeData.selectedPharmacistId == null) {
-            _uiState.update { it.copy(userMessage = ConsultUiMessage.PharmacistRequired) }
-            return null
-        }
-
-        val userId = consultUseCases.getCurrentUserId()
-        if (userId == null) {
-            _uiState.update { it.copy(userMessage = ConsultUiMessage.LoginRequired) }
-            return null
-        }
-
-        return userId
     }
 
     fun submitConsult() {
@@ -291,7 +269,51 @@ class ConsultViewModel @Inject constructor(
     }
     // endregion
 
-    // region 6. System & Reset Actions
+    // region User Actions (Write Answer)
+    fun onAnswerContentChanged(content: String) {
+        _answerContent.value = content
+    }
+
+    fun registerAnswer(consultId: String) {
+        val content = _answerContent.value
+        if (content.isBlank()) return
+
+        val pharmacist = _uiState.value.answerPharmacist
+        if (pharmacist == null) {
+            _uiState.update { it.copy(userMessage = UiMessage.LoadDataFailed) }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            consultUseCases.registerAnswer(consultId, content, pharmacist).collectLatest { result ->
+                when (result) {
+                    is DataResourceResult.Success -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                selectedItem = result.resultData,
+                                canAnswer = false,
+                                userMessage = ConsultUiMessage.AnswerRegisterSuccess
+                            )
+                        }
+                        _answerContent.value = ""
+                    }
+
+                    is DataResourceResult.Failure -> {
+                        _uiState.update {
+                            it.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed)
+                        }
+                    }
+
+                    is DataResourceResult.Loading -> {}
+                }
+            }
+        }
+    }
+    // endregion
+
+    // region System & Reset Actions
     fun userMessageShown() {
         _uiState.update { it.copy(userMessage = null) }
     }
@@ -301,7 +323,7 @@ class ConsultViewModel @Inject constructor(
     }
     // endregion
 
-    // region 7. Private Implementation (Internal Logic)
+    // region Private Implementation
     private fun fetchConsultList() {
         viewModelScope.launch {
             consultUseCases.getConsultList().collectLatest { result ->
@@ -360,6 +382,31 @@ class ConsultViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun validateAndGetUserId(writeData: ConsultWriteState): String? {
+        val validationResult = consultUseCases.validateConsultForm(writeData.title, writeData.content)
+        if (validationResult is ValidateConsultFormUseCase.Result.Invalid) {
+            val errorState = when (validationResult.error) {
+                ValidateConsultFormUseCase.ErrorType.EMPTY_INPUT -> ConsultUiMessage.InputRequired
+                ValidateConsultFormUseCase.ErrorType.TITLE_TOO_SHORT -> ConsultUiMessage.TitleTooShort
+            }
+            _uiState.update { it.copy(userMessage = errorState) }
+            return null
+        }
+
+        if (writeData.selectedPharmacistId == null) {
+            _uiState.update { it.copy(userMessage = ConsultUiMessage.PharmacistRequired) }
+            return null
+        }
+
+        val userId = consultUseCases.getCurrentUserId()
+        if (userId == null) {
+            _uiState.update { it.copy(userMessage = ConsultUiMessage.LoginRequired) }
+            return null
+        }
+
+        return userId
     }
     // endregion
 }

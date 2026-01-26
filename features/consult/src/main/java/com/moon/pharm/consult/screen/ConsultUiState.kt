@@ -2,8 +2,8 @@ package com.moon.pharm.consult.screen
 
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.model.ConsultPrimaryTab
-import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.auth.Pharmacist
+import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 
 data class ConsultUiState (
@@ -17,6 +17,7 @@ data class ConsultUiState (
     val selectedItem: ConsultItem? = null,
     val answerPharmacist: Pharmacist? = null,
     val answerPharmacistProfileUrl: String? = null,
+    val canAnswer: Boolean = false,
 
     val writeState: ConsultWriteState = ConsultWriteState()
 )

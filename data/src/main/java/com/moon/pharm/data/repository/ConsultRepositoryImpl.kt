@@ -1,8 +1,12 @@
 package com.moon.pharm.data.repository
 
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.ImageDataSource
 import com.moon.pharm.data.di.IoDispatcher
+import com.moon.pharm.data.mapper.toDomain
+import com.moon.pharm.data.mapper.toDto
+import com.moon.pharm.domain.model.consult.ConsultAnswer
 import com.moon.pharm.domain.model.consult.ConsultError
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.repository.ConsultRepository
@@ -22,32 +26,39 @@ class ConsultRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ConsultRepository {
 
-    private fun wrapCUDOperation(
-        operation: suspend () -> Unit
-    ): Flow<DataResourceResult<Unit>> = flow {
+    private fun <T> wrapOperation(
+        operation: suspend () -> T
+    ): Flow<DataResourceResult<T>> = flow {
         emit(DataResourceResult.Loading)
-        operation()
-        emit(DataResourceResult.Success(Unit))
+        val result = operation()
+        emit(DataResourceResult.Success(result))
     }.catch { e ->
-        emit(DataResourceResult.Failure(e))
+        if (e is FirebaseFirestoreException && e.code == FirebaseFirestoreException.Code.NOT_FOUND) {
+            emit(DataResourceResult.Failure(ConsultError.NotFound()))
+        } else {
+            emit(DataResourceResult.Failure(e))
+        }
     }.flowOn(ioDispatcher)
 
-    override fun getConsultItems() = dataSource.getConsultItems()
-        .map { list ->
-            DataResourceResult.Success(list) as DataResourceResult<List<ConsultItem>>
-        }
-        .onStart { emit(DataResourceResult.Loading) }
-        .catch { emit(DataResourceResult.Failure(it)) }
-        .flowOn(ioDispatcher)
+    override fun getConsultItems(): Flow<DataResourceResult<List<ConsultItem>>> {
+        return dataSource.getConsultItems()
+            .map { dtoList ->
+                val domainList = dtoList.map { it.toDomain() }
+                DataResourceResult.Success(domainList) as DataResourceResult<List<ConsultItem>>
+            }
+            .onStart { emit(DataResourceResult.Loading) }
+            .catch { emit(DataResourceResult.Failure(it)) }
+            .flowOn(ioDispatcher)
+    }
 
     override fun createConsult(consultInfo: ConsultItem) =
-        wrapCUDOperation { dataSource.create(consultInfo) }
+        wrapOperation { dataSource.create(consultInfo.toDto()) }
 
     override fun getConsultDetail(id: String): Flow<DataResourceResult<ConsultItem>> {
         return dataSource.getConsultDetail(id)
-            .map { item ->
-                if (item != null) {
-                    DataResourceResult.Success(item) as DataResourceResult<ConsultItem>
+            .map { dto ->
+                if (dto != null) {
+                    DataResourceResult.Success(dto.toDomain())
                 } else {
                     DataResourceResult.Failure(ConsultError.NotFound())
                 }
@@ -55,6 +66,15 @@ class ConsultRepositoryImpl @Inject constructor(
             .onStart { emit(DataResourceResult.Loading) }
             .catch { e -> emit(DataResourceResult.Failure(e)) }
             .flowOn(ioDispatcher)
+    }
+
+    override fun registerAnswer(
+        consultId: String,
+        answer: ConsultAnswer
+    ): Flow<DataResourceResult<ConsultItem>> = wrapOperation {
+        val answerDto = answer.toDto()
+        val updatedDto = dataSource.updateConsultAnswer(consultId, answerDto)
+        updatedDto.toDomain()
     }
 
     override suspend fun uploadImage(uri: String, userId: String): String {

@@ -1,12 +1,12 @@
 <resources>
-    <!-- Error -->
+    <!--  Error  -->
     <string name="error_create_consult">상담 등록 실패</string>
     <string name="consult_error_input_required">제목과 내용을 입력해주세요.</string>
     <string name="consult_error_pharmacist_required">상담할 약사를 선택해주세요.</string>
     <string name="consult_error_title_short">제목은 최소 5자 이상 입력해주세요.</string>
     <string name="consult_create_failed">상담 등록에 실패했습니다. 다시 시도해주세요.</string>
 
-    <!-- ConsultList -->
+    <!--  ConsultList  -->
     <string name="consult_board_title">상담 게시판</string>
     <string name="consult_write_title">상담글 작성</string>
     <string name="consult_meta_format">%1$s • %2$s</string>
@@ -27,7 +27,7 @@
     <string name="consult_status_waiting_title">약사님의 답변을 기다리고 있어요.</string>
     <string name="consult_status_waiting_subtitle">답변이 등록되면 알림을 통해 알려드리겠습니다.</string>
 
-    <!-- WriteScreen -->
+    <!--  WriteScreen  -->
     <string name="consult_write_placeholder_title">제목을 입력해주세요</string>
     <string name="consult_write_placeholder_content">구체적인 증상, 복용 중인 다른 약물 정보 등을 자세히 작성해주세요.</string>
     <string name="consult_write_public_setting_title">공개 설정</string>
@@ -40,13 +40,13 @@
 
     <string name="consult_button_next">다음</string>
 
-    <!-- PharmacistScreen -->
+    <!--  PharmacistScreen  -->
     <string name="consult_search_select_pharmacist">약사 선택</string>
     <string name="consult_search_placeholder">지역, 약국명, 약사 전문 분야 검색</string>
     <string name="consult_search_nearby">내 주변</string>
     <string name="consult_search_favorite">단골 약사</string>
 
-    <!-- ConfirmScreen -->
+    <!--  ConfirmScreen  -->
     <string name="consult_write_empty_value">아직 작성되지 않음</string>
 
     <string name="consult_confirm_title">약사 최종 검토 및 요청</string>
@@ -61,7 +61,7 @@
     </string>
     <string name="consult_confirm_submit_btn">상담 요청하기</string>
 
-    <!-- Map -->
+    <!--  Map  -->
     <string name="consult_map_search_placeholder">지도를 열어 약사 찾기</string>
     <string name="consult_map_pharmacy_default_name">약국</string>
     <string name="consult_map_select_btn">선택</string>
@@ -69,4 +69,8 @@
     <string name="consult_map_no_pharmacist">등록된 약사가 없습니다.</string>
 
     <string name="desc_map_icon">지도</string>
+
+    <!--  Answer  -->
+    <string name="consult_answer_success">답변이 등록되었습니다.</string>
+    <string name="consult_answer_write_placeholder_content">답변을 작성해주세요.</string>
 </resources>
