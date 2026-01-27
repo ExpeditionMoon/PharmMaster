@@ -10,7 +10,6 @@ import com.moon.pharm.profile.auth.screen.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -50,20 +49,20 @@ class LoginViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            loginUseCase(currentState.email, currentState.password).collectLatest { result ->
-                _uiState.update { state ->
-                    when (result) {
-                        is DataResourceResult.Loading -> state.copy(isLoading = true)
-                        is DataResourceResult.Success -> state.copy(
-                            isLoading = false,
-                            isLoginSuccess = true,
-                            userMessage = null
-                        )
-                        is DataResourceResult.Failure -> state.copy(
-                            isLoading = false,
-                            userMessage = LoginUiMessage.LoginFailed
-                        )
-                    }
+            _uiState.update { it.copy(isLoading = true) }
+            val result = loginUseCase(currentState.email, currentState.password)
+            _uiState.update { state ->
+                when (result) {
+                    is DataResourceResult.Success -> state.copy(
+                        isLoading = false,
+                        isLoginSuccess = true,
+                        userMessage = null
+                    )
+                    is DataResourceResult.Failure -> state.copy(
+                        isLoading = false,
+                        userMessage = LoginUiMessage.LoginFailed
+                    )
+                    else -> state.copy(isLoading = false)
                 }
             }
         }
