@@ -51,17 +51,14 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    // Auth
-    implementation(libs.firebase.auth)
-
     // Hilt Core
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    // Firestore
+    // Firebase
     implementation(platform(libs.firebase.bom))
-    implementation(libs.bundles.firebase.libs)
-    implementation(libs.firebase.storage)
+    implementation(libs.bundles.firebase.data)
+    implementation(libs.firebase.messaging)
 
     // Map
     implementation(libs.bundles.google.maps.libs)
