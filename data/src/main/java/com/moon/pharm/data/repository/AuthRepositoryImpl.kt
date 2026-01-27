@@ -5,9 +5,7 @@ import com.moon.pharm.data.di.IoDispatcher
 import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -15,25 +13,25 @@ class AuthRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : AuthRepository {
 
-    override fun createAccount(email: String, password: String): Flow<DataResourceResult<String>> = flow {
-        emit(DataResourceResult.Loading)
-        emit(dataSource.createAccount(email, password))
-    }.flowOn(ioDispatcher)
+    override suspend fun createAccount(email: String, password: String):DataResourceResult<String> =
+        withContext(ioDispatcher) {
+        dataSource.createAccount(email, password)
+    }
 
-    override fun login(email: String, password: String): Flow<DataResourceResult<String>> = flow {
-        emit(DataResourceResult.Loading)
-        emit(dataSource.login(email, password))
-    }.flowOn(ioDispatcher)
+    override suspend fun login(email: String, password: String): DataResourceResult<String> =
+        withContext(ioDispatcher) {
+            dataSource.login(email, password)
+        }
 
-    override fun logout(): Flow<DataResourceResult<Unit>> = flow {
-        emit(DataResourceResult.Loading)
-        emit(dataSource.logout())
-    }.flowOn(ioDispatcher)
+    override suspend fun logout(): DataResourceResult<Unit> =
+        withContext(ioDispatcher) {
+            dataSource.logout()
+        }
 
-    override fun deleteAccount(): Flow<DataResourceResult<Unit>> = flow {
-        emit(DataResourceResult.Loading)
-        emit(dataSource.deleteAccount())
-    }.flowOn(ioDispatcher)
+    override suspend fun deleteAccount(): DataResourceResult<Unit> =
+        withContext(ioDispatcher) {
+            dataSource.deleteAccount()
+        }
 
     override fun getCurrentUserId(): String? = dataSource.getCurrentUserId()
 
