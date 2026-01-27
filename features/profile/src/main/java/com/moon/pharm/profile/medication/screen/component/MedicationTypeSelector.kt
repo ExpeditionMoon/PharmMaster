@@ -1,7 +1,6 @@
 package com.moon.pharm.profile.medication.screen.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -20,6 +19,7 @@ import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.Tertiary
 import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.util.clickableSingle
 import com.moon.pharm.domain.model.medication.MedicationType
 
 @Composable
@@ -43,7 +43,7 @@ fun MedicationTypeSelector(
                         color = if (isSelected) Primary else Tertiary,
                         shape = RoundedCornerShape(6.dp)
                     )
-                    .clickable { onTypeSelected(type) },
+                    .clickableSingle { onTypeSelected(type) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(

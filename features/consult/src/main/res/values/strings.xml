@@ -1,26 +1,76 @@
 <resources>
+    <!--  Error  -->
     <string name="error_create_consult">상담 등록 실패</string>
     <string name="consult_error_input_required">제목과 내용을 입력해주세요.</string>
     <string name="consult_error_pharmacist_required">상담할 약사를 선택해주세요.</string>
-    <string name="consult_error_login_required">로그인이 필요한 서비스입니다.</string>
+    <string name="consult_error_title_short">제목은 최소 5자 이상 입력해주세요.</string>
+    <string name="consult_create_failed">상담 등록에 실패했습니다. 다시 시도해주세요.</string>
+
+    <!--  ConsultList  -->
+    <string name="consult_board_title">상담 게시판</string>
+    <string name="consult_write_title">상담글 작성</string>
+    <string name="consult_meta_format">%1$s • %2$s</string>
+
+    <string name="consult_list_empty_title">등록된 상담 게시글이 없습니다.</string>
+    <string name="consult_list_empty_subtitle">첫 번째 상담을 작성해보세요!</string>
 
     <string name="consult_filter_latest">최신순</string>
     <string name="consult_tab_my_consult">나의 상담</string>
 
+    <string name="consult_detail_answer_section">약사 답변</string>
+    <string name="consult_detail_error_load">상담 내역을 불러올 수 없습니다.</string>
+    <string name="consult_detail_pharmacist_profile_desc">약사 프로필</string>
+    <string name="consult_detail_no_pharmacist_info">약사 정보 없음</string>
+    <string name="consult_detail_answer_date_format">답변 일시: %1$s</string>
+    <string name="consult_detail_image_desc">상담 첨부 이미지</string>
+
+    <string name="consult_status_waiting_title">약사님의 답변을 기다리고 있어요.</string>
+    <string name="consult_status_waiting_subtitle">답변이 등록되면 알림을 통해 알려드리겠습니다.</string>
+
+    <!--  WriteScreen  -->
     <string name="consult_write_placeholder_title">제목을 입력해주세요</string>
     <string name="consult_write_placeholder_content">구체적인 증상, 복용 중인 다른 약물 정보 등을 자세히 작성해주세요.</string>
     <string name="consult_write_public_setting_title">공개 설정</string>
     <string name="consult_write_public_desc_all">모든 사용자가 볼 수 있습니다.</string>
     <string name="consult_write_public_desc_private">나와 상담 약사만 볼 수 있습니다.</string>
 
+    <string name="consult_photo_camera_desc">카메라 실행</string>
+    <string name="consult_photo_attached_desc">첨부 이미지</string>
+    <string name="consult_photo_delete_desc">삭제</string>
+
     <string name="consult_button_next">다음</string>
 
+    <!--  PharmacistScreen  -->
     <string name="consult_search_select_pharmacist">약사 선택</string>
     <string name="consult_search_placeholder">지역, 약국명, 약사 전문 분야 검색</string>
     <string name="consult_search_nearby">내 주변</string>
     <string name="consult_search_favorite">단골 약사</string>
 
-    <string name="consult_detail_answer_section">약사 답변</string>
-    <string name="consult_status_waiting_title">약사님의 답변을 기다리고 있어요.</string>
-    <string name="consult_status_waiting_subtitle">답변이 등록되면 알림을 통해 알려드리겠습니다.</string>
+    <!--  ConfirmScreen  -->
+    <string name="consult_write_empty_value">아직 작성되지 않음</string>
+
+    <string name="consult_confirm_title">약사 최종 검토 및 요청</string>
+    <string name="consult_confirm_label_title">제목</string>
+    <string name="consult_confirm_label_content">상담 내용</string>
+    <string name="consult_confirm_label_pharmacist">선택된 약사</string>
+    <string name="consult_confirm_no_pharmacist">선택된 약사 없음</string>
+    <string name="consult_confirm_edit_btn">수정</string>
+    <string name="consult_confirm_guidance">
+        상담 요청 전에 모든 내용을 다시 한번 확인해주세요. <br/>
+        요청이 완료되면 약사에게 실시간으로 연결됩니다.
+    </string>
+    <string name="consult_confirm_submit_btn">상담 요청하기</string>
+
+    <!--  Map  -->
+    <string name="consult_map_search_placeholder">지도를 열어 약사 찾기</string>
+    <string name="consult_map_pharmacy_default_name">약국</string>
+    <string name="consult_map_select_btn">선택</string>
+    <string name="consult_map_pharmacist_list_format">%s 약사 목록</string>
+    <string name="consult_map_no_pharmacist">등록된 약사가 없습니다.</string>
+
+    <string name="desc_map_icon">지도</string>
+
+    <!--  Answer  -->
+    <string name="consult_answer_success">답변이 등록되었습니다.</string>
+    <string name="consult_answer_write_placeholder_content">답변을 작성해주세요.</string>
 </resources>

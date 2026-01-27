@@ -20,11 +20,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.component.card.TimeSettingCard
+import com.moon.pharm.component_ui.component.dialog.TimePickerDialog
 import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.backgroundLight
-import com.moon.pharm.component_ui.util.toDisplayTimeString
-import com.moon.pharm.component_ui.component.dialog.TimePickerDialog
-import com.moon.pharm.component_ui.component.card.TimeSettingCard
+import com.moon.pharm.component_ui.util.toMinuteTimeUiString
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.screen.MedicationFormState
 import com.moon.pharm.profile.medication.screen.component.AlarmOptionSelector
@@ -64,7 +64,7 @@ fun MedicationAlarmSection(
 
 
         TimeSettingCard(
-            time = form.selectedTime.toDisplayTimeString(),
+            time = form.selectedTime.toMinuteTimeUiString(),
             onTimeClick = { showTimePicker = true }
         )
 

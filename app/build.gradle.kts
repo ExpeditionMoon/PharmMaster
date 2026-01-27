@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.kotlin.android.ksp)
+    alias(libs.plugins.secrets.gradle.plugin)
 }
 
 android {
@@ -38,11 +39,15 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
 kotlin {
     jvmToolchain(21)
+}
+secrets {
+    propertiesFileName = "secret.properties"
 }
 
 dependencies {
@@ -60,8 +65,10 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose.libs)
 
+    // Firestore
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.libs)
+    implementation(libs.firebase.storage)
 
     // Splash
     implementation(libs.androidx.core.splashscreen)

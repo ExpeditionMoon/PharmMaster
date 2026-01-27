@@ -2,7 +2,6 @@ package com.moon.pharm.component_ui.component.chip
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,12 +18,13 @@ import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.util.clickableSingle
 
 @Composable
 fun FilterChip(
     text: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -35,7 +35,7 @@ fun FilterChip(
                 color = if (isSelected) Color.Transparent else tertiaryLight,
                 shape = RoundedCornerShape(10.dp)
             )
-            .clickable { onClick() }
+            .clickableSingle { onClick() }
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {

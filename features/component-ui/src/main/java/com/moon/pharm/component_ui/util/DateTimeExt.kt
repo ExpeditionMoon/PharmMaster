@@ -72,12 +72,12 @@ fun Long?.toDisplayTimeString(): String {
 }
 
 @SuppressLint("NewApi")
-fun Long?.toLifeStyleUiString(): String {
+fun Long?.toMinuteTimeUiString(): String {
     if (this == null) return ""
 
-    val totalSeconds = this / 1000
-    val hour = (totalSeconds / 3600).toInt()
-    val minute = ((totalSeconds % 3600) / 60).toInt()
+    val totalMinutes = this.toInt()
+    val hour = totalMinutes / 60
+    val minute = totalMinutes % 60
 
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         LocalTime.of(hour, minute).format(hourMinuteFormatter)

@@ -12,6 +12,10 @@
     <string name="login_prompt_no_account">계정이 없으신가요?</string>
     <string name="login_action_sign_up">회원가입</string>
 
+    <string name="login_error_empty_email">이메일을 입력해주세요.</string>
+    <string name="login_error_empty_password">비밀번호를 입력해주세요.</string>
+    <string name="login_failed_default">로그인에 실패했습니다. 다시 시도해주세요.</string>
+
 <!--  회원가입(auth)  -->
     <string name="signup_button_next">다음</string>
     <string name="signup_button_complete">회원가입</string>
@@ -33,8 +37,15 @@
 
     <string name="signup_pharmacy_name_label">약국 이름</string>
     <string name="signup_pharmacy_name_placeholder">근무 중인 약국 이름을 입력하세요</string>
-    <string name="signup_bio_label">한줄 소개</string>
+    <string name="signup_pharmacy_selected_format">%s 선택 완료</string>
+    <string name="signup_bio_label">약사 소개</string>
     <string name="signup_bio_placeholder">환자분들에게 보여질 소개글을 적어주세요.</string>
+
+    <string name="signup_error_failed">회원가입에 실패했습니다. 다시 시도해주세요.</string>
+    <string name="signup_error_email_format">올바른 이메일 형식이 아닙니다.</string>
+    <string name="signup_error_password_short">비밀번호는 6자리 이상이어야 합니다.</string>
+    <string name="signup_error_pharmacy_required">근무할 약국을 선택해주세요.</string>
+    <string name="signup_error_bio_required">약사 소개글을 입력해주세요.</string>
 
 <!--  복약 관리(medication)  -->
     <string name="error_empty_medication_name">약 이름을 입력해주세요.</string>
@@ -44,6 +55,9 @@
     <string name="medication_category_prescription">처방약</string>
     <string name="medication_category_general">일반약</string>
     <string name="medication_category_supplements">비타민/영양제</string>
+
+    <string name="medication_board_title">복약 관리</string>
+    <string name="medication_create_title">복약 알림 설정</string>
 
     <string name="medication_start_date">시작일</string>
     <string name="medication_end_date">종료일</string>

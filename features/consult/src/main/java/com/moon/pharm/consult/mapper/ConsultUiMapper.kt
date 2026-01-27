@@ -1,18 +1,37 @@
 package com.moon.pharm.consult.mapper
 
-import androidx.compose.ui.graphics.Color
-import com.moon.pharm.component_ui.theme.onPrimaryLight
-import com.moon.pharm.component_ui.theme.onSecondaryLight
-import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.theme.secondaryLight
+import com.moon.pharm.component_ui.common.PATH_DELIMITER
+import com.moon.pharm.component_ui.common.QUERY_DELIMITER
+import com.moon.pharm.consult.screen.ConsultWriteState
+import com.moon.pharm.domain.model.consult.ConsultImage
+import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.consult.ConsultStatus
 
-fun ConsultStatus.toBackgroundColor(): Color = when(this) {
-    ConsultStatus.WAITING -> secondaryLight
-    ConsultStatus.COMPLETED -> primaryLight
-}
+object ConsultUiMapper {
 
-fun ConsultStatus.toTextColor(): Color = when(this) {
-    ConsultStatus.WAITING -> onSecondaryLight
-    ConsultStatus.COMPLETED -> onPrimaryLight
+    fun toDomainModel(
+        writeState: ConsultWriteState,
+        currentUserId: String,
+        currentUserNickname: String,
+        selectedPharmacistId: String,
+        uploadedImageUrls: List<String>
+    ): ConsultItem {
+        return ConsultItem(
+            id = "",
+            userId = currentUserId,
+            nickName = currentUserNickname,
+            pharmacistId = selectedPharmacistId,
+            title = writeState.title,
+            content = writeState.content,
+            status = ConsultStatus.WAITING,
+            isPublic = writeState.isPublic,
+            createdAt = System.currentTimeMillis(),
+            images = uploadedImageUrls.map { url ->
+                ConsultImage(
+                    imageName = url.substringAfterLast(PATH_DELIMITER).substringBefore(QUERY_DELIMITER),
+                    imageUrl = url
+                )
+            }
+        )
+    }
 }

@@ -2,69 +2,73 @@ package com.moon.pharm.domain.usecase.auth
 
 import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.model.auth.User
-import com.moon.pharm.domain.model.auth.UserLifeStyle
 import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.domain.repository.AuthRepository
-import com.moon.pharm.domain.repository.PharmacistRepository
-import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
+import com.moon.pharm.domain.usecase.pharmacist.SavePharmacistUseCase
+import com.moon.pharm.domain.usecase.pharmacy.SavePharmacyUseCase
+import com.moon.pharm.domain.usecase.user.SaveUserUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class SignUpUseCase @Inject constructor(
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository,
-    private val pharmacistRepository: PharmacistRepository
+    private val saveUserUseCase: SaveUserUseCase,
+    private val savePharmacyUseCase: SavePharmacyUseCase,
+    private val savePharmacistUseCase: SavePharmacistUseCase
 ) {
     operator fun invoke(
         user: User,
         password: String,
-        pharmacist: Pharmacist? = null
+        pharmacist: Pharmacist?,
+        pharmacy: Pharmacy?
     ): Flow<DataResourceResult<Unit>> = flow {
 
         emit(DataResourceResult.Loading)
 
-        authRepository.createAccount(user.email, password).collect { result ->
-            when (result) {
-                is DataResourceResult.Success -> {
-                    val uid = result.resultData
+        val result = authRepository.createAccount(user.email, password)
 
-                    try {
-                        val userWithId = user.copy(id = uid)
-                        val saveUserResult = userRepository.saveUser(userWithId)
+        if (result is DataResourceResult.Failure) {
+            emit(DataResourceResult.Failure(result.exception))
+            return@flow
+        }
 
-                        if (saveUserResult is DataResourceResult.Failure) {
-                            throw saveUserResult.exception
-                        }
+        if (result !is DataResourceResult.Success) {
+            emit(DataResourceResult.Failure(Exception("알 수 없는 오류 발생")))
+            return@flow
+        }
 
-                        val defaultLifeStyle = UserLifeStyle(userId = uid)
-                        userRepository.saveUserLifeStyle(uid, defaultLifeStyle)
+        val uid = result.resultData
 
-                        if (user.userType == UserType.PHARMACIST && pharmacist != null) {
-                            val pharmacistWithId = pharmacist.copy(userId = uid)
-                            val savePharmResult = pharmacistRepository.savePharmacist(pharmacistWithId)
+        try {
+            val userWithId = user.copy(id = uid)
 
-                            if (savePharmResult is DataResourceResult.Failure) {
-                                throw savePharmResult.exception
-                            }
-                        }
-                        emit(DataResourceResult.Success(Unit))
+            val saveUserResult = saveUserUseCase(userWithId)
+            if (saveUserResult is DataResourceResult.Failure) {
+                throw saveUserResult.exception
+            }
 
-                    } catch (e: Exception) {
-                        authRepository.deleteAccount()
-
-                        emit(DataResourceResult.Failure(Exception("회원가입 중 오류가 발생하여 취소되었습니다. (${e.message})")))
+            if (user.userType == UserType.PHARMACIST && pharmacist != null) {
+                if (pharmacy != null) {
+                    val savePharmacyResult = savePharmacyUseCase(pharmacy)
+                    if (savePharmacyResult is DataResourceResult.Failure) {
+                        throw Exception("약국 저장 실패: ${savePharmacyResult.exception.message}")
                     }
                 }
+                val pharmacistWithId = pharmacist.copy(userId = uid)
+                val savePharmResult = savePharmacistUseCase(pharmacistWithId)
 
-                is DataResourceResult.Failure -> {
-                    emit(DataResourceResult.Failure(result.exception))
-                }
-
-                is DataResourceResult.Loading -> {
+                if (savePharmResult is DataResourceResult.Failure) {
+                    throw savePharmResult.exception
                 }
             }
+            emit(DataResourceResult.Success(Unit))
+
+        } catch (e: Exception) {
+            authRepository.deleteAccount()
+            emit(DataResourceResult.Failure(e))
         }
     }
 }

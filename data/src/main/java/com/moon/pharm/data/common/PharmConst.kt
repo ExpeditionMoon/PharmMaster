@@ -1,19 +1,24 @@
 package com.moon.pharm.data.common
 
-const val DEFAULT_LOCATION_COORDINATE = 0.0
+// 기본 유틸리티 (Basic Utilities)
 const val EMPTY_STRING = ""
 const val TIME_DELIMITER = ":"
 
+// 위치 및 지도 설정 (Location & Maps)
+const val DEFAULT_LOCATION_COORDINATE = 0.0
+
+// Firestore 컬렉션 이름 (Collections)
 const val USER_COLLECTION = "users"
 const val PHARMACIST_COLLECTION = "pharmacists"
 const val PHARMACY_COLLECTION = "pharmacies"
 const val SETTING_COLLECTION = "settings"
 const val CONSULT_COLLECTION = "consults"
 const val MEDICATION_COLLECTION = "medications"
-
 const val INTAKE_RECORDS_COLLECTION = "intakeRecords"
 
+// Firestore 필드 및 문서 키 (Fields & Keys)
 const val DOCUMENT_LIFESTYLE = "lifeStyle"
+
 const val FIELD_USER_ID = "userId"
 const val FIELD_USER_EMAIL = "email"
 const val FIELD_CREATED_AT = "createdAt"
@@ -21,15 +26,14 @@ const val FIELD_USER_TYPE = "userType"
 const val FIELD_PLACE_ID = "placeId"
 const val FIELD_MEDICATION_ID = "medicationId"
 const val FIELD_SCHEDULE_ID = "scheduleId"
-
 const val FIELD_RECORD_DATE = "recordDate"
+const val FIELD_STATUS = "status"
+const val FIELD_ANSWER = "answer"
 
-const val USER_TYPE_PHARMACIST = "PHARMACIST"
+// 에러 메시지 (Error Messages)
+const val ERROR_MSG_PHARMACY_NOT_FOUND = "Pharmacy not found"
+const val ERROR_MSG_UPLOAD_FAILED = "Upload failed"
+const val ERROR_MSG_CONSULT_NOT_FOUND = "Consult document not found"
 
-
-private const val INTERNAL_PW_PREFIX = "auto_pass_"
-
-fun generateInternalPassword(email: String): String {
-    val hash = email.hashCode().toString().replace("-", "")
-    return (INTERNAL_PW_PREFIX + hash + "000000").take(10)
-}
+// Firebase Storage 설정 (Storage)
+const val STORAGE_CONSULT_IMAGES = "consult_images"

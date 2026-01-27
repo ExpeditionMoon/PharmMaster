@@ -3,12 +3,17 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.kotlin.android.ksp)
+    alias(libs.plugins.secrets.gradle.plugin)
 }
 
 android {
     namespace = "com.moon.pharm.data"
     compileSdk {
         version = release(36)
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     defaultConfig {
@@ -35,6 +40,9 @@ android {
 kotlin {
     jvmToolchain(21)
 }
+secrets {
+    propertiesFileName = "secret.properties"
+}
 
 dependencies {
     implementation(project(":domain"))
@@ -50,9 +58,17 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    //Firestore
+    // Firestore
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.libs)
+    implementation(libs.firebase.storage)
+
+    // Map
+    implementation(libs.bundles.google.maps.libs)
+
+    //REST
+    implementation(libs.bundles.rest.libraries)
+    implementation(libs.mockwebserver)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

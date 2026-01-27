@@ -2,7 +2,6 @@ package com.moon.pharm.component_ui.component.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +25,7 @@ import com.moon.pharm.component_ui.theme.Placeholder
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.util.clickableSingle
 
 @Composable
 fun TimeSettingCard(
@@ -37,7 +37,7 @@ fun TimeSettingCard(
             .fillMaxWidth()
             .background(White, RoundedCornerShape(10.dp))
             .border(0.5.dp, tertiaryLight, RoundedCornerShape(10.dp))
-            .clickable { onTimeClick() }
+            .clickableSingle { onTimeClick() }
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween

@@ -8,12 +8,12 @@ import com.moon.pharm.domain.model.consult.ConsultAnswer
 import com.moon.pharm.domain.model.consult.ConsultImage
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.consult.ConsultStatus
-import kotlin.collections.map
 
 fun ConsultItemDTO.toDomain(): ConsultItem {
     return ConsultItem(
         id = this.id,
         userId = this.userId,
+        nickName = this.nickName,
         pharmacistId = this.pharmacistId,
         title = this.title,
         content = this.content,
@@ -33,6 +33,7 @@ fun ConsultItem.toDto(): ConsultItemDTO {
     return ConsultItemDTO(
         id = this.id,
         userId = this.userId,
+        nickName = this.nickName,
         pharmacistId = this.pharmacistId,
         title = this.title,
         content = this.content,
@@ -59,6 +60,16 @@ fun ConsultAnswerDTO.toDomain(): ConsultAnswer {
         pharmacistName = this.pharmacistName,
         content = this.content,
         createdAt = this.createdAt?.toDate()?.time ?: 0L
+    )
+}
+
+fun ConsultAnswer.toDto(): ConsultAnswerDTO {
+    return ConsultAnswerDTO(
+        answerId = this.answerId,
+        pharmacistId = this.pharmacistId,
+        pharmacistName = this.pharmacistName,
+        content = this.content,
+        createdAt = this.createdAt.toTimestamp()
     )
 }
 
