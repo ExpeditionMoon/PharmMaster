@@ -19,6 +19,7 @@ import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.screen.section.AnswerSection
+import com.moon.pharm.consult.screen.section.PharmacistAnswerInputSection
 import com.moon.pharm.consult.screen.section.QuestionSection
 import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.model.consult.ConsultItem
@@ -29,7 +30,12 @@ fun ConsultDetailContent(
     isLoading: Boolean,
     item: ConsultItem?,
     pharmacist: Pharmacist?,
-    pharmacistImageUrl: String?
+    pharmacistImageUrl: String?,
+
+    isPharmacistMode: Boolean = false,
+    answerInput: String = "",
+    onAnswerChange: (String) -> Unit = {},
+    onSubmitAnswer: () -> Unit = {}
 ) {
     if (item != null) {
         LazyColumn(
@@ -51,9 +57,18 @@ fun ConsultDetailContent(
                     )
                 } else if (item.status == ConsultStatus.WAITING) {
                     Spacer(modifier = Modifier.height(20.dp))
-                    WaitingForAnswerBox()
+                    if (isPharmacistMode) {
+                        PharmacistAnswerInputSection(
+                            input = answerInput,
+                            onValueChange = onAnswerChange,
+                            onSubmit = onSubmitAnswer
+                        )
+                    } else {
+                        WaitingForAnswerBox()
+                    }
                 }
             }
+            item { Spacer(modifier = Modifier.height(50.dp)) }
         }
     } else if (!isLoading) {
         Box(

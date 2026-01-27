@@ -10,6 +10,7 @@ data class ConsultUseCases @Inject constructor(
     val getConsultList: GetConsultItemsUseCase,
     val getConsultDetail: GetConsultDetailUseCase,
     val createConsult: CreateConsultUseCase,
+    val registerAnswer: RegisterAnswerUseCase,
 
     val searchPharmacy: SearchPharmacyUseCase,
     val searchNearbyPharmacies: SearchNearbyPharmaciesUseCase,

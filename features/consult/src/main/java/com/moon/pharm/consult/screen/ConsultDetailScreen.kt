@@ -3,6 +3,7 @@ package com.moon.pharm.consult.screen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,6 +14,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
+import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
+import com.moon.pharm.component_ui.component.snackbar.SnackbarType
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.consult.R
@@ -28,6 +31,8 @@ fun ConsultDetailScreen(
     viewModel: ConsultViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val answerContent by viewModel.answerContent.collectAsStateWithLifecycle()
+    val isPharmacistMode = uiState.canAnswer
     val snackbarHostState = remember { SnackbarHostState() }
 
     val userMessage = uiState.userMessage
@@ -56,14 +61,23 @@ fun ConsultDetailScreen(
                 )
             )
         },
-        snackbarHost = {}
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                CustomSnackbar(snackbarData = data, type = SnackbarType.ERROR)
+            }
+        }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             ConsultDetailContent(
                 isLoading = uiState.isLoading,
                 item = uiState.selectedItem,
                 pharmacist = uiState.answerPharmacist,
-                pharmacistImageUrl = uiState.answerPharmacistProfileUrl
+                pharmacistImageUrl = uiState.answerPharmacistProfileUrl,
+
+                isPharmacistMode = isPharmacistMode,
+                answerInput = answerContent,
+                onAnswerChange = viewModel::onAnswerContentChanged,
+                onSubmitAnswer = { viewModel.registerAnswer(consultId)}
             )
         }
     }
