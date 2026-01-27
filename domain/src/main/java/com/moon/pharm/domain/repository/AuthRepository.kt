@@ -4,7 +4,7 @@ import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
-    fun createAccount(email: String, password: String): Flow<DataResourceResult<String>>
+    suspend fun createAccount(email: String, password: String): DataResourceResult<String>
 
     fun login(email: String, password: String): Flow<DataResourceResult<String>>
     fun logout(): Flow<DataResourceResult<Unit>>
