@@ -35,21 +35,19 @@ import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.screen.component.ConsultPharmacistContent
-import com.moon.pharm.consult.viewmodel.ConsultViewModel
+import com.moon.pharm.consult.viewmodel.ConsultWriteViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConsultPharmacistScreen(
     navController: NavController,
-    viewModel: ConsultViewModel,
+    viewModel: ConsultWriteViewModel,
     onMapModeChanged: (Boolean) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val writeState = uiState.writeState
 
     var isMapView by remember { mutableStateOf(false) }
-
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
 
@@ -112,10 +110,10 @@ fun ConsultPharmacistScreen(
         Box(modifier = Modifier.padding(innerPadding)) {
             ConsultPharmacistContent(
                 isMapView = isMapView,
-                searchQuery = writeState.searchQuery,
-                searchResults = writeState.searchResults,
-                selectedPharmacy = writeState.selectedPharmacy,
-                availablePharmacists = writeState.availablePharmacists,
+                searchQuery = uiState.searchQuery,
+                searchResults = uiState.searchResults,
+                selectedPharmacy = uiState.selectedPharmacy,
+                availablePharmacists = uiState.availablePharmacists,
                 cameraPositionState = cameraPositionState,
                 cameraMoveEvent = viewModel.moveCameraEvent,
                 onSearchQueryChange = viewModel::onSearchQueryChanged,
@@ -128,7 +126,7 @@ fun ConsultPharmacistScreen(
                 },
                 onMapModeChange = { isMap -> isMapView = isMap },
                 onBackFromMap = {
-                    if (writeState.selectedPharmacy != null) {
+                    if (uiState.selectedPharmacy != null) {
                         viewModel.clearSelectedPharmacy()
                     } else {
                         isMapView = false
