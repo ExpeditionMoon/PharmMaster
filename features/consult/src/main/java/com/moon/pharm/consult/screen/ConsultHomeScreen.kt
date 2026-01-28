@@ -6,7 +6,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -21,16 +23,34 @@ import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.util.MultipleEventsCutter
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.model.ConsultPrimaryTab
+import com.moon.pharm.consult.navigation.ConsultNavKeys.REFRESH_CONSULT_LIST
 import com.moon.pharm.consult.screen.component.ConsultContent
-import com.moon.pharm.consult.viewmodel.ConsultViewModel
+import com.moon.pharm.consult.viewmodel.ConsultListViewModel
 
 @Composable
 fun ConsultScreen(
     navController: NavController? = null,
-    viewModel: ConsultViewModel
+    viewModel: ConsultListViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
+
+    if (navController != null) {
+        val refreshFlow = navController.currentBackStackEntry
+                ?.savedStateHandle
+            ?.getStateFlow(REFRESH_CONSULT_LIST, false)
+
+        val shouldRefresh by refreshFlow?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
+
+        LaunchedEffect(shouldRefresh) {
+            if (shouldRefresh) {
+                viewModel.fetchConsultList()
+                navController.currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.set(REFRESH_CONSULT_LIST, false)
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
