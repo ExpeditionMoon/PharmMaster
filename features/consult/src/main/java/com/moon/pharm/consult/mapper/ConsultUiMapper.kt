@@ -2,7 +2,7 @@ package com.moon.pharm.consult.mapper
 
 import com.moon.pharm.component_ui.common.PATH_DELIMITER
 import com.moon.pharm.component_ui.common.QUERY_DELIMITER
-import com.moon.pharm.consult.screen.ConsultWriteState
+import com.moon.pharm.consult.viewmodel.ConsultWriteUiState
 import com.moon.pharm.domain.model.consult.ConsultImage
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.consult.ConsultStatus
@@ -10,7 +10,7 @@ import com.moon.pharm.domain.model.consult.ConsultStatus
 object ConsultUiMapper {
 
     fun toDomainModel(
-        writeState: ConsultWriteState,
+        writeState: ConsultWriteUiState,
         currentUserId: String,
         currentUserNickname: String,
         selectedPharmacistId: String,

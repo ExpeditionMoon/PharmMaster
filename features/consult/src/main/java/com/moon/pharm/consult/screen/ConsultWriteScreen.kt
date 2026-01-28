@@ -26,15 +26,14 @@ import com.moon.pharm.consult.R
 import com.moon.pharm.consult.mapper.asString
 import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.consult.screen.component.ConsultWriteContent
-import com.moon.pharm.consult.viewmodel.ConsultViewModel
+import com.moon.pharm.consult.viewmodel.ConsultWriteViewModel
 
 @Composable
 fun ConsultWriteScreen(
     navController: NavController,
-    viewModel: ConsultViewModel
+    viewModel: ConsultWriteViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val writeState = uiState.writeState
 
     val snackbarHostState = remember { SnackbarHostState() }
     val userMessage = uiState.userMessage
@@ -47,15 +46,25 @@ fun ConsultWriteScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.writeEvent.collect { event ->
+            when (event) {
+                is ConsultWriteViewModel.WriteEvent.MoveToPharmacist -> {
+                    navController.navigate(ContentNavigationRoute.ConsultTabPharmacistScreen)
+                }
+            }
+        }
+    }
+
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
-            viewModel.updateImages(writeState.images + uri.toString())
+            viewModel.updateImages(uiState.images + uri.toString())
         }
     }
 
-    val isFormValid = writeState.title.isNotBlank() && writeState.content.isNotBlank()
+    val isFormValid = uiState.title.isNotBlank() && uiState.content.isNotBlank()
 
     Scaffold(
         topBar = {
@@ -75,15 +84,15 @@ fun ConsultWriteScreen(
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             ConsultWriteContent(
-                title = writeState.title,
-                content = writeState.content,
-                images = writeState.images,
-                isPublic = writeState.isPublic,
+                title = uiState.title,
+                content = uiState.content,
+                images = uiState.images,
+                isPublic = uiState.isPublic,
                 isButtonEnabled = isFormValid,
                 onTitleChange = viewModel::onTitleChanged,
                 onContentChange = viewModel::onContentChanged,
                 onImageRemove = { removedUrl ->
-                    viewModel.updateImages(writeState.images.filter { it != removedUrl })
+                    viewModel.updateImages(uiState.images.filter { it != removedUrl })
                 },
                 onVisibilityChange = viewModel::onVisibilityChanged,
                 onCameraClick = {
@@ -92,7 +101,7 @@ fun ConsultWriteScreen(
                     )
                 },
                 onNextClick = {
-                    navController.navigate(ContentNavigationRoute.ConsultTabPharmacistScreen)
+                    viewModel.onNextClick()
                 }
             )
         }
