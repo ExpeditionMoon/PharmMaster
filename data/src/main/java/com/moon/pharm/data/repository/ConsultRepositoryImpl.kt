@@ -1,6 +1,12 @@
 package com.moon.pharm.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.moon.pharm.data.common.NotificationConstants.ERR_FCM_FAILED
+import com.moon.pharm.data.common.NotificationConstants.ERR_UNKNOWN_SERVER
+import com.moon.pharm.data.common.NotificationConstants.MSG_ANSWER_BODY
+import com.moon.pharm.data.common.NotificationConstants.MSG_ANSWER_TITLE
+import com.moon.pharm.data.common.NotificationConstants.MSG_NEW_CONSULT_BODY
+import com.moon.pharm.data.common.NotificationConstants.MSG_NEW_CONSULT_TITLE
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.ImageDataSource
 import com.moon.pharm.data.datasource.remote.fcm.FcmApi
@@ -85,13 +91,13 @@ class ConsultRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sendAnswerNotification(
-        targetToken: String,
+        targetUserToken: String,
         consultId: String
     ): DataResourceResult<Unit> {
         return sendFcmNotification(
-            targetToken = targetToken,
-            title = "약사님 답변 도착! 💊",
-            body = "회원님의 상담 질문에 답변이 등록되었습니다.",
+            targetToken = targetUserToken,
+            title = MSG_ANSWER_TITLE,
+            body = MSG_ANSWER_BODY,
             consultId = consultId
         )
     }
@@ -102,8 +108,8 @@ class ConsultRepositoryImpl @Inject constructor(
     ): DataResourceResult<Unit> {
         return sendFcmNotification(
             targetToken = targetToken,
-            title = "새로운 상담 요청! 📝",
-            body = "약사님, 답변을 기다리는 새로운 상담이 있습니다.",
+            title = MSG_NEW_CONSULT_TITLE,
+            body = MSG_NEW_CONSULT_BODY,
             consultId = consultId
         )
     }
@@ -126,8 +132,8 @@ class ConsultRepositoryImpl @Inject constructor(
             if (response.success) {
                 DataResourceResult.Success(Unit)
             } else {
-                val errorMsg = response.error ?: "알 수 없는 서버 오류"
-                DataResourceResult.Failure(Exception("FCM 전송 실패: $errorMsg"))
+                val errorMsg = response.error ?: ERR_UNKNOWN_SERVER
+                DataResourceResult.Failure(Exception("$ERR_FCM_FAILED$errorMsg"))
             }
         } catch (e: Exception) {
             DataResourceResult.Failure(e)

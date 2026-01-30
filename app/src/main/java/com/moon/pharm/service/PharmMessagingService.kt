@@ -3,7 +3,6 @@ package com.moon.pharm.service
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
@@ -11,6 +10,11 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.moon.pharm.MainActivity
 import com.moon.pharm.R
+import com.moon.pharm.data.common.NotificationConstants.CHANNEL_ID_CONSULT
+import com.moon.pharm.data.common.NotificationConstants.CHANNEL_NAME_CONSULT
+import com.moon.pharm.data.common.NotificationConstants.KEY_BODY
+import com.moon.pharm.data.common.NotificationConstants.KEY_CONSULT_ID
+import com.moon.pharm.data.common.NotificationConstants.KEY_TITLE
 import com.moon.pharm.domain.usecase.user.SyncFcmTokenUseCase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -27,9 +31,14 @@ class PharmMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        val title = remoteMessage.notification?.title ?: remoteMessage.data["title"] ?: "약대장 알림"
-        val body = remoteMessage.notification?.body ?: remoteMessage.data["body"] ?: "새로운 소식이 있습니다."
-        val consultId = remoteMessage.data["consultId"]
+        val title = remoteMessage.notification?.title
+            ?: remoteMessage.data[KEY_TITLE]
+            ?: getString(R.string.noti_default_title)
+
+        val body = remoteMessage.notification?.body
+            ?: remoteMessage.data[KEY_BODY]
+            ?: getString(R.string.noti_default_body)
+        val consultId = remoteMessage.data[KEY_CONSULT_ID]
 
         showNotification(title, body, consultId)
     }
@@ -47,13 +56,13 @@ class PharmMessagingService : FirebaseMessagingService() {
     }
 
     private fun showNotification(title: String, messageBody: String, consultId: String?) {
-        val channelId = "pharm_consult_channel"
-        val channelName = "상담 알림"
+        val channelId = CHANNEL_ID_CONSULT
+        val channelName = CHANNEL_NAME_CONSULT
 
         val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             if (consultId != null) {
-                putExtra("consultId", consultId)
+                putExtra(KEY_CONSULT_ID, consultId)
             }
         }
 
@@ -72,7 +81,7 @@ class PharmMessagingService : FirebaseMessagingService() {
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = getSystemService(NotificationManager::class.java)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(

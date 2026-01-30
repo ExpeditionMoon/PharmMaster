@@ -29,6 +29,7 @@ const val FIELD_SCHEDULE_ID = "scheduleId"
 const val FIELD_RECORD_DATE = "recordDate"
 const val FIELD_STATUS = "status"
 const val FIELD_ANSWER = "answer"
+const val FIELD_FCM_TOKEN = "fcmToken"
 
 // 에러 메시지 (Error Messages)
 const val ERROR_MSG_PHARMACY_NOT_FOUND = "Pharmacy not found"
