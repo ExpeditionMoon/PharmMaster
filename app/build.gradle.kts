@@ -60,15 +60,14 @@ dependencies {
     implementation(project(":features:prescription"))
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.bundles.runtime.lifecycle.libraries)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose.libs)
 
-    // Firestore
+    // Firebase
     implementation(platform(libs.firebase.bom))
-    implementation(libs.bundles.firebase.libs)
-    implementation(libs.firebase.storage)
+    implementation(libs.firebase.messaging)
 
     // Splash
     implementation(libs.androidx.core.splashscreen)

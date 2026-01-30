@@ -22,13 +22,13 @@ import com.moon.pharm.consult.R
 import com.moon.pharm.consult.mapper.asString
 import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.consult.screen.component.ConsultDetailContent
-import com.moon.pharm.consult.viewmodel.ConsultViewModel
+import com.moon.pharm.consult.viewmodel.ConsultDetailViewModel
 
 @Composable
 fun ConsultDetailScreen(
     navController: NavController,
     consultId: String,
-    viewModel: ConsultViewModel
+    viewModel: ConsultDetailViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val answerContent by viewModel.answerContent.collectAsStateWithLifecycle()

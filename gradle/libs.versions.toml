@@ -105,6 +105,7 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 
 # REST
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
@@ -161,8 +162,10 @@ compose-libs = [
     "androidx-material-icons-extended",
 ]
 
-firebase-libs = [
-    "firebase-firestore"
+firebase-data = [
+    "firebase-firestore",
+    "firebase-auth",
+    "firebase-storage"
 ]
 
 google-maps-libs = [

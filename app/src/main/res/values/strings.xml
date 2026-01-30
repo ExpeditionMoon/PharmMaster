@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">PharmMaster</string>
+
+    <string name="noti_default_title">약대장 알림</string>
+    <string name="noti_default_body">새로운 소식이 있습니다.</string>
 </resources>

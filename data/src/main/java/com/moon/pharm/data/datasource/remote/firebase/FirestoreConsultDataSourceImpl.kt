@@ -2,6 +2,7 @@ package com.moon.pharm.data.datasource.remote.firebase
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.snapshots
 import com.moon.pharm.data.common.CONSULT_COLLECTION
 import com.moon.pharm.data.common.ERROR_MSG_CONSULT_NOT_FOUND
@@ -33,7 +34,7 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
     }
 
     override fun getConsultItems(): Flow<List<ConsultItemDTO>> =
-        collection.orderBy(FIELD_CREATED_AT)
+        collection.orderBy(FIELD_CREATED_AT, Query.Direction.DESCENDING)
             .snapshots()
             .map { snapshot ->
                 snapshot.toObjects(ConsultItemDTO::class.java)

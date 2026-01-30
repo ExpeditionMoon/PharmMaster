@@ -40,4 +40,12 @@ class UserRepositoryImpl @Inject constructor(
             }
         }.flowOn(ioDispatcher)
     }
+
+    override suspend fun getFcmToken(): String {
+        return dataSource.getFcmToken()
+    }
+
+    override suspend fun updateFcmToken(userId: String, token: String): DataResourceResult<Unit> {
+        return dataSource.updateFcmToken(userId, token)
+    }
 }

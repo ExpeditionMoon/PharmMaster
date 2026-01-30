@@ -18,6 +18,8 @@ sealed interface ContentNavigationRoute : PharmNavigation {
     @Serializable
     data object ConsultGraph : ContentNavigationRoute
     @Serializable
+    data object ConsultWriteGraph : ContentNavigationRoute
+    @Serializable
     data object ConsultTab : ContentNavigationRoute
     @Serializable
     data object ConsultTabWriteScreen : ContentNavigationRoute

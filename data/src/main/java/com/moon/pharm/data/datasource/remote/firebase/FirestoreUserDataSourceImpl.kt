@@ -1,7 +1,9 @@
 package com.moon.pharm.data.datasource.remote.firebase
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.moon.pharm.data.common.DOCUMENT_LIFESTYLE
+import com.moon.pharm.data.common.FIELD_FCM_TOKEN
 import com.moon.pharm.data.common.FIELD_USER_EMAIL
 import com.moon.pharm.data.common.SETTING_COLLECTION
 import com.moon.pharm.data.common.USER_COLLECTION
@@ -64,5 +66,20 @@ class FirestoreUserDataSourceImpl @Inject constructor(
             }
         }
         awaitClose { registration.remove() }
+    }
+
+    override suspend fun getFcmToken(): String {
+        return FirebaseMessaging.getInstance().token.await()
+    }
+
+    override suspend fun updateFcmToken(userId: String, token: String): DataResourceResult<Unit> {
+        return try {
+            userCollection.document(userId)
+                .update(FIELD_FCM_TOKEN, token)
+                .await()
+            DataResourceResult.Success(Unit)
+        } catch (e: Exception) {
+            DataResourceResult.Failure(e)
+        }
     }
 }
