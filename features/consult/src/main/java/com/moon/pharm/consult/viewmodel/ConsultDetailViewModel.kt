@@ -4,19 +4,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.model.ConsultUiMessage
+import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
+import com.moon.pharm.domain.usecase.consult.SendAnswerNotificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ConsultDetailViewModel @Inject constructor(
-    private val consultUseCases: ConsultUseCases
+    private val consultUseCases: ConsultUseCases,
+    private val userRepository: UserRepository,
+    private val sendAnswerNotificationUseCase: SendAnswerNotificationUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ConsultDetailUiState())
@@ -53,9 +58,11 @@ class ConsultDetailViewModel @Inject constructor(
 
     fun registerAnswer(consultId: String) {
         val content = _answerContent.value
-        if (content.isBlank()) return
-
+        val questionerId = _uiState.value.selectedItem?.userId
         val pharmacist = _uiState.value.answerPharmacist
+
+        if (content.isBlank() || questionerId == null) return
+
         if (pharmacist == null) {
             _uiState.update { it.copy(userMessage = UiMessage.LoadDataFailed) }
             return
@@ -76,10 +83,24 @@ class ConsultDetailViewModel @Inject constructor(
                             )
                         }
                         _answerContent.value = ""
+                        sendNotificationToUser(questionerId, consultId)
                     }
                     is DataResourceResult.Failure -> {
                         _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed) }
                     }
+                }
+            }
+        }
+    }
+
+    private fun sendNotificationToUser(userId: String, consultId: String) {
+        viewModelScope.launch {
+            val userResult = userRepository.getUser(userId).first()
+
+            if (userResult is DataResourceResult.Success) {
+                val token = userResult.resultData.fcmToken
+                if (!token.isNullOrEmpty()) {
+                    sendAnswerNotificationUseCase(token, consultId)
                 }
             }
         }

@@ -10,13 +10,16 @@ import com.moon.pharm.consult.mapper.ConsultUiMapper
 import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
+import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
+import com.moon.pharm.domain.usecase.consult.SendNewConsultNotificationUseCase
 import com.moon.pharm.domain.usecase.consult.UploadConsultImagesUseCase
 import com.moon.pharm.domain.usecase.consult.ValidateConsultFormUseCase
 import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocationUseCase
 import com.moon.pharm.domain.usecase.user.GetNicknameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +29,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,7 +40,9 @@ class ConsultWriteViewModel @Inject constructor(
     private val consultUseCases: ConsultUseCases,
     private val getLocationUseCase: GetNearbyPharmaciesCurrentLocationUseCase,
     private val getNicknameUseCase: GetNicknameUseCase,
-    private val uploadImagesUseCase: UploadConsultImagesUseCase
+    private val uploadImagesUseCase: UploadConsultImagesUseCase,
+    private val sendNewConsultNotificationUseCase: SendNewConsultNotificationUseCase,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -170,7 +176,6 @@ class ConsultWriteViewModel @Inject constructor(
             return
         }
 
-        // 성공 시: 이동 이벤트 발생
         viewModelScope.launch {
             _writeEvent.emit(WriteEvent.MoveToPharmacist)
         }
@@ -203,6 +208,24 @@ class ConsultWriteViewModel @Inject constructor(
             } catch (e: Exception) {
                 e.printStackTrace()
                 _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed) }
+            }
+        }
+    }
+
+    private fun sendNotificationToPharmacist(pharmacistId: String, consultId: String) {
+        CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            try {
+                val pharmacistResult = userRepository.getUser(pharmacistId).first()
+
+                if (pharmacistResult is DataResourceResult.Success) {
+                    val user = pharmacistResult.resultData
+                    val token = user.fcmToken
+                    if (!token.isNullOrEmpty()) {
+                        sendNewConsultNotificationUseCase(token, consultId)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
@@ -241,7 +264,13 @@ class ConsultWriteViewModel @Inject constructor(
                 _uiState.update { state ->
                     when (result) {
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
-                        is DataResourceResult.Success -> state.copy(isLoading = false, isConsultCreated = true)
+                        is DataResourceResult.Success -> {
+                            val pharmacistId = consultInfo.pharmacistId
+                            if (pharmacistId != null) {
+                                sendNotificationToPharmacist(pharmacistId, consultInfo.id)
+                            }
+                            state.copy(isLoading = false, isConsultCreated = true)
+                        }
                         is DataResourceResult.Failure -> state.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed)
                     }
                 }

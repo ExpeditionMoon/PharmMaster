@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.LoginUseCase
 import com.moon.pharm.domain.usecase.auth.ValidateLoginFormUseCase
+import com.moon.pharm.domain.usecase.user.SyncFcmTokenUseCase
 import com.moon.pharm.profile.auth.model.LoginUiMessage
 import com.moon.pharm.profile.auth.screen.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
-    private val validateLoginFormUseCase: ValidateLoginFormUseCase
+    private val validateLoginFormUseCase: ValidateLoginFormUseCase,
+    private val syncFcmTokenUseCase: SyncFcmTokenUseCase
 ) : ViewModel() {
 
     // region 1. State
@@ -51,6 +53,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val result = loginUseCase(currentState.email, currentState.password)
+            if (result is DataResourceResult.Success) { syncFcmTokenUseCase() }
             _uiState.update { state ->
                 when (result) {
                     is DataResourceResult.Success -> state.copy(

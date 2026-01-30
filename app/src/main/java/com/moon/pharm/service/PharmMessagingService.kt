@@ -11,17 +11,24 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.moon.pharm.MainActivity
 import com.moon.pharm.R
+import com.moon.pharm.domain.usecase.user.SyncFcmTokenUseCase
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class PharmMessagingService : FirebaseMessagingService() {
+
+    @Inject
+    lateinit var syncFcmTokenUseCase: SyncFcmTokenUseCase
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
         val title = remoteMessage.notification?.title ?: remoteMessage.data["title"] ?: "약대장 알림"
         val body = remoteMessage.notification?.body ?: remoteMessage.data["body"] ?: "새로운 소식이 있습니다."
-
         val consultId = remoteMessage.data["consultId"]
 
         showNotification(title, body, consultId)
@@ -29,6 +36,14 @@ class PharmMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                syncFcmTokenUseCase()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     private fun showNotification(title: String, messageBody: String, consultId: String?) {

@@ -73,7 +73,7 @@ class FirestoreUserDataSourceImpl @Inject constructor(
 
     override suspend fun updateFcmToken(userId: String, token: String): DataResourceResult<Unit> {
         return try {
-            firestore.collection("users").document(userId)
+            userCollection.document(userId)
                 .update("fcmToken", token)
                 .await()
             DataResourceResult.Success(Unit)

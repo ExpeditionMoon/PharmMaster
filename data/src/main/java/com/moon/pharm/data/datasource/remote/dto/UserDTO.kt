@@ -3,6 +3,7 @@ package com.moon.pharm.data.datasource.remote.dto
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.IgnoreExtraProperties
+import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ServerTimestamp
 import com.moon.pharm.data.common.EMPTY_STRING
 
@@ -17,5 +18,9 @@ data class UserDTO(
     val profileImageUrl: String? = null,
 
     @ServerTimestamp
-    var createdAt: Timestamp? = null
+    var createdAt: Timestamp? = null,
+
+    @get:PropertyName("fcmToken")
+    @set:PropertyName("fcmToken")
+    var fcmToken: String? = null
 )

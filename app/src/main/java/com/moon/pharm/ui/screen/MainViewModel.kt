@@ -32,4 +32,14 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    fun refreshFcmToken() {
+        viewModelScope.launch {
+            try {
+                syncFcmTokenUseCase()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 }

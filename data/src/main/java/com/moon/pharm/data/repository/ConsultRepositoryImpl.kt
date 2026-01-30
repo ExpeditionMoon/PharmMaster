@@ -3,6 +3,8 @@ package com.moon.pharm.data.repository
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.ImageDataSource
+import com.moon.pharm.data.datasource.remote.fcm.FcmApi
+import com.moon.pharm.data.datasource.remote.fcm.FcmSendRequest
 import com.moon.pharm.data.di.IoDispatcher
 import com.moon.pharm.data.mapper.toDomain
 import com.moon.pharm.data.mapper.toDto
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class ConsultRepositoryImpl @Inject constructor(
+    private val fcmApi: FcmApi,
     private val dataSource: ConsultDataSource,
     private val imageDataSource: ImageDataSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
@@ -79,5 +82,55 @@ class ConsultRepositoryImpl @Inject constructor(
 
     override suspend fun uploadImage(uri: String, userId: String): String {
         return imageDataSource.uploadImage(uri, userId)
+    }
+
+    override suspend fun sendAnswerNotification(
+        targetToken: String,
+        consultId: String
+    ): DataResourceResult<Unit> {
+        return sendFcmNotification(
+            targetToken = targetToken,
+            title = "약사님 답변 도착! 💊",
+            body = "회원님의 상담 질문에 답변이 등록되었습니다.",
+            consultId = consultId
+        )
+    }
+
+    override suspend fun sendNewConsultNotification(
+        targetToken: String,
+        consultId: String
+    ): DataResourceResult<Unit> {
+        return sendFcmNotification(
+            targetToken = targetToken,
+            title = "새로운 상담 요청! 📝",
+            body = "약사님, 답변을 기다리는 새로운 상담이 있습니다.",
+            consultId = consultId
+        )
+    }
+
+    private suspend fun sendFcmNotification(
+        targetToken: String,
+        title: String,
+        body: String,
+        consultId: String
+    ): DataResourceResult<Unit> {
+        return try {
+            val request = FcmSendRequest(
+                targetToken = targetToken,
+                title = title,
+                body = body,
+                consultId = consultId
+            )
+            val response = fcmApi.sendNotification(request)
+
+            if (response.success) {
+                DataResourceResult.Success(Unit)
+            } else {
+                val errorMsg = response.error ?: "알 수 없는 서버 오류"
+                DataResourceResult.Failure(Exception("FCM 전송 실패: $errorMsg"))
+            }
+        } catch (e: Exception) {
+            DataResourceResult.Failure(e)
+        }
     }
 }
