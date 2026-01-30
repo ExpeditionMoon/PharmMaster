@@ -1,5 +1,7 @@
 package com.moon.pharm.data.di
 
+import com.moon.pharm.data.BuildConfig
+import com.moon.pharm.data.datasource.remote.fcm.FcmApi
 import com.moon.pharm.data.datasource.remote.kakao.KakaoApiConst
 import com.moon.pharm.data.datasource.remote.kakao.KakaoApiService
 import com.squareup.moshi.Moshi
@@ -49,5 +51,20 @@ object NetworkModule {
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create(KakaoApiService::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideFcmApi(
+        moshi: Moshi,
+        client: OkHttpClient
+    ): FcmApi {
+        val localServerUrl = BuildConfig.FCM_SERVER_URL
+
+        return Retrofit.Builder()
+            .baseUrl(localServerUrl)
+            .client(client)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+            .create(FcmApi::class.java)
     }
 }

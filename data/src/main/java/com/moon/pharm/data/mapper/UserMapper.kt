@@ -16,7 +16,8 @@ fun UserDTO.toDomain(): User {
             UserType.GENERAL
         },
         profileImageUrl = this.profileImageUrl,
-        createdAt = this.createdAt?.toDate()?.time ?: 0L
+        createdAt = this.createdAt?.toDate()?.time ?: 0L,
+        fcmToken = this.fcmToken
     )
 }
 
@@ -28,5 +29,6 @@ fun User.toDto(): UserDTO {
         userType = this.userType.name,
         profileImageUrl = this.profileImageUrl,
         createdAt = this.createdAt.toTimestamp(),
+        fcmToken = this.fcmToken
     )
 }

@@ -11,4 +11,7 @@ interface ConsultRepository {
     fun getConsultDetail(id: String): Flow<DataResourceResult<ConsultItem>>
     fun registerAnswer(consultId: String, answer: ConsultAnswer): Flow<DataResourceResult<ConsultItem>>
     suspend fun uploadImage(uri: String, userId: String): String
+
+    suspend fun sendAnswerNotification(targetUserToken: String, consultId: String): DataResourceResult<Unit>
+    suspend fun sendNewConsultNotification(targetToken: String, consultId: String): DataResourceResult<Unit>
 }
