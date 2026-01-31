@@ -42,6 +42,7 @@ import com.moon.pharm.profile.mypage.screen.component.MyPageMenuSection
 import com.moon.pharm.profile.mypage.screen.component.MyPageProfileCard
 import com.moon.pharm.profile.mypage.viewmodel.MyPageUiState
 import com.moon.pharm.profile.mypage.viewmodel.MyPageViewModel
+import com.moon.pharm.profile.util.myPageConsultMenuTitleRes
 import com.moon.pharm.component_ui.R as UiR
 
 @Composable
@@ -102,15 +103,19 @@ fun MyPageScreen(
                 ) {
                     MyPageProfileCard(user = user)
 
-                    val consultCount = uiState.myConsults.size
-                    val consultTitle = if (consultCount > 0)
-                        stringResource(R.string.mypage_consult_history_format, consultCount)
-                    else
-                        stringResource(R.string.mypage_consult_history)
+                    val baseTitle = stringResource(user.userType.myPageConsultMenuTitleRes)
+
+                    val formattedCount = uiState.consultHistoryText?.let {
+                        stringResource(R.string.mypage_consult_history_format, it)
+                    }
 
                     MyPageMenuSection(
                         title = stringResource(R.string.mypage_menu_core_feature),
-                        items = getCoreMenuItems(consultTitle, onNavigateToMyConsultation)
+                        items = getCoreMenuItems(
+                            consultTitle = baseTitle,
+                            consultCount = formattedCount,
+                            onConsultClick = onNavigateToMyConsultation
+                        )
                     )
 
                     MyPageMenuSection(
@@ -135,6 +140,7 @@ fun MyPageScreen(
 @Composable
 private fun getCoreMenuItems(
     consultTitle: String,
+    consultCount: String?,
     onConsultClick: () -> Unit
 ): List<MyPageMenuItemData> {
     return listOf(
@@ -151,6 +157,7 @@ private fun getCoreMenuItems(
         MyPageMenuItemData(
             icon = Icons.Outlined.Person,
             title = consultTitle,
+            count = consultCount,
             onClick = onConsultClick
         )
     )

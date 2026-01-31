@@ -7,9 +7,10 @@ import com.moon.pharm.domain.model.consult.ConsultItem
 
 data class MyPageUiState(
     val isLoading: Boolean = true,
+    val userMessage: UiMessage? = null,
     val user: User? = null,
     val myConsults: List<ConsultItem> = emptyList(),
-    val userMessage: UiMessage? = null,
+    val consultHistoryText: String? = null,
 
     val menuItems: List<MyPageMenuState> = emptyList(),
     val supportItems: List<MyPageMenuState> = emptyList()
