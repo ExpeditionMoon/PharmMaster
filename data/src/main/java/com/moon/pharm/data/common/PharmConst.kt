@@ -20,6 +20,7 @@ const val INTAKE_RECORDS_COLLECTION = "intakeRecords"
 const val DOCUMENT_LIFESTYLE = "lifeStyle"
 
 const val FIELD_USER_ID = "userId"
+const val FIELD_PHARMACIST_ID = "pharmacistId"
 const val FIELD_USER_EMAIL = "email"
 const val FIELD_CREATED_AT = "createdAt"
 const val FIELD_USER_TYPE = "userType"

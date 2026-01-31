@@ -5,5 +5,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 data class MyPageMenuItemData(
     val icon: ImageVector,
     val title: String,
+    val count: String? = null,
     val onClick: () -> Unit
 )

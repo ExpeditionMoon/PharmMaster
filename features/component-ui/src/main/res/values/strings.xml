@@ -16,4 +16,8 @@
 
     <string name="search_result_count_format">검색 결과 %d건</string>
     <string name="search_result_empty">검색된 약국이 없습니다.</string>
+
+    <!-- Consult -->
+    <string name="my_consult_title">나의 상담 내역</string>
+    <string name="my_answer_title">나의 답변 내역</string>
 </resources>

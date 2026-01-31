@@ -27,8 +27,8 @@
     <string name="consult_status_waiting_title">약사님의 답변을 기다리고 있어요.</string>
     <string name="consult_status_waiting_subtitle">답변이 등록되면 알림을 통해 알려드리겠습니다.</string>
 
-    <string name="my_consult_title">나의 상담 내역</string>
     <string name="my_consult_empty">작성한 상담 내역이 없습니다.</string>
+    <string name="my_answer_empty">작성한 답변 내역이 없습니다.</string>
 
     <!--  WriteScreen  -->
     <string name="consult_write_placeholder_title">제목을 입력해주세요</string>

@@ -10,6 +10,7 @@ interface ConsultRepository {
     fun getConsultItems(): Flow<DataResourceResult<List<ConsultItem>>>
     fun getConsultDetail(id: String): Flow<DataResourceResult<ConsultItem>>
     fun getMyConsult(userId: String): Flow<DataResourceResult<List<ConsultItem>>>
+    fun getMyAnsweredConsultList(userId: String): Flow<DataResourceResult<List<ConsultItem>>>
     fun registerAnswer(consultId: String, answer: ConsultAnswer): Flow<DataResourceResult<ConsultItem>>
     suspend fun uploadImage(uri: String, userId: String): String
 
