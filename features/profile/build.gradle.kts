@@ -42,8 +42,9 @@ kotlin{
 }
 
 dependencies {
-    implementation(project(":features:component-ui"))
     implementation(project(":domain"))
+    implementation(project(":features:component-ui"))
+    implementation(project(":features:consult"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
