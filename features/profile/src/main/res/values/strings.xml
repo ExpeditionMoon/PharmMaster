@@ -1,5 +1,5 @@
 <resources>
-<!--  로그인(auth)  -->
+    <!--  로그인(auth)  -->
     <string name="login_logo_description">로고 이미지</string>
 
     <string name="login_app_title">약대장</string>
@@ -16,7 +16,7 @@
     <string name="login_error_empty_password">비밀번호를 입력해주세요.</string>
     <string name="login_failed_default">로그인에 실패했습니다. 다시 시도해주세요.</string>
 
-<!--  회원가입(auth)  -->
+    <!--  회원가입(auth)  -->
     <string name="signup_button_next">다음</string>
     <string name="signup_button_complete">회원가입</string>
     <string name="signup_logo_description">로고 이미지</string>
@@ -47,7 +47,28 @@
     <string name="signup_error_pharmacy_required">근무할 약국을 선택해주세요.</string>
     <string name="signup_error_bio_required">약사 소개글을 입력해주세요.</string>
 
-<!--  복약 관리(medication)  -->
+    <!--  마이페이지(mypage)  -->
+    <string name="mypage_title">마이페이지</string>
+    <string name="mypage_consult_history">나의 상담 내역</string>
+    <string name="mypage_consult_history_format">나의 상담 내역 (%d)</string>
+    <string name="mypage_menu_medication_record">나의 약 기록</string>
+    <string name="mypage_menu_alarm_setting">복용 알림 설정</string>
+    <string name="mypage_menu_core_feature">핵심 기능</string>
+    <string name="mypage_menu_customer_support">고객 지원</string>
+    <string name="mypage_menu_notice">공지사항</string>
+    <string name="mypage_menu_faq">자주 묻는 질문</string>
+    <string name="mypage_menu_inquiry">1:1 문의</string>
+    <string name="mypage_terms_of_use">이용 약관</string>
+    <string name="mypage_privacy_policy">개인정보 처리방침</string>
+    <string name="mypage_edit_info">내 정보 수정</string>
+    <string name="mypage_logout">로그아웃</string>
+    <string name="mypage_withdraw">회원 탈퇴</string>
+    <string name="mypage_user_suffix">님</string>
+    <string name="mypage_pharmacist_member">약사 회원</string>
+    <string name="mypage_general_member">일반 회원</string>
+    <string name="mypage_app_version_format">App Version v%s</string>
+
+    <!--  복약 관리(medication)  -->
     <string name="error_empty_medication_name">약 이름을 입력해주세요.</string>
     <string name="error_create_medication">복용 알림 등록 실패</string>
 
@@ -75,7 +96,6 @@
     <string name="medication_alarm_group_description">식사 시간(식전/식후)이 같은 약들을 한 번의 알림으로 모아줍니다.</string>
     <string name="medication_info">정보</string>
     <string name="medication_add">등록하기</string>
-
 
     <string name="medication_time_label">%1$s 복용</string>
     <string name="medication_progress_today">오늘 복용 %1$d/%2$d회 완료</string>

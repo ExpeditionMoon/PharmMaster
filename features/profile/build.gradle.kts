@@ -16,6 +16,9 @@ android {
     defaultConfig {
         minSdk = 24
 
+        // PharmMaster version
+        buildConfigField("String", "VERSION_NAME", "\"1.0.0\"")
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -35,6 +38,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 kotlin{

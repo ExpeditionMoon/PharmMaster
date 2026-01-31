@@ -2,6 +2,7 @@ package com.moon.pharm.profile.mypage.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.auth.LogoutUseCase
@@ -32,29 +33,22 @@ class MyPageViewModel @Inject constructor(
 
     private fun loadData() {
         val userId = getCurrentUserIdUseCase()
-
         if (userId.isNullOrEmpty()) {
-            _uiState.value = MyPageUiState(isLoading = false, error = "로그인이 필요합니다.")
+            _uiState.value = MyPageUiState(isLoading = false, userMessage = UiMessage.LoginRequired)
             return
         }
 
         viewModelScope.launch {
-            // [핵심] 유저 정보 Flow와 상담 내역 Flow를 동시에 구독하여 하나로 합침
             combine(
                 getUserUseCase(userId),
                 getMyConsultUseCase(userId)
             ) { userResult, consultResult ->
-
                 val user = if (userResult is DataResourceResult.Success) userResult.resultData else null
                 val consults = if (consultResult is DataResourceResult.Success) consultResult.resultData else emptyList()
-
-                // 둘 중 하나라도 로딩 중이면 로딩 상태
                 val isLoading = userResult is DataResourceResult.Loading || consultResult is DataResourceResult.Loading
-
-                // 에러 메시지 추출
-                val errorMsg = when {
-                    userResult is DataResourceResult.Failure -> userResult.exception.message
-                    consultResult is DataResourceResult.Failure -> consultResult.exception.message
+                val errorMsg: UiMessage? = when {
+                    userResult is DataResourceResult.Failure -> UiMessage.LoadDataFailed
+                    consultResult is DataResourceResult.Failure -> UiMessage.LoadDataFailed
                     else -> null
                 }
 
@@ -62,7 +56,7 @@ class MyPageViewModel @Inject constructor(
                     isLoading = isLoading,
                     user = user,
                     myConsults = consults,
-                    error = errorMsg
+                    userMessage = errorMsg
                 )
             }.collect { newState ->
                 _uiState.value = newState
@@ -73,7 +67,6 @@ class MyPageViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             logoutUseCase()
-            // 로그아웃 후 처리는 UI(Compose)의 LaunchedEffect에서 로그인 화면 이동 등으로 처리
         }
     }
 }

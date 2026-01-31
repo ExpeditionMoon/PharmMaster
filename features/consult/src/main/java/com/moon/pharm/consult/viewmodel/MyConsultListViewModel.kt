@@ -58,7 +58,7 @@ class MyConsultListViewModel @Inject constructor(
                         is DataResourceResult.Failure -> {
                             state.copy(
                                 isLoading = false,
-                                userMessage = UiMessage.LoadDataFailed
+                                userMessage = if (state.myConsults.isEmpty()) UiMessage.LoadDataFailed else null
                             )
                         }
                     }
