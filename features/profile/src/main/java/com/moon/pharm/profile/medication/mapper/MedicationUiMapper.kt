@@ -1,7 +1,7 @@
 package com.moon.pharm.profile.medication.mapper
 
 import com.moon.pharm.component_ui.util.toDisplayDateString
-import com.moon.pharm.component_ui.util.toDisplayTimeString
+import com.moon.pharm.component_ui.util.toScheduleTimeString
 import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.model.medication.MedicationSchedule
@@ -13,7 +13,7 @@ object MedicationUiMapper {
     fun toDomain(form: MedicationFormState, userId: String): Medication {
         val schedule = MedicationSchedule(
             id = UUID.randomUUID().toString(),
-            time = form.selectedTime.toDisplayTimeString(),
+            time = form.selectedTime.toScheduleTimeString(),
             dosage = form.medicationDosage ?: "",
             mealTiming = form.selectedMealTiming
         )

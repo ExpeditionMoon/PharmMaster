@@ -3,6 +3,7 @@ package com.moon.pharm.profile.medication.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.model.medication.MedicationProgress
 import com.moon.pharm.domain.model.medication.MedicationTimeGroup
 import com.moon.pharm.domain.result.DataResourceResult
@@ -35,7 +36,8 @@ class MedicationViewModel @Inject constructor(
     private val saveMedicationUseCase: SaveMedicationUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
-    private val validateMedicationEntryUseCase: ValidateMedicationEntryUseCase
+    private val validateMedicationEntryUseCase: ValidateMedicationEntryUseCase,
+    private val alarmScheduler: AlarmScheduler
 ): ViewModel() {
 
     // region 1. State & Derived State
@@ -136,6 +138,10 @@ class MedicationViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
 
             saveMedicationUseCase(newItem).collectLatest { result ->
+                if (result is DataResourceResult.Success) {
+                    alarmScheduler.schedule(newItem)
+                }
+
                 _uiState.update { currentState ->
                     when (result) {
                         is DataResourceResult.Loading -> currentState.copy(isLoading = true)
