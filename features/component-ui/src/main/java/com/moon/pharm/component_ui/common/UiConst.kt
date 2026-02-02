@@ -5,6 +5,7 @@ const val ASIA_SEOUL_ZONE = "Asia/Seoul"
 const val DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss"
 const val DATE_PATTERN = "yyyy.MM.dd"
 const val TIME_PATTERN = "a hh:mm"
+const val FORMAT_TIME_HH_MM = "%02d:%02d"
 
 // 2. 문자열 처리용 구분자 (String Delimiters)
 const val PATH_DELIMITER = "/"

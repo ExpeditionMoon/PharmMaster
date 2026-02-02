@@ -1,6 +1,7 @@
 package com.moon.pharm.consult.screen
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -10,6 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -73,8 +75,10 @@ fun ConsultScreen(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier.padding(innerPadding)
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
         ) {
             ConsultContent(
                 selectedTab = uiState.selectedTab,
@@ -85,7 +89,7 @@ fun ConsultScreen(
                 })
 
             if (uiState.isLoading) {
-                CircularProgressBar()
+                CircularProgressBar(modifier = Modifier.align(Alignment.Center))
             }
         }
     }

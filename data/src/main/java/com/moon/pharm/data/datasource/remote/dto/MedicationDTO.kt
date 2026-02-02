@@ -18,7 +18,9 @@ data class MedicationDTO(
     val repeatType: String = EMPTY_STRING,
     val memo: String? = null,
 
-    val schedules: List<MedicationScheduleDTO> = emptyList()
+    val schedules: List<MedicationScheduleDTO> = emptyList(),
+    val prescriptionImageUrl: String? = null,
+    val isGrouped: Boolean = false
 )
 
 @IgnoreExtraProperties

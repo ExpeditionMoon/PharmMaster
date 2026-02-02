@@ -33,5 +33,7 @@ sealed interface ContentNavigationRoute : PharmNavigation {
     @Serializable
     data object ProfileTab : ContentNavigationRoute
     @Serializable
+    object MyConsultList : ContentNavigationRoute
+    @Serializable
     data object PrescriptionCapture : ContentNavigationRoute
 }

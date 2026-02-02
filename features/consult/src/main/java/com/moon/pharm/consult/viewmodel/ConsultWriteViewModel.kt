@@ -294,7 +294,7 @@ class ConsultWriteViewModel @Inject constructor(
         }
         val userId = consultUseCases.getCurrentUserId()
         if (userId == null) {
-            _uiState.update { it.copy(userMessage = ConsultUiMessage.LoginRequired) }
+            _uiState.update { it.copy(userMessage = UiMessage.LoginRequired) }
             return null
         }
         return userId

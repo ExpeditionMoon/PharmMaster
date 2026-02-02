@@ -3,6 +3,7 @@ package com.moon.pharm.profile.medication.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.model.medication.MedicationProgress
 import com.moon.pharm.domain.model.medication.MedicationTimeGroup
 import com.moon.pharm.domain.result.DataResourceResult
@@ -15,8 +16,6 @@ import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
 import com.moon.pharm.profile.medication.mapper.toUiMessage
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 import com.moon.pharm.profile.medication.model.MedicationUiMessage
-import com.moon.pharm.profile.medication.screen.MedicationFormState
-import com.moon.pharm.profile.medication.screen.MedicationUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,7 +34,8 @@ class MedicationViewModel @Inject constructor(
     private val saveMedicationUseCase: SaveMedicationUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
-    private val validateMedicationEntryUseCase: ValidateMedicationEntryUseCase
+    private val validateMedicationEntryUseCase: ValidateMedicationEntryUseCase,
+    private val alarmScheduler: AlarmScheduler
 ): ViewModel() {
 
     // region 1. State & Derived State
@@ -73,7 +73,7 @@ class MedicationViewModel @Inject constructor(
             is MedicationUiEvent.UpdateMealTiming -> updateForm { it.copy(selectedMealTiming = event.timing) }
             is MedicationUiEvent.UpdateAlarmTime -> updateForm { it.copy(selectedTime = (event.hour * 60 + event.minute).toLong()) }
             is MedicationUiEvent.UpdateRepeatType -> updateForm { it.copy(selectedRepeatType = event.type) }
-            is MedicationUiEvent.UpdateMealAlarm -> updateForm { it.copy(isMealTimeAlarmEnabled = event.enabled) }
+            is MedicationUiEvent.UpdateGroupedNotification -> updateForm { it.copy(isGrouped = event.enabled) }
 
             // 2. 주요 비즈니스 로직 (Business Logic)
             MedicationUiEvent.SaveMedication -> saveMedication()
@@ -136,6 +136,10 @@ class MedicationViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
 
             saveMedicationUseCase(newItem).collectLatest { result ->
+                if (result is DataResourceResult.Success) {
+                    alarmScheduler.schedule(newItem)
+                }
+
                 _uiState.update { currentState ->
                     when (result) {
                         is DataResourceResult.Loading -> currentState.copy(isLoading = true)

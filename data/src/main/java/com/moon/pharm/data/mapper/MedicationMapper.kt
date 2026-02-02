@@ -10,7 +10,6 @@ import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.model.medication.MedicationSchedule
 import com.moon.pharm.domain.model.medication.MedicationType
 import com.moon.pharm.domain.model.medication.RepeatType
-import kotlin.collections.map
 
 fun MedicationDTO.toDomain(): Medication {
     return Medication(
@@ -22,7 +21,9 @@ fun MedicationDTO.toDomain(): Medication {
         endDate = this.endDate?.toDate()?.time,
         repeatType = try { RepeatType.valueOf(this.repeatType) } catch(e: Exception) { RepeatType.DAILY },
         memo = this.memo,
-        schedules = this.schedules.map { it.toDomain() }
+        schedules = this.schedules.map { it.toDomain() },
+        prescriptionImageUrl = this.prescriptionImageUrl,
+        isGrouped = this.isGrouped
     )
 }
 fun Medication.toDto(): MedicationDTO {
@@ -35,7 +36,9 @@ fun Medication.toDto(): MedicationDTO {
         endDate = this.endDate?.toTimestamp(),
         repeatType = this.repeatType.name,
         memo = this.memo,
-        schedules = this.schedules.map { it.toDto() }
+        schedules = this.schedules.map { it.toDto() },
+        prescriptionImageUrl = this.prescriptionImageUrl,
+        isGrouped = this.isGrouped
     )
 }
 

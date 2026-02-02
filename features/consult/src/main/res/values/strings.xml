@@ -27,6 +27,9 @@
     <string name="consult_status_waiting_title">약사님의 답변을 기다리고 있어요.</string>
     <string name="consult_status_waiting_subtitle">답변이 등록되면 알림을 통해 알려드리겠습니다.</string>
 
+    <string name="my_consult_empty">작성한 상담 내역이 없습니다.</string>
+    <string name="my_answer_empty">작성한 답변 내역이 없습니다.</string>
+
     <!--  WriteScreen  -->
     <string name="consult_write_placeholder_title">제목을 입력해주세요</string>
     <string name="consult_write_placeholder_content">구체적인 증상, 복용 중인 다른 약물 정보 등을 자세히 작성해주세요.</string>
@@ -56,7 +59,7 @@
     <string name="consult_confirm_no_pharmacist">선택된 약사 없음</string>
     <string name="consult_confirm_edit_btn">수정</string>
     <string name="consult_confirm_guidance">
-        상담 요청 전에 모든 내용을 다시 한번 확인해주세요. <br/>
+        상담 요청 전에 모든 내용을 다시 한번 확인해주세요.\n
         요청이 완료되면 약사에게 실시간으로 연결됩니다.
     </string>
     <string name="consult_confirm_submit_btn">상담 요청하기</string>

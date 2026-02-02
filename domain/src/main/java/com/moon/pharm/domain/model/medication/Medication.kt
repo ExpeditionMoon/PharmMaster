@@ -12,5 +12,5 @@ data class Medication(
     val schedules: List<MedicationSchedule>,
 
     val prescriptionImageUrl: String? = null,
-    val useMealTimeAlarm: Boolean = false
+    val isGrouped: Boolean = false
 )

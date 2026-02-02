@@ -7,11 +7,6 @@ import com.moon.pharm.component_ui.model.TopBarData
 fun NavBackStackEntry.getTopBarData(navController: NavController): TopBarData {
         val routeName = destination.route ?: return TopBarData()
         return when {
-            routeName.contains("ProfileTab") -> {
-                TopBarData(
-                    title = "내정보"
-                )
-            }
             routeName.contains("PrescriptionCapture") -> {
                 TopBarData(
                     title = "처방전"

@@ -8,7 +8,9 @@ import com.moon.pharm.data.common.CONSULT_COLLECTION
 import com.moon.pharm.data.common.ERROR_MSG_CONSULT_NOT_FOUND
 import com.moon.pharm.data.common.FIELD_ANSWER
 import com.moon.pharm.data.common.FIELD_CREATED_AT
+import com.moon.pharm.data.common.FIELD_PHARMACIST_ID
 import com.moon.pharm.data.common.FIELD_STATUS
+import com.moon.pharm.data.common.FIELD_USER_ID
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.remote.dto.ConsultAnswerDTO
 import com.moon.pharm.data.datasource.remote.dto.ConsultItemDTO
@@ -48,6 +50,24 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
             emit(dto)
         }
     }
+
+    override fun getMyConsults(userId: String): Flow<List<ConsultItemDTO>> =
+        collection
+            .whereEqualTo(FIELD_USER_ID, userId)
+            .orderBy(FIELD_CREATED_AT, Query.Direction.DESCENDING)
+            .snapshots()
+            .map { snapshot ->
+                snapshot.toObjects(ConsultItemDTO::class.java)
+            }
+
+    override fun getMyAnsweredConsults(pharmacistId: String): Flow<List<ConsultItemDTO>> =
+        collection
+            .whereEqualTo(FIELD_PHARMACIST_ID, pharmacistId)
+            .orderBy(FIELD_CREATED_AT, Query.Direction.DESCENDING)
+            .snapshots()
+            .map { snapshot ->
+                snapshot.toObjects(ConsultItemDTO::class.java)
+            }
 
     override suspend fun updateConsultAnswer(consultId: String, answerDto: ConsultAnswerDTO): ConsultItemDTO {
         val consultRef = collection.document(consultId)

@@ -1,4 +1,4 @@
-package com.moon.pharm.profile.medication.screen
+package com.moon.pharm.profile.medication.viewmodel
 
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.domain.model.medication.MealTiming
@@ -13,9 +13,7 @@ data class MedicationUiState(
     val isMedicationCreated: Boolean = false,
 
     val medicationList: List<TodayMedicationUiModel> = emptyList(),
-
     val selectedTab: MedicationPrimaryTab = MedicationPrimaryTab.ALL,
-
     val form: MedicationFormState = MedicationFormState()
 )
 
@@ -29,5 +27,5 @@ data class MedicationFormState(
     val selectedMealTiming: MealTiming = MealTiming.BEFORE_MEAL,
     val selectedTime: Long? = null,
     val selectedRepeatType: RepeatType = RepeatType.DAILY,
-    val isMealTimeAlarmEnabled: Boolean = false
+    val isGrouped: Boolean = false
 )

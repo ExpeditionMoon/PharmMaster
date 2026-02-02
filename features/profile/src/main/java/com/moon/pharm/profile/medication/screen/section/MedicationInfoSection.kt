@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.component.input.PrimaryTextField
-import com.moon.pharm.profile.medication.screen.MedicationFormState
+import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
 import com.moon.pharm.profile.medication.screen.component.MedicationTypeSelector
 import com.moon.pharm.profile.medication.screen.component.PeriodInputSection
 import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent

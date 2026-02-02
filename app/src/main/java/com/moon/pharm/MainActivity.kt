@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.firebase.messaging.FirebaseMessaging
+import com.moon.pharm.alarm.AlarmConstants
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.ui.screen.EntryPointScreen
 import com.moon.pharm.ui.screen.MainViewModel
@@ -24,6 +25,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        checkNotificationIntent()
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -52,6 +55,15 @@ class MainActivity : ComponentActivity() {
             PharmMasterTheme {
                 EntryPointScreen()
             }
+        }
+    }
+
+    private fun checkNotificationIntent() {
+        val isFromAlarm = intent.getBooleanExtra(AlarmConstants.KEY_IS_FROM_ALARM, false)
+        val targetFragment = intent.getStringExtra(AlarmConstants.KEY_TARGET_FRAGMENT)
+
+        if (isFromAlarm && targetFragment == AlarmConstants.FRAGMENT_MEDICATION) {
+            viewModel.moveToMedicationTab()
         }
     }
 }

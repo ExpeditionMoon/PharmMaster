@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.profile.R
-import com.moon.pharm.profile.medication.screen.MedicationFormState
+import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
 import com.moon.pharm.profile.medication.screen.section.MedicationAlarmSection
 import com.moon.pharm.profile.medication.screen.section.MedicationInfoSection
 import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent

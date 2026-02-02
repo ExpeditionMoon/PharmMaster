@@ -77,6 +77,28 @@ class ConsultRepositoryImpl @Inject constructor(
             .flowOn(ioDispatcher)
     }
 
+    override fun getMyConsult(userId: String): Flow<DataResourceResult<List<ConsultItem>>> {
+        return dataSource.getMyConsults(userId)
+            .map { dtoList ->
+                val domainList = dtoList.map { it.toDomain() }
+                DataResourceResult.Success(domainList) as DataResourceResult<List<ConsultItem>>
+            }
+            .onStart { emit(DataResourceResult.Loading) }
+            .catch { emit(DataResourceResult.Failure(it)) }
+            .flowOn(ioDispatcher)
+    }
+
+    override fun getMyAnsweredConsultList(userId: String): Flow<DataResourceResult<List<ConsultItem>>> {
+        return dataSource.getMyAnsweredConsults(userId)
+            .map { dtoList ->
+                val domainList = dtoList.map { it.toDomain() }
+                DataResourceResult.Success(domainList) as DataResourceResult<List<ConsultItem>>
+            }
+            .onStart { emit(DataResourceResult.Loading) }
+            .catch { emit(DataResourceResult.Failure(it)) }
+            .flowOn(ioDispatcher)
+    }
+
     override fun registerAnswer(
         consultId: String,
         answer: ConsultAnswer

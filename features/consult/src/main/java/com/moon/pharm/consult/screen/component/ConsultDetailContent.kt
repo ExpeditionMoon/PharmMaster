@@ -37,53 +37,59 @@ fun ConsultDetailContent(
     onAnswerChange: (String) -> Unit = {},
     onSubmitAnswer: () -> Unit = {}
 ) {
-    if (item != null) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(backgroundLight)
-                .padding(horizontal = 24.dp, vertical = 20.dp)
-        ) {
-            item {
-                QuestionSection(item)
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-            item {
-                if (item.status == ConsultStatus.COMPLETED && item.answer != null) {
-                    AnswerSection(
-                        pharmacist = pharmacist,
-                        pharmacistImageUrl = pharmacistImageUrl,
-                        item = item
-                    )
-                } else if (item.status == ConsultStatus.WAITING) {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    if (isPharmacistMode) {
-                        PharmacistAnswerInputSection(
-                            input = answerInput,
-                            onValueChange = onAnswerChange,
-                            onSubmit = onSubmitAnswer
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundLight)
+    ) {
+        if (item != null) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(backgroundLight)
+                    .padding(horizontal = 24.dp, vertical = 20.dp)
+            ) {
+                item {
+                    QuestionSection(item)
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+                item {
+                    if (item.status == ConsultStatus.COMPLETED && item.answer != null) {
+                        AnswerSection(
+                            pharmacist = pharmacist,
+                            pharmacistImageUrl = pharmacistImageUrl,
+                            item = item
                         )
-                    } else {
-                        WaitingForAnswerBox()
+                    } else if (item.status == ConsultStatus.WAITING) {
+                        Spacer(modifier = Modifier.height(20.dp))
+                        if (isPharmacistMode) {
+                            PharmacistAnswerInputSection(
+                                input = answerInput,
+                                onValueChange = onAnswerChange,
+                                onSubmit = onSubmitAnswer
+                            )
+                        } else {
+                            WaitingForAnswerBox()
+                        }
                     }
                 }
+                item { Spacer(modifier = Modifier.height(50.dp)) }
             }
-            item { Spacer(modifier = Modifier.height(50.dp)) }
+        } else if (!isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.consult_detail_error_load),
+                    color = SecondFont,
+                    fontSize = 16.sp
+                )
+            }
         }
-    } else if (!isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = stringResource(R.string.consult_detail_error_load),
-                color = SecondFont,
-                fontSize = 16.sp
-            )
-        }
-    }
 
-    if (isLoading) {
-        CircularProgressBar()
+        if (isLoading) {
+            CircularProgressBar(modifier = Modifier.align(Alignment.Center))
+        }
     }
 }
