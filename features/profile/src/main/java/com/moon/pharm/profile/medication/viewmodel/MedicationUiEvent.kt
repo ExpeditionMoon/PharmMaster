@@ -16,7 +16,7 @@ sealed interface MedicationUiEvent {
     data class UpdateMealTiming(val timing: MealTiming) : MedicationUiEvent
     data class UpdateAlarmTime(val hour: Int, val minute: Int) : MedicationUiEvent
     data class UpdateRepeatType(val type: RepeatType) : MedicationUiEvent
-    data class UpdateMealAlarm(val enabled: Boolean) : MedicationUiEvent
+    data class UpdateGroupedNotification(val enabled: Boolean) : MedicationUiEvent
 
     // 2. 주요 비즈니스 로직 (Business Logic)
     object SaveMedication : MedicationUiEvent

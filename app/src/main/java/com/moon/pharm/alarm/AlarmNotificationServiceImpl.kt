@@ -19,8 +19,16 @@ class AlarmNotificationServiceImpl @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) : AlarmNotificationService {
 
-    override fun showMedicationAlarm(name: String, dosage: String, time: String) {
+    override fun showMedicationAlarm(name: String, dosage: String, time: String, isGrouped: Boolean) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val groupKey = if (isGrouped) {
+            "${AlarmConstants.GROUP_KEY_PREFIX_TIME}$time"
+        } else {
+            "${AlarmConstants.GROUP_KEY_PREFIX_SINGLE}${name}_$time"
+        }
+        val summaryId = groupKey.hashCode()
+        val notificationId = System.currentTimeMillis().toInt()
 
         val title = context.getString(R.string.notification_title)
         val content = context.getString(R.string.notification_content, time, name, dosage)
@@ -33,7 +41,9 @@ class AlarmNotificationServiceImpl @Inject constructor(
             putExtra(AlarmConstants.KEY_TARGET_FRAGMENT, AlarmConstants.FRAGMENT_MEDICATION)
         }
         val pendingIntent = PendingIntent.getActivity(
-            context, 0, intent,
+            context,
+            notificationId,
+            intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
@@ -44,8 +54,22 @@ class AlarmNotificationServiceImpl @Inject constructor(
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setGroup(groupKey)
 
-        notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
+        val summaryNotification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_pill)
+            .setContentTitle(time)
+            .setContentText(context.getString(R.string.notification_title))
+            .setStyle(NotificationCompat.InboxStyle()
+                .setSummaryText(context.getString(R.string.notification_summary_text, time)))
+            .setGroup(groupKey)
+            .setGroupSummary(true)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        notificationManager.notify(notificationId, builder.build())
+        notificationManager.notify(summaryId, summaryNotification)
     }
 
     private fun createNotificationChannel(manager: NotificationManager) {

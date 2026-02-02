@@ -6,7 +6,7 @@ import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.model.medication.MedicationSchedule
 import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
-import com.moon.pharm.profile.medication.screen.MedicationFormState
+import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
 import java.util.UUID
 
 object MedicationUiMapper {
@@ -27,7 +27,7 @@ object MedicationUiMapper {
             endDate = if (form.noEndDate) null else form.endDate,
             repeatType = form.selectedRepeatType,
             schedules = listOf(schedule),
-            useMealTimeAlarm = form.isMealTimeAlarmEnabled
+            isGrouped = form.isGrouped
         )
     }
 

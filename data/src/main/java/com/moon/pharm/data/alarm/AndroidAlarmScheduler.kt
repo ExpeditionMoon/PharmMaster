@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import com.moon.pharm.data.common.ALARM_NEXT_DAY_OFFSET
 import com.moon.pharm.data.common.KEY_ALARM_TIME
 import com.moon.pharm.data.common.KEY_DOSAGE
+import com.moon.pharm.data.common.KEY_IS_GROUPED
 import com.moon.pharm.data.common.KEY_MEDICATION_NAME
 import com.moon.pharm.data.common.TIME_DELIMITER
 import com.moon.pharm.data.common.TIME_PARTS_SIZE
@@ -41,6 +42,7 @@ class AndroidAlarmScheduler @Inject constructor(
                 putExtra(KEY_MEDICATION_NAME, medication.name)
                 putExtra(KEY_DOSAGE, schedule.dosage)
                 putExtra(KEY_ALARM_TIME, schedule.time)
+                putExtra(KEY_IS_GROUPED, medication.isGrouped)
             }
 
             val pendingIntent = PendingIntent.getBroadcast(

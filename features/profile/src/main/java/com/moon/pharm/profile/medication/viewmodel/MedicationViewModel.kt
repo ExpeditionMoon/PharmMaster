@@ -16,8 +16,6 @@ import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
 import com.moon.pharm.profile.medication.mapper.toUiMessage
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 import com.moon.pharm.profile.medication.model.MedicationUiMessage
-import com.moon.pharm.profile.medication.screen.MedicationFormState
-import com.moon.pharm.profile.medication.screen.MedicationUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -75,7 +73,7 @@ class MedicationViewModel @Inject constructor(
             is MedicationUiEvent.UpdateMealTiming -> updateForm { it.copy(selectedMealTiming = event.timing) }
             is MedicationUiEvent.UpdateAlarmTime -> updateForm { it.copy(selectedTime = (event.hour * 60 + event.minute).toLong()) }
             is MedicationUiEvent.UpdateRepeatType -> updateForm { it.copy(selectedRepeatType = event.type) }
-            is MedicationUiEvent.UpdateMealAlarm -> updateForm { it.copy(isMealTimeAlarmEnabled = event.enabled) }
+            is MedicationUiEvent.UpdateGroupedNotification -> updateForm { it.copy(isGrouped = event.enabled) }
 
             // 2. 주요 비즈니스 로직 (Business Logic)
             MedicationUiEvent.SaveMedication -> saveMedication()
