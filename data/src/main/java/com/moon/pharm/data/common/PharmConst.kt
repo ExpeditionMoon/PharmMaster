@@ -39,3 +39,14 @@ const val ERROR_MSG_CONSULT_NOT_FOUND = "Consult document not found"
 
 // Firebase Storage 설정 (Storage)
 const val STORAGE_CONSULT_IMAGES = "consult_images"
+
+// Alarm
+const val KEY_MEDICATION_NAME = "key_medication_name"
+const val KEY_DOSAGE = "key_dosage"
+const val KEY_ALARM_TIME = "key_alarm_time"
+const val KEY_IS_GROUPED = "IS_GROUPED"
+
+const val NOTIFICATION_CHANNEL_ID = "medication_alarm_channel"
+const val NOTIFICATION_CHANNEL_NAME = "복약 알림"
+const val TIME_PARTS_SIZE = 2
+const val ALARM_NEXT_DAY_OFFSET = 1L

@@ -26,10 +26,10 @@ import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.backgroundLight
 import com.moon.pharm.component_ui.util.toMinuteTimeUiString
 import com.moon.pharm.profile.R
-import com.moon.pharm.profile.medication.screen.MedicationFormState
 import com.moon.pharm.profile.medication.screen.component.AlarmOptionSelector
-import com.moon.pharm.profile.medication.screen.component.AlarmTypeSection
 import com.moon.pharm.profile.medication.screen.component.MealTimeChips
+import com.moon.pharm.profile.medication.screen.component.MedicationAlarmOptionsCard
+import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
 import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,9 +88,9 @@ fun MedicationAlarmSection(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        AlarmTypeSection(
-            isChecked = form.isMealTimeAlarmEnabled,
-            onCheckedChange = { onEvent(MedicationUiEvent.UpdateMealAlarm(it)) }
+        MedicationAlarmOptionsCard(
+            form = form,
+            onEvent = onEvent
         )
     }
 }

@@ -72,6 +72,10 @@ dependencies {
     // Splash
     implementation(libs.androidx.core.splashscreen)
 
+    // Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
     // Hilt Core
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

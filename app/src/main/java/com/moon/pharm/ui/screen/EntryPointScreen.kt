@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -25,10 +27,27 @@ import com.moon.pharm.home.navigation.homeNavGraph
 import com.moon.pharm.prescription.navigation.prescriptionNavGraph
 import com.moon.pharm.profile.navigation.profileNavGraph
 import com.moon.pharm.ui.navigation.BottomAppBarItem
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun EntryPointScreen() {
+fun EntryPointScreen(
+    viewModel: MainViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collectLatest { route ->
+            if (route == "MedicationScreen") {
+                navController.navigate(ContentNavigationRoute.MedicationTab) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
+        }
+    }
 
     val bottomAppBarItems = remember { BottomAppBarItem.fetchBottomAppBarItems() }
     val navBackStackEntry by navController.currentBackStackEntryAsState()

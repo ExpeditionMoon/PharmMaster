@@ -91,8 +91,13 @@
     <string name="medication_dosage_hint">복용 용량 입력(예: 2알, 1캡슐)</string>
 
     <string name="medication_alarm_time_dialog_title">알람 시간 설정</string>
-    <string name="medication_alarm_group_by_meal">묶음 알림 (식사 시간에 따라)</string>
-    <string name="medication_alarm_group_description">식사 시간(식전/식후)이 같은 약들을 한 번의 알림으로 모아줍니다.</string>
+    <string name="medication_alarm_grouped_title">묶음 알림</string>
+    <string name="medication_alarm_grouped_desc">같은 시간대 약 통합</string>
+    <string name="medication_alarm_group_description">
+        같은 시간에 복용해야 할 약이 여러 개일 때,\n
+        알림을 하나로 묶어서 보여줍니다.\n\n
+        (꺼져 있을 경우 각각 알림이 옵니다.)
+    </string>
     <string name="medication_info">정보</string>
     <string name="medication_add">등록하기</string>
 

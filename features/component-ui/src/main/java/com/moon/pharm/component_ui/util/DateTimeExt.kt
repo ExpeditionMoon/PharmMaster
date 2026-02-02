@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import com.moon.pharm.component_ui.common.ASIA_SEOUL_ZONE
 import com.moon.pharm.component_ui.common.DATE_PATTERN
 import com.moon.pharm.component_ui.common.DATE_TIME_PATTERN
+import com.moon.pharm.component_ui.common.FORMAT_TIME_HH_MM
 import com.moon.pharm.component_ui.common.TIME_PATTERN
 import java.time.Instant
 import java.time.LocalDateTime
@@ -18,6 +19,7 @@ import java.util.Locale
 @get:RequiresApi(Build.VERSION_CODES.O)
 private val SEOUL_ZONE get() = ZoneId.of(ASIA_SEOUL_ZONE)
 
+// Formatters
 @get:RequiresApi(Build.VERSION_CODES.O)
 private val yearMonthDayFormatter get() = DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.KOREAN)
 
@@ -31,6 +33,9 @@ private fun getLegacyFormatter(pattern: String): java.text.SimpleDateFormat {
     return java.text.SimpleDateFormat(pattern, Locale.KOREAN)
 }
 
+/**
+ * 타임스탬프(Millis)를 날짜+시간 문자열로 변환
+ */
 @SuppressLint("NewApi")
 fun Long?.toDisplayDateTimeString(): String {
     if (this == null) return ""
@@ -44,6 +49,9 @@ fun Long?.toDisplayDateTimeString(): String {
     }
 }
 
+/**
+ * 타임스탬프(Millis)를 날짜 문자열로 변환
+ */
 @SuppressLint("NewApi")
 fun Long?.toDisplayDateString(): String {
     if (this == null) return ""
@@ -54,6 +62,9 @@ fun Long?.toDisplayDateString(): String {
     }
 }
 
+/**
+ * 타임스탬프(Millis)를 시간 문자열로 변환
+ */
 @SuppressLint("NewApi")
 fun Long?.toDisplayTimeString(): String {
     if (this == null) return ""
@@ -71,6 +82,9 @@ fun Long?.toDisplayTimeString(): String {
     }
 }
 
+/**
+ * 총 분(Total Minutes)을 UI용 시간 문자열로 변환
+ */
 @SuppressLint("NewApi")
 fun Long?.toMinuteTimeUiString(): String {
     if (this == null) return ""
@@ -90,13 +104,14 @@ fun Long?.toMinuteTimeUiString(): String {
     }
 }
 
-fun Long.toTodayTimestamp(): Long {
-    val now = java.util.Calendar.getInstance()
+/**
+ * 알람 스케줄러 및 DB 저장을 위한 기계용 시간 포맷
+ */
+@SuppressLint("NewApi")
+fun Long?.toScheduleTimeString(): String {
+    val totalMinutes = (this ?: 0L).toInt()
+    val hour = totalMinutes / 60
+    val minute = totalMinutes % 60
 
-    now.set(java.util.Calendar.HOUR_OF_DAY, 0)
-    now.set(java.util.Calendar.MINUTE, 0)
-    now.set(java.util.Calendar.SECOND, 0)
-    now.set(java.util.Calendar.MILLISECOND, 0)
-
-    return now.timeInMillis + this
+    return String.format(java.util.Locale.US, FORMAT_TIME_HH_MM, hour, minute)
 }

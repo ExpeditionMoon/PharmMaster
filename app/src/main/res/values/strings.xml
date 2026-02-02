@@ -3,4 +3,10 @@
 
     <string name="noti_default_title">약대장 알림</string>
     <string name="noti_default_body">새로운 소식이 있습니다.</string>
+
+    <!-- Medication Alarm -->
+    <string name="notification_title">💊 복약 시간입니다</string>
+    <string name="notification_content">%1$s - %2$s %3$s 복용할 시간이에요!</string>
+    <string name="notification_channel_description">복약 알림을 위한 채널입니다.</string>
+    <string name="notification_summary_text">%1$s 복약</string>
 </resources>

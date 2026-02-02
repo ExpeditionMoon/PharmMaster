@@ -59,7 +59,7 @@
     <string name="consult_confirm_no_pharmacist">선택된 약사 없음</string>
     <string name="consult_confirm_edit_btn">수정</string>
     <string name="consult_confirm_guidance">
-        상담 요청 전에 모든 내용을 다시 한번 확인해주세요. <br/>
+        상담 요청 전에 모든 내용을 다시 한번 확인해주세요.\n
         요청이 완료되면 약사에게 실시간으로 연결됩니다.
     </string>
     <string name="consult_confirm_submit_btn">상담 요청하기</string>
