@@ -9,14 +9,11 @@ import javax.inject.Inject
 class ToggleIntakeCheckUseCase @Inject constructor(
     private val repository: MedicationRepository
 ) {
-    operator fun invoke(
-        record: IntakeRecord,
-        isCurrentlyChecked: Boolean
-    ): Flow<DataResourceResult<Unit>> {
-        return if (isCurrentlyChecked) {
-            repository.deleteIntakeRecord(record.medicationId, record.scheduleId, record.recordDate)
-        } else {
+    operator fun invoke(record: IntakeRecord, isTaken: Boolean): Flow<DataResourceResult<Unit>> {
+        return if (isTaken) {
             repository.saveIntakeRecord(record)
+        } else {
+            repository.deleteIntakeRecord(record.medicationId, record.scheduleId, record.recordDate)
         }
     }
 }

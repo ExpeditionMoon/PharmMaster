@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
 
         // PharmMaster version
         buildConfigField("String", "VERSION_NAME", "\"1.0.0\"")

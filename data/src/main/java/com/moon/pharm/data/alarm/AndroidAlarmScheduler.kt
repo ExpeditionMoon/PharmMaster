@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.annotation.RequiresApi
 import com.moon.pharm.data.common.ALARM_NEXT_DAY_OFFSET
 import com.moon.pharm.data.common.KEY_ALARM_TIME
 import com.moon.pharm.data.common.KEY_DOSAGE
@@ -27,7 +26,6 @@ class AndroidAlarmScheduler @Inject constructor(
 
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun schedule(medication: Medication) {
         medication.schedules.forEach { schedule ->
             val timeParts = schedule.time.split(TIME_DELIMITER)

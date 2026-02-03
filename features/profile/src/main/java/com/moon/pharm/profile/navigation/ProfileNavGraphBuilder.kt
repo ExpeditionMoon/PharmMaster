@@ -1,5 +1,6 @@
 package com.moon.pharm.profile.navigation
 
+import android.os.Build
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -11,6 +12,7 @@ import com.moon.pharm.profile.auth.screen.SignUpScreen
 import com.moon.pharm.profile.auth.viewmodel.LoginViewModel
 import com.moon.pharm.profile.auth.viewmodel.SignUpViewModel
 import com.moon.pharm.profile.medication.screen.MedicationCreateScreen
+import com.moon.pharm.profile.medication.screen.MedicationHistoryScreen
 import com.moon.pharm.profile.medication.screen.MedicationScreen
 import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 import com.moon.pharm.profile.mypage.screen.MyPageRoute
@@ -73,5 +75,8 @@ fun NavGraphBuilder.profileNavGraph(navController: NavController) {
     composable<ContentNavigationRoute.MedicationTabCreateScreen>{
         val viewModel: MedicationViewModel = hiltViewModel()
         MedicationCreateScreen(navController = navController, viewModel)
+    }
+    composable<ContentNavigationRoute.MedicationTabHistoryScreen>{
+        MedicationHistoryScreen(onBackClick = { navController.popBackStack() })
     }
 }
