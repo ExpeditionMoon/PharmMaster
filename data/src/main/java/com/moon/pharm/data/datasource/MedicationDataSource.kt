@@ -10,6 +10,7 @@ interface MedicationDataSource {
     suspend fun deleteMedication(medicationId: String)
 
     fun getIntakeRecords(userId: String, date: String): Flow<List<IntakeRecordDTO>>
+    fun getIntakeRecordsByRange(userId: String, startDate: String, endDate: String): Flow<List<IntakeRecordDTO>>
     suspend fun saveIntakeRecord(record: IntakeRecordDTO)
     suspend fun deleteIntakeRecord(medicationId: String, scheduleId: String, date: String)
 }

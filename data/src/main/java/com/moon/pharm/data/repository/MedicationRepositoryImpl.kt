@@ -64,6 +64,23 @@ class MedicationRepositoryImpl @Inject constructor(
             .flowOn(ioDispatcher)
     }
 
+    override fun getIntakeRecordsByRange(
+        userId: String,
+        startDate: String,
+        endDate: String
+    ): Flow<DataResourceResult<List<IntakeRecord>>> {
+        return dataSource.getIntakeRecordsByRange(userId, startDate, endDate)
+            .map { dto ->
+                val records = dto.map { it.toDomain() }
+                DataResourceResult.Success(records) as DataResourceResult<List<IntakeRecord>>
+            }
+            .onStart { emit(DataResourceResult.Loading) }
+            .catch { e ->
+                android.util.Log.e("RepositoryDebug", "데이터 로드 실패: ${e.message}", e)
+                emit(DataResourceResult.Failure(e)) }
+            .flowOn(ioDispatcher)
+    }
+
     override fun saveIntakeRecord(record: IntakeRecord): Flow<DataResourceResult<Unit>> =
         wrapCUDOperation {
             dataSource.saveIntakeRecord(record.toDto())
