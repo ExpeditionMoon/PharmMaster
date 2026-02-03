@@ -16,7 +16,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,8 +27,6 @@ import com.moon.pharm.component_ui.theme.Black
 import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.util.toDisplayString
 import com.moon.pharm.component_ui.util.toQueryString
-import com.moon.pharm.domain.model.medication.IntakeRecord
-import com.moon.pharm.profile.medication.model.HistoryRecordUiModel
 import com.moon.pharm.profile.medication.screen.component.HistoryRecordItem
 import com.moon.pharm.profile.medication.screen.section.HistoryCalendarSection
 import com.moon.pharm.profile.medication.viewmodel.MedicationHistoryUiState
@@ -135,40 +132,4 @@ fun MedicationHistoryContent(
             }
         }
     }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
-@Composable
-fun PreviewMedicationHistoryScreen() {
-    val today = LocalDate.now()
-    val todayKey = today.toQueryString()
-
-    val record1 = IntakeRecord(
-        id = "1", userId = "user", medicationId = "med1", scheduleId = "sch1",
-        recordDate = todayKey, isTaken = true, takenTime = System.currentTimeMillis()
-    )
-    val record2 = IntakeRecord(
-        id = "2", userId = "user", medicationId = "med2", scheduleId = "sch2",
-        recordDate = todayKey, isTaken = false, takenTime = null
-    )
-
-    val dummyUiModels = listOf(
-        HistoryRecordUiModel(record = record1, medicationName = "타이레놀"),
-        HistoryRecordUiModel(record = record2, medicationName = "비타민 C")
-    )
-
-    val dummyState = MedicationHistoryUiState(
-        isLoading = false,
-        selectedMonth = YearMonth.now(),
-        selectedDate = today,
-        recordsByDate = mapOf(todayKey to dummyUiModels)
-    )
-
-    MedicationHistoryContent(
-        uiState = dummyState,
-        onBackClick = {},
-        onMonthChanged = {},
-        onDateClick = {},
-        onToggleRecord = { _, _, _ -> }
-    )
 }
