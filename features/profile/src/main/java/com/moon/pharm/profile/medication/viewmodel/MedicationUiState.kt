@@ -19,6 +19,7 @@ data class MedicationUiState(
 
 data class MedicationFormState(
     val medicationName: String = "",
+    val dailyCount: Int = 0,
     val medicationDosage: String? = "",
     val selectedType: MedicationType = MedicationType.PRESCRIPTION,
     val startDate: Long? = null,

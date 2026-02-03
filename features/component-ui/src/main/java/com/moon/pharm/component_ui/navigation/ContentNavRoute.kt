@@ -13,7 +13,7 @@ sealed interface ContentNavigationRoute : PharmNavigation {
     @Serializable
     data object MedicationTab : ContentNavigationRoute
     @Serializable
-    data object MedicationTabCreateScreen : ContentNavigationRoute
+    data class MedicationTabCreateScreen(val name: String = "", val dailyCount: Int = 0) : ContentNavigationRoute
     @Serializable
     data object MedicationTabHistoryScreen : ContentNavigationRoute
 
@@ -38,4 +38,6 @@ sealed interface ContentNavigationRoute : PharmNavigation {
     object MyConsultList : ContentNavigationRoute
     @Serializable
     data object PrescriptionCapture : ContentNavigationRoute
+    @Serializable
+    data object PrescriptionCamera : ContentNavigationRoute
 }

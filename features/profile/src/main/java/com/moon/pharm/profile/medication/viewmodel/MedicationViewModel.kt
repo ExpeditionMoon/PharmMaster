@@ -1,8 +1,11 @@
 package com.moon.pharm.profile.medication.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.model.medication.MedicationProgress
 import com.moon.pharm.domain.model.medication.MedicationTimeGroup
@@ -33,13 +36,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MedicationViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val getMedicationsUseCase: GetMedicationsUseCase,
     private val saveMedicationUseCase: SaveMedicationUseCase,
     private val getDailyIntakeRecordsUseCase: GetDailyIntakeRecordsUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     private val validateMedicationEntryUseCase: ValidateMedicationEntryUseCase,
-    private val alarmScheduler: AlarmScheduler
+    private val alarmScheduler: AlarmScheduler,
 ): ViewModel() {
 
     // region 1. State & Derived State
@@ -62,6 +66,7 @@ class MedicationViewModel @Inject constructor(
 
     init {
         fetchMedicationList()
+        initializeFormFromArgs()
     }
 
     // region 2. Event Handler
@@ -136,6 +141,17 @@ class MedicationViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun initializeFormFromArgs() {
+        try {
+            val args = savedStateHandle.toRoute<ContentNavigationRoute.MedicationTabCreateScreen>()
+            if (args.name.isNotEmpty()) {
+                updateForm { it.copy(medicationName = args.name, dailyCount = args.dailyCount) }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
