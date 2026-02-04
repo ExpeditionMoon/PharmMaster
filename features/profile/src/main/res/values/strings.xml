@@ -52,7 +52,7 @@
     <string name="mypage_nickname_update">닉네임 수정</string>
     <string name="mypage_consult_history_format">(%s)</string>
     <string name="mypage_menu_medication_record">나의 약 기록</string>
-    <string name="mypage_menu_alarm_setting">복용 알림 설정</string>
+    <string name="mypage_menu_intake_history">나의 복약 기록</string>
     <string name="mypage_menu_core_feature">핵심 기능</string>
     <string name="mypage_menu_customer_support">고객 지원</string>
     <string name="mypage_menu_notice">공지사항</string>

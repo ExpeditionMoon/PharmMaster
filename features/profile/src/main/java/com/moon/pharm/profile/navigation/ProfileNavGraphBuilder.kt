@@ -52,6 +52,9 @@ fun NavGraphBuilder.profileNavGraph(navController: NavController) {
             onNavigateToMyConsultation = {
                 navController.navigate(ContentNavigationRoute.MyConsultList)
             },
+            onNavigateToMedicationHistory = {
+                navController.navigate(ContentNavigationRoute.MedicationTabHistoryScreen)
+            },
             onNavigateToLogin = {
                 navController.navigate(ContentNavigationRoute.LoginScreen) {
                     popUpTo(0) { inclusive = true }

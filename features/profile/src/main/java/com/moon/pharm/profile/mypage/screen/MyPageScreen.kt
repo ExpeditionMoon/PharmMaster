@@ -9,7 +9,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Person
@@ -52,6 +51,7 @@ import com.moon.pharm.component_ui.R as UiR
 @Composable
 fun MyPageRoute(
     onNavigateToMyConsultation: () -> Unit,
+    onNavigateToMedicationHistory: () -> Unit,
     onNavigateToLogin: () -> Unit,
     viewModel: MyPageViewModel = hiltViewModel()
 ) {
@@ -60,6 +60,7 @@ fun MyPageRoute(
     MyPageScreen(
         uiState = uiState,
         onNavigateToMyConsultation = onNavigateToMyConsultation,
+        onNavigateToMedicationHistory = onNavigateToMedicationHistory,
         onLogout = {
             viewModel.logout()
             onNavigateToLogin()
@@ -72,6 +73,7 @@ fun MyPageRoute(
 fun MyPageScreen(
     uiState: MyPageUiState,
     onNavigateToMyConsultation: () -> Unit,
+    onNavigateToMedicationHistory: () -> Unit,
     onLogout: () -> Unit,
     onUpdateNickname: (String) -> Unit
 ) {
@@ -135,7 +137,8 @@ fun MyPageScreen(
                         items = getCoreMenuItems(
                             consultTitle = baseTitle,
                             consultCount = formattedCount,
-                            onConsultClick = onNavigateToMyConsultation
+                            onConsultClick = onNavigateToMyConsultation,
+                            onMedicationHistoryClick = onNavigateToMedicationHistory
                         )
                     )
 
@@ -162,7 +165,8 @@ fun MyPageScreen(
 private fun getCoreMenuItems(
     consultTitle: String,
     consultCount: String?,
-    onConsultClick: () -> Unit
+    onConsultClick: () -> Unit,
+    onMedicationHistoryClick: () -> Unit
 ): List<MyPageMenuItemData> {
     return listOf(
         MyPageMenuItemData(
@@ -171,9 +175,9 @@ private fun getCoreMenuItems(
             onClick = {}
         ),
         MyPageMenuItemData(
-            icon = Icons.Default.Notifications,
-            title = stringResource(R.string.mypage_menu_alarm_setting),
-            onClick = {}
+            icon = Icons.Default.Face,
+            title = stringResource(R.string.mypage_menu_intake_history),
+            onClick = onMedicationHistoryClick
         ),
         MyPageMenuItemData(
             icon = Icons.Outlined.Person,
@@ -227,6 +231,7 @@ fun MyPageScreenPreviewSuccess() {
                     myConsults = emptyList()
                 ),
                 onNavigateToMyConsultation = {},
+                onNavigateToMedicationHistory = {},
                 onLogout = {},
                 onUpdateNickname = {}
             )
