@@ -19,15 +19,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.util.toDisplayDateString
 import com.moon.pharm.component_ui.component.card.DateSettingCard
 import com.moon.pharm.component_ui.component.dialog.DatePickerModal
 import com.moon.pharm.component_ui.component.toggle.CustomSwitch
-import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
+import com.moon.pharm.component_ui.util.toDisplayDateString
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 
 @Composable
 fun PeriodInputSection(
+    medicationIndex: Int,
     startDate: Long?,
     endDate: Long?,
     noEndDate: Boolean,
@@ -65,7 +66,7 @@ fun PeriodInputSection(
         DatePickerModal(
             state = startDatePickerState,
             onDateSelected = { millis ->
-                onEvent(MedicationUiEvent.UpdateStartDate(millis))
+                onEvent(MedicationUiEvent.UpdateStartDate(index = medicationIndex, millis = millis))
                 showStartPicker = false
             },
             onDismiss = { showStartPicker = false }
@@ -76,7 +77,7 @@ fun PeriodInputSection(
         DatePickerModal(
             state = endDatePickerState,
             onDateSelected = { millis ->
-                onEvent(MedicationUiEvent.UpdateEndDate(millis))
+                onEvent(MedicationUiEvent.UpdateEndDate(index = medicationIndex, millis = millis))
                 showEndPicker = false
             },
             onDismiss = { showEndPicker = false }
@@ -101,7 +102,12 @@ fun PeriodInputSection(
         CustomSwitch(
             checked = noEndDate,
             onCheckedChange = { checked ->
-                onEvent(MedicationUiEvent.UpdatePeriod(startDate, if (checked) null else endDate, checked))
+                onEvent(MedicationUiEvent.UpdatePeriod(
+                    index = medicationIndex,
+                    start = startDate,
+                    end = if (checked) null else endDate,
+                    noEnd = checked
+                ))
             }
         )
     }

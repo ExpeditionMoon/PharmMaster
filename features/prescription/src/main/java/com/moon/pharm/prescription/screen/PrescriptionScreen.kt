@@ -7,7 +7,11 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,9 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
+import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
+import com.moon.pharm.component_ui.theme.Black
+import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.prescription.viewmodel.PrescriptionUiEvent
 import com.moon.pharm.prescription.viewmodel.PrescriptionViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -42,6 +50,7 @@ fun PrescriptionScreen(
 ) {
     val context = LocalContext.current
     var showCamera by remember { mutableStateOf(false) }
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     LaunchedEffect(true) {
         viewModel.uiEvent.collectLatest { event ->
@@ -49,8 +58,7 @@ fun PrescriptionScreen(
                 is PrescriptionUiEvent.NavigateToCreate -> {
                     navController.navigate(
                         ContentNavigationRoute.MedicationTabCreateScreen(
-                            name = event.name,
-                            dailyCount = event.dailyCount
+                            scannedList = event.scannedList
                         )
                     ) {
                         popUpTo(ContentNavigationRoute.PrescriptionCapture) { inclusive = false }
@@ -106,7 +114,8 @@ fun PrescriptionScreen(
                     } else {
                         permissionLauncher.launch(permission)
                     }
-                }
+                },
+                enabled = !isLoading
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -117,8 +126,33 @@ fun PrescriptionScreen(
                     photoPickerLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
-                }
+                },
+                enabled = !isLoading
             )
+        }
+    }
+
+    if (isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Black.copy(alpha = 0.5f))
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = {}
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                CircularProgressBar()
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "처방전을 분석하고 있어요...",
+                    color = White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }

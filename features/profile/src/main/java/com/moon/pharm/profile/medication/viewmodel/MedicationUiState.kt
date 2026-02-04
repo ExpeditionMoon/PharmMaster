@@ -14,7 +14,7 @@ data class MedicationUiState(
 
     val medicationList: List<TodayMedicationUiModel> = emptyList(),
     val selectedTab: MedicationPrimaryTab = MedicationPrimaryTab.ALL,
-    val form: MedicationFormState = MedicationFormState()
+    val medicationForms: List<MedicationFormState> = listOf(MedicationFormState())
 )
 
 data class MedicationFormState(

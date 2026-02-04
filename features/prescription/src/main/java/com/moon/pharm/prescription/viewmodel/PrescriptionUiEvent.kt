@@ -1,8 +1,9 @@
 package com.moon.pharm.prescription.viewmodel
 
+import com.moon.pharm.component_ui.model.ScannedMedication
+
 sealed interface PrescriptionUiEvent {
     data class NavigateToCreate(
-        val name: String,
-        val dailyCount: Int
+        val scannedList: List<ScannedMedication>
     ) : PrescriptionUiEvent
 }

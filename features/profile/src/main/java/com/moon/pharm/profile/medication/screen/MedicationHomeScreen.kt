@@ -56,7 +56,7 @@ fun MedicationScreen(
                             icon = Icons.Default.Add,
                             onClick = {
                                 multipleEventsCutter.processEvent {
-                                    navController?.navigate(ContentNavigationRoute.MedicationTabCreateScreen)
+                                    navController?.navigate(ContentNavigationRoute.MedicationTabCreateScreen())
                                 }
                             }
                         )

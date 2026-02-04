@@ -40,8 +40,7 @@ fun CameraPreviewRoute(
                 is PrescriptionUiEvent.NavigateToCreate -> {
                     navController?.navigate(
                         ContentNavigationRoute.MedicationTabCreateScreen(
-                            name = event.name,
-                            dailyCount = event.dailyCount
+                            scannedList = event.scannedList
                         )
                     ) {
                         popUpTo(ContentNavigationRoute.PrescriptionCapture) { inclusive = false }
