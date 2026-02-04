@@ -51,6 +51,15 @@ class FirestoreMedicationDataSourceImpl @Inject constructor(
             .map { it.toObjects(IntakeRecordDTO::class.java) }
     }
 
+    override fun getIntakeRecordsByRange(userId: String, startDate: String, endDate: String): Flow<List<IntakeRecordDTO>> {
+        return intakeCollection
+            .whereEqualTo(FIELD_USER_ID, userId)
+            .whereGreaterThanOrEqualTo(FIELD_RECORD_DATE, startDate)
+            .whereLessThanOrEqualTo(FIELD_RECORD_DATE, endDate)
+            .snapshots()
+            .map { it.toObjects(IntakeRecordDTO::class.java) }
+    }
+
     override suspend fun saveIntakeRecord(record: IntakeRecordDTO) {
         val docRef = if (record.id.isEmpty()) {
             intakeCollection.document()

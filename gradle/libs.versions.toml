@@ -53,6 +53,13 @@ mapsCompose = "6.12.1"
 playServicesMaps = "19.2.0"
 playServicesLocation = "21.3.0"
 
+# CameraX
+cameraXVersion = "1.5.2"
+accompanistPermissions = "0.37.3"
+# ML Kit
+mlkitTextKorean = "16.0.1"
+
+
 # Test Toolebox
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -88,6 +95,7 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 
 # coroutine
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 
 # Coil
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilCompose" }
@@ -119,6 +127,17 @@ mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", versio
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+
+# CameraX
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraXVersion" }
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "cameraXVersion" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraXVersion" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraXVersion" }
+androidx-camera-compose = { group = "androidx.camera", name = "camera-compose", version.ref = "cameraXVersion" }
+accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
+
+# ML Kit
+mlkit-text-recognition-korean = { group = "com.google.android.gms", name = "play-services-mlkit-text-recognition-korean", version.ref = "mlkitTextKorean" }
 
 # Test Box
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
@@ -180,4 +199,12 @@ rest-libraries = [
     "moshi-kotlin",
     "moshi-codegen",
     "logging-interceptor"
+]
+
+camerax-libs = [
+    "androidx-camera-core",
+    "androidx-camera-camera2",
+    "androidx-camera-lifecycle",
+    "androidx-camera-view",
+    "androidx-camera-compose"
 ]

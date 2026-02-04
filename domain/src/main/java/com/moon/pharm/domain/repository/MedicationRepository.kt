@@ -12,6 +12,7 @@ interface MedicationRepository {
     fun deleteMedication(medicationId: String): Flow<DataResourceResult<Unit>>
 
     fun getIntakeRecords(userId: String, date: String): Flow<DataResourceResult<List<IntakeRecord>>>
+    fun getIntakeRecordsByRange(userId: String, startDate: String, endDate: String): Flow<DataResourceResult<List<IntakeRecord>>>
     fun saveIntakeRecord(record: IntakeRecord): Flow<DataResourceResult<Unit>>
     fun deleteIntakeRecord(medicationId: String, scheduleId: String, date: String): Flow<DataResourceResult<Unit>>
 }

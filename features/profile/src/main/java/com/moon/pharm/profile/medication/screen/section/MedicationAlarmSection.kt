@@ -35,6 +35,7 @@ import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicationAlarmSection(
+    medicationIndex: Int,
     form: MedicationFormState,
     onEvent: (MedicationUiEvent) -> Unit
 ) {
@@ -57,11 +58,10 @@ fun MedicationAlarmSection(
 
         MealTimeChips(
             selectedTimes = form.selectedMealTiming,
-            onTimeClick = { onEvent(MedicationUiEvent.UpdateMealTiming(it)) }
+            onTimeClick = { onEvent(MedicationUiEvent.UpdateMealTiming(index = medicationIndex, timing = it)) }
         )
 
         Spacer(modifier = Modifier.height(15.dp))
-
 
         TimeSettingCard(
             time = form.selectedTime.toMinuteTimeUiString(),
@@ -72,7 +72,11 @@ fun MedicationAlarmSection(
             TimePickerDialog(
                 title = stringResource(id = R.string.medication_alarm_time_dialog_title),
                 onConfirm = { state ->
-                    onEvent(MedicationUiEvent.UpdateAlarmTime(state.hour, state.minute))
+                    onEvent(MedicationUiEvent.UpdateAlarmTime(
+                        index = medicationIndex,
+                        hour = state.hour,
+                        minute = state.minute
+                    ))
                     showTimePicker = false
                 },
                 onDismiss = { showTimePicker = false }
@@ -83,12 +87,13 @@ fun MedicationAlarmSection(
 
         AlarmOptionSelector(
             selectedOption = form.selectedRepeatType,
-            onOptionSelected = { onEvent(MedicationUiEvent.UpdateRepeatType(it)) }
+            onOptionSelected = { onEvent(MedicationUiEvent.UpdateRepeatType(index = medicationIndex, type = it)) }
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
         MedicationAlarmOptionsCard(
+            medicationIndex = medicationIndex,
             form = form,
             onEvent = onEvent
         )

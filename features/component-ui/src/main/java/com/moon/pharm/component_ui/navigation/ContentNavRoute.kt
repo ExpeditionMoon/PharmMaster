@@ -1,5 +1,6 @@
 package com.moon.pharm.component_ui.navigation
 
+import com.moon.pharm.component_ui.model.ScannedMedication
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -13,7 +14,11 @@ sealed interface ContentNavigationRoute : PharmNavigation {
     @Serializable
     data object MedicationTab : ContentNavigationRoute
     @Serializable
-    data object MedicationTabCreateScreen : ContentNavigationRoute
+    data class MedicationTabCreateScreen(
+        val scannedList: List<ScannedMedication> = emptyList()
+    ) : ContentNavigationRoute
+    @Serializable
+    data object MedicationTabHistoryScreen : ContentNavigationRoute
 
     @Serializable
     data object ConsultGraph : ContentNavigationRoute
@@ -36,4 +41,6 @@ sealed interface ContentNavigationRoute : PharmNavigation {
     object MyConsultList : ContentNavigationRoute
     @Serializable
     data object PrescriptionCapture : ContentNavigationRoute
+    @Serializable
+    data object PrescriptionCamera : ContentNavigationRoute
 }

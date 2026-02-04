@@ -13,9 +13,9 @@ import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
+import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.screen.component.MedicationCreateContent
-import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 
 @Composable
@@ -26,8 +26,10 @@ fun MedicationCreateScreen(
 
     LaunchedEffect(uiState.isMedicationCreated) {
         if (uiState.isMedicationCreated) {
-            viewModel.onEvent(MedicationUiEvent.ResetNavigation)
-            navController?.popBackStack()
+            navController?.navigate(ContentNavigationRoute.MedicationTab) {
+                popUpTo(ContentNavigationRoute.MedicationTab) { inclusive = false }
+                launchSingleTop = true
+            }
         }
     }
 
@@ -43,7 +45,10 @@ fun MedicationCreateScreen(
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             MedicationCreateContent(
-                form = uiState.form, onEvent = { intent -> viewModel.onEvent(intent) })
+                forms = uiState.medicationForms,
+                isLoading = uiState.isLoading,
+                onEvent = { intent -> viewModel.onEvent(intent) }
+            )
         }
     }
 }

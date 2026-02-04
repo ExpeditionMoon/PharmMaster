@@ -1,12 +1,12 @@
 package com.moon.pharm.profile.medication.mapper
 
-import com.moon.pharm.component_ui.util.toDisplayDateString
 import com.moon.pharm.component_ui.util.toScheduleTimeString
 import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.model.medication.MedicationSchedule
 import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
 import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
+import java.time.LocalDate
 import java.util.UUID
 
 object MedicationUiMapper {
@@ -51,12 +51,13 @@ object MedicationUiMapper {
 
     fun toIntakeRecord(uiModel: TodayMedicationUiModel, userId: String): IntakeRecord {
         val currentTime = System.currentTimeMillis()
+        val standardDate = LocalDate.now().toString()
         return IntakeRecord(
             id = "",
             userId = userId,
             medicationId = uiModel.medicationId,
             scheduleId = uiModel.scheduleId,
-            recordDate = currentTime.toDisplayDateString(),
+            recordDate = standardDate,
             isTaken = uiModel.isTaken,
             takenTime = if (uiModel.isTaken) currentTime else null
         )

@@ -47,14 +47,16 @@ fun MedicationScreen(
                         TopBarAction(
                             icon = Icons.Default.Storage,
                             onClick = {
-                                multipleEventsCutter.processEvent {}
+                                multipleEventsCutter.processEvent {
+                                    navController?.navigate(ContentNavigationRoute.MedicationTabHistoryScreen)
+                                }
                             }
                         ),
                         TopBarAction(
                             icon = Icons.Default.Add,
                             onClick = {
                                 multipleEventsCutter.processEvent {
-                                    navController?.navigate(ContentNavigationRoute.MedicationTabCreateScreen)
+                                    navController?.navigate(ContentNavigationRoute.MedicationTabCreateScreen())
                                 }
                             }
                         )
@@ -70,7 +72,14 @@ fun MedicationScreen(
                 totalCount = totalCount,
                 completedCount = completedCount,
                 onTabSelected = { viewModel.onTabSelected(it) },
-                onTakeClick = { item -> viewModel.onEvent(MedicationUiEvent.ToggleTaken(item.medicationId)) }
+                onTakeClick = { item ->
+                    viewModel.onEvent(
+                        MedicationUiEvent.ToggleTaken(
+                            medicationId = item.medicationId,
+                            scheduleId = item.scheduleId
+                        )
+                    )
+                }
             )
         }
     }

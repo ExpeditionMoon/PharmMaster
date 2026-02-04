@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.moon.pharm.MainActivity
 import com.moon.pharm.R
@@ -73,18 +72,16 @@ class AlarmNotificationServiceImpl @Inject constructor(
     }
 
     private fun createNotificationChannel(manager: NotificationManager) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (manager.getNotificationChannel(NOTIFICATION_CHANNEL_ID) == null) {
-                val channel = NotificationChannel(
-                    NOTIFICATION_CHANNEL_ID,
-                    NOTIFICATION_CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_HIGH
-                ).apply {
-                    description = context.getString(R.string.notification_channel_description)
-                    enableVibration(true)
-                }
-                manager.createNotificationChannel(channel)
+        if (manager.getNotificationChannel(NOTIFICATION_CHANNEL_ID) == null) {
+            val channel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                NOTIFICATION_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = context.getString(R.string.notification_channel_description)
+                enableVibration(true)
             }
+            manager.createNotificationChannel(channel)
         }
     }
 }
