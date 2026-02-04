@@ -11,6 +11,7 @@ import com.moon.pharm.domain.usecase.auth.LogoutUseCase
 import com.moon.pharm.domain.usecase.consult.GetMyAnsweredConsultUseCase
 import com.moon.pharm.domain.usecase.consult.GetMyConsultUseCase
 import com.moon.pharm.domain.usecase.user.GetUserUseCase
+import com.moon.pharm.domain.usecase.user.UpdateNicknameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +29,8 @@ class MyPageViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val getMyConsultUseCase: GetMyConsultUseCase,
     private val getMyAnsweredConsultUseCase: GetMyAnsweredConsultUseCase,
-    private val logoutUseCase: LogoutUseCase
+    private val logoutUseCase: LogoutUseCase,
+    private val updateNicknameUseCase: UpdateNicknameUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MyPageUiState())
@@ -36,6 +38,25 @@ class MyPageViewModel @Inject constructor(
 
     init {
         loadData()
+    }
+
+    fun updateNickname(newNickname: String) {
+        val currentUser = uiState.value.user ?: return
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+
+            val result = updateNicknameUseCase(currentUser, newNickname)
+
+            if (result is DataResourceResult.Failure) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    userMessage = UiMessage.LoadDataFailed
+                )
+            } else {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+            }
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
