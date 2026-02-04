@@ -49,6 +49,7 @@
 
     <!--  마이페이지(mypage)  -->
     <string name="mypage_title">마이페이지</string>
+    <string name="mypage_nickname_update">닉네임 수정</string>
     <string name="mypage_consult_history_format">(%s)</string>
     <string name="mypage_menu_medication_record">나의 약 기록</string>
     <string name="mypage_menu_alarm_setting">복용 알림 설정</string>

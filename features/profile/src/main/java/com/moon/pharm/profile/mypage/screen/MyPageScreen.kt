@@ -21,6 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -36,6 +39,7 @@ import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.profile.BuildConfig
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.mypage.screen.component.EditNicknameDialog
 import com.moon.pharm.profile.mypage.screen.component.MyPageFooterSection
 import com.moon.pharm.profile.mypage.screen.component.MyPageMenuItemData
 import com.moon.pharm.profile.mypage.screen.component.MyPageMenuSection
@@ -59,7 +63,8 @@ fun MyPageRoute(
         onLogout = {
             viewModel.logout()
             onNavigateToLogin()
-        }
+        },
+        onUpdateNickname = viewModel::updateNickname
     )
 }
 
@@ -67,9 +72,22 @@ fun MyPageRoute(
 fun MyPageScreen(
     uiState: MyPageUiState,
     onNavigateToMyConsultation: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onUpdateNickname: (String) -> Unit
 ) {
     val scrollState = rememberScrollState()
+    var showEditDialog by remember { mutableStateOf(false) }
+
+    if (showEditDialog && uiState.user != null) {
+        EditNicknameDialog(
+            currentNickname = uiState.user.nickName,
+            onDismiss = { showEditDialog = false },
+            onConfirm = { newNickname ->
+                onUpdateNickname(newNickname)
+                showEditDialog = false
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -101,7 +119,10 @@ fun MyPageScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    MyPageProfileCard(user = user)
+                    MyPageProfileCard(
+                        user = user,
+                        onEditProfileClick = { showEditDialog = true }
+                    )
 
                     val baseTitle = stringResource(user.userType.myPageConsultMenuTitleRes)
 
@@ -206,7 +227,8 @@ fun MyPageScreenPreviewSuccess() {
                     myConsults = emptyList()
                 ),
                 onNavigateToMyConsultation = {},
-                onLogout = {}
+                onLogout = {},
+                onUpdateNickname = {}
             )
         }
     }
