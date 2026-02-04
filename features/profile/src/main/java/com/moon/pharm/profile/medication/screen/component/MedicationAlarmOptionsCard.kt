@@ -20,6 +20,7 @@ import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 
 @Composable
 fun MedicationAlarmOptionsCard(
+    medicationIndex: Int,
     form: MedicationFormState,
     onEvent: (MedicationUiEvent) -> Unit
 ) {
@@ -36,7 +37,7 @@ fun MedicationAlarmOptionsCard(
                 title = stringResource(R.string.medication_alarm_grouped_title),
                 description = stringResource(R.string.medication_alarm_grouped_desc),
                 isChecked = form.isGrouped,
-                onCheckedChange = { onEvent(MedicationUiEvent.UpdateGroupedNotification(it)) },
+                onCheckedChange = { onEvent(MedicationUiEvent.UpdateGroupedNotification(index = medicationIndex, enabled = it)) },
                 explanation = stringResource(R.string.medication_alarm_group_description)
             )
         }

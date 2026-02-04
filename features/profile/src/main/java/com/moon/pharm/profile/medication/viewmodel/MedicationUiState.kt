@@ -14,11 +14,12 @@ data class MedicationUiState(
 
     val medicationList: List<TodayMedicationUiModel> = emptyList(),
     val selectedTab: MedicationPrimaryTab = MedicationPrimaryTab.ALL,
-    val form: MedicationFormState = MedicationFormState()
+    val medicationForms: List<MedicationFormState> = listOf(MedicationFormState())
 )
 
 data class MedicationFormState(
     val medicationName: String = "",
+    val dailyCount: Int = 0,
     val medicationDosage: String? = "",
     val selectedType: MedicationType = MedicationType.PRESCRIPTION,
     val startDate: Long? = null,
