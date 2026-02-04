@@ -25,12 +25,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.component.SectionHeader
@@ -47,12 +50,16 @@ import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.Secondary
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.home.viewmodel.HomeViewModel
 
 @Composable
 fun HomeMainScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val scrollState = rememberScrollState()
+    val nickname by viewModel.nickname.collectAsState()
+    val displayName = nickname.ifEmpty { "회원" }
 
     Scaffold(
         topBar = {
@@ -90,7 +97,7 @@ fun HomeMainScreen(
                     .padding(24.dp),
             ) {
                 Text(
-                    text = "ooo님, 건강 챙기세요!",
+                    text = "${displayName}님, 건강 챙기세요!",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = OnSurface

@@ -42,6 +42,7 @@ kotlin{
 }
 
 dependencies {
+    implementation(project(":domain"))
     implementation(project(":features:component-ui"))
 
     implementation(libs.androidx.core.ktx)
