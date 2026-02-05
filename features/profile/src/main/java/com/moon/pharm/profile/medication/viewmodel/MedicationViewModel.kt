@@ -79,7 +79,18 @@ class MedicationViewModel @Inject constructor(
     // region 2. Event Handler
     fun onEvent(event: MedicationUiEvent) {
         when (event) {
-            is MedicationUiEvent.UpdateType -> updateForm(event.index) { it.copy(selectedType = event.type) }
+            is MedicationUiEvent.UpdateType -> {
+                if (event.index == -1) {
+                    _uiState.update { state ->
+                        val newForms = state.medicationForms.map {
+                            it.copy(selectedType = event.type)
+                        }
+                        state.copy(medicationForms = newForms)
+                    }
+                } else {
+                    updateForm(event.index) { it.copy(selectedType = event.type) }
+                }
+            }
             is MedicationUiEvent.UpdateName -> updateForm(event.index) { it.copy(medicationName = event.name) }
             is MedicationUiEvent.UpdateDosage -> {
                 if (event.index == -1) {
