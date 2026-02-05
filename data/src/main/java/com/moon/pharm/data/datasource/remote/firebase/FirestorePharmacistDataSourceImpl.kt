@@ -1,6 +1,7 @@
 package com.moon.pharm.data.datasource.remote.firebase
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.moon.pharm.data.common.FIELD_NICKNAME
 import com.moon.pharm.data.common.FIELD_PLACE_ID
 import com.moon.pharm.data.common.PHARMACIST_COLLECTION
 import com.moon.pharm.data.datasource.PharmacistDataSource
@@ -59,5 +60,14 @@ class FirestorePharmacistDataSourceImpl @Inject constructor(
             trySend(DataResourceResult.Success(dtos))
         }
         awaitClose { registration.remove() }
+    }
+
+    override suspend fun updatePharmacistNickname(userId: String, newNickname: String): DataResourceResult<Unit> {
+        return try {
+            pharmacistCollection.document(userId).update(FIELD_NICKNAME, newNickname).await()
+            DataResourceResult.Success(Unit)
+        } catch (e: Exception) {
+            DataResourceResult.Failure(e)
+        }
     }
 }
