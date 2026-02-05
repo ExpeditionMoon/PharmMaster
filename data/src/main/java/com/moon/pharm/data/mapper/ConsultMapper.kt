@@ -22,7 +22,7 @@ fun ConsultItemDTO.toDomain(): ConsultItem {
         } catch (e: Exception) {
             ConsultStatus.WAITING
         },
-        isPublic = this.isPublic,
+        isPublic = this.isPublic?: false,
         images = this.images?.map { ConsultImage(it.imageName, it.imageUrl) } ?: emptyList(),
         createdAt = this.createdAt?.toDate()?.time ?: 0L,
         answer = this.answer?.toDomain()

@@ -8,4 +8,5 @@ interface PharmacistDataSource {
     suspend fun savePharmacist(pharmacistDto: PharmacistDTO): DataResourceResult<Unit>
     fun getPharmacistById(pharmacistId: String): Flow<DataResourceResult<PharmacistDTO>>
     fun getPharmacistsByPlaceId(placeId: String): Flow<DataResourceResult<List<PharmacistDTO>>>
+    suspend fun updatePharmacistNickname(userId: String, newNickname: String): DataResourceResult<Unit>
 }

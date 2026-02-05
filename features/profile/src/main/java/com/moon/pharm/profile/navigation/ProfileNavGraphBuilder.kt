@@ -18,34 +18,63 @@ import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 import com.moon.pharm.profile.mypage.screen.MyPageRoute
 import kotlin.reflect.typeOf
 
-fun NavGraphBuilder.profileNavGraph(navController: NavController) {
-
+fun NavGraphBuilder.authNavGraph(rootNavController: NavController) {
     composable<ContentNavigationRoute.LoginScreen> {
         val viewModel: LoginViewModel = hiltViewModel()
         LoginScreen(
             viewModel = viewModel,
+            onNavigateToSignUp = {
+                rootNavController.navigate(ContentNavigationRoute.SignUpScreen)
+            },
             onNavigateToHome = {
-                navController.navigate(ContentNavigationRoute.HomeTab) {
+                rootNavController.navigate(ContentNavigationRoute.MainBase) {
                     popUpTo(ContentNavigationRoute.LoginScreen) { inclusive = true }
                 }
-            },
-            onNavigateToSignUp = {
-                navController.navigate(ContentNavigationRoute.SignUpScreen)
             }
         )
     }
 
-    composable<ContentNavigationRoute.SignUpScreen>{
+    composable<ContentNavigationRoute.SignUpScreen> {
         val viewModel: SignUpViewModel = hiltViewModel()
         SignUpScreen(
             viewModel = viewModel,
             onNavigateToHome = {
-                navController.navigate(ContentNavigationRoute.HomeTab) {
+                rootNavController.navigate(ContentNavigationRoute.MainBase) {
                     popUpTo(ContentNavigationRoute.SignUpScreen) { inclusive = true }
                 }
             }
         )
     }
+}
+
+fun NavGraphBuilder.profileNavGraph(navController: NavController, onLogout: () -> Unit) {
+
+//    composable<ContentNavigationRoute.LoginScreen> {
+//        val viewModel: LoginViewModel = hiltViewModel()
+//        LoginScreen(
+//            viewModel = viewModel,
+//            onNavigateToHome = {
+//                navController.navigate(ContentNavigationRoute.HomeTab) {
+//                    popUpTo(ContentNavigationRoute.LoginScreen) { inclusive = true }
+//                }
+//            },
+//            onNavigateToSignUp = {
+//                navController.navigate(ContentNavigationRoute.SignUpScreen)
+//            }
+//        )
+//    }
+//
+//    composable<ContentNavigationRoute.SignUpScreen>{
+//        val viewModel: SignUpViewModel = hiltViewModel()
+//        SignUpScreen(
+//            viewModel = viewModel,
+//            onNavigateToHome = {
+//                navController.navigate(ContentNavigationRoute.HomeTab) {
+//                    popUpTo(ContentNavigationRoute.SignUpScreen) { inclusive = true }
+//                }
+//            }
+//        )
+//    }
 
     composable<ContentNavigationRoute.ProfileTab> {
         MyPageRoute(
@@ -56,10 +85,7 @@ fun NavGraphBuilder.profileNavGraph(navController: NavController) {
                 navController.navigate(ContentNavigationRoute.MedicationTabHistoryScreen)
             },
             onNavigateToLogin = {
-                navController.navigate(ContentNavigationRoute.LoginScreen) {
-                    popUpTo(0) { inclusive = true }
-                    launchSingleTop = true
-                }
+                onLogout()
             }
         )
     }

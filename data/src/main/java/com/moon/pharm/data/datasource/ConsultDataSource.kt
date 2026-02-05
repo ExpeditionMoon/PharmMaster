@@ -12,4 +12,5 @@ interface ConsultDataSource {
     fun getMyAnsweredConsults(pharmacistId: String): Flow<List<ConsultItemDTO>>
 
     suspend fun updateConsultAnswer(consultId: String, answerDto: ConsultAnswerDTO): ConsultItemDTO
+    suspend fun updatePharmacistNicknameInAnswers(pharmacistId: String, newNickname: String)
 }

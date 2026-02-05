@@ -40,4 +40,8 @@ class PharmacistRepositoryImpl @Inject constructor(
             }
         }.flowOn(ioDispatcher)
     }
+
+    override suspend fun updatePharmacistNickname(userId: String, newNickname: String): DataResourceResult<Unit> {
+        return dataSource.updatePharmacistNickname(userId, newNickname)
+    }
 }

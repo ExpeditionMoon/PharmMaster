@@ -14,8 +14,10 @@ import com.moon.pharm.domain.model.consult.ConsultItem
 fun ConsultContent(
     selectedTab: ConsultPrimaryTab,
     currentList: List<ConsultItem>,
+    currentUserId: String?,
+    isPharmacist: Boolean,
     onTabSelected: (ConsultPrimaryTab) -> Unit,
-    onItemClick: (String) -> Unit
+    onItemClick: (ConsultItem) -> Unit
 ) {
     val tabTitles = ConsultPrimaryTab.entries.map { it.title }
 
@@ -30,7 +32,11 @@ fun ConsultContent(
             onTabSelected = { index -> onTabSelected(ConsultPrimaryTab.fromIndex(index)) })
 
         ConsultList(
-            currentList = currentList, onItemClick = onItemClick, modifier = Modifier.weight(1f)
+            currentList = currentList,
+            currentUserId = currentUserId,
+            isPharmacist = isPharmacist,
+            onItemClick = onItemClick,
+            modifier = Modifier.weight(1f)
         )
     }
 }

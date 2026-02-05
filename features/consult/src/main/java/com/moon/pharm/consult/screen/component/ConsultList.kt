@@ -25,7 +25,11 @@ import com.moon.pharm.domain.model.consult.ConsultItem
 
 @Composable
 fun ConsultList(
-    currentList: List<ConsultItem>, onItemClick: (String) -> Unit, modifier: Modifier = Modifier
+    currentList: List<ConsultItem>,
+    currentUserId: String?,
+    isPharmacist: Boolean,
+    onItemClick: (ConsultItem) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     if (currentList.isEmpty()) {
         Box(
@@ -60,7 +64,11 @@ fun ConsultList(
             items(
                 items = currentList, key = { it.id }) { item ->
                 ConsultItemCard(
-                    item = item, onClick = { onItemClick(item.id) })
+                    item = item,
+                    currentUserId = currentUserId,
+                    isPharmacist = isPharmacist,
+                    onClick = { onItemClick(item) }
+                )
             }
         }
     }
