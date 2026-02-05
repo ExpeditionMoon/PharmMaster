@@ -13,6 +13,8 @@ import com.moon.pharm.domain.model.consult.ConsultItem
 @Composable
 fun MyConsultListContent(
     items: List<ConsultItem>,
+    currentUserId: String?,
+    isPharmacist: Boolean,
     onItemClick: (String) -> Unit
 ) {
     LazyColumn(
@@ -23,6 +25,8 @@ fun MyConsultListContent(
         items(items = items, key = { it.id }) { item ->
             ConsultItemCard(
                 item = item,
+                currentUserId = currentUserId,
+                isPharmacist = isPharmacist,
                 onClick = { onItemClick(item.id) }
             )
         }

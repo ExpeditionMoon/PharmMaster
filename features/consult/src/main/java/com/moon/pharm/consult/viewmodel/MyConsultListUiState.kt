@@ -7,5 +7,6 @@ data class MyConsultListUiState(
     val isLoading: Boolean = false,
     val userMessage: UiMessage? = null,
     val myConsults: List<ConsultItem> = emptyList(),
-    val isPharmacist: Boolean = false
+    val isPharmacist: Boolean = false,
+    val currentUserId: String? = null
 )

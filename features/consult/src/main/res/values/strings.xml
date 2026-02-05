@@ -30,6 +30,9 @@
     <string name="my_consult_empty">작성한 상담 내역이 없습니다.</string>
     <string name="my_answer_empty">작성한 답변 내역이 없습니다.</string>
 
+    <string name="consult_secret_icon_desc">비공개</string>
+    <string name="consult_secret_hidden_title">비공개 상담입니다.</string>
+
     <!--  WriteScreen  -->
     <string name="consult_write_placeholder_title">제목을 입력해주세요</string>
     <string name="consult_write_placeholder_content">구체적인 증상, 복용 중인 다른 약물 정보 등을 자세히 작성해주세요.</string>

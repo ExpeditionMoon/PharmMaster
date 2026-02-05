@@ -3,6 +3,7 @@ package com.moon.pharm.data.datasource.remote.dto
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.IgnoreExtraProperties
+import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ServerTimestamp
 import com.moon.pharm.data.common.EMPTY_STRING
 import com.moon.pharm.domain.model.consult.ConsultStatus
@@ -18,7 +19,11 @@ data class ConsultItemDTO(
     var title: String = EMPTY_STRING,
     var content: String = EMPTY_STRING,
     var status: String = ConsultStatus.WAITING.name,
-    val isPublic: Boolean = true,
+
+    @get:PropertyName("public")
+    @set:PropertyName("public")
+    var isPublic: Boolean? = null,
+
     var images: List<ConsultImageDTO>? = null,
 
     @ServerTimestamp

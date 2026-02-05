@@ -56,6 +56,10 @@ class MyConsultListViewModel @Inject constructor(
                 false
             }
 
+            _uiState.update {
+                it.copy(currentUserId = userId, isPharmacist = isPharmacist)
+            }
+
             val consultFlow = if (isPharmacist) {
                 getMyAnsweredConsultUseCase(userId)
             } else {
@@ -70,12 +74,14 @@ class MyConsultListViewModel @Inject constructor(
                             isLoading = false,
                             myConsults = result.resultData,
                             userMessage = null,
-                            isPharmacist = isPharmacist
+                            isPharmacist = isPharmacist,
+                            currentUserId = userId
                         )
                         is DataResourceResult.Failure -> state.copy(
                             isLoading = false,
                             userMessage = if (state.myConsults.isEmpty()) UiMessage.LoadDataFailed else null,
-                            isPharmacist = isPharmacist
+                            isPharmacist = isPharmacist,
+                            currentUserId = userId
                         )
                     }
                 }
