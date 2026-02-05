@@ -161,4 +161,13 @@ class ConsultRepositoryImpl @Inject constructor(
             DataResourceResult.Failure(e)
         }
     }
+
+    override suspend fun updatePharmacistNicknameInAnswers(userId: String, newNickname: String): DataResourceResult<Unit> {
+        return try {
+            dataSource.updatePharmacistNicknameInAnswers(userId, newNickname)
+            DataResourceResult.Success(Unit)
+        } catch (e: Exception) {
+            DataResourceResult.Failure(e)
+        }
+    }
 }

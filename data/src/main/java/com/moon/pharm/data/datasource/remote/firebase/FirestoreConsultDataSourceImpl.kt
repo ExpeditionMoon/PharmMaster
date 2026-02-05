@@ -7,6 +7,7 @@ import com.google.firebase.firestore.snapshots
 import com.moon.pharm.data.common.CONSULT_COLLECTION
 import com.moon.pharm.data.common.ERROR_MSG_CONSULT_NOT_FOUND
 import com.moon.pharm.data.common.FIELD_ANSWER
+import com.moon.pharm.data.common.FIELD_ANSWER_PHARMACIST_NAME
 import com.moon.pharm.data.common.FIELD_CREATED_AT
 import com.moon.pharm.data.common.FIELD_PHARMACIST_ID
 import com.moon.pharm.data.common.FIELD_STATUS
@@ -86,5 +87,18 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
                 status = ConsultStatus.COMPLETED.name
             )
         }.await()
+    }
+
+    override suspend fun updatePharmacistNicknameInAnswers(pharmacistId: String, newNickname: String) {
+        val snapshot = collection
+            .whereEqualTo(FIELD_PHARMACIST_ID, pharmacistId)
+            .get()
+            .await()
+
+        val batch = firestore.batch()
+        snapshot.documents.forEach { doc ->
+            batch.update(doc.reference, FIELD_ANSWER_PHARMACIST_NAME, newNickname)
+        }
+        batch.commit().await()
     }
 }

@@ -16,4 +16,5 @@ interface ConsultRepository {
 
     suspend fun sendAnswerNotification(targetUserToken: String, consultId: String): DataResourceResult<Unit>
     suspend fun sendNewConsultNotification(targetToken: String, consultId: String): DataResourceResult<Unit>
+    suspend fun updatePharmacistNicknameInAnswers(userId: String, newNickname: String): DataResourceResult<Unit>
 }
