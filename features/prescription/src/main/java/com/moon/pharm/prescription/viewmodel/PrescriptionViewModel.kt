@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.model.ScannedMedication
 import com.moon.pharm.prescription.ocr.TextRecognitionHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -28,10 +29,13 @@ class PrescriptionViewModel @Inject constructor(
     private var isProcessing = false
     fun onTextRecognized(text: String) {
         if (isProcessing) return
-
-        if (text.length > 10 && (text.contains("정") || text.contains("회"))) {
+        if (text.length > 10 && (text.contains("정") || text.contains("회") || text.contains("캡슐"))) {
             isProcessing = true
-            processAndNavigate(text)
+            viewModelScope.launch {
+                _isLoading.value = true
+                delay(1000)
+                processAndNavigate(text)
+            }
         }
     }
 
@@ -44,31 +48,30 @@ class PrescriptionViewModel @Inject constructor(
             }.onFailure {
                 it.printStackTrace()
                 _isLoading.value = false
+                isProcessing = false
             }
         }
     }
 
     private fun processAndNavigate(rawText: String) {
-        Log.d("OCR_RAW", rawText)
-
         val scannedList = mutableListOf<ScannedMedication>()
         val lines = rawText.lines().map { it.trim() }.filter { it.isNotEmpty() }
 
-        val drugKeywords = listOf("정", "캡슐", "연고", "시럽", "액", "겔", "크림", "mg", "g", "ml", "mL", "서방정")
+        val drugKeywords = listOf("정", "캡슐", "연고", "시럽", "액", "겔", "크림", "mg", "g", "ml", "mL", "서방정", "tab", "cap")
         val frequencyRegex = Regex("1일\\s*(\\d+)회|(\\d+)회")
 
         val candidateNames = ArrayDeque<String>()
 
         for (line in lines) {
-            val freqMatch = frequencyRegex.find(line)
-            val hasDrugKeyword = drugKeywords.any { line.contains(it) }
-
             val isNoise = listOf(
                 "약국", "처방", "조제", "환자", "병원", "합계", "계산서", "납부",
-                "영수증", "전화", "Tel", "Fax", "발행", "교부", "번호", "성명", "면허"
-            ).any {
-                line.contains(it, ignoreCase = true)
-            }
+                "영수증", "전화", "Tel", "Fax", "발행", "교부", "번호", "성명", "면허",
+                "식후", "식전", "분복", "투약"
+            ).any { line.contains(it, ignoreCase = true) }
+
+            val freqMatch = frequencyRegex.find(line)
+            val hasDrugKeyword = drugKeywords.any { line.contains(it, ignoreCase = true) }
+
             if (freqMatch != null) {
                 val count = freqMatch.groupValues[1].toIntOrNull()
                     ?: freqMatch.groupValues[2].toIntOrNull()
@@ -77,7 +80,8 @@ class PrescriptionViewModel @Inject constructor(
                 var pairedName: String? = null
 
                 if (hasDrugKeyword && !isNoise) {
-                    pairedName = line.split(" ").firstOrNull { w -> drugKeywords.any { k -> w.contains(k) } }
+                    pairedName = line.split("\\s+".toRegex())
+                        .firstOrNull { w -> drugKeywords.any { k -> w.contains(k, ignoreCase = true) } }
                 }
 
                 if (pairedName == null && candidateNames.isNotEmpty()) {
@@ -85,16 +89,19 @@ class PrescriptionViewModel @Inject constructor(
                 }
 
                 if (pairedName != null) {
-                    val cleanName = pairedName.split("(")[0].trim()
-                    if (scannedList.none { it.name == cleanName }) {
+                    val cleanName = cleanDrugName(pairedName)
+                    if (scannedList.none { it.name == cleanName } && cleanName.length > 1) {
                         scannedList.add(ScannedMedication(cleanName, count))
                     }
                 }
 
             } else {
                 if (hasDrugKeyword && !isNoise) {
-                    val possibleName = line.split(" ").firstOrNull { w -> drugKeywords.any { k -> w.contains(k) } } ?: line
-                    if (possibleName.length < 40) {
+                    val possibleName = line.split("\\s+".toRegex())
+                        .firstOrNull { w -> drugKeywords.any { k -> w.contains(k, ignoreCase = true) } }
+                        ?: line
+
+                    if (possibleName.length in 2..40) {
                         candidateNames.add(possibleName)
                     }
                 }
@@ -102,8 +109,8 @@ class PrescriptionViewModel @Inject constructor(
         }
 
         while (candidateNames.isNotEmpty()) {
-            val name = candidateNames.removeFirst().split("(")[0].trim()
-            if (scannedList.none { it.name == name }) {
+            val name = cleanDrugName(candidateNames.removeFirst())
+            if (scannedList.none { it.name == name } && name.length > 1) {
                 scannedList.add(ScannedMedication(name, 3))
             }
         }
@@ -113,5 +120,11 @@ class PrescriptionViewModel @Inject constructor(
             _isLoading.value = false
             isProcessing = false
         }
+    }
+
+    private fun cleanDrugName(rawName: String): String {
+        return rawName.split("(")[0]
+            .replace(Regex("[^가-힣a-zA-Z0-9\\s]"), "")
+            .trim()
     }
 }

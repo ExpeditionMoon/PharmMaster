@@ -1,6 +1,5 @@
 package com.moon.pharm.prescription.screen
 
-import android.util.Log
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.view.LifecycleCameraController
@@ -72,7 +71,6 @@ fun CameraPreviewScreen(
         cameraController.setImageAnalysisAnalyzer(
             ContextCompat.getMainExecutor(context),
             TextRecognitionAnalyzer { text ->
-                Log.d("OCR_TEST", "인식된 텍스트: $text")
                 onTextRecognized(text)
             }
         )

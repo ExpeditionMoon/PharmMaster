@@ -76,7 +76,6 @@ class MedicationRepositoryImpl @Inject constructor(
             }
             .onStart { emit(DataResourceResult.Loading) }
             .catch { e ->
-                android.util.Log.e("RepositoryDebug", "데이터 로드 실패: ${e.message}", e)
                 emit(DataResourceResult.Failure(e)) }
             .flowOn(ioDispatcher)
     }
