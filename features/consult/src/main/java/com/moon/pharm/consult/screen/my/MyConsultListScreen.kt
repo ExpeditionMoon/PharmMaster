@@ -102,6 +102,8 @@ fun MyConsultListScreen(
                 else -> {
                     MyConsultListContent(
                         items = uiState.myConsults,
+                        currentUserId = uiState.currentUserId,
+                        isPharmacist = uiState.isPharmacist,
                         onItemClick = onItemClick
                     )
                 }

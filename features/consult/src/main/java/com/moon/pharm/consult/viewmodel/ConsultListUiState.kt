@@ -8,5 +8,7 @@ data class ConsultListUiState(
     val isLoading: Boolean = false,
     val userMessage: UiMessage? = null,
     val consultList: List<ConsultItem> = emptyList(),
-    val selectedTab: ConsultPrimaryTab = ConsultPrimaryTab.LATEST
+    val selectedTab: ConsultPrimaryTab = ConsultPrimaryTab.LATEST,
+    val currentUserId: String? = null,
+    val isPharmacist: Boolean = false
 )

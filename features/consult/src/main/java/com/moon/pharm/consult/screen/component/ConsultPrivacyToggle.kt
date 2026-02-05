@@ -23,6 +23,8 @@ fun ConsultPrivacyToggle(
     isPublic: Boolean,
     onVisibilityChange: (Boolean) -> Unit
 ) {
+    val isSecretMode = !isPublic
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -45,8 +47,10 @@ fun ConsultPrivacyToggle(
             )
         }
         CustomSwitch(
-            checked = isPublic,
-            onCheckedChange = onVisibilityChange
+            checked = isSecretMode,
+            onCheckedChange = { isChecked ->
+                onVisibilityChange(!isChecked)
+            }
         )
     }
 }
