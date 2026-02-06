@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -48,41 +47,49 @@ class MyConsultListViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val userResult = getUserUseCase(userId).first()
+            getUserUseCase(userId).collectLatest { userResult ->
+                var isPharmacist = false
+                var currentNickname = ""
 
-            val isPharmacist = if (userResult is DataResourceResult.Success) {
-                userResult.resultData.userType == UserType.PHARMACIST
-            } else {
-                false
-            }
+                if (userResult is DataResourceResult.Success) {
+                    isPharmacist = userResult.resultData.userType == UserType.PHARMACIST
+                    currentNickname = userResult.resultData.nickName
+                }
 
-            _uiState.update {
-                it.copy(currentUserId = userId, isPharmacist = isPharmacist)
-            }
+                _uiState.update {
+                    it.copy(currentUserId = userId, isPharmacist = isPharmacist)
+                }
 
-            val consultFlow = if (isPharmacist) {
-                getMyAnsweredConsultUseCase(userId)
-            } else {
-                getMyConsultUseCase(userId)
-            }
+                val consultFlow = if (isPharmacist) {
+                    getMyAnsweredConsultUseCase(userId)
+                } else {
+                    getMyConsultUseCase(userId)
+                }
 
-            consultFlow.collectLatest { result ->
-                _uiState.update { state ->
-                    when (result) {
-                        is DataResourceResult.Loading -> state.copy(isLoading = true)
-                        is DataResourceResult.Success -> state.copy(
-                            isLoading = false,
-                            myConsults = result.resultData,
-                            userMessage = null,
-                            isPharmacist = isPharmacist,
-                            currentUserId = userId
-                        )
-                        is DataResourceResult.Failure -> state.copy(
-                            isLoading = false,
-                            userMessage = if (state.myConsults.isEmpty()) UiMessage.LoadDataFailed else null,
-                            isPharmacist = isPharmacist,
-                            currentUserId = userId
-                        )
+                consultFlow.collectLatest { result ->
+                    _uiState.update { state ->
+                        when (result) {
+                            is DataResourceResult.Loading -> state.copy(isLoading = true)
+                            is DataResourceResult.Success -> {
+                                val displayedConsults =
+                                    if (!isPharmacist && currentNickname.isNotEmpty()) {
+                                        result.resultData.map { item ->
+                                            item.copy(nickName = currentNickname)
+                                        }
+                                    } else {
+                                        result.resultData
+                                    }
+                                state.copy(
+                                    isLoading = false,
+                                    myConsults = displayedConsults,
+                                    userMessage = null
+                                )
+                            }
+                            is DataResourceResult.Failure -> state.copy(
+                                isLoading = false,
+                                userMessage = if (state.myConsults.isEmpty()) UiMessage.LoadDataFailed else null
+                            )
+                        }
                     }
                 }
             }

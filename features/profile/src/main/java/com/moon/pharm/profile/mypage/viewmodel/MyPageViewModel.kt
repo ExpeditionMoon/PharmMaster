@@ -54,7 +54,12 @@ class MyPageViewModel @Inject constructor(
                     userMessage = UiMessage.LoadDataFailed
                 )
             } else {
-                _uiState.value = _uiState.value.copy(isLoading = false)
+                val updatedUser = currentUser.copy(nickName = newNickname)
+
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    user = updatedUser
+                )
             }
         }
     }
