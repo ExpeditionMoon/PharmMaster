@@ -48,34 +48,6 @@ fun NavGraphBuilder.authNavGraph(rootNavController: NavController) {
 }
 
 fun NavGraphBuilder.profileNavGraph(navController: NavController, onLogout: () -> Unit) {
-
-//    composable<ContentNavigationRoute.LoginScreen> {
-//        val viewModel: LoginViewModel = hiltViewModel()
-//        LoginScreen(
-//            viewModel = viewModel,
-//            onNavigateToHome = {
-//                navController.navigate(ContentNavigationRoute.HomeTab) {
-//                    popUpTo(ContentNavigationRoute.LoginScreen) { inclusive = true }
-//                }
-//            },
-//            onNavigateToSignUp = {
-//                navController.navigate(ContentNavigationRoute.SignUpScreen)
-//            }
-//        )
-//    }
-//
-//    composable<ContentNavigationRoute.SignUpScreen>{
-//        val viewModel: SignUpViewModel = hiltViewModel()
-//        SignUpScreen(
-//            viewModel = viewModel,
-//            onNavigateToHome = {
-//                navController.navigate(ContentNavigationRoute.HomeTab) {
-//                    popUpTo(ContentNavigationRoute.SignUpScreen) { inclusive = true }
-//                }
-//            }
-//        )
-//    }
-
     composable<ContentNavigationRoute.ProfileTab> {
         MyPageRoute(
             onNavigateToMyConsultation = {
