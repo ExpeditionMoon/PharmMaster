@@ -37,7 +37,7 @@ fun MainScreen(
 
     LaunchedEffect(Unit) {
         viewModel.navigationEvent.collectLatest { route ->
-            if (route == "MedicationScreen") {
+            if (route is ContentNavigationRoute.MedicationTab) {
                 mainNavController.navigate(ContentNavigationRoute.MedicationTab) {
                     popUpTo(mainNavController.graph.findStartDestination().id) {
                         saveState = true
