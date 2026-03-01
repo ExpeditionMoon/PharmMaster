@@ -23,26 +23,16 @@ class FirestoreUserDataSourceImpl @Inject constructor(
 
     private val userCollection = firestore.collection(USER_COLLECTION)
 
-    override suspend fun saveUser(userDto: UserDTO): DataResourceResult<Unit> {
-        return try {
-            userCollection.document(userDto.id).set(userDto).await()
-            DataResourceResult.Success(Unit)
-        } catch (e: Exception) {
-            DataResourceResult.Failure(e)
-        }
+    override suspend fun saveUser(userDto: UserDTO) {
+        userCollection.document(userDto.id).set(userDto).await()
     }
 
-    override suspend fun saveUserLifeStyle(userId: String, lifeStyleDto: UserLifeStyleDTO): DataResourceResult<Unit> {
-        return try {
-            userCollection.document(userId)
-                .collection(SETTING_COLLECTION)
-                .document(DOCUMENT_LIFESTYLE)
-                .set(lifeStyleDto)
-                .await()
-            DataResourceResult.Success(Unit)
-        } catch (e: Exception) {
-            DataResourceResult.Failure(e)
-        }
+    override suspend fun saveUserLifeStyle(userId: String, lifeStyleDto: UserLifeStyleDTO) {
+        userCollection.document(userId)
+            .collection(SETTING_COLLECTION)
+            .document(DOCUMENT_LIFESTYLE)
+            .set(lifeStyleDto)
+            .await()
     }
 
     override suspend fun isEmailDuplicated(email: String): Boolean {
@@ -50,19 +40,19 @@ class FirestoreUserDataSourceImpl @Inject constructor(
         return !query.isEmpty
     }
 
-    override fun getUserById(userId: String): Flow<DataResourceResult<UserDTO>> = callbackFlow {
+    override fun getUserById(userId: String): Flow<UserDTO> = callbackFlow {
         val docRef = userCollection.document(userId)
         val registration = docRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                trySend(DataResourceResult.Failure(error))
+                close(error)
                 return@addSnapshotListener
             }
             if (snapshot != null && snapshot.exists()) {
                 val dto = snapshot.toObject(UserDTO::class.java)
-                if (dto != null) trySend(DataResourceResult.Success(dto))
-                else trySend(DataResourceResult.Failure(Exception("Mapping failed")))
+                if (dto != null) trySend(dto)
+                else close(Exception("Mapping failed"))
             } else {
-                trySend(DataResourceResult.Failure(Exception("User not found")))
+                close(Exception("User not found"))
             }
         }
         awaitClose { registration.remove() }
@@ -72,14 +62,7 @@ class FirestoreUserDataSourceImpl @Inject constructor(
         return FirebaseMessaging.getInstance().token.await()
     }
 
-    override suspend fun updateFcmToken(userId: String, token: String): DataResourceResult<Unit> {
-        return try {
-            userCollection.document(userId)
-                .update(FIELD_FCM_TOKEN, token)
-                .await()
-            DataResourceResult.Success(Unit)
-        } catch (e: Exception) {
-            DataResourceResult.Failure(e)
-        }
+    override suspend fun updateFcmToken(userId: String, token: String) {
+        userCollection.document(userId).update(FIELD_FCM_TOKEN, token).await()
     }
 }

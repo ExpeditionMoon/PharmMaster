@@ -6,7 +6,6 @@ import com.moon.pharm.data.common.FIELD_PLACE_ID
 import com.moon.pharm.data.common.PHARMACIST_COLLECTION
 import com.moon.pharm.data.datasource.PharmacistDataSource
 import com.moon.pharm.data.datasource.remote.dto.PharmacistDTO
-import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -18,56 +17,44 @@ class FirestorePharmacistDataSourceImpl @Inject constructor(
 ) : PharmacistDataSource {
     private val pharmacistCollection = firestore.collection(PHARMACIST_COLLECTION)
 
-    override suspend fun savePharmacist(pharmacistDto: PharmacistDTO): DataResourceResult<Unit> {
-        return try {
-            pharmacistCollection.document(pharmacistDto.userId).set(pharmacistDto).await()
-            DataResourceResult.Success(Unit)
-        } catch (e: Exception) {
-            DataResourceResult.Failure(e)
-        }
+    override suspend fun savePharmacist(pharmacistDto: PharmacistDTO) {
+        pharmacistCollection.document(pharmacistDto.userId).set(pharmacistDto).await()
     }
 
-    override fun getPharmacistById(pharmacistId: String): Flow<DataResourceResult<PharmacistDTO>> = callbackFlow {
+    override fun getPharmacistById(pharmacistId: String): Flow<PharmacistDTO> = callbackFlow {
         val docRef = pharmacistCollection.document(pharmacistId)
 
         val registration = docRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                trySend(DataResourceResult.Failure(error))
+                close(error)
                 return@addSnapshotListener
             }
             if (snapshot != null && snapshot.exists()) {
                 val dto = snapshot.toObject(PharmacistDTO::class.java)
-                if (dto != null) trySend(DataResourceResult.Success(dto))
-                else trySend(DataResourceResult.Failure(Exception("Mapping failed")))
+                if (dto != null) trySend(dto)
+                else close(Exception("Mapping failed"))
             } else {
-                trySend(DataResourceResult.Failure(Exception("Pharmacist not found")))
+                close(Exception("Pharmacist not found"))
             }
         }
         awaitClose { registration.remove() }
     }
 
-    override fun getPharmacistsByPlaceId(placeId: String): Flow<DataResourceResult<List<PharmacistDTO>>> = callbackFlow {
-        trySend(DataResourceResult.Loading)
-        val query = pharmacistCollection
-            .whereEqualTo(FIELD_PLACE_ID, placeId)
+    override fun getPharmacistsByPlaceId(placeId: String): Flow<List<PharmacistDTO>> = callbackFlow {
+        val query = pharmacistCollection.whereEqualTo(FIELD_PLACE_ID, placeId)
 
         val registration = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                trySend(DataResourceResult.Failure(error))
+                close(error)
                 return@addSnapshotListener
             }
             val dtos = snapshot?.toObjects(PharmacistDTO::class.java) ?: emptyList()
-            trySend(DataResourceResult.Success(dtos))
+            trySend(dtos)
         }
         awaitClose { registration.remove() }
     }
 
-    override suspend fun updatePharmacistNickname(userId: String, newNickname: String): DataResourceResult<Unit> {
-        return try {
-            pharmacistCollection.document(userId).update(FIELD_NICKNAME, newNickname).await()
-            DataResourceResult.Success(Unit)
-        } catch (e: Exception) {
-            DataResourceResult.Failure(e)
-        }
+    override suspend fun updatePharmacistNickname(userId: String, newNickname: String) {
+        pharmacistCollection.document(userId).update(FIELD_NICKNAME, newNickname).await()
     }
 }
