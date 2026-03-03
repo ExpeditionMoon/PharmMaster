@@ -17,11 +17,12 @@ import com.moon.pharm.component_ui.theme.backgroundLight
 @Composable
 fun PharmBottomBar(
     items: List<BottomBarUiModel>,
-    currentRoute: String?
+    currentRoute: String?,
+    modifier: Modifier = Modifier
 ) {
     NavigationBar (
         containerColor = backgroundLight,
-        modifier = Modifier.shadow(elevation = 10.dp)
+        modifier = modifier.shadow(elevation = 10.dp)
     ){
         items.forEach { item ->
             val isSelected = item.tabName == currentRoute

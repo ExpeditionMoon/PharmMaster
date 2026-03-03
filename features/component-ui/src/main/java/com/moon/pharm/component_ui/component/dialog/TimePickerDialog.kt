@@ -35,6 +35,7 @@ fun TimePickerDialog(
     title: String,
     onConfirm: (TimePickerState) -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val currentTime = Calendar.getInstance()
     val timePickerState = rememberTimePickerState(
@@ -45,6 +46,7 @@ fun TimePickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = modifier,
         confirmButton = {
             TextButton(onClick = { onConfirm(timePickerState) }) {
                 Text(

@@ -50,6 +50,7 @@ private data class SnackbarStyle(
 @Composable
 fun CustomSnackbar(
     snackbarData: SnackbarData,
+    modifier: Modifier = Modifier,
     type: SnackbarType = SnackbarType.ERROR
 ) {
     val style = remember(type) {
@@ -76,7 +77,7 @@ fun CustomSnackbar(
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .padding(16.dp)
             .shadow(4.dp, RoundedCornerShape(12.dp))
             .clip(RoundedCornerShape(12.dp))

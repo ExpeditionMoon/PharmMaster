@@ -2,7 +2,14 @@ package com.moon.pharm.component_ui.component.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -23,10 +30,11 @@ import com.moon.pharm.domain.model.pharmacy.Pharmacy
 @Composable
 fun PharmacyListItem(
     pharmacy: Pharmacy,
-    onClick: (Pharmacy) -> Unit
+    onClick: (Pharmacy) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onClick(pharmacy) }
             .background(White, RoundedCornerShape(10.dp))

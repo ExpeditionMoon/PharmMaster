@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
@@ -32,8 +33,7 @@ import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.backgroundLight
 
 /**
- * 앱 표준 상단바.
- * ([TopBarData]를 통해 UI 구성)
+ * 앱 표준 상단바
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,10 +41,12 @@ fun PharmTopBar(
     data: TopBarData,
     modifier: Modifier = Modifier
 ) {
-    val titleContent: @Composable () -> Unit = if (data.isLogoTitle) {
-        { PharmLogoTitle() }
-    } else {
-        { PharmTextTitle(title = data.title) }
+    val titleContent: @Composable () -> Unit = remember(data.isLogoTitle, data.title) {
+        if (data.isLogoTitle) {
+            { PharmLogoTitle() }
+        } else {
+            { PharmTextTitle(title = data.title) }
+        }
     }
 
     CenterAlignedTopAppBar(

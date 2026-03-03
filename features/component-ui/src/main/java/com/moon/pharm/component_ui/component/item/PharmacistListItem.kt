@@ -2,7 +2,17 @@ package com.moon.pharm.component_ui.component.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,23 +30,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.theme.Primary
 import com.moon.pharm.component_ui.theme.SecondFont
 import com.moon.pharm.component_ui.theme.White
 import com.moon.pharm.component_ui.theme.tertiaryLight
 import com.moon.pharm.domain.model.auth.Pharmacist
-import com.moon.pharm.component_ui.R
 
 @Composable
 fun PharmacistListItem(
     pharmacist: Pharmacist,
-    btnText: String? = null,
-    onSelect: (Pharmacist) -> Unit
+    onSelect: (Pharmacist) -> Unit,
+    modifier: Modifier = Modifier,
+    btnText: String? = null
 ) {
     val textToDisplay = btnText ?: stringResource(R.string.btn_select)
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(White, RoundedCornerShape(10.dp))
             .padding(16.dp),
