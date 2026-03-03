@@ -58,8 +58,8 @@ fun PharmacistSearchView(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            FilterChip(text = stringResource(R.string.consult_search_nearby), isSelected = true)
-            FilterChip(text = stringResource(R.string.consult_search_favorite), isSelected = false)
+            FilterChip(text = stringResource(R.string.consult_search_nearby), isSelected = true, onClick = {})
+            FilterChip(text = stringResource(R.string.consult_search_favorite), isSelected = false, onClick = {})
         }
 
         Spacer(modifier = Modifier.height(24.dp))

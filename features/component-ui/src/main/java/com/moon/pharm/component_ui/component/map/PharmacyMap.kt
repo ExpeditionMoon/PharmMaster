@@ -34,13 +34,13 @@ import com.moon.pharm.domain.model.pharmacy.Pharmacy
 @Composable
 fun PharmacyMap(
     pharmacies: List<Pharmacy>,
-    selectedPharmacy: Pharmacy? = null,
     onPharmacyClick: (Pharmacy) -> Unit,
     onBackClick: () -> Unit,
-    showBackButton: Boolean = true,
     cameraPositionState: CameraPositionState,
-    isLocationEnabled: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedPharmacy: Pharmacy? = null,
+    showBackButton: Boolean = true,
+    isLocationEnabled: Boolean = false
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         GoogleMap(

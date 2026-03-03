@@ -28,9 +28,9 @@ import com.moon.pharm.component_ui.util.clickableSingle
 fun DateSettingCard(
     placeholder: String,
     value: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    showCalendarIcon: Boolean = false,
-    onClick: () -> Unit
+    showCalendarIcon: Boolean = false
 ) {
     Box(
         modifier = modifier

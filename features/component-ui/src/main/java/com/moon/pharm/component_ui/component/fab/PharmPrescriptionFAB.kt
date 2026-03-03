@@ -13,10 +13,12 @@ import com.moon.pharm.component_ui.theme.Primary
 
 @Composable
 fun PharmPrescriptionFAB(
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     FloatingActionButton(
         onClick = onClick,
+        modifier = modifier,
         shape = RoundedCornerShape(100.dp),
         containerColor = Primary
     ) {

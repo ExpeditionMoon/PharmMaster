@@ -24,10 +24,11 @@ import com.moon.pharm.component_ui.util.clickableSingle
 fun FilterChip(
     text: String,
     isSelected: Boolean,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .height(32.dp)
             .background(if (isSelected) Primary else White, RoundedCornerShape(10.dp))
             .border(

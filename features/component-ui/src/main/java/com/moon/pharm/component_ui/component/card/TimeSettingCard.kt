@@ -30,10 +30,11 @@ import com.moon.pharm.component_ui.util.clickableSingle
 @Composable
 fun TimeSettingCard(
     time: String?,
-    onTimeClick: () -> Unit
+    onTimeClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(White, RoundedCornerShape(10.dp))
             .border(0.5.dp, tertiaryLight, RoundedCornerShape(10.dp))

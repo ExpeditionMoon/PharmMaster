@@ -41,6 +41,7 @@ fun PharmacySelector(
     onSearch: (String) -> Unit,
     onSearchArea: (Double, Double) -> Unit,
     onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
     isLocationEnabled: Boolean = false,
     sheetContent: (@Composable () -> Unit)? = null,
     bottomContent: @Composable () -> Unit = {},
@@ -50,8 +51,7 @@ fun PharmacySelector(
             LatLng(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL),
             15f
         )
-    },
-    modifier: Modifier = Modifier
+    }
 ) {
     var searchText by remember { mutableStateOf("") }
     val scaffoldState = rememberBottomSheetScaffoldState()
