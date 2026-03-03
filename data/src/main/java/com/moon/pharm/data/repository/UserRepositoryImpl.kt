@@ -2,9 +2,9 @@ package com.moon.pharm.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.moon.pharm.data.datasource.UserDataSource
+import com.moon.pharm.data.datasource.remote.dto.toDomain
+import com.moon.pharm.data.datasource.remote.dto.toDto
 import com.moon.pharm.data.di.IoDispatcher
-import com.moon.pharm.data.mapper.toDomain
-import com.moon.pharm.data.mapper.toDto
 import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.model.auth.UserException
 import com.moon.pharm.domain.model.auth.UserLifeStyle

@@ -9,11 +9,11 @@ import com.moon.pharm.data.common.NotificationConstants.MSG_NEW_CONSULT_BODY
 import com.moon.pharm.data.common.NotificationConstants.MSG_NEW_CONSULT_TITLE
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.ImageDataSource
+import com.moon.pharm.data.datasource.remote.dto.toDomain
+import com.moon.pharm.data.datasource.remote.dto.toDto
 import com.moon.pharm.data.datasource.remote.fcm.FcmApi
 import com.moon.pharm.data.datasource.remote.fcm.FcmSendRequest
 import com.moon.pharm.data.di.IoDispatcher
-import com.moon.pharm.data.mapper.toDomain
-import com.moon.pharm.data.mapper.toDto
 import com.moon.pharm.domain.model.consult.ConsultAnswer
 import com.moon.pharm.domain.model.consult.ConsultException
 import com.moon.pharm.domain.model.consult.ConsultItem

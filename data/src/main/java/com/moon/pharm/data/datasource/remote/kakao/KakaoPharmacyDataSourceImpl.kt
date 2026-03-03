@@ -3,7 +3,6 @@ package com.moon.pharm.data.datasource.remote.kakao
 import com.moon.pharm.data.BuildConfig
 import com.moon.pharm.data.datasource.PharmacySearchDataSource
 import com.moon.pharm.data.datasource.remote.dto.PharmacyDTO
-import com.moon.pharm.data.mapper.toDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

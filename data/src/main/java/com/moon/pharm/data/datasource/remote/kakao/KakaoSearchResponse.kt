@@ -1,5 +1,7 @@
 package com.moon.pharm.data.datasource.remote.kakao
 
+import com.moon.pharm.data.common.DEFAULT_LOCATION_COORDINATE
+import com.moon.pharm.data.datasource.remote.dto.PharmacyDTO
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -26,4 +28,14 @@ data class KakaoPharmacyDocument(
 data class KakaoMeta(
     @Json(name = "total_count") val totalCount: Int,
     @Json(name = "is_end") val isEnd: Boolean
+)
+
+// 매퍼
+fun KakaoPharmacyDocument.toDto(): PharmacyDTO = PharmacyDTO(
+    placeId = this.id,
+    name = this.placeName,
+    address = this.roadAddressName.ifEmpty { this.addressName },
+    tel = this.phone,
+    lat = this.y.toDoubleOrNull() ?: DEFAULT_LOCATION_COORDINATE,
+    lng = this.x.toDoubleOrNull() ?: DEFAULT_LOCATION_COORDINATE
 )

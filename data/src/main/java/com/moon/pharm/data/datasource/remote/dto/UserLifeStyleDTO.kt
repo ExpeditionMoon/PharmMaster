@@ -10,3 +10,20 @@ data class UserLifeStyleDTO(
     val dinnerTime: Long = UserLifeStyle.DEFAULT_DINNER,
     val isNotificationEnabled: Boolean = true
 )
+
+// UserLifeStyle 매퍼
+fun UserLifeStyleDTO.toDomain(): UserLifeStyle = UserLifeStyle(
+    userId = this.userId,
+    breakfastTime = this.breakfastTime,
+    lunchTime = this.lunchTime,
+    dinnerTime = this.dinnerTime,
+    isNotificationEnabled = this.isNotificationEnabled
+)
+
+fun UserLifeStyle.toDto(): UserLifeStyleDTO = UserLifeStyleDTO(
+    userId = this.userId,
+    breakfastTime = this.breakfastTime,
+    lunchTime = this.lunchTime,
+    dinnerTime = this.dinnerTime,
+    isNotificationEnabled = this.isNotificationEnabled
+)
