@@ -18,7 +18,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 import com.moon.pharm.domain.model.consult.ConsultItem
 
@@ -70,5 +72,18 @@ fun ConsultList(
                 )
             }
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun ConsultListPreview() {
+    PharmMasterTheme {
+        ConsultList(
+            currentList = ConsultPreviewData.dummyConsultItems,
+            currentUserId = "u1",
+            isPharmacist = false,
+            onItemClick = {}
+        )
     }
 }

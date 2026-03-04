@@ -23,6 +23,8 @@ import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
 import com.moon.pharm.component_ui.component.snackbar.SnackbarType
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.screen.component.MyConsultEmptyView
 import com.moon.pharm.consult.screen.component.MyConsultListContent
 import com.moon.pharm.consult.util.myConsultListEmptyTextRes
@@ -109,5 +111,23 @@ fun MyConsultListScreen(
                 }
             }
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MyConsultListScreenPreview() {
+    PharmMasterTheme {
+        MyConsultListScreen(
+            uiState = MyConsultListUiState(
+                isLoading = false,
+                myConsults = emptyList(),
+                currentUserId = "u1",
+                isPharmacist = false
+            ),
+            snackbarHostState = SnackbarHostState(),
+            onNavigateUp = {},
+            onItemClick = {}
+        )
     }
 }

@@ -17,7 +17,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.button.PharmSmallButton
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 
 @Composable
@@ -53,6 +55,20 @@ fun InfoCard(label: String, content: String, onEditClick: () -> Unit = {}) {
                 text = stringResource(R.string.consult_confirm_edit_btn),
                 onClick = onEditClick,
                 modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun InfoCardPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            InfoCard(
+                label = "지정 약국",
+                content = "달빛약국 (김약사)",
+                onEditClick = {}
             )
         }
     }

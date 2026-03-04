@@ -8,7 +8,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.consult.ConsultItem
+import com.moon.pharm.domain.model.consult.ConsultStatus
 
 @Composable
 fun MyConsultListContent(
@@ -30,5 +33,30 @@ fun MyConsultListContent(
                 onClick = { onItemClick(item.id) }
             )
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MyConsultListContentPreview() {
+    PharmMasterTheme {
+        MyConsultListContent(
+            items = listOf(
+                ConsultItem(
+                    id = "1",
+                    userId = "u1",
+                    pharmacistId = "p1",
+                    nickName = "사용자1",
+                    title = "타이레놀 복용 문의",
+                    content = "...",
+                    isPublic = true,
+                    status = ConsultStatus.WAITING,
+                    createdAt = System.currentTimeMillis()
+                )
+            ),
+            currentUserId = "u1",
+            isPharmacist = false,
+            onItemClick = {}
+        )
     }
 }

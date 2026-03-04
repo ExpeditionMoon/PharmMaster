@@ -2,6 +2,7 @@ package com.moon.pharm.consult.screen.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +19,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 
 @Composable
@@ -50,6 +53,16 @@ fun WaitingForAnswerBox() {
                 color = PharmTheme.colors.secondFont,
                 modifier = Modifier.padding(top = 4.dp)
             )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun WaitingForAnswerBoxPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            WaitingForAnswerBox()
         }
     }
 }

@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.moon.pharm.component_ui.component.bar.PharmPrimaryTabRow
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.model.ConsultPrimaryTab
 import com.moon.pharm.domain.model.consult.ConsultItem
 
@@ -37,6 +39,21 @@ fun ConsultContent(
             isPharmacist = isPharmacist,
             onItemClick = onItemClick,
             modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun ConsultContentPreview() {
+    PharmMasterTheme {
+        ConsultContent(
+            selectedTab = ConsultPrimaryTab.LATEST,
+            currentList = ConsultPreviewData.dummyConsultItems,
+            currentUserId = "u1",
+            isPharmacist = false,
+            onTabSelected = {},
+            onItemClick = {}
         )
     }
 }

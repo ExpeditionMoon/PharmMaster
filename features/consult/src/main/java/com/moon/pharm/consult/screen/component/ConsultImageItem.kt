@@ -2,6 +2,8 @@ package com.moon.pharm.consult.screen.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -14,7 +16,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 
 @Composable
@@ -31,4 +35,14 @@ fun ConsultImageItem(imageUrl: String) {
         error = rememberVectorPainter(Icons.Default.Image),
         placeholder = rememberVectorPainter(Icons.Default.Image)
     )
+}
+
+@ThemePreviews
+@Composable
+private fun ConsultImageItemPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            ConsultImageItem(imageUrl = "")
+        }
+    }
 }

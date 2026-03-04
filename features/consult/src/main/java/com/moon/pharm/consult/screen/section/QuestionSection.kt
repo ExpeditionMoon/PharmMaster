@@ -1,6 +1,7 @@
 package com.moon.pharm.consult.screen.section
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,9 +19,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.StatusBadge
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.screen.component.ConsultImageItem
+import com.moon.pharm.consult.screen.component.ConsultPreviewData
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.consult.ConsultStatus
 
@@ -76,6 +80,18 @@ fun QuestionSection(item: ConsultItem) {
                     ConsultImageItem(imageUrl = image.imageUrl)
                 }
             }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun QuestionSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            QuestionSection(
+                item = ConsultPreviewData.dummyConsultItems.first()
+            )
         }
     }
 }

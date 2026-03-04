@@ -1,6 +1,7 @@
 package com.moon.pharm.consult.screen.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -10,7 +11,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 @Composable
 fun ConsultWriteContent(
@@ -55,5 +58,23 @@ fun ConsultWriteContent(
             onVisibilityChange = onVisibilityChange,
             onNextClick = onNextClick
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun ConsultWriteFormPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            ConsultWriteForm(
+                title = "타이레놀 복용 문의",
+                content = "하루에 몇 알까지 먹어도 되나요?",
+                images = listOf("", ""),
+                onTitleChange = {},
+                onContentChange = {},
+                onCameraClick = {},
+                onImageRemove = {}
+            )
+        }
     }
 }

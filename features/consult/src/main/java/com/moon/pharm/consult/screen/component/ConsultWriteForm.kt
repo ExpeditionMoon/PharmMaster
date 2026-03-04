@@ -18,7 +18,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.input.PrimaryTextField
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.screen.section.PhotoAttachmentSection
 
@@ -77,5 +79,25 @@ fun ConsultWriteForm(
         )
 
         Spacer(modifier = Modifier.height(20.dp))
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun ConsultWriteContentPreview() {
+    PharmMasterTheme {
+        ConsultWriteContent(
+            title = "",
+            content = "",
+            images = emptyList(),
+            isPublic = true,
+            isButtonEnabled = false,
+            onTitleChange = {},
+            onContentChange = {},
+            onImageRemove = {},
+            onCameraClick = {},
+            onVisibilityChange = {},
+            onNextClick = {}
+        )
     }
 }
