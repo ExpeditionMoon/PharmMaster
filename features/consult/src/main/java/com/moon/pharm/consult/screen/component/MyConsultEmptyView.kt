@@ -3,7 +3,7 @@ package com.moon.pharm.consult.screen.component
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.moon.pharm.component_ui.theme.SecondFont
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun MyConsultEmptyView(
@@ -13,6 +13,6 @@ fun MyConsultEmptyView(
     Text(
         text = text,
         modifier = modifier,
-        color = SecondFont
+        color = PharmTheme.colors.secondFont
     )
 }

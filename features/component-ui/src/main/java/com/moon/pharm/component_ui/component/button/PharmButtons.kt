@@ -17,9 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.theme.secondaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.MultipleEventsCutter
 
 /**
@@ -32,8 +30,8 @@ fun PharmPrimaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    containerColor: Color = primaryLight,
-    contentColor: Color = White
+    containerColor: Color = PharmTheme.colors.primary,
+    contentColor: Color = PharmTheme.colors.surface
 ) {
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
 
@@ -66,8 +64,8 @@ fun PharmSmallButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    containerColor: Color = secondaryLight,
-    contentColor: Color = White
+    containerColor: Color = PharmTheme.colors.secondary,
+    contentColor: Color = PharmTheme.colors.surface
 ) {
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
 
@@ -103,8 +101,8 @@ fun PharmOutlinedButton(
             .fillMaxWidth()
             .height(52.dp),
         shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(1.dp, primaryLight),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = primaryLight)
+        border = BorderStroke(1.dp, PharmTheme.colors.primary),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = PharmTheme.colors.primary)
     ) {
         content()
     }

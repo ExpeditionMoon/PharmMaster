@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.chip.FilterChip
 import com.moon.pharm.component_ui.component.input.SearchBar
 import com.moon.pharm.component_ui.component.item.PharmacyListItem
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.consult.R
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 
@@ -36,14 +35,14 @@ fun PharmacistSearchView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundLight)
+            .background(PharmTheme.colors.background)
             .padding(horizontal = 24.dp, vertical = 20.dp)
     ) {
         Text(
             text = stringResource(R.string.consult_search_select_pharmacist),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black,
+            color = PharmTheme.colors.onSurface,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 

@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.moon.pharm.component_ui.component.bar.PharmPrimaryTabRow
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.consult.model.ConsultPrimaryTab
 import com.moon.pharm.domain.model.consult.ConsultItem
 
@@ -24,7 +24,7 @@ fun ConsultContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundLight)
+            .background(PharmTheme.colors.background)
     ) {
         PharmPrimaryTabRow(
             selectedTabIndex = selectedTab.index,

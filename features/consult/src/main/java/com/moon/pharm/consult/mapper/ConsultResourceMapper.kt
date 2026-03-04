@@ -1,18 +1,18 @@
 package com.moon.pharm.consult.mapper
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.moon.pharm.component_ui.theme.onPrimaryLight
-import com.moon.pharm.component_ui.theme.onSecondaryLight
-import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.theme.secondaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.domain.model.consult.ConsultStatus
 
+@Composable
 fun ConsultStatus.toBackgroundColor(): Color = when(this) {
-    ConsultStatus.WAITING -> secondaryLight
-    ConsultStatus.COMPLETED -> primaryLight
+    ConsultStatus.WAITING -> PharmTheme.colors.secondary
+    ConsultStatus.COMPLETED -> PharmTheme.colors.primary
 }
 
+@Composable
 fun ConsultStatus.toTextColor(): Color = when(this) {
-    ConsultStatus.WAITING -> onSecondaryLight
-    ConsultStatus.COMPLETED -> onPrimaryLight
+    ConsultStatus.WAITING -> PharmTheme.colors.onSecondary
+    ConsultStatus.COMPLETED -> PharmTheme.colors.onPrimary
 }

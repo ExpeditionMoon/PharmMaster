@@ -21,10 +21,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.moon.pharm.component_ui.theme.Placeholder
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun PrimaryTextField(
@@ -52,12 +49,12 @@ fun PrimaryTextField(
             maxLines = maxLines,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
-            cursorBrush = SolidColor(primaryLight),
+            cursorBrush = SolidColor(PharmTheme.colors.primary),
             modifier = modifier
                 .fillMaxWidth()
                 .height(height)
-                .background(White, shape)
-                .border(0.5.dp, tertiaryLight, shape),
+                .background(PharmTheme.colors.surface, shape)
+                .border(0.5.dp, PharmTheme.colors.tertiary, shape),
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -66,7 +63,7 @@ fun PrimaryTextField(
                     if (value.isEmpty()) {
                         Text(
                             text = placeholder,
-                            style = textStyle.copy(color = Placeholder)
+                            style = textStyle.copy(color = PharmTheme.colors.placeholder)
                         )
                     }
                     innerTextField()

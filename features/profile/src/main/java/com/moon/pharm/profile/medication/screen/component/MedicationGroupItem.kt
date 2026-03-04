@@ -15,11 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.SecondFont
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.toDisplayTimeString
 import com.moon.pharm.domain.model.medication.MedicationTimeGroup
 import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
@@ -40,14 +39,14 @@ fun MedicationGroupItem(
                 modifier = Modifier
                     .size(8.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFFFC107))
+                    .background(PharmTheme.colors.warning)
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = displayTime ?: "",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = SecondFont
+                color = PharmTheme.colors.secondFont
             )
         }
 

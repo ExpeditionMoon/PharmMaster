@@ -15,8 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.consult.R
 import com.moon.pharm.domain.model.auth.Pharmacist
 
@@ -27,7 +26,7 @@ fun PharmacistProfileCard(
 ) {
     Surface(
         shape = RoundedCornerShape(10.dp),
-        color = White,
+        color = PharmTheme.colors.surface,
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -48,7 +47,7 @@ fun PharmacistProfileCard(
                 Text(
                     text = stringResource(R.string.consult_detail_no_pharmacist_info),
                     fontSize = 13.sp,
-                    color = SecondFont
+                    color = PharmTheme.colors.secondFont
                 )
             }
         }

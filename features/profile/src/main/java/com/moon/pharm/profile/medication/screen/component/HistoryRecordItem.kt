@@ -22,10 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Success
-import com.moon.pharm.component_ui.theme.SuccessContainer
-import com.moon.pharm.component_ui.theme.Warning
-import com.moon.pharm.component_ui.theme.WarningContainer
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.model.HistoryRecordUiModel
 
@@ -35,8 +32,8 @@ fun HistoryRecordItem(
     onRecordClick: () -> Unit
 ) {
     val record = uiModel.record
-    val borderColor = if (record.isTaken) Success else Warning
-    val backgroundColor = if (record.isTaken) SuccessContainer else WarningContainer
+    val borderColor = if (record.isTaken) PharmTheme.colors.success else PharmTheme.colors.warning
+    val backgroundColor = if (record.isTaken) PharmTheme.colors.successContainer else PharmTheme.colors.warningContainer
 
     Row(
         modifier = Modifier

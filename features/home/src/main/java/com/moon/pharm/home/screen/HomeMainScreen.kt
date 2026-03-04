@@ -29,7 +29,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,12 +43,7 @@ import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.component_ui.theme.OnSurface
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.Secondary
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.home.viewmodel.HomeViewModel
 
 @Composable
@@ -88,7 +82,7 @@ fun HomeMainScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(backgroundLight)
+                .background(PharmTheme.colors.background)
                 .verticalScroll(scrollState)
         ) {
             Column(
@@ -100,7 +94,7 @@ fun HomeMainScreen(
                     text = "${displayName}님, 건강 챙기세요!",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = OnSurface
+                    color = PharmTheme.colors.onSurface
                 )
 
                 PharmNotice()
@@ -132,10 +126,10 @@ fun PharmNotice() {
                 .height(130.dp)
                 .border(
                     width = 0.5.dp,
-                    color = Color(118, 118, 118).copy(alpha = 0.5f),
+                    color = PharmTheme.colors.placeholder,
                     shape = RoundedCornerShape(10.dp)
                 )
-                .background(White),
+                .background(PharmTheme.colors.surface),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
@@ -149,7 +143,7 @@ fun PharmNotice() {
                     modifier = Modifier
                         .padding(start = 20.dp, end = 10.dp)
                         .background(
-                            color = Secondary.copy(alpha = 0.2f),
+                            color = PharmTheme.colors.secondary.copy(alpha = 0.2f),
                             shape = RoundedCornerShape(100.dp)
                         )
                 ) {
@@ -170,7 +164,7 @@ fun PharmNotice() {
                         text = "점심약 복용 시간입니다",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Normal,
-                        color = SecondFont
+                        color = PharmTheme.colors.secondFont
                     )
                 }
             }
@@ -181,7 +175,7 @@ fun PharmNotice() {
                 text = "총 2개 알림",
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(51, 51, 51)
+                color = PharmTheme.colors.onSurface.copy(alpha = 0.8f)
             )
         }
     }
@@ -195,7 +189,7 @@ fun RateOfUse() {
             .fillMaxWidth()
             .padding(top = 20.dp)
             .background(
-                color = Secondary.copy(alpha = 0.1f),
+                color = PharmTheme.colors.secondary.copy(alpha = 0.1f),
                 shape = RoundedCornerShape(10.dp)
             )
             .heightIn(min = 60.dp),
@@ -207,10 +201,9 @@ fun RateOfUse() {
                 .padding(10.dp)
                 .border(
                     width = 1.dp,
-                    color = Secondary,
+                    color = PharmTheme.colors.secondary,
                     shape = RoundedCornerShape(10.dp)
                 )
-//                .height(40.dp)
                 .width(80.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -224,7 +217,7 @@ fun RateOfUse() {
                 text = "95%",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = SecondFont
+                color = PharmTheme.colors.secondFont
             )
         }
         Column(
@@ -242,7 +235,7 @@ fun RateOfUse() {
                 text = "오전 8:00 아침약 복용 완료",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Normal,
-                color = Color(118, 118, 118)
+                color = PharmTheme.colors.secondFont
             )
         }
     }
@@ -257,7 +250,7 @@ fun PharmSafety() {
             .padding(top = 20.dp)
             .heightIn(min = 140.dp)
             .background(
-                color = Primary,
+                color = PharmTheme.colors.primary,
                 shape = RoundedCornerShape(10.dp)
             ),
     ) {
@@ -270,7 +263,7 @@ fun PharmSafety() {
             Icon(
                 Icons.Outlined.VerifiedUser,
                 contentDescription = "verifiedUser",
-                tint = Color.White,
+                tint = PharmTheme.colors.surface,
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp)
             )
             Column(
@@ -281,14 +274,14 @@ fun PharmSafety() {
                     text = "복용 전 약물 안전성을 확인하세요!",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.White
+                    color = PharmTheme.colors.surface
                 )
                 Text(
                     modifier = Modifier.padding(top = 10.dp),
                     text = "복용 중인 약물 간 상호작용(DDI) 위험을 점검하고 건강을 챙기세요.",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Normal,
-                    color = Color(0xFFDDDDDD)
+                    color = PharmTheme.colors.surface.copy(alpha = 0.8f)
                 )
             }
         }
@@ -297,7 +290,7 @@ fun PharmSafety() {
                 .fillMaxWidth()
                 .padding(start = 65.dp, end = 20.dp, top = 12.dp, bottom = 16.dp)
                 .background(
-                    color = Color.White,
+                    color = PharmTheme.colors.surface,
                     shape = RoundedCornerShape(5.dp)
                 )
                 .padding(vertical = 4.dp),
@@ -315,7 +308,7 @@ fun PharmSafety() {
                 text = "안전성 바로 확인하기 >",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Normal,
-                color = Primary,
+                color = PharmTheme.colors.primary,
                 modifier = Modifier
                     .padding(horizontal = 4.dp)
                     .clickable { }

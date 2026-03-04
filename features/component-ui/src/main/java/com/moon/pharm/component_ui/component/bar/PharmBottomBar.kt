@@ -11,8 +11,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.model.BottomBarUiModel
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun PharmBottomBar(
@@ -21,7 +20,7 @@ fun PharmBottomBar(
     modifier: Modifier = Modifier
 ) {
     NavigationBar (
-        containerColor = backgroundLight,
+        containerColor = PharmTheme.colors.background,
         modifier = modifier.shadow(elevation = 10.dp)
     ){
         items.forEach { item ->
@@ -39,10 +38,10 @@ fun PharmBottomBar(
                     Text(text = item.tabName)
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Primary,
-                    selectedTextColor = Primary,
-                    unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray,
+                    selectedIconColor = PharmTheme.colors.primary,
+                    selectedTextColor = PharmTheme.colors.primary,
+                    unselectedIconColor = PharmTheme.colors.placeholder,
+                    unselectedTextColor = PharmTheme.colors.placeholder,
                     indicatorColor = Color.Transparent
                 )
             )

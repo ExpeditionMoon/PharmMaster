@@ -17,9 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.button.PharmSmallButton
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.primaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.consult.R
 
 @Composable
@@ -27,7 +25,7 @@ fun InfoCard(label: String, content: String, onEditClick: () -> Unit = {}) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(White, RoundedCornerShape(10.dp))
+            .background(PharmTheme.colors.surface, RoundedCornerShape(10.dp))
             .padding(12.dp)
     ) {
         Row(
@@ -39,14 +37,14 @@ fun InfoCard(label: String, content: String, onEditClick: () -> Unit = {}) {
                 Text(
                     text = label,
                     fontSize = 12.sp,
-                    color = SecondFont,
+                    color = PharmTheme.colors.secondFont,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Text(
                     text = content,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = primaryLight,
+                    color = PharmTheme.colors.primary,
                     maxLines = 2
                 )
             }

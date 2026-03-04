@@ -27,7 +27,7 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
 import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -87,7 +87,7 @@ fun PharmacySelector(
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetPeekHeight = 80.dp,
-        sheetContainerColor = White,
+        sheetContainerColor = PharmTheme.colors.surface,
         sheetContent = {
             if (sheetContent != null) {
                 sheetContent()

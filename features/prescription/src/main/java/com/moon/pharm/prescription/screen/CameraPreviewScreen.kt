@@ -22,7 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.prescription.ocr.TextRecognitionAnalyzer
 import com.moon.pharm.prescription.viewmodel.PrescriptionUiEvent
 import com.moon.pharm.prescription.viewmodel.PrescriptionViewModel
@@ -106,7 +106,7 @@ fun CameraPreviewScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(32.dp),
-            color = White
+            color = PharmTheme.colors.surface
         )
     }
 }

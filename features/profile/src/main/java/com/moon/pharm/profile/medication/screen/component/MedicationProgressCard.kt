@@ -21,10 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.profile.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,7 +30,7 @@ fun MedicationProgressCard(total: Int, completed: Int) {
     val progressValue = if (total > 0) completed.toFloat() / total.toFloat() else 0f
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = White),
+        colors = CardDefaults.cardColors(containerColor = PharmTheme.colors.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth()
@@ -54,7 +51,7 @@ fun MedicationProgressCard(total: Int, completed: Int) {
                     ),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = PharmTheme.colors.onSurface
                 )
             }
 
@@ -65,8 +62,8 @@ fun MedicationProgressCard(total: Int, completed: Int) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp),
-                color = Primary,
-                trackColor = tertiaryLight,
+                color = PharmTheme.colors.primary,
+                trackColor = PharmTheme.colors.tertiary,
                 gapSize = 0.dp,
             )
 
@@ -76,7 +73,7 @@ fun MedicationProgressCard(total: Int, completed: Int) {
                 // TODO: 실제 데이터 기반 계산으로 변경
                 text = "이번 주 복용 준수율 94%",
                 fontSize = 13.sp,
-                color = SecondFont
+                color = PharmTheme.colors.secondFont
             )
         }
     }

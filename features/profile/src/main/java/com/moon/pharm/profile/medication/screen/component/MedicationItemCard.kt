@@ -18,9 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
 
 @Composable
@@ -30,8 +28,8 @@ fun MedicationItemCard(
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = White,
-            contentColor = Primary
+            containerColor = PharmTheme.colors.surface,
+            contentColor = PharmTheme.colors.primary
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(12.dp),
@@ -50,19 +48,19 @@ fun MedicationItemCard(
                         text = item.name,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = PharmTheme.colors.onSurface
                     )
                     Text(
                         text = " · ${item.type.label}",
                         fontSize = 13.sp,
-                        color = SecondFont
+                        color = PharmTheme.colors.secondFont
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "${item.mealTiming.label} · ${item.repeatType.label}",
                     fontSize = 13.sp,
-                    color = SecondFont
+                    color = PharmTheme.colors.secondFont
                 )
             }
 

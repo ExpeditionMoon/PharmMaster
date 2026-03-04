@@ -9,9 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.backgroundLight
-import com.moon.pharm.component_ui.theme.primaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun PharmPrimaryTabRow(
@@ -26,11 +24,11 @@ fun PharmPrimaryTabRow(
         indicator = {
             TabRowDefaults.SecondaryIndicator(
                 modifier = Modifier.tabIndicatorOffset(selectedTabIndex),
-                color = primaryLight
+                color = PharmTheme.colors.primary
             )
         },
-        containerColor = backgroundLight,
-        contentColor = primaryLight,
+        containerColor = PharmTheme.colors.background,
+        contentColor = PharmTheme.colors.primary,
         divider = {}
     ) {
         tabs.forEachIndexed { index, title ->
@@ -44,7 +42,7 @@ fun PharmPrimaryTabRow(
                         fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal,
                     )
                 },
-                unselectedContentColor = SecondFont
+                unselectedContentColor = PharmTheme.colors.secondFont
             )
         }
     }

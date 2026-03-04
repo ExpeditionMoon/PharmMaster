@@ -33,7 +33,7 @@ import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.profile.BuildConfig
@@ -223,7 +223,7 @@ fun MyPageScreenPreviewSuccess() {
     )
 
     MaterialTheme {
-        Surface(color = backgroundLight) {
+        Surface(color = PharmTheme.colors.background) {
             MyPageScreen(
                 uiState = MyPageUiState(
                     isLoading = false,
