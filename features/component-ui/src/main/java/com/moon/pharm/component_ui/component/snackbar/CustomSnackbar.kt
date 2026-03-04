@@ -1,7 +1,9 @@
 package com.moon.pharm.component_ui.component.snackbar
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -14,6 +16,7 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -26,7 +29,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 enum class SnackbarType {
     SUCCESS, ERROR, INFO
@@ -92,6 +97,40 @@ fun CustomSnackbar(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
+        }
+    }
+}
+
+// 프리뷰용 더미 데이터 클래스
+private class PreviewSnackbarData(
+    override val visuals: SnackbarVisuals
+) : androidx.compose.material3.SnackbarData {
+    override fun dismiss() {}
+    override fun performAction() {}
+}
+
+private class PreviewSnackbarVisuals(
+    override val message: String,
+    override val actionLabel: String? = null,
+    override val duration: androidx.compose.material3.SnackbarDuration = androidx.compose.material3.SnackbarDuration.Short,
+    override val withDismissAction: Boolean = false
+) : SnackbarVisuals
+
+@ThemePreviews
+@Composable
+private fun CustomSnackbarPreview() {
+    val dummyData = PreviewSnackbarData(
+        visuals = PreviewSnackbarVisuals(message = "처방전 전송에 성공했습니다.")
+    )
+
+    PharmMasterTheme {
+        Column(
+            modifier = Modifier.background(PharmTheme.colors.background).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            CustomSnackbar(snackbarData = dummyData, type = SnackbarType.SUCCESS)
+            CustomSnackbar(snackbarData = PreviewSnackbarData(PreviewSnackbarVisuals("네트워크 오류가 발생했습니다.")), type = SnackbarType.ERROR)
+            CustomSnackbar(snackbarData = PreviewSnackbarData(PreviewSnackbarVisuals("새로운 알림이 있습니다.")), type = SnackbarType.INFO)
         }
     }
 }

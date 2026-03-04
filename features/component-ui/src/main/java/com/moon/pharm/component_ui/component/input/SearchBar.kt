@@ -3,7 +3,9 @@ package com.moon.pharm.component_ui.component.input
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +26,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 @Composable
 fun SearchBar(
@@ -71,6 +75,30 @@ fun SearchBar(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun SearchBarPreview() {
+    PharmMasterTheme {
+        Column(
+            modifier = Modifier
+                .background(PharmTheme.colors.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            SearchBar(
+                value = "",
+                onValueChange = {},
+                placeholder = "약국 이름이나 주소를 검색해보세요"
+            )
+            SearchBar(
+                value = "강남역",
+                onValueChange = {},
+                placeholder = "약국 이름이나 주소를 검색해보세요"
+            )
         }
     }
 }

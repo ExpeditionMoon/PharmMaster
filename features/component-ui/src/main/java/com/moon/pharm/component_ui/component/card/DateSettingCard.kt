@@ -2,7 +2,9 @@ package com.moon.pharm.component_ui.component.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,7 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.clickableSingle
 
 @Composable
@@ -57,3 +61,18 @@ fun DateSettingCard(
     }
 }
 
+@ThemePreviews
+@Composable
+private fun DateSettingCardPreview() {
+    PharmMasterTheme {
+        Column(
+            modifier = Modifier
+                .background(PharmTheme.colors.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            DateSettingCard(placeholder = "날짜를 선택해주세요", value = "", onClick = {}, showCalendarIcon = true)
+            DateSettingCard(placeholder = "날짜를 선택해주세요", value = "2024. 05. 20", onClick = {}, showCalendarIcon = true)
+        }
+    }
+}

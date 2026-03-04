@@ -19,7 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 @Composable
 fun MapRefreshButton(
@@ -49,5 +51,13 @@ fun MapRefreshButton(
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MapRefreshButtonPreview() {
+    PharmMasterTheme {
+        MapRefreshButton(onClick = {})
     }
 }

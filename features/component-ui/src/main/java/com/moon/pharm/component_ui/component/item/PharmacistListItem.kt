@@ -30,7 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.auth.Pharmacist
 
 @Composable
@@ -95,6 +97,31 @@ fun PharmacistListItem(
                 text = textToDisplay,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacistListItemPreview() {
+    PharmMasterTheme {
+        Box(
+            modifier = Modifier
+                .background(PharmTheme.colors.background)
+                .padding(16.dp)
+        ) {
+            PharmacistListItem(
+                pharmacist = Pharmacist(
+                    userId = "user_12345",
+                    name = "김약사",
+                    bio = "복약 지도를 꼼꼼하게 해드립니다.",
+                    placeId = "place_001",
+                    pharmacyName = "달빛약국",
+                    isApproved = true
+                ),
+                onSelect = {},
+                btnText = "선택하기"
             )
         }
     }

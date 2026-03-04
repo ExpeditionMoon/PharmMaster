@@ -2,6 +2,7 @@ package com.moon.pharm.component_ui.component.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,9 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 
 @Composable
@@ -57,6 +62,25 @@ fun PharmacyListItem(
                 text = pharmacy.address,
                 color = PharmTheme.colors.secondFont,
                 fontSize = 13.sp
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacyListItemPreview(
+    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<Pharmacy>
+) {
+    PharmMasterTheme {
+        Box(
+            modifier = Modifier
+                .background(PharmTheme.colors.background)
+                .padding(16.dp)
+        ) {
+            PharmacyListItem(
+                pharmacy = pharmacies.first(),
+                onClick = {}
             )
         }
     }

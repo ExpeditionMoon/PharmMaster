@@ -25,7 +25,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 @Composable
 fun MapSearchBar(
@@ -82,5 +84,13 @@ fun MapSearchBar(
             ),
             shape = RoundedCornerShape(10.dp)
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MapSearchBarPreview() {
+    PharmMasterTheme {
+        MapSearchBar(value = "", onValueChange = {}, onSearch = {}, onBackClick = {})
     }
 }

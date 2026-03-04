@@ -3,6 +3,7 @@ package com.moon.pharm.component_ui.component.card
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.clickableSingle
 
 @Composable
@@ -57,5 +60,21 @@ fun TimeSettingCard(
             modifier = Modifier
                 .size(24.dp)
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun TimeSettingCardPreview() {
+    PharmMasterTheme {
+        Column(
+            modifier = Modifier
+                .background(PharmTheme.colors.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            TimeSettingCard(time = "", onTimeClick = {})
+            TimeSettingCard(time = "오후 12:30", onTimeClick = {})
+        }
     }
 }
