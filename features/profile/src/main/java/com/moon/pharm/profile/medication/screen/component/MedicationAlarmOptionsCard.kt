@@ -12,8 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
 import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
@@ -27,8 +26,8 @@ fun MedicationAlarmOptionsCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(White, RoundedCornerShape(12.dp))
-            .border(0.5.dp, tertiaryLight, RoundedCornerShape(12.dp))
+            .background(PharmTheme.colors.surface, RoundedCornerShape(12.dp))
+            .border(0.5.dp, PharmTheme.colors.tertiary, RoundedCornerShape(12.dp))
             .padding(10.dp),
         contentAlignment = Alignment.Center
     ) {

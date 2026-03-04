@@ -37,8 +37,7 @@ import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.component_ui.theme.Black
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.prescription.viewmodel.PrescriptionUiEvent
 import com.moon.pharm.prescription.viewmodel.PrescriptionViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -136,7 +135,7 @@ fun PrescriptionScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Black.copy(alpha = 0.5f))
+                .background(PharmTheme.colors.onSurface.copy(alpha = 0.5f))
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -149,7 +148,7 @@ fun PrescriptionScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "처방전을 분석하고 있어요...",
-                    color = White,
+                    color = PharmTheme.colors.surface,
                     fontWeight = FontWeight.Bold
                 )
             }

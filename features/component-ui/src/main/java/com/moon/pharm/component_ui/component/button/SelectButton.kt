@@ -13,10 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun SelectButton(
@@ -28,10 +25,10 @@ fun SelectButton(
     Box(
         modifier = modifier
             .height(40.dp)
-            .background(White, RoundedCornerShape(8.dp))
+            .background(PharmTheme.colors.surface, RoundedCornerShape(8.dp))
             .border(
                 width = if (isSelected) 1.dp else 0.5.dp,
-                color = if (isSelected) Primary else tertiaryLight,
+                color = if (isSelected) PharmTheme.colors.primary else PharmTheme.colors.tertiary,
                 shape = RoundedCornerShape(8.dp)
             )
             .clickable { onClick() },
@@ -41,7 +38,7 @@ fun SelectButton(
             text = text,
             fontSize = 14.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) Primary else SecondFont
+            color = if (isSelected) PharmTheme.colors.primary else PharmTheme.colors.secondFont
         )
     }
 }

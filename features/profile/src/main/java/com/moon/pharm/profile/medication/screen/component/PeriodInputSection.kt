@@ -15,13 +15,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.card.DateSettingCard
 import com.moon.pharm.component_ui.component.dialog.DatePickerModal
 import com.moon.pharm.component_ui.component.toggle.CustomSwitch
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.toDisplayDateString
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
@@ -96,7 +96,7 @@ fun PeriodInputSection(
         Text(
             text = stringResource(R.string.medication_no_end_date),
             fontSize = 12.sp,
-            color = Color.Black
+            color = PharmTheme.colors.onSurface
         )
         Spacer(modifier = Modifier.width(4.dp))
         CustomSwitch(

@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
-import com.moon.pharm.component_ui.theme.Secondary
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.auth.model.SignUpStep
@@ -41,6 +41,6 @@ fun SignUpButtonSection(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 24.dp),
-        containerColor = Secondary
+        containerColor = PharmTheme.colors.secondary
     )
 }

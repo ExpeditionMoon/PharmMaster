@@ -19,12 +19,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.input.PrimaryTextField
-import com.moon.pharm.component_ui.theme.Secondary
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.screen.component.PeriodInputSection
 import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
@@ -41,8 +39,8 @@ fun MedicationInfoSection(
     Column(
         modifier = Modifier
             .wrapContentSize()
-            .background(backgroundLight)
-            .background(Secondary.copy(alpha = 0.1f), RoundedCornerShape(10.dp))
+            .background(PharmTheme.colors.background)
+            .background(PharmTheme.colors.surface.copy(alpha = 0.1f), RoundedCornerShape(10.dp))
             .padding(10.dp)
     ) {
         if (!isSingleMode) {
@@ -81,7 +79,7 @@ fun MedicationInfoSection(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "삭제",
-                            tint = Color.Gray
+                            tint = PharmTheme.colors.placeholder
                         )
                     }
                 }

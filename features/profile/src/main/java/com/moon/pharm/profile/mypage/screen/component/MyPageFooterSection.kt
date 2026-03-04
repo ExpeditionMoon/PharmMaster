@@ -27,11 +27,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.button.PharmOutlinedButton
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.Tertiary
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.profile.R
 
 @Composable
@@ -44,7 +40,7 @@ fun MyPageFooterSection(
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Card(
-            colors = CardDefaults.cardColors(containerColor = White),
+            colors = CardDefaults.cardColors(containerColor = PharmTheme.colors.surface),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -54,7 +50,7 @@ fun MyPageFooterSection(
                     onClick = onTermsClick
                 )
                 HorizontalDivider(
-                    color = backgroundLight,
+                    color = PharmTheme.colors.background,
                     thickness = 1.dp,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
@@ -71,7 +67,7 @@ fun MyPageFooterSection(
             text = stringResource(R.string.mypage_app_version_format, appVersion),
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
-            color = SecondFont,
+            color = PharmTheme.colors.secondFont,
             fontSize = 12.sp
         )
 
@@ -92,7 +88,7 @@ fun MyPageFooterSection(
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Text(
                 text = stringResource(R.string.mypage_withdraw),
-                color = SecondFont,
+                color = PharmTheme.colors.secondFont,
                 fontSize = 13.sp,
                 textDecoration = TextDecoration.Underline,
                 modifier = Modifier.clickable { onWithdrawClick() }
@@ -110,11 +106,11 @@ private fun SimpleLinkItem(text: String, onClick: () -> Unit) {
             .padding(18.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text, fontSize = 14.sp, color = Primary)
+        Text(text, fontSize = 14.sp, color = PharmTheme.colors.primary)
         Icon(
             Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
-            tint = Tertiary
+            tint = PharmTheme.colors.tertiary
         )
     }
 }

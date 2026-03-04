@@ -21,7 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
 import com.moon.pharm.component_ui.component.snackbar.SnackbarType
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.auth.mapper.asString
 import com.moon.pharm.profile.auth.model.LoginUiMessage
@@ -79,7 +79,7 @@ fun LoginScreenContent(
     onSignUpClick: () -> Unit
 ) {
     Scaffold(
-        containerColor = White,
+        containerColor = PharmTheme.colors.surface,
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
                 CustomSnackbar(snackbarData = data, type = SnackbarType.ERROR)

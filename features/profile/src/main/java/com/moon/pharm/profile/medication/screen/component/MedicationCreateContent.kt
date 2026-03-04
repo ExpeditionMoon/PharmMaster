@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.screen.section.MedicationAlarmSection
 import com.moon.pharm.profile.medication.screen.section.MedicationInfoSection
@@ -35,7 +35,7 @@ fun MedicationCreateContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundLight)
+            .background(PharmTheme.colors.background)
             .verticalScroll(scrollState)
             .padding(horizontal = 24.dp, vertical = 20.dp)
     ) {

@@ -28,8 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.dialog.PharmInfoDialog
 import com.moon.pharm.component_ui.component.toggle.CustomSwitch
-import com.moon.pharm.component_ui.theme.Black
-import com.moon.pharm.component_ui.theme.SecondFont
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.profile.R
 
 @Composable
@@ -52,9 +51,9 @@ fun MedicationSwitchRow(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column {
-                Text(text = title, fontSize = 14.sp, color = Black, fontWeight = FontWeight.Medium)
+                Text(text = title, fontSize = 14.sp, color = PharmTheme.colors.onSurface, fontWeight = FontWeight.Medium)
                 if (description != null) {
-                    Text(text = description, fontSize = 12.sp, color = SecondFont)
+                    Text(text = description, fontSize = 12.sp, color = PharmTheme.colors.secondFont)
                 }
             }
 
@@ -63,7 +62,7 @@ fun MedicationSwitchRow(
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = stringResource(R.string.medication_info),
-                    tint = SecondFont,
+                    tint = PharmTheme.colors.secondFont,
                     modifier = Modifier
                         .size(20.dp)
                         .clip(CircleShape)

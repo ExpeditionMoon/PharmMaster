@@ -25,9 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.R
-import com.moon.pharm.component_ui.theme.Placeholder
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun MapSearchBar(
@@ -51,7 +49,7 @@ fun MapSearchBar(
             interactionSource = interactionSource,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(White, RoundedCornerShape(10.dp)),
+                .background(PharmTheme.colors.surface, RoundedCornerShape(10.dp)),
             placeholder = { Text(stringResource(R.string.search_pharmacy_placeholder)) },
             leadingIcon = {
                 Icon(
@@ -77,10 +75,10 @@ fun MapSearchBar(
             }),
             singleLine = true,
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = White,
-                unfocusedContainerColor = White,
-                focusedIndicatorColor = Primary,
-                unfocusedIndicatorColor = Placeholder
+                focusedContainerColor = PharmTheme.colors.surface,
+                unfocusedContainerColor = PharmTheme.colors.surface,
+                focusedIndicatorColor = PharmTheme.colors.primary,
+                unfocusedIndicatorColor = PharmTheme.colors.placeholder
             ),
             shape = RoundedCornerShape(10.dp)
         )

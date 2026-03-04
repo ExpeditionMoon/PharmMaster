@@ -14,10 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.clickableSingle
 
 @Composable
@@ -30,10 +27,10 @@ fun FilterChip(
     Box(
         modifier = modifier
             .height(32.dp)
-            .background(if (isSelected) Primary else White, RoundedCornerShape(10.dp))
+            .background(if (isSelected) PharmTheme.colors.primary else PharmTheme.colors.surface, RoundedCornerShape(10.dp))
             .border(
                 width = if (isSelected) 0.dp else 0.5.dp,
-                color = if (isSelected) Color.Transparent else tertiaryLight,
+                color = if (isSelected) Color.Transparent else PharmTheme.colors.tertiary,
                 shape = RoundedCornerShape(10.dp)
             )
             .clickableSingle { onClick() }
@@ -44,7 +41,7 @@ fun FilterChip(
             text = text,
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
-            color = if (isSelected) White else SecondFont
+            color = if (isSelected) PharmTheme.colors.surface else PharmTheme.colors.secondFont
         )
     }
 }

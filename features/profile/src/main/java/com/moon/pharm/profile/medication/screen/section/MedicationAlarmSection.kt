@@ -15,15 +15,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.card.TimeSettingCard
 import com.moon.pharm.component_ui.component.dialog.TimePickerDialog
-import com.moon.pharm.component_ui.theme.Secondary
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.toMinuteTimeUiString
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.screen.component.AlarmOptionSelector
@@ -44,15 +42,15 @@ fun MedicationAlarmSection(
     Column(
         modifier = Modifier
             .wrapContentSize()
-            .background(backgroundLight)
-            .background(Secondary.copy(alpha = 0.1f), RoundedCornerShape(10.dp))
+            .background(PharmTheme.colors.background)
+            .background(PharmTheme.colors.secondary.copy(alpha = 0.1f), RoundedCornerShape(10.dp))
             .padding(10.dp)
     ) {
         Text(
             text = stringResource(R.string.medication_setting_alarm),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black,
+            color = PharmTheme.colors.onSurface,
             modifier = Modifier.padding(bottom = 12.dp)
         )
 

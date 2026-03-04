@@ -5,7 +5,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun CircularProgressBar(
@@ -16,7 +16,7 @@ fun CircularProgressBar(
         contentAlignment = Alignment.Center
     ){
         CircularProgressIndicator(
-            color = tertiaryLight
+            color = PharmTheme.colors.tertiary
         )
     }
 }

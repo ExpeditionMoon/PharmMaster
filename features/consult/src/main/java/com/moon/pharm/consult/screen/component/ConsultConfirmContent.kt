@@ -17,9 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
-import com.moon.pharm.component_ui.theme.backgroundLight
-import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.theme.secondaryContainerLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.consult.R
 
 @Composable
@@ -34,21 +32,21 @@ fun ConsultConfirmContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundLight)
+            .background(PharmTheme.colors.background)
             .padding(horizontal = 24.dp, vertical = 20.dp)
     ) {
         Text(
             text = stringResource(R.string.consult_confirm_title),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = primaryLight,
+            color = PharmTheme.colors.primary,
             modifier = Modifier.padding(bottom = 20.dp)
         )
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(secondaryContainerLight, RoundedCornerShape(10.dp))
+                .background(PharmTheme.colors.secondaryContainer, RoundedCornerShape(10.dp))
                 .padding(10.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {

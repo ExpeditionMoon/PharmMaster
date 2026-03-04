@@ -26,15 +26,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Black
-import com.moon.pharm.component_ui.theme.InfoContainer
-import com.moon.pharm.component_ui.theme.OnInfoContainer
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.Success
-import com.moon.pharm.component_ui.theme.SuccessContainer
-import com.moon.pharm.component_ui.theme.errorContainerLight
-import com.moon.pharm.component_ui.theme.errorLight
-import com.moon.pharm.component_ui.theme.onErrorContainerLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 enum class SnackbarType {
     SUCCESS, ERROR, INFO
@@ -53,25 +45,27 @@ fun CustomSnackbar(
     modifier: Modifier = Modifier,
     type: SnackbarType = SnackbarType.ERROR
 ) {
+    val colors = PharmTheme.colors
+
     val style = remember(type) {
         when (type) {
             SnackbarType.SUCCESS -> SnackbarStyle(
-                containerColor = SuccessContainer,
+                containerColor = colors.successContainer,
                 icon = Icons.Default.CheckCircle,
-                iconColor = Success,
-                textColor = Black.copy(alpha = 0.8f)
+                iconColor = colors.success,
+                textColor = colors.onSurface.copy(alpha = 0.8f)
             )
             SnackbarType.ERROR -> SnackbarStyle(
-                containerColor = errorContainerLight,
+                containerColor = colors.errorContainer,
                 icon = Icons.Default.Error,
-                iconColor = errorLight,
-                textColor = onErrorContainerLight
+                iconColor = colors.error,
+                textColor = colors.onErrorContainer
             )
             SnackbarType.INFO -> SnackbarStyle(
-                containerColor = InfoContainer,
+                containerColor = colors.infoContainer,
                 icon = Icons.Default.Info,
-                iconColor = Primary,
-                textColor = OnInfoContainer
+                iconColor = colors.primary,
+                textColor = colors.onInfoContainer
             )
         }
     }

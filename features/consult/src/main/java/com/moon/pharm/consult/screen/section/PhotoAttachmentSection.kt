@@ -31,8 +31,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.moon.pharm.component_ui.component.button.PharmOutlinedButton
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.consult.R
 
 @Composable
@@ -74,17 +73,17 @@ fun PhotoAttachmentSection(
                                 .align(Alignment.BottomStart)
                                 .size(80.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(Color.LightGray)
+                                .background(PharmTheme.colors.placeholder)
                         )
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = stringResource(R.string.consult_photo_delete_desc),
-                            tint = White,
+                            tint = PharmTheme.colors.surface,
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .size(20.dp)
                                 .clip(CircleShape)
-                                .background(Primary)
+                                .background(PharmTheme.colors.primary)
                                 .clickable { onRemoveImage(imageUrl) }
                                 .padding(4.dp)
                         )

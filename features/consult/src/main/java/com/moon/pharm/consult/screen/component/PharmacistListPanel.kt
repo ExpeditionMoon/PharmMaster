@@ -20,9 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.item.PharmacistListItem
-import com.moon.pharm.component_ui.theme.Black
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.consult.R
 import com.moon.pharm.domain.model.auth.Pharmacist
 
@@ -36,7 +34,7 @@ fun PharmacistListPanel(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = White,
+                color = PharmTheme.colors.surface,
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
             )
             .padding(24.dp)
@@ -46,7 +44,7 @@ fun PharmacistListPanel(
             text = stringResource(R.string.consult_map_pharmacist_list_format, pharmacyName),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Black,
+            color = PharmTheme.colors.onSurface,
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
@@ -57,7 +55,7 @@ fun PharmacistListPanel(
                     .padding(20.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(stringResource(R.string.consult_map_no_pharmacist), color = SecondFont)
+                Text(stringResource(R.string.consult_map_no_pharmacist), color = PharmTheme.colors.secondFont)
             }
         } else {
             LazyColumn(

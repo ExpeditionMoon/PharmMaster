@@ -14,13 +14,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.component.item.PharmacyListItem
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 
 @Composable
@@ -50,7 +50,7 @@ fun PharmacyListPanel(
                     .height(100.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = stringResource(R.string.search_result_empty), color = Color.Gray)
+                Text(text = stringResource(R.string.search_result_empty), color = PharmTheme.colors.placeholder)
             }
         } else {
             LazyColumn(

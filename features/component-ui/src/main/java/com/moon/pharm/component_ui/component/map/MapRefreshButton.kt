@@ -19,8 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.R
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun MapRefreshButton(
@@ -34,8 +33,8 @@ fun MapRefreshButton(
             .padding(top = 80.dp),
         shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = White,
-            contentColor = Primary
+            containerColor = PharmTheme.colors.surface,
+            contentColor = PharmTheme.colors.primary
         ),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp)
     ) {

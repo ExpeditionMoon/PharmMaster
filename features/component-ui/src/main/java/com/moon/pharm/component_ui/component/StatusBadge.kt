@@ -15,15 +15,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.onPrimaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun StatusBadge(
     text: String,
     statusColor: Color,
     modifier: Modifier = Modifier,
-    contentColor: Color = onPrimaryLight,
+    contentColor: Color = PharmTheme.colors.onPrimary,
     useBorderedStyle: Boolean = false,
     leadingIcon: @Composable (() -> Unit)? = null
 ) {
@@ -49,8 +48,8 @@ fun StatusBadge(
 
         val textColor = when {
             useBorderedStyle -> statusColor
-            contentColor != onPrimaryLight -> contentColor
-            else -> White
+            contentColor != PharmTheme.colors.onPrimary -> contentColor
+            else -> PharmTheme.colors.surface
         }
 
         Text(

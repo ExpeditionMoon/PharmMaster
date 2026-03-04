@@ -25,16 +25,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.R
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.domain.model.auth.Pharmacist
 
 @Composable
@@ -49,7 +45,7 @@ fun PharmacistListItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(White, RoundedCornerShape(10.dp))
+            .background(PharmTheme.colors.surface, RoundedCornerShape(10.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -59,14 +55,14 @@ fun PharmacistListItem(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(tertiaryLight)
-                    .border(1.dp, tertiaryLight, CircleShape),
+                    .background(PharmTheme.colors.tertiary)
+                    .border(1.dp, PharmTheme.colors.tertiary, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Image,
                     contentDescription = null,
-                    tint = Color.Gray,
+                    tint = PharmTheme.colors.placeholder,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -76,19 +72,19 @@ fun PharmacistListItem(
                     text = pharmacist.name,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = PharmTheme.colors.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = pharmacist.bio,
                     fontSize = 13.sp,
-                    color = SecondFont
+                    color = PharmTheme.colors.secondFont
                 )
             }
         }
         Button(
             onClick = { onSelect(pharmacist) },
-            colors = ButtonDefaults.buttonColors(containerColor = Primary),
+            colors = ButtonDefaults.buttonColors(containerColor = PharmTheme.colors.primary),
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier
                 .height(36.dp)

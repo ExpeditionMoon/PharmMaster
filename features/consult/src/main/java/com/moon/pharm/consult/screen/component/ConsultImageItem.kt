@@ -9,12 +9,12 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.consult.R
 
 @Composable
@@ -25,8 +25,8 @@ fun ConsultImageItem(imageUrl: String) {
         modifier = Modifier
             .size(100.dp)
             .clip(RoundedCornerShape(8.dp))
-            .background(Color.LightGray.copy(alpha = 0.2f))
-            .border(1.dp, Color.LightGray.copy(alpha = 0.5f), RoundedCornerShape(8.dp)),
+            .background(PharmTheme.colors.placeholder.copy(alpha = 0.2f))
+            .border(1.dp, PharmTheme.colors.placeholder.copy(alpha = 0.5f), RoundedCornerShape(8.dp)),
         contentScale = ContentScale.Crop,
         error = rememberVectorPainter(Icons.Default.Image),
         placeholder = rememberVectorPainter(Icons.Default.Image)

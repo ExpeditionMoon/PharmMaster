@@ -7,8 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Black
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun PharmInfoDialog(
@@ -21,13 +20,13 @@ fun PharmInfoDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
         title = { Text(text = title, fontWeight = FontWeight.Bold, fontSize = 16.sp) },
-        text = { Text(text = content, fontSize = 12.sp, color = Black) },
+        text = { Text(text = content, fontSize = 12.sp, color = PharmTheme.colors.onSurface) },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("닫기", color = Black)
+                Text("닫기", color = PharmTheme.colors.onSurface)
             }
         },
-        containerColor = White,
-        textContentColor = Black
+        containerColor = PharmTheme.colors.surface,
+        textContentColor = PharmTheme.colors.onSurface
     )
 }

@@ -15,15 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun HealthInfoCard(
@@ -39,7 +37,7 @@ fun HealthInfoCard(
             .width(110.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(
-                color = White
+                color = PharmTheme.colors.surface
             )
             .clickable { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -61,7 +59,7 @@ fun HealthInfoCard(
                 text = title,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.Black,
+                color = PharmTheme.colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(bottom = 4.dp)
@@ -70,7 +68,7 @@ fun HealthInfoCard(
                 text = description,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Normal,
-                color = SecondFont,
+                color = PharmTheme.colors.secondFont,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )

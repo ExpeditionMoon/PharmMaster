@@ -20,15 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Placeholder
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.primaryLight
-import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun SearchBar(
@@ -43,8 +39,8 @@ fun SearchBar(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp)
-            .background(White, RoundedCornerShape(10.dp))
-            .border(0.5.dp, tertiaryLight, RoundedCornerShape(10.dp))
+            .background(PharmTheme.colors.surface, RoundedCornerShape(10.dp))
+            .border(0.5.dp, PharmTheme.colors.tertiary, RoundedCornerShape(10.dp))
             .padding(horizontal = 12.dp),
         contentAlignment = Alignment.CenterStart
     ) {
@@ -54,7 +50,7 @@ fun SearchBar(
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = null,
-                tint = Placeholder,
+                tint = PharmTheme.colors.placeholder,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.size(8.dp))
@@ -62,16 +58,16 @@ fun SearchBar(
                 if (value.isEmpty()) {
                     Text(
                         text = placeholder,
-                        style = TextStyle(color = Placeholder, fontSize = 14.sp)
+                        style = TextStyle(color = PharmTheme.colors.placeholder, fontSize = 14.sp)
                     )
                 }
                 BasicTextField(
                     value = value,
                     onValueChange = onValueChange,
                     interactionSource = interactionSource,
-                    textStyle = TextStyle(color = Color.Black, fontSize = 14.sp),
+                    textStyle = TextStyle(color = PharmTheme.colors.onSurface, fontSize = 14.sp),
                     singleLine = true,
-                    cursorBrush = SolidColor(primaryLight),
+                    cursorBrush = SolidColor(PharmTheme.colors.primary),
                     modifier = Modifier.fillMaxWidth()
                 )
             }

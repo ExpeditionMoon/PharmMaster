@@ -9,14 +9,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.R
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.tertiaryContainerLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun DatePickerModal(
@@ -35,29 +32,29 @@ fun DatePickerModal(
             }) {
                 Text(
                     stringResource(R.string.common_confirm),
-                    color = Primary, fontWeight = FontWeight.Bold)
+                    color = PharmTheme.colors.primary, fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text(
                     stringResource(R.string.common_cancel),
-                    color = Primary)
+                    color = PharmTheme.colors.primary)
             }
         },
         shape = RoundedCornerShape(10.dp),
-        colors = DatePickerDefaults.colors(containerColor = tertiaryContainerLight)
+        colors = DatePickerDefaults.colors(containerColor = PharmTheme.colors.tertiaryContainer)
     ) {
         DatePicker(
             state = state,
             colors = DatePickerDefaults.colors(
-                containerColor = White,
-                titleContentColor = Color.Black,
-                headlineContentColor = Color.Black,
-                selectedDayContainerColor = Primary,
-                selectedDayContentColor = White,
-                todayContentColor = Primary,
-                todayDateBorderColor = Primary
+                containerColor = PharmTheme.colors.surface,
+                titleContentColor = PharmTheme.colors.onSurface,
+                headlineContentColor = PharmTheme.colors.onSurface,
+                selectedDayContainerColor = PharmTheme.colors.primary,
+                selectedDayContentColor = PharmTheme.colors.surface,
+                todayContentColor = PharmTheme.colors.primary,
+                todayDateBorderColor = PharmTheme.colors.primary
             )
         )
     }

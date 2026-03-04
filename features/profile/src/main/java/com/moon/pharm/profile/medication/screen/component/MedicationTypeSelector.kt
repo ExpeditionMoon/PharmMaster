@@ -15,10 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.Tertiary
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.clickableSingle
 import com.moon.pharm.domain.model.medication.MedicationType
 
@@ -40,7 +37,7 @@ fun MedicationTypeSelector(
                     .weight(1f)
                     .height(32.dp)
                     .background(
-                        color = if (isSelected) Primary else Tertiary,
+                        color = if (isSelected) PharmTheme.colors.primary else PharmTheme.colors.tertiary,
                         shape = RoundedCornerShape(6.dp)
                     )
                     .clickableSingle { onTypeSelected(type) },
@@ -50,7 +47,7 @@ fun MedicationTypeSelector(
                     text = type.label,
                     fontSize = 13.sp,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                    color = if (isSelected) White else SecondFont
+                    color = if (isSelected) PharmTheme.colors.surface else PharmTheme.colors.secondFont
                 )
             }
         }

@@ -18,8 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.consult.R
 import com.moon.pharm.domain.model.consult.ConsultItem
 
@@ -35,21 +34,21 @@ fun ConsultList(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .background(backgroundLight),
+                .background(PharmTheme.colors.background),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = stringResource(R.string.consult_list_empty_title),
                     fontSize = 16.sp,
-                    color = SecondFont,
+                    color = PharmTheme.colors.secondFont,
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.consult_list_empty_subtitle),
                     fontSize = 14.sp,
-                    color = SecondFont.copy(alpha = 0.7f)
+                    color = PharmTheme.colors.secondFont.copy(alpha = 0.7f)
                 )
             }
         }
@@ -59,7 +58,7 @@ fun ConsultList(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = modifier
                 .fillMaxSize()
-                .background(backgroundLight)
+                .background(PharmTheme.colors.background)
         ) {
             items(
                 items = currentList, key = { it.id }) { item ->

@@ -10,12 +10,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.R
 import com.moon.pharm.domain.model.consult.ConsultAnswer
@@ -26,14 +24,14 @@ fun AnswerContentCard(
 ) {
     Surface(
         shape = RoundedCornerShape(10.dp),
-        color = White,
+        color = PharmTheme.colors.surface,
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
                 text = answer.content,
                 fontSize = 14.sp,
-                color = Color.Black,
+                color = PharmTheme.colors.onSurface,
                 lineHeight = 22.sp
             )
 
@@ -45,7 +43,7 @@ fun AnswerContentCard(
                     answer.createdAt.toDisplayDateTimeString()
                 ),
                 fontSize = 12.sp,
-                color = SecondFont
+                color = PharmTheme.colors.secondFont
             )
         }
     }

@@ -28,9 +28,7 @@ import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.theme.OnSurface
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 /**
  * 앱 표준 상단바
@@ -61,7 +59,7 @@ fun PharmTopBar(
             PharmActions(actions = data.actions)
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = backgroundLight
+            containerColor = PharmTheme.colors.background
         ),
         windowInsets = WindowInsets.statusBars,
         modifier = modifier
@@ -85,7 +83,7 @@ private fun PharmTextTitle(title: String) {
         text = title,
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        color = Primary
+        color = PharmTheme.colors.primary
     )
 }
 
@@ -105,7 +103,7 @@ private fun PharmNavigationIcon(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Primary
+            tint = PharmTheme.colors.primary
         )
     }
 }
@@ -118,14 +116,14 @@ private fun PharmActions(actions: List<TopBarAction>) {
                 Icon(
                     imageVector = action.icon,
                     contentDescription = action.text,
-                    tint = Primary
+                    tint = PharmTheme.colors.primary
                 )
             }
         } else if (action.text != null) {
             TextButton(onClick = action.onClick) {
                 Text(
                     text = action.text,
-                    color = OnSurface
+                    color = PharmTheme.colors.onSurface
                 )
             }
         }

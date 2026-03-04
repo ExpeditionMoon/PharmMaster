@@ -10,7 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun ConsultWriteContent(
@@ -31,7 +31,7 @@ fun ConsultWriteContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundLight)
+            .background(PharmTheme.colors.background)
             .imePadding()
             .padding(horizontal = 24.dp)
             .padding(top = 20.dp, bottom = 10.dp)

@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Primary
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.profile.R
 
 @Composable
@@ -34,7 +34,7 @@ fun LoginHeader() {
             text = stringResource(R.string.login_app_title),
             fontSize = 28.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = Primary
+            color = PharmTheme.colors.primary
         )
     }
 }

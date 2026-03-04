@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.R
-import com.moon.pharm.component_ui.theme.Primary
+import com.moon.pharm.component_ui.theme.PharmTheme
 
 @Composable
 fun PharmPrescriptionFAB(
@@ -20,7 +20,7 @@ fun PharmPrescriptionFAB(
         onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(100.dp),
-        containerColor = Primary
+        containerColor = PharmTheme.colors.primary
     ) {
         Image(
             painter = painterResource(id = R.drawable.prescription_image),

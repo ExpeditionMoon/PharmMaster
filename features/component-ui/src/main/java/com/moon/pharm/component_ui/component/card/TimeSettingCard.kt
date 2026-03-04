@@ -20,11 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Black
-import com.moon.pharm.component_ui.theme.Placeholder
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.tertiaryLight
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.clickableSingle
 
 @Composable
@@ -36,8 +32,8 @@ fun TimeSettingCard(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(White, RoundedCornerShape(10.dp))
-            .border(0.5.dp, tertiaryLight, RoundedCornerShape(10.dp))
+            .background(PharmTheme.colors.surface, RoundedCornerShape(10.dp))
+            .border(0.5.dp, PharmTheme.colors.tertiary, RoundedCornerShape(10.dp))
             .clickableSingle { onTimeClick() }
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -48,7 +44,7 @@ fun TimeSettingCard(
                 text = time,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = if (time.isEmpty()) Placeholder else Black
+                color = if (time.isEmpty()) PharmTheme.colors.placeholder else PharmTheme.colors.onSurface
             )
         }
 
@@ -57,7 +53,7 @@ fun TimeSettingCard(
         Icon(
             imageVector = Icons.Default.Alarm,
             contentDescription = null,
-            tint = Primary,
+            tint = PharmTheme.colors.primary,
             modifier = Modifier
                 .size(24.dp)
         )

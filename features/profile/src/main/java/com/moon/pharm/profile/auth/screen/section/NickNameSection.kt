@@ -19,11 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.clickableSingle
 import com.moon.pharm.profile.R
 
@@ -42,7 +42,7 @@ fun NickNameSection(
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
-                .background(Color.LightGray)
+                .background(PharmTheme.colors.placeholder)
                 .clickableSingle { onImageClick() },
             contentAlignment = Alignment.Center
         ) {
@@ -58,7 +58,7 @@ fun NickNameSection(
                     imageVector = Icons.Default.Person,
                     contentDescription = null,
                     modifier = Modifier.size(50.dp),
-                    tint = Color.Gray
+                    tint = PharmTheme.colors.placeholder
                 )
             }
         }

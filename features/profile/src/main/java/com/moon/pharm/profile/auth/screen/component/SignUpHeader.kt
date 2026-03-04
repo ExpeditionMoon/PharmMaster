@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Primary
+import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.profile.R
 
 @Composable
@@ -34,7 +34,7 @@ fun SignUpHeader() {
             text = stringResource(R.string.signup_button_complete),
             fontSize = 20.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = Primary
+            color = PharmTheme.colors.primary
         )
     }
 }
