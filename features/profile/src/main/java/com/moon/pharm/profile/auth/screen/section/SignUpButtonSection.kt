@@ -1,5 +1,6 @@
 package com.moon.pharm.profile.auth.screen.section
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -7,7 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.auth.model.SignUpStep
@@ -43,4 +46,29 @@ fun SignUpButtonSection(
             .padding(bottom = 24.dp),
         containerColor = PharmTheme.colors.secondary
     )
+}
+
+@ThemePreviews
+@Composable
+private fun SignUpButtonSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(24.dp)) {
+            SignUpButtonSection(
+                uiState = SignUpUiState(
+                    currentStep = SignUpStep.EMAIL,
+                    userType = UserType.GENERAL,
+                    email = "",
+                    password = "",
+                    isEmailAvailable = true,
+                    isEmailChecking = false,
+                    nickName = "",
+                    profileImageUri = null,
+                    pharmacyName = "",
+                    pharmacistBio = "",
+                    isComplete = false
+                ),
+                onNextClick = {}
+            )
+        }
+    }
 }

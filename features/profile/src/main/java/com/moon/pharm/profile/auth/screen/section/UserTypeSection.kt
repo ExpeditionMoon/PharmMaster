@@ -2,6 +2,7 @@ package com.moon.pharm.profile.auth.screen.section
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +20,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.profile.util.labelRes
 
@@ -79,3 +82,15 @@ fun UserTypeRow(
     }
 }
 
+@ThemePreviews
+@Composable
+private fun UserTypeSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(24.dp)) {
+            UserTypeSection(
+                selectedType = UserType.GENERAL,
+                onSelect = {}
+            )
+        }
+    }
+}

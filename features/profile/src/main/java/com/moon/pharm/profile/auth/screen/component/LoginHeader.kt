@@ -1,10 +1,12 @@
 package com.moon.pharm.profile.auth.screen.component
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,7 +17,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.profile.R
 
 @Composable
@@ -36,5 +40,15 @@ fun LoginHeader() {
             fontWeight = FontWeight.ExtraBold,
             color = PharmTheme.colors.primary
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun LoginHeaderPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(24.dp)) {
+            LoginHeader()
+        }
     }
 }

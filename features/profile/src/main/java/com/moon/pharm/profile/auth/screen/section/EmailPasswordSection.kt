@@ -18,7 +18,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.clickableSingle
 import com.moon.pharm.profile.R
 
@@ -102,6 +104,24 @@ fun EmailPasswordSection(
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                     keyboardType = androidx.compose.ui.text.input.KeyboardType.Password
                 )
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun EmailPasswordSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(24.dp)) {
+            EmailPasswordSection(
+                email = "test@moonpharm.com",
+                password = "password123",
+                isAvailable = true,
+                isEmailChecking = false,
+                onUpdateEmail = {},
+                onUpdatePassword = {},
+                onCheckClick = {}
             )
         }
     }

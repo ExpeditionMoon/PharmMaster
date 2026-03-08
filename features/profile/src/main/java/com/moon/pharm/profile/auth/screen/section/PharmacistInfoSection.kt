@@ -1,10 +1,12 @@
 package com.moon.pharm.profile.auth.screen.section
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -15,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.clickableSingle
 import com.moon.pharm.profile.R
 import com.moon.pharm.component_ui.R as UiR
@@ -67,5 +71,20 @@ fun PharmacistInfoSection(
             shape = RoundedCornerShape(10.dp),
             maxLines = 5
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacistInfoSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(24.dp)) {
+            PharmacistInfoSection(
+                pharmacyName = "달빛약국",
+                bio = "친절하게 복약 지도를 도와드립니다.",
+                onSearchClick = {},
+                onUpdateBio = {}
+            )
+        }
     }
 }
