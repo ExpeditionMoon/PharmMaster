@@ -43,7 +43,9 @@ import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.home.viewmodel.HomeViewModel
 
 @Composable
@@ -350,6 +352,62 @@ fun HealthInfo() {
                 title = "유통기한 확인",
                 description = "유통기한이 지난 약은 폐기해야 합니다."
             )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun HomeMainScreenPreview() {
+    val displayName = "홍길동"
+
+    PharmMasterTheme {
+        Scaffold(
+            topBar = {
+                PharmTopBar(
+                    data = TopBarData(
+                        title = "홈",
+                        navigationType = TopBarNavigationType.Menu,
+                        isLogoTitle = true,
+                        actions = listOf(
+                            TopBarAction(icon = Icons.Filled.Search, onClick = {}),
+                            TopBarAction(icon = Icons.Filled.Notifications, onClick = {})
+                        )
+                    )
+                )
+            },
+            floatingActionButton = {
+                PharmPrescriptionFAB(onClick = {})
+            }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .background(PharmTheme.colors.background)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                ) {
+                    Text(
+                        text = "${displayName}님, 건강 챙기세요!",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = PharmTheme.colors.onSurface
+                    )
+
+                    PharmNotice()
+
+                    RateOfUse()
+
+                    PharmSafety()
+
+                    HealthInfo()
+                }
+            }
         }
     }
 }
