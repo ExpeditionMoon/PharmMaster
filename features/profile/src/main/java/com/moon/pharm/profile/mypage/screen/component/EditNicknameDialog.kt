@@ -14,7 +14,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.profile.R
 import com.moon.pharm.component_ui.R as UiR
 
@@ -73,4 +75,16 @@ fun EditNicknameDialog(
             }
         }
     )
+}
+
+@ThemePreviews
+@Composable
+private fun EditNicknameDialogPreview() {
+    PharmMasterTheme {
+        EditNicknameDialog(
+            currentNickname = "기존닉네임",
+            onDismiss = {},
+            onConfirm = {}
+        )
+    }
 }

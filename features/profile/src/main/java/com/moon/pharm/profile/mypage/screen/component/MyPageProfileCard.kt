@@ -30,7 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.moon.pharm.component_ui.component.button.PharmOutlinedButton
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.profile.R
@@ -96,6 +98,27 @@ fun MyPageProfileCard(
                     fontWeight = FontWeight.SemiBold
                 )
             }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MyPageProfileCardPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MyPageProfileCard(
+                user = User(
+                    id = "test_id",
+                    email = "test@email.com",
+                    nickName = "보름달",
+                    userType = UserType.PHARMACIST,
+                    profileImageUrl = null,
+                    createdAt = 0L,
+                    fcmToken = null
+                ),
+                onEditProfileClick = {}
+            )
         }
     }
 }

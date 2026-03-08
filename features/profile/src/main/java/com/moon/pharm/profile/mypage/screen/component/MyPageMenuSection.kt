@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -26,7 +28,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 @Composable
 fun MyPageMenuSection(
@@ -114,5 +118,31 @@ private fun MenuRowItem(item: MyPageMenuItemData) {
             contentDescription = null,
             tint = PharmTheme.colors.tertiary
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MyPageMenuSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MyPageMenuSection(
+                title = "핵심 기능",
+                items = listOf(
+                    MyPageMenuItemData(
+                        icon = Icons.Default.Notifications,
+                        title = "알림 설정",
+                        count = "2",
+                        onClick = {}
+                    ),
+                    MyPageMenuItemData(
+                        icon = Icons.Default.Settings,
+                        title = "계정 설정",
+                        count = null,
+                        onClick = {}
+                    )
+                )
+            )
+        }
     }
 }

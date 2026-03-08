@@ -13,9 +13,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -26,14 +24,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.profile.BuildConfig
@@ -209,32 +207,28 @@ private fun getSupportMenuItems(): List<MyPageMenuItemData> {
     )
 }
 
-@Preview(showBackground = true, name = "마이페이지 - 일반 회원")
+@ThemePreviews
 @Composable
-fun MyPageScreenPreviewSuccess() {
-    val mockUser = User(
-        id = "test",
-        email = "test@test.com",
-        nickName = "홍길동",
-        userType = UserType.GENERAL,
-        profileImageUrl = null,
-        createdAt = System.currentTimeMillis(),
-        fcmToken = null
-    )
-
-    MaterialTheme {
-        Surface(color = PharmTheme.colors.background) {
-            MyPageScreen(
-                uiState = MyPageUiState(
-                    isLoading = false,
-                    user = mockUser,
-                    myConsults = emptyList()
+private fun MyPageScreenPreview() {
+    PharmMasterTheme {
+        MyPageScreen(
+            uiState = MyPageUiState(
+                isLoading = false,
+                user = User(
+                    id = "test_user_id",
+                    email = "test@moonpharm.com",
+                    nickName = "달토끼",
+                    userType = UserType.GENERAL,
+                    profileImageUrl = null,
+                    createdAt = System.currentTimeMillis(),
+                    fcmToken = null
                 ),
-                onNavigateToMyConsultation = {},
-                onNavigateToMedicationHistory = {},
-                onLogout = {},
-                onUpdateNickname = {}
-            )
-        }
+                myConsults = emptyList()
+            ),
+            onNavigateToMyConsultation = {},
+            onNavigateToMedicationHistory = {},
+            onLogout = {},
+            onUpdateNickname = {}
+        )
     }
 }

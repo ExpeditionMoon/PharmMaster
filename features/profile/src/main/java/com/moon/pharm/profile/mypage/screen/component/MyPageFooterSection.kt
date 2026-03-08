@@ -27,7 +27,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.button.PharmOutlinedButton
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.profile.R
 
 @Composable
@@ -112,5 +114,21 @@ private fun SimpleLinkItem(text: String, onClick: () -> Unit) {
             contentDescription = null,
             tint = PharmTheme.colors.tertiary
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MyPageFooterSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MyPageFooterSection(
+                onLogout = {},
+                appVersion = "1.0.0",
+                onTermsClick = {},
+                onPrivacyClick = {},
+                onWithdrawClick = {}
+            )
+        }
     }
 }
