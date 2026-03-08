@@ -15,7 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.clickableSingle
 import com.moon.pharm.domain.model.medication.MedicationType
 
@@ -50,6 +52,19 @@ fun MedicationTypeSelector(
                     color = if (isSelected) PharmTheme.colors.surface else PharmTheme.colors.secondFont
                 )
             }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MedicationTypeSelectorPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MedicationTypeSelector(
+                selectedType = MedicationType.OTC,
+                onTypeSelected = {}
+            )
         }
     }
 }

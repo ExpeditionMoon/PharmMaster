@@ -1,9 +1,13 @@
 package com.moon.pharm.component_ui.component.button
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -17,8 +21,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.MultipleEventsCutter
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 /**
  * 앱 메인 액션 버튼 (높이 50dp).
@@ -105,5 +111,24 @@ fun PharmOutlinedButton(
         colors = ButtonDefaults.outlinedButtonColors(contentColor = PharmTheme.colors.primary)
     ) {
         content()
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmButtonsPreview() {
+    PharmMasterTheme {
+        Column(
+            modifier = Modifier
+                .background(PharmTheme.colors.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            PharmPrimaryButton(text = "메인 액션 버튼", onClick = {})
+            PharmSmallButton(text = "작은버튼", onClick = {})
+            PharmOutlinedButton(onClick = {}) {
+                Text(text = "테두리 버튼")
+            }
+        }
     }
 }

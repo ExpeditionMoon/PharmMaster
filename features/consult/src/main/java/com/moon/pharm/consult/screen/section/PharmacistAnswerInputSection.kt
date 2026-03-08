@@ -1,6 +1,7 @@
 package com.moon.pharm.consult.screen.section
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.component.input.PrimaryTextField
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 
 @Composable
@@ -65,5 +68,19 @@ fun PharmacistAnswerInputSection(
             modifier = Modifier.fillMaxWidth(),
             enabled = input.isNotBlank()
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacistAnswerInputSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            PharmacistAnswerInputSection(
+                input = "",
+                onValueChange = {},
+                onSubmit = {}
+            )
+        }
     }
 }

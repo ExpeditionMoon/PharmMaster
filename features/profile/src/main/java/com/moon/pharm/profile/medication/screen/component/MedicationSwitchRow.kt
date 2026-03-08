@@ -2,6 +2,7 @@ package com.moon.pharm.profile.medication.screen.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.dialog.PharmInfoDialog
 import com.moon.pharm.component_ui.component.toggle.CustomSwitch
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.profile.R
 
 @Composable
@@ -86,5 +89,21 @@ fun MedicationSwitchRow(
             content = explanation,
             onDismiss = { showDialog = false }
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MedicationSwitchRowPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MedicationSwitchRow(
+                title = "알림 묶기",
+                description = "같은 시간의 약을 한 번에 알림 받습니다.",
+                isChecked = true,
+                onCheckedChange = {},
+                explanation = "여러 약의 복용 시간이 동일할 때 알림이 한 번만 울리도록 묶어주는 기능입니다."
+            )
+        }
     }
 }

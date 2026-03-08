@@ -23,7 +23,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toDisplayString
 import com.moon.pharm.component_ui.util.toQueryString
 import com.moon.pharm.profile.medication.screen.component.HistoryRecordItem
@@ -130,5 +132,23 @@ fun MedicationHistoryContent(
                 }
             }
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MedicationHistoryContentPreview() {
+    PharmMasterTheme {
+        MedicationHistoryContent(
+            uiState = MedicationHistoryUiState(
+                selectedMonth = YearMonth.now(),
+                selectedDate = LocalDate.now(),
+                recordsByDate = emptyMap()
+            ),
+            onBackClick = {},
+            onMonthChanged = {},
+            onDateClick = {},
+            onToggleRecord = { _, _, _ -> }
+        )
     }
 }

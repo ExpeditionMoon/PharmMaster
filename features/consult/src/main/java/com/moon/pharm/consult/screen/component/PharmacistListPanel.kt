@@ -20,7 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.item.PharmacistListItem
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 import com.moon.pharm.domain.model.auth.Pharmacist
 
@@ -70,5 +72,19 @@ fun PharmacistListPanel(
                 }
             }
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacistListPanelPreview() {
+    PharmMasterTheme {
+        PharmacistListPanel(
+            pharmacyName = "달빛약국",
+            pharmacists = listOf(
+                Pharmacist(userId = "p1", name = "김약사", bio = "친절하게 상담해 드립니다.", placeId = "1", pharmacyName = "달빛약국")
+            ),
+            onPharmacistSelect = {}
+        )
     }
 }

@@ -2,8 +2,10 @@ package com.moon.pharm.profile.medication.screen.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,7 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.profile.R
 
 /**
@@ -58,5 +62,17 @@ fun MedicationCheckButton(
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MedicationCheckButtonPreview() {
+    PharmMasterTheme {
+        Row(modifier = Modifier.padding(16.dp)) {
+            MedicationCheckButton(isTaken = true, onClick = {})
+            Spacer(modifier = Modifier.width(8.dp))
+            MedicationCheckButton(isTaken = false, onClick = {})
+        }
     }
 }

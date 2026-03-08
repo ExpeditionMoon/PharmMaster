@@ -9,7 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 @Composable
 fun PharmPrimaryTabRow(
@@ -45,5 +48,17 @@ fun PharmPrimaryTabRow(
                 unselectedContentColor = PharmTheme.colors.secondFont
             )
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmTabsPreview() {
+    PharmMasterTheme {
+        PharmPrimaryTabRow(
+            selectedTabIndex = 0,
+            tabs = listOf(R.string.common_confirm, R.string.common_cancel),
+            onTabSelected = {}
+        )
     }
 }

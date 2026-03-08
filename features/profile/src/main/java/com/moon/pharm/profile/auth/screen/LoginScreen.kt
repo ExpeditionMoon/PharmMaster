@@ -21,7 +21,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
 import com.moon.pharm.component_ui.component.snackbar.SnackbarType
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.auth.mapper.asString
 import com.moon.pharm.profile.auth.model.LoginUiMessage
@@ -117,5 +119,22 @@ fun LoginScreenContent(
 
             LoginFooterSection(onSignUpClick = onSignUpClick)
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun LoginScreenContentPreview() {
+    PharmMasterTheme {
+        LoginScreenContent(
+            email = "test@example.com",
+            password = "password123",
+            isLoading = false,
+            snackbarHostState = SnackbarHostState(),
+            onEmailChange = {},
+            onPasswordChange = {},
+            onLoginClick = {},
+            onSignUpClick = {}
+        )
     }
 }

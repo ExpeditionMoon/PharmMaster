@@ -21,7 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,4 +99,17 @@ fun TimePickerDialog(
         shape = RoundedCornerShape(10.dp),
         containerColor = PharmTheme.colors.surface
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@ThemePreviews
+@Composable
+private fun TimePickerDialogPreview() {
+    PharmMasterTheme {
+        TimePickerDialog(
+            title = "복용 시간 설정",
+            onConfirm = {},
+            onDismiss = {}
+        )
+    }
 }

@@ -1,11 +1,16 @@
 package com.moon.pharm.profile.medication.screen.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.chip.FilterChip
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.medication.MealTiming
 
 @Composable
@@ -21,6 +26,19 @@ fun MealTimeChips(
                 text = timing.label,
                 isSelected = selectedTimes == timing,
                 onClick = { onTimeClick(timing) }
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MealTimeChipsPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MealTimeChips(
+                selectedTimes = MealTiming.AFTER_MEAL,
+                onTimeClick = {}
             )
         }
     }

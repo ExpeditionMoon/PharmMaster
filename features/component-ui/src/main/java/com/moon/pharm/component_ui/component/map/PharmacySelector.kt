@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -27,7 +28,10 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
 import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -147,5 +151,22 @@ fun PharmacySelector(
                 bottomContent()
             }
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacySelectorPreview(
+    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<Pharmacy>
+) {
+    PharmMasterTheme {
+        PharmacySelector(
+            pharmacies = pharmacies,
+            selectedPharmacy = null,
+            onPharmacyClick = {},
+            onSearch = {},
+            onSearchArea = { _, _ -> },
+            onBackClick = {}
+        )
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,7 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 @Composable
 fun HealthInfoCard(
@@ -71,6 +74,22 @@ fun HealthInfoCard(
                 color = PharmTheme.colors.secondFont,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun HealthInfoCardPreview() {
+    PharmMasterTheme {
+        Box(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            HealthInfoCard(
+                imageResId = android.R.drawable.ic_menu_gallery,
+                title = "올바른 약 복용법",
+                description = "물과 함께 복용하는 것이 가장 좋습니다. 식후 30분에 드세요."
             )
         }
     }

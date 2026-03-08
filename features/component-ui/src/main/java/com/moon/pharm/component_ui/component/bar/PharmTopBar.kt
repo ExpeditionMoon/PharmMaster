@@ -1,6 +1,8 @@
 package com.moon.pharm.component_ui.component.bar
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -9,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,7 +31,9 @@ import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 /**
  * 앱 표준 상단바
@@ -126,6 +131,31 @@ private fun PharmActions(actions: List<TopBarAction>) {
                     color = PharmTheme.colors.onSurface
                 )
             }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmTopBarPreview() {
+    PharmMasterTheme {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            PharmTopBar(
+                data = TopBarData(
+                    title = "상세 화면",
+                    navigationType = TopBarNavigationType.Back
+                )
+            )
+            PharmTopBar(
+                data = TopBarData(
+                    title = "",
+                    isLogoTitle = true,
+                    navigationType = TopBarNavigationType.Menu,
+                    actions = listOf(TopBarAction(icon = Icons.Default.Notifications, onClick = {}))
+                )
+            )
         }
     }
 }

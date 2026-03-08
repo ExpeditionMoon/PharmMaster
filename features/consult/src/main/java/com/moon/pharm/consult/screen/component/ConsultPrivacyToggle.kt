@@ -14,7 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.toggle.CustomSwitch
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 
 @Composable
@@ -51,5 +53,16 @@ fun ConsultPrivacyToggle(
                 onVisibilityChange(!isChecked)
             }
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun ConsultPrivacyTogglePreview() {
+    PharmMasterTheme {
+        Column(modifier = Modifier.padding(16.dp)) {
+            ConsultPrivacyToggle(isPublic = true, onVisibilityChange = {})
+            ConsultPrivacyToggle(isPublic = false, onVisibilityChange = {})
+        }
     }
 }

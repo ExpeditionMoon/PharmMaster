@@ -18,9 +18,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toDisplayTimeString
+import com.moon.pharm.domain.model.medication.MealTiming
 import com.moon.pharm.domain.model.medication.MedicationTimeGroup
+import com.moon.pharm.domain.model.medication.MedicationType
+import com.moon.pharm.domain.model.medication.RepeatType
 import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
 
 @Composable
@@ -56,6 +61,34 @@ fun MedicationGroupItem(
             group.items.forEach { item ->
                 MedicationItemCard(item = item, onTakeClick = onTakeClick)
             }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MedicationGroupItemPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MedicationGroupItem(
+                group = MedicationTimeGroup(
+                    time = "08:00",
+                    items = listOf(
+                        TodayMedicationUiModel(
+                            medicationId = "m1",
+                            scheduleId = "s1",
+                            name = "혈압약",
+                            type = MedicationType.OTC,
+                            repeatType = RepeatType.DAILY,
+                            time = "오전 08:00",
+                            dosage = "1알",
+                            mealTiming = MealTiming.AFTER_MEAL,
+                            isTaken = false
+                        ),
+                    )
+                ),
+                onTakeClick = {}
+            )
         }
     }
 }

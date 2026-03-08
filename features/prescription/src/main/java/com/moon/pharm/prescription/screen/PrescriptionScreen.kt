@@ -37,7 +37,9 @@ import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.prescription.viewmodel.PrescriptionUiEvent
 import com.moon.pharm.prescription.viewmodel.PrescriptionViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -150,6 +152,44 @@ fun PrescriptionScreen(
                     text = "처방전을 분석하고 있어요...",
                     color = PharmTheme.colors.surface,
                     fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PrescriptionScreenDefaultPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.fillMaxSize().background(PharmTheme.colors.background)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "처방전을 어떻게 등록할까요?",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PharmTheme.colors.onSurface
+                )
+                Spacer(modifier = Modifier.height(30.dp))
+
+                PharmPrimaryButton(
+                    text = "📸 카메라로 촬영",
+                    onClick = {},
+                    enabled = true
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                PharmPrimaryButton(
+                    text = "🖼️ 앨범에서 선택",
+                    onClick = {},
+                    enabled = true
                 )
             }
         }

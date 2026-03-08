@@ -30,7 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toDisplayString
 import com.moon.pharm.component_ui.util.toQueryString
 import com.moon.pharm.profile.medication.model.HistoryRecordUiModel
@@ -205,5 +207,19 @@ private fun DayCell(
                 )
             }
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun HistoryCalendarSectionPreview() {
+    PharmMasterTheme {
+        HistoryCalendarSection(
+            currentMonth = YearMonth.now(),
+            recordsByDate = emptyMap(),
+            selectedDate = LocalDate.now(),
+            onMonthChanged = {},
+            onDateClick = {}
+        )
     }
 }

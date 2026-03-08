@@ -2,7 +2,9 @@ package com.moon.pharm.component_ui.component.chip
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,7 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.clickableSingle
 
 @Composable
@@ -43,5 +47,21 @@ fun FilterChip(
             fontWeight = FontWeight.Medium,
             color = if (isSelected) PharmTheme.colors.surface else PharmTheme.colors.secondFont
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun FilterChipPreview() {
+    PharmMasterTheme {
+        Row(
+            modifier = Modifier
+                .background(PharmTheme.colors.background)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilterChip(text = "일반약", isSelected = true, onClick = {})
+            FilterChip(text = "비타민", isSelected = false, onClick = {})
+        }
     }
 }

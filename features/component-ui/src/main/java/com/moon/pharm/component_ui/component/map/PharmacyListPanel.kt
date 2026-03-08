@@ -1,5 +1,6 @@
 package com.moon.pharm.component_ui.component.map
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,10 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.component.item.PharmacyListItem
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 
 @Composable
@@ -67,6 +72,18 @@ fun PharmacyListPanel(
                     )
                 }
             }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacyListPanelPreview(
+    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<Pharmacy>
+) {
+    PharmMasterTheme {
+        Box(modifier = Modifier.background(PharmTheme.colors.background)) {
+            PharmacyListPanel(pharmacies = pharmacies, onPharmacyClick = {})
         }
     }
 }

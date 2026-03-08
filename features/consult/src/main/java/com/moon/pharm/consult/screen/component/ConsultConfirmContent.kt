@@ -17,7 +17,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 
 @Composable
@@ -78,6 +80,21 @@ fun ConsultConfirmContent(
         PharmPrimaryButton(
             text = stringResource(R.string.consult_confirm_submit_btn),
             onClick = onSubmit
+        )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun ConsultConfirmContentPreview() {
+    PharmMasterTheme {
+        ConsultConfirmContent(
+            title = "두통약 복용 문의",
+            content = "타이레놀과 이부프로펜을 같이 먹어도 되나요?",
+            selectedPharmacistName = "김약사",
+            onEditTitleOrContent = {},
+            onEditPharmacist = {},
+            onSubmit = {}
         )
     }
 }

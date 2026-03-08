@@ -2,7 +2,11 @@ package com.moon.pharm.consult.screen.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -16,7 +20,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 
 @Composable
@@ -45,6 +51,18 @@ fun PharmacistProfileImage(imageUrl: String?) {
                 contentDescription = null,
                 tint = PharmTheme.colors.surface
             )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacistProfileImagePreview() {
+    PharmMasterTheme {
+        Row(modifier = Modifier.padding(16.dp)) {
+            PharmacistProfileImage(imageUrl = "https://example.com/image.jpg")
+            Spacer(modifier = Modifier.width(16.dp))
+            PharmacistProfileImage(imageUrl = null)
         }
     }
 }

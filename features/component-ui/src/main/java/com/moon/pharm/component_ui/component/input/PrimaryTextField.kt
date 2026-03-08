@@ -3,7 +3,9 @@ package com.moon.pharm.component_ui.component.input
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,7 +23,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 @Composable
 fun PrimaryTextField(
@@ -70,5 +74,29 @@ fun PrimaryTextField(
                 }
             }
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PrimaryTextFieldPreview() {
+    PharmMasterTheme {
+        Column(
+            modifier = Modifier
+                .background(PharmTheme.colors.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            PrimaryTextField(
+                value = "",
+                onValueChange = {},
+                placeholder = "내용을 입력해주세요"
+            )
+            PrimaryTextField(
+                value = "입력된 텍스트입니다",
+                onValueChange = {},
+                placeholder = "내용을 입력해주세요"
+            )
+        }
     }
 }
