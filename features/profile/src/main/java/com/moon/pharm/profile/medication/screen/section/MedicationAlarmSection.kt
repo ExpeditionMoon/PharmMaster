@@ -1,6 +1,7 @@
 package com.moon.pharm.profile.medication.screen.section
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -21,7 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.card.TimeSettingCard
 import com.moon.pharm.component_ui.component.dialog.TimePickerDialog
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toMinuteTimeUiString
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.screen.component.AlarmOptionSelector
@@ -95,5 +98,19 @@ fun MedicationAlarmSection(
             form = form,
             onEvent = onEvent
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MedicationAlarmSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MedicationAlarmSection(
+                medicationIndex = 0,
+                form = MedicationFormState(),
+                onEvent = {}
+            )
+        }
     }
 }

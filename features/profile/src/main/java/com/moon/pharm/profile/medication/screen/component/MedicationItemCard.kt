@@ -1,6 +1,7 @@
 package com.moon.pharm.profile.medication.screen.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +19,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
+import com.moon.pharm.domain.model.medication.MealTiming
+import com.moon.pharm.domain.model.medication.MedicationType
+import com.moon.pharm.domain.model.medication.RepeatType
 import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
 
 @Composable
@@ -67,6 +73,29 @@ fun MedicationItemCard(
             MedicationCheckButton(
                 isTaken = item.isTaken,
                 onClick = { onTakeClick(item) }
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MedicationItemCardPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MedicationItemCard(
+                item = TodayMedicationUiModel(
+                    medicationId = "m1",
+                    scheduleId = "s1",
+                    name = "혈압약",
+                    type = MedicationType.OTC,
+                    repeatType = RepeatType.DAILY,
+                    time = "오전 08:00",
+                    dosage = "1알",
+                    mealTiming = MealTiming.AFTER_MEAL,
+                    isTaken = false
+                ),
+                onTakeClick = {}
             )
         }
     }

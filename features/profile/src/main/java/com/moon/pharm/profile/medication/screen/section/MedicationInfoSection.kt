@@ -2,6 +2,7 @@ package com.moon.pharm.profile.medication.screen.section
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.input.PrimaryTextField
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.screen.component.PeriodInputSection
 import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
@@ -121,6 +124,22 @@ fun MedicationInfoSection(
                 value = globalForm.medicationDosage.orEmpty(),
                 onValueChange = { onEvent(MedicationUiEvent.UpdateDosage(index = -1, dosage = it)) },
                 placeholder = stringResource(R.string.medication_dosage_hint)
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MedicationInfoSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MedicationInfoSection(
+                forms = listOf(
+                    MedicationFormState(medicationName = "타이레놀 500mg"),
+                    MedicationFormState(medicationName = "오메가3")
+                ),
+                onEvent = {}
             )
         }
     }
