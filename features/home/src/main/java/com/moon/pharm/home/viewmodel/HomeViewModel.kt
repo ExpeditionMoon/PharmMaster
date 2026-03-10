@@ -2,9 +2,9 @@ package com.moon.pharm.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
+    private val authRepository: AuthRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
 
@@ -28,7 +28,7 @@ class HomeViewModel @Inject constructor(
 
     private fun loadUserNickname() {
         viewModelScope.launch {
-            val userId = getCurrentUserIdUseCase()
+            val userId = authRepository.getCurrentUserId()
 
             if (userId != null) {
                 userRepository.getUser(userId).collectLatest { result ->

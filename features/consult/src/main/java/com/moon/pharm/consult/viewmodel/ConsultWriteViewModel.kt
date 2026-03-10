@@ -10,14 +10,14 @@ import com.moon.pharm.consult.mapper.ConsultUiMapper
 import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
+import com.moon.pharm.domain.repository.ConsultRepository
+import com.moon.pharm.domain.repository.PharmacyRepository
 import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
-import com.moon.pharm.domain.usecase.consult.SendNewConsultNotificationUseCase
 import com.moon.pharm.domain.usecase.consult.UploadConsultImagesUseCase
 import com.moon.pharm.domain.usecase.consult.ValidateConsultFormUseCase
 import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocationUseCase
-import com.moon.pharm.domain.usecase.user.GetNicknameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
@@ -38,9 +38,9 @@ import javax.inject.Inject
 class ConsultWriteViewModel @Inject constructor(
     private val consultUseCases: ConsultUseCases,
     private val getLocationUseCase: GetNearbyPharmaciesCurrentLocationUseCase,
-    private val getNicknameUseCase: GetNicknameUseCase,
     private val uploadImagesUseCase: UploadConsultImagesUseCase,
-    private val sendNewConsultNotificationUseCase: SendNewConsultNotificationUseCase,
+    private val consultRepository: ConsultRepository,
+    private val pharmacyRepository: PharmacyRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
 
@@ -122,7 +122,7 @@ class ConsultWriteViewModel @Inject constructor(
 
     fun fetchNearbyPharmacies(lat: Double, lng: Double) {
         viewModelScope.launch {
-            consultUseCases.searchNearbyPharmacies(lat, lng).collectLatest { result ->
+            pharmacyRepository.searchNearbyPharmacies(lat, lng).collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
@@ -191,7 +191,8 @@ class ConsultWriteViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                val nickname = getNicknameUseCase.getNickname(userId)
+                val userResult = userRepository.getUserOnce(userId)
+                val nickname = if (userResult is DataResourceResult.Success) userResult.resultData.nickName else ""
                 val uploadedUrls = if (state.images.isNotEmpty()) {
                     uploadImagesUseCase(state.images, userId)
                 } else emptyList()
@@ -220,7 +221,7 @@ class ConsultWriteViewModel @Inject constructor(
                     val user = pharmacistResult.resultData
                     val token = user.fcmToken
                     if (!token.isNullOrEmpty()) {
-                        sendNewConsultNotificationUseCase(token, consultId)
+                        consultRepository.sendNewConsultNotification(token, consultId)
                     }
                 }
             } catch (e: Exception) {
@@ -237,7 +238,7 @@ class ConsultWriteViewModel @Inject constructor(
     // region Private Helpers
     private fun fetchPharmacistsInPharmacy(pharmacy: Pharmacy) {
         viewModelScope.launch {
-            consultUseCases.getPharmacists(pharmacy.placeId).collectLatest { result ->
+            consultUseCases.pharmacistRepository.getPharmacistsByPlaceId(pharmacy.placeId).collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
@@ -259,7 +260,7 @@ class ConsultWriteViewModel @Inject constructor(
 
     private fun createConsult(consultInfo: ConsultItem) {
         viewModelScope.launch {
-            consultUseCases.createConsult(consultInfo).collectLatest { result ->
+            consultRepository.createConsult(consultInfo).collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
@@ -291,7 +292,7 @@ class ConsultWriteViewModel @Inject constructor(
             _uiState.update { it.copy(userMessage = ConsultUiMessage.PharmacistRequired) }
             return null
         }
-        val userId = consultUseCases.getCurrentUserId()
+        val userId = consultUseCases.authRepository.getCurrentUserId()
         if (userId == null) {
             _uiState.update { it.copy(userMessage = UiMessage.LoginRequired) }
             return null

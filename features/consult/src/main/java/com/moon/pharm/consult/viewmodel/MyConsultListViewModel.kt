@@ -4,11 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.domain.repository.AuthRepository
+import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
-import com.moon.pharm.domain.usecase.consult.GetMyAnsweredConsultUseCase
-import com.moon.pharm.domain.usecase.consult.GetMyConsultUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,9 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyConsultListViewModel @Inject constructor(
-    private val getMyConsultUseCase: GetMyConsultUseCase,
-    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
-    private val getMyAnsweredConsultUseCase: GetMyAnsweredConsultUseCase,
+    private val authRepository: AuthRepository,
+    private val consultRepository: ConsultRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
 
@@ -38,7 +36,7 @@ class MyConsultListViewModel @Inject constructor(
     }
 
     private fun fetchMyConsultList() {
-        val userId = getCurrentUserIdUseCase() ?: return
+        val userId = authRepository.getCurrentUserId() ?: return
 
         viewModelScope.launch {
             userRepository.getUser(userId).collectLatest { userResult ->
@@ -55,9 +53,9 @@ class MyConsultListViewModel @Inject constructor(
                 }
 
                 val consultFlow = if (isPharmacist) {
-                    getMyAnsweredConsultUseCase(userId)
+                    consultRepository.getMyAnsweredConsultList(userId)
                 } else {
-                    getMyConsultUseCase(userId)
+                    consultRepository.getMyConsult(userId)
                 }
 
                 consultFlow.collectLatest { result ->
