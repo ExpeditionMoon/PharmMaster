@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -215,7 +214,7 @@ class ConsultWriteViewModel @Inject constructor(
     private fun sendNotificationToPharmacist(pharmacistId: String, consultId: String) {
         CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
             try {
-                val pharmacistResult = userRepository.getUser(pharmacistId).first()
+                val pharmacistResult = userRepository.getUserOnce(pharmacistId)
 
                 if (pharmacistResult is DataResourceResult.Success) {
                     val user = pharmacistResult.resultData

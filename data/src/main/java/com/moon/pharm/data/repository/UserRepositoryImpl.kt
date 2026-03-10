@@ -13,10 +13,12 @@ import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -34,7 +36,9 @@ class UserRepositoryImpl @Inject constructor(
         operation: suspend () -> T
     ): DataResourceResult<T> = withContext(ioDispatcher) {
         runCatching {
-            operation()
+            withTimeout(10000L) {
+                operation()
+            }
         }.fold(
             onSuccess = { DataResourceResult.Success(it) },
             onFailure = { e -> DataResourceResult.Failure(e.toUserException()) }
@@ -68,6 +72,13 @@ class UserRepositoryImpl @Inject constructor(
             .map { dto -> dto.toDomain() }
             .asDataResourceResult()
     }
+
+    override suspend fun getUserOnce(userId: String): DataResourceResult<User> =
+        wrapUserOperation {
+            withTimeout(5000L) {
+                dataSource.getUserById(userId).first().toDomain()
+            }
+        }
 
     override suspend fun getFcmToken(): String {
         return withContext(ioDispatcher) { dataSource.getFcmToken() }

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 class UserLifeStyleRepositoryImpl @Inject constructor(
@@ -33,10 +34,16 @@ class UserLifeStyleRepositoryImpl @Inject constructor(
         operation: suspend () -> Unit
     ): Flow<DataResourceResult<Unit>> = flow {
         emit(DataResourceResult.Loading)
-        operation()
-        emit(DataResourceResult.Success(Unit))
-    }.catch { e ->
-        emit(DataResourceResult.Failure(e.toUserException()))
+
+        val result = runCatching {
+            withTimeout(10000L) {
+                operation()
+            }
+        }.fold(
+            onSuccess = { DataResourceResult.Success(Unit) },
+            onFailure = { e -> DataResourceResult.Failure(e.toUserException()) } // ⚠️ 여기는 toUserException 입니다!
+        )
+        emit(result)
     }.flowOn(ioDispatcher)
 
     override fun getUserLifeStyle(userId: String): Flow<DataResourceResult<UserLifeStyle>> {

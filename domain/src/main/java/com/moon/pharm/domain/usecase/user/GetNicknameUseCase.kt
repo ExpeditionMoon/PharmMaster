@@ -2,7 +2,6 @@ package com.moon.pharm.domain.usecase.user
 
 import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class GetNicknameUseCase @Inject constructor(
@@ -10,7 +9,7 @@ class GetNicknameUseCase @Inject constructor(
 ) {
     suspend fun getNickname(userId: String): String {
         return try {
-            val result = userRepository.getUser(userId).first()
+            val result = userRepository.getUserOnce(userId)
 
             if (result is DataResourceResult.Success) {
                 result.resultData.nickName

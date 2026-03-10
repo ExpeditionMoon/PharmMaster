@@ -4,14 +4,15 @@ import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.consult.ConsultStatus
 import com.moon.pharm.domain.repository.ConsultRepository
+import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.pharmacist.GetPharmacistDetailUseCase
-import com.moon.pharm.domain.usecase.user.GetNicknameUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 data class ConsultDetailResult(
@@ -22,20 +23,23 @@ data class ConsultDetailResult(
 
 class GetConsultDetailUseCase @Inject constructor(
     private val consultRepository: ConsultRepository,
-    private val getNicknameUseCase: GetNicknameUseCase,
+    private val userRepository: UserRepository,
     private val getPharmacistDetail: GetPharmacistDetailUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase
 ) {
     operator fun invoke(id: String): Flow<DataResourceResult<ConsultDetailResult>> = flow {
         emit(DataResourceResult.Loading)
 
-        val consultResult = consultRepository.getConsultDetail(id)
-            .filter { it !is DataResourceResult.Loading }
-            .first()
+        val consultResult = withTimeout(5000L) {
+            consultRepository.getConsultDetail(id)
+                .filter { it !is DataResourceResult.Loading }
+                .first()
+        }
 
         if (consultResult is DataResourceResult.Success) {
             val originConsult = consultResult.resultData
-            val nickName = getNicknameUseCase.getNickname(originConsult.userId)
+            val userResult = userRepository.getUserOnce(originConsult.userId)
+            val nickName = if (userResult is DataResourceResult.Success) userResult.resultData.nickName else ""
             val consult = originConsult.copy(nickName = nickName)
 
             var pharmacist: Pharmacist? = null

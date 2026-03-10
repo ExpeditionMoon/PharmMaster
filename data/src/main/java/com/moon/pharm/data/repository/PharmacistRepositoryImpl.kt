@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 class PharmacistRepositoryImpl @Inject constructor(
@@ -33,7 +34,9 @@ class PharmacistRepositoryImpl @Inject constructor(
         operation: suspend () -> T
     ): DataResourceResult<T> = withContext(ioDispatcher) {
         runCatching {
-            operation()
+            withTimeout(10000L) {
+                operation()
+            }
         }.fold(
             onSuccess = { DataResourceResult.Success(it) },
             onFailure = { e -> DataResourceResult.Failure(e.toPharmacistException()) }

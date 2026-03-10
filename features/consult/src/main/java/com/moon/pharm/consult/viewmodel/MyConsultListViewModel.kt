@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.consult.GetMyAnsweredConsultUseCase
 import com.moon.pharm.domain.usecase.consult.GetMyConsultUseCase
-import com.moon.pharm.domain.usecase.user.GetUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +23,7 @@ class MyConsultListViewModel @Inject constructor(
     private val getMyConsultUseCase: GetMyConsultUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     private val getMyAnsweredConsultUseCase: GetMyAnsweredConsultUseCase,
-    private val getUserUseCase: GetUserUseCase
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MyConsultListUiState(isLoading = true))
@@ -38,23 +38,17 @@ class MyConsultListViewModel @Inject constructor(
     }
 
     private fun fetchMyConsultList() {
-        val userId = getCurrentUserIdUseCase()
-        if (userId == null) {
-            _uiState.update {
-                it.copy(isLoading = false, userMessage = UiMessage.LoadDataFailed)
-            }
-            return
-        }
+        val userId = getCurrentUserIdUseCase() ?: return
 
         viewModelScope.launch {
-            getUserUseCase(userId).collectLatest { userResult ->
-                var isPharmacist = false
-                var currentNickname = ""
-
-                if (userResult is DataResourceResult.Success) {
-                    isPharmacist = userResult.resultData.userType == UserType.PHARMACIST
-                    currentNickname = userResult.resultData.nickName
+            userRepository.getUser(userId).collectLatest { userResult ->
+                if (userResult !is DataResourceResult.Success) {
+                    return@collectLatest
                 }
+
+                val user = userResult.resultData
+                val isPharmacist = user.userType == UserType.PHARMACIST
+                val currentNickname = user.nickName
 
                 _uiState.update {
                     it.copy(currentUserId = userId, isPharmacist = isPharmacist)

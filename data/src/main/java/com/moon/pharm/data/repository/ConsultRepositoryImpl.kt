@@ -26,6 +26,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 class ConsultRepositoryImpl @Inject constructor(
@@ -47,7 +49,9 @@ class ConsultRepositoryImpl @Inject constructor(
         emit(DataResourceResult.Loading)
 
         val result = runCatching {
-            operation()
+            withTimeout(10000L) {
+                operation()
+            }
         }.fold(
             onSuccess = { DataResourceResult.Success(it) },
             onFailure = { e ->
@@ -133,27 +137,39 @@ class ConsultRepositoryImpl @Inject constructor(
 
     private suspend fun sendFcmNotification(
         targetToken: String, title: String, body: String, consultId: String
-    ): DataResourceResult<Unit> = runCatching {
-        val request = FcmSendRequest(
-            targetToken = targetToken, title = title, body = body, consultId = consultId
-        )
-        val response = fcmApi.sendNotification(request)
+    ): DataResourceResult<Unit> = withContext(ioDispatcher) {
+        runCatching {
+            val request = FcmSendRequest(
+                targetToken = targetToken, title = title, body = body, consultId = consultId
+            )
+            val response = withTimeout(5000L) {
+                fcmApi.sendNotification(request)
+            }
 
-        if (!response.success) {
-            val errorMsg = response.error ?: ERR_UNKNOWN_SERVER
-            throw ConsultException.Unknown("$ERR_FCM_FAILED$errorMsg")
-        }
-    }.fold(onSuccess = { DataResourceResult.Success(Unit) }, onFailure = { e ->
-        val error = e as? ConsultException ?: ConsultException.Unknown(e.message)
-        DataResourceResult.Failure(error)
-    })
+            if (!response.success) {
+                val errorMsg = response.error ?: ERR_UNKNOWN_SERVER
+                throw ConsultException.Unknown("$ERR_FCM_FAILED$errorMsg")
+            }
+        }.fold(
+            onSuccess = { DataResourceResult.Success(Unit) },
+            onFailure = { e ->
+                val error = e as? ConsultException ?: ConsultException.Unknown(e.message)
+                DataResourceResult.Failure(error)
+            }
+        )
+    }
 
     override suspend fun updatePharmacistNicknameInAnswers(
         userId: String, newNickname: String
     ): DataResourceResult<Unit> = runCatching {
-        dataSource.updatePharmacistNicknameInAnswers(userId, newNickname)
-    }.fold(onSuccess = { DataResourceResult.Success(Unit) }, onFailure = { e ->
-        val error = e as? ConsultException ?: ConsultException.Unknown(e.message)
-        DataResourceResult.Failure(error)
-    })
+        withTimeout(10000L) {
+            dataSource.updatePharmacistNicknameInAnswers(userId, newNickname)
+        }
+    }.fold(
+        onSuccess = { DataResourceResult.Success(Unit) },
+        onFailure = { e ->
+            val error = e as? ConsultException ?: ConsultException.Unknown(e.message)
+            DataResourceResult.Failure(error)
+        }
+    )
 }

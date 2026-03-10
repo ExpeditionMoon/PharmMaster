@@ -10,6 +10,7 @@ import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -20,20 +21,22 @@ class AuthRepositoryImpl @Inject constructor(
     private suspend fun <T> wrapAuthOperation(
         operation: suspend () -> T
     ): DataResourceResult<T> = withContext(ioDispatcher) {
-        runCatching {
-            operation()
-        }.fold(
-            onSuccess = { DataResourceResult.Success(it) },
-            onFailure = { e ->
-                val domainError = when (e) {
-                    is FirebaseAuthInvalidCredentialsException -> AuthException.InvalidCredentials()
-                    is FirebaseAuthUserCollisionException -> AuthException.EmailDuplicated()
-                    is FirebaseNetworkException -> AuthException.NetworkError()
-                    else -> AuthException.Unknown(e.message)
+        withTimeout(10000L) {
+            runCatching {
+                operation()
+            }.fold(
+                onSuccess = { DataResourceResult.Success(it) },
+                onFailure = { e ->
+                    val domainError = when (e) {
+                        is FirebaseAuthInvalidCredentialsException -> AuthException.InvalidCredentials()
+                        is FirebaseAuthUserCollisionException -> AuthException.EmailDuplicated()
+                        is FirebaseNetworkException -> AuthException.NetworkError()
+                        else -> AuthException.Unknown(e.message)
+                    }
+                    DataResourceResult.Failure(domainError)
                 }
-                DataResourceResult.Failure(domainError)
-            }
-        )
+            )
+        }
     }
 
     override suspend fun createAccount(

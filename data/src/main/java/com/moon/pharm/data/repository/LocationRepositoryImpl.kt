@@ -8,6 +8,7 @@ import com.moon.pharm.domain.repository.LocationRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -27,15 +28,17 @@ class LocationRepositoryImpl @Inject constructor(
     @SuppressLint("MissingPermission")
     override suspend fun getCurrentLocation(): DataResourceResult<Pair<Double, Double>> {
         return runCatching {
-            suspendCancellableCoroutine { continuation ->
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    if (location != null) {
-                        continuation.resume(Pair(location.latitude, location.longitude))
-                    } else {
-                        continuation.resumeWithException(Exception("Location is null"))
+            withTimeout(10000L) {
+                suspendCancellableCoroutine { continuation ->
+                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                        if (location != null) {
+                            continuation.resume(Pair(location.latitude, location.longitude))
+                        } else {
+                            continuation.resumeWithException(Exception("Location is null"))
+                        }
+                    }.addOnFailureListener { e ->
+                        continuation.resumeWithException(e)
                     }
-                }.addOnFailureListener { e ->
-                    continuation.resumeWithException(e)
                 }
             }
         }.fold(
