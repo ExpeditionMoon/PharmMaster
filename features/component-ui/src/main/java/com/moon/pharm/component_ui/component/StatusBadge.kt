@@ -2,6 +2,7 @@ package com.moon.pharm.component_ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -15,15 +16,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.onPrimaryLight
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 @Composable
 fun StatusBadge(
     text: String,
     statusColor: Color,
     modifier: Modifier = Modifier,
-    contentColor: Color = onPrimaryLight,
+    contentColor: Color = PharmTheme.colors.onPrimary,
     useBorderedStyle: Boolean = false,
     leadingIcon: @Composable (() -> Unit)? = null
 ) {
@@ -49,8 +51,8 @@ fun StatusBadge(
 
         val textColor = when {
             useBorderedStyle -> statusColor
-            contentColor != onPrimaryLight -> contentColor
-            else -> White
+            contentColor != PharmTheme.colors.onPrimary -> contentColor
+            else -> PharmTheme.colors.surface
         }
 
         Text(
@@ -59,5 +61,32 @@ fun StatusBadge(
             fontSize = if (useBorderedStyle) 12.sp else 11.sp,
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun StatusBadgePreview() {
+    PharmMasterTheme {
+        Row(
+            modifier = Modifier
+                .background(PharmTheme.colors.background)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            StatusBadge(
+                text = "답변 완료",
+                statusColor = PharmTheme.colors.primary
+            )
+            StatusBadge(
+                text = "답변 대기",
+                statusColor = PharmTheme.colors.secondary
+            )
+            StatusBadge(
+                text = "테두리",
+                statusColor = PharmTheme.colors.primary,
+                useBorderedStyle = true
+            )
+        }
     }
 }

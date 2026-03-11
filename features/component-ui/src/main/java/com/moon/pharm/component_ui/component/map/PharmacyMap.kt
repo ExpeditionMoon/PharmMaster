@@ -17,6 +17,7 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
@@ -25,22 +26,25 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.moon.pharm.component_ui.R
-import com.moon.pharm.component_ui.theme.Black
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun PharmacyMap(
     pharmacies: List<Pharmacy>,
-    selectedPharmacy: Pharmacy? = null,
     onPharmacyClick: (Pharmacy) -> Unit,
     onBackClick: () -> Unit,
-    showBackButton: Boolean = true,
     cameraPositionState: CameraPositionState,
-    isLocationEnabled: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedPharmacy: Pharmacy? = null,
+    showBackButton: Boolean = true,
+    isLocationEnabled: Boolean = false
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         GoogleMap(
@@ -75,7 +79,7 @@ fun PharmacyMap(
                     .padding(16.dp)
                     .statusBarsPadding()
                     .align(Alignment.TopStart),
-                colors = ButtonDefaults.buttonColors(containerColor = White),
+                colors = ButtonDefaults.buttonColors(containerColor = PharmTheme.colors.surface),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 contentPadding = PaddingValues(0.dp),
                 shape = CircleShape
@@ -83,9 +87,25 @@ fun PharmacyMap(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.desc_back_button),
-                    tint = Black
+                    tint = PharmTheme.colors.onSurface
                 )
             }
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacyMapPreview(
+    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<Pharmacy>
+) {
+    PharmMasterTheme {
+        val cameraPositionState = rememberCameraPositionState()
+        PharmacyMap(
+            pharmacies = pharmacies,
+            onPharmacyClick = {},
+            onBackClick = {},
+            cameraPositionState = cameraPositionState
+        )
     }
 }

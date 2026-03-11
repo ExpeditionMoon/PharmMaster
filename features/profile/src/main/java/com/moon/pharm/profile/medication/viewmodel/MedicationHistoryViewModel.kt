@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.util.toQueryString
 import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.model.medication.Medication
+import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMonthlyIntakeRecordsUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
@@ -27,7 +27,7 @@ class MedicationHistoryViewModel @Inject constructor(
     private val getMonthlyIntakeRecordsUseCase: GetMonthlyIntakeRecordsUseCase,
     private val getMedicationsUseCase: GetMedicationsUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
-    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -45,7 +45,7 @@ class MedicationHistoryViewModel @Inject constructor(
     }
 
     fun fetchMonthlyRecords(yearMonth: YearMonth) {
-        val userId = getCurrentUserIdUseCase() ?: return
+        val userId = authRepository.getCurrentUserId() ?: return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, selectedMonth = yearMonth) }
@@ -125,7 +125,7 @@ class MedicationHistoryViewModel @Inject constructor(
     }
 
     fun toggleRecord(medicationId: String, scheduleId: String, isNowTaken: Boolean, date: LocalDate) {
-        val userId = getCurrentUserIdUseCase() ?: return
+        val userId = authRepository.getCurrentUserId() ?: return
         val dateString = date.toQueryString()
 
         viewModelScope.launch {

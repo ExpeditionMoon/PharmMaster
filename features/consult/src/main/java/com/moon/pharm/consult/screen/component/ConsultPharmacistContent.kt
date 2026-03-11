@@ -3,9 +3,13 @@ package com.moon.pharm.consult.screen.component
 import androidx.compose.runtime.Composable
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.moon.pharm.component_ui.component.map.PharmacySelector
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
@@ -57,6 +61,28 @@ fun ConsultPharmacistContent(
                 onMapModeChange(true)
                 onPharmacySelect(pharmacy)
             }
+        )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun ConsultPharmacistContentPreview() {
+    PharmMasterTheme {
+        ConsultPharmacistContent(
+            isMapView = false,
+            searchQuery = "",
+            searchResults = emptyList(),
+            selectedPharmacy = null,
+            availablePharmacists = emptyList(),
+            cameraPositionState = rememberCameraPositionState(),
+            cameraMoveEvent = MutableSharedFlow(),
+            onSearchQueryChange = {},
+            onSearchArea = { _, _ -> },
+            onPharmacySelect = {},
+            onPharmacistSelect = {},
+            onMapModeChange = {},
+            onBackFromMap = {}
         )
     }
 }

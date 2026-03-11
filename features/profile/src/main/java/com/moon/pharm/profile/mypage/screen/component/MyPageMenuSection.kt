@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -26,11 +28,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.Tertiary
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 @Composable
 fun MyPageMenuSection(
@@ -41,11 +41,11 @@ fun MyPageMenuSection(
         Text(
             text = title,
             fontSize = 13.sp,
-            color = SecondFont,
+            color = PharmTheme.colors.secondFont,
             modifier = Modifier.padding(bottom = 8.dp, start = 4.dp)
         )
         Card(
-            colors = CardDefaults.cardColors(containerColor = White),
+            colors = CardDefaults.cardColors(containerColor = PharmTheme.colors.surface),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -54,7 +54,7 @@ fun MyPageMenuSection(
                     MenuRowItem(item)
                     if (index < items.lastIndex) {
                         HorizontalDivider(
-                            color = backgroundLight,
+                            color = PharmTheme.colors.background,
                             thickness = 1.dp,
                             modifier = Modifier.padding(horizontal = 20.dp)
                         )
@@ -78,13 +78,13 @@ private fun MenuRowItem(item: MyPageMenuItemData) {
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(Tertiary),
+                .background(PharmTheme.colors.tertiary),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = item.icon,
                 contentDescription = null,
-                tint = Primary,
+                tint = PharmTheme.colors.primary,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -99,7 +99,7 @@ private fun MenuRowItem(item: MyPageMenuItemData) {
                 text = item.title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = Primary
+                color = PharmTheme.colors.primary
             )
 
             if (!item.count.isNullOrEmpty()) {
@@ -108,7 +108,7 @@ private fun MenuRowItem(item: MyPageMenuItemData) {
                     text = item.count,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
-                    color = SecondFont
+                    color = PharmTheme.colors.secondFont
                 )
             }
         }
@@ -116,7 +116,33 @@ private fun MenuRowItem(item: MyPageMenuItemData) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
-            tint = Tertiary
+            tint = PharmTheme.colors.tertiary
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MyPageMenuSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MyPageMenuSection(
+                title = "핵심 기능",
+                items = listOf(
+                    MyPageMenuItemData(
+                        icon = Icons.Default.Notifications,
+                        title = "알림 설정",
+                        count = "2",
+                        onClick = {}
+                    ),
+                    MyPageMenuItemData(
+                        icon = Icons.Default.Settings,
+                        title = "계정 설정",
+                        count = null,
+                        onClick = {}
+                    )
+                )
+            )
+        }
     }
 }

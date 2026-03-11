@@ -1,6 +1,7 @@
 package com.moon.pharm.consult.screen.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,15 +25,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.StatusBadge
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.primaryLight
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.clickableSingle
 import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.mapper.toBackgroundColor
 import com.moon.pharm.consult.mapper.toTextColor
 import com.moon.pharm.domain.model.consult.ConsultItem
+import com.moon.pharm.domain.model.consult.ConsultStatus
 
 @Composable
 fun ConsultItemCard(
@@ -47,7 +49,7 @@ fun ConsultItemCard(
     val hasPermission = !isSecret || isOwner || isAssignedPharmacist
 
     ElevatedCard(
-        colors = CardDefaults.elevatedCardColors(containerColor = White),
+        colors = CardDefaults.elevatedCardColors(containerColor = PharmTheme.colors.surface),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -66,7 +68,7 @@ fun ConsultItemCard(
                         Icon(
                             imageVector = Icons.Default.Lock,
                             contentDescription = stringResource(R.string.consult_secret_icon_desc),
-                            tint = if (hasPermission) primaryLight else SecondFont,
+                            tint = if (hasPermission) PharmTheme.colors.primary else PharmTheme.colors.secondFont,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -76,7 +78,7 @@ fun ConsultItemCard(
                         text = if (hasPermission) item.title else stringResource(R.string.consult_secret_hidden_title),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (hasPermission) primaryLight else SecondFont,
+                        color = if (hasPermission) PharmTheme.colors.primary else PharmTheme.colors.secondFont,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         lineHeight = 20.sp
@@ -87,7 +89,7 @@ fun ConsultItemCard(
                 Text(
                     text = "${item.nickName} • ${item.createdAt.toDisplayDateTimeString()}",
                     fontSize = 12.sp,
-                    color = SecondFont
+                    color = PharmTheme.colors.secondFont
                 )
             }
 
@@ -97,6 +99,21 @@ fun ConsultItemCard(
                 text = item.status.label,
                 statusColor = item.status.toBackgroundColor(),
                 contentColor = item.status.toTextColor()
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun ConsultItemCardPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            ConsultItemCard(
+                item = ConsultItem(id = "1", userId = "u1", pharmacistId = "p1", nickName = "사용자", title = "공개 상담", content = "...", isPublic = true, status = ConsultStatus.WAITING, createdAt = System.currentTimeMillis()),
+                currentUserId = "u1",
+                isPharmacist = false,
+                onClick = {}
             )
         }
     }

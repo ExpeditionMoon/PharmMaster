@@ -20,14 +20,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.Tertiary
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.onPrimaryContainerLight
-import com.moon.pharm.component_ui.theme.primaryContainerLight
-import com.moon.pharm.component_ui.theme.tertiaryLight
-import java.util.Calendar
 import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
+import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,6 +32,7 @@ fun TimePickerDialog(
     title: String,
     onConfirm: (TimePickerState) -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val currentTime = Calendar.getInstance()
     val timePickerState = rememberTimePickerState(
@@ -45,11 +43,12 @@ fun TimePickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = modifier,
         confirmButton = {
             TextButton(onClick = { onConfirm(timePickerState) }) {
                 Text(
                     stringResource(R.string.common_confirm),
-                    color = Primary, fontWeight = FontWeight.Bold
+                    color = PharmTheme.colors.primary, fontWeight = FontWeight.Bold
                 )
             }
         },
@@ -57,7 +56,7 @@ fun TimePickerDialog(
             TextButton(onClick = onDismiss) {
                 Text(
                     stringResource(R.string.common_cancel),
-                    color = Primary
+                    color = PharmTheme.colors.primary
                 )
             }
         },
@@ -74,30 +73,43 @@ fun TimePickerDialog(
                 )
                 MaterialTheme(
                     colorScheme = MaterialTheme.colorScheme.copy(
-                        primary = Primary
+                        primary = PharmTheme.colors.primary
                     )
                 ) {
                     TimeInput(
                         state = timePickerState,
                         colors = TimePickerDefaults.colors(
-                            containerColor = White,
-                            timeSelectorSelectedContainerColor = primaryContainerLight,
-                            timeSelectorSelectedContentColor = onPrimaryContainerLight,
+                            containerColor = PharmTheme.colors.surface,
+                            timeSelectorSelectedContainerColor = PharmTheme.colors.primaryContainer,
+                            timeSelectorSelectedContentColor = PharmTheme.colors.onPrimaryContainer,
 
-                            timeSelectorUnselectedContainerColor = White,
-                            timeSelectorUnselectedContentColor = Tertiary,
+                            timeSelectorUnselectedContainerColor = PharmTheme.colors.surface,
+                            timeSelectorUnselectedContentColor = PharmTheme.colors.tertiary,
 
-                            periodSelectorSelectedContainerColor = primaryContainerLight,
-                            periodSelectorSelectedContentColor = onPrimaryContainerLight,
-                            periodSelectorUnselectedContainerColor = White,
-                            periodSelectorUnselectedContentColor = Tertiary,
-                            periodSelectorBorderColor = tertiaryLight
+                            periodSelectorSelectedContainerColor = PharmTheme.colors.primaryContainer,
+                            periodSelectorSelectedContentColor = PharmTheme.colors.onPrimaryContainer,
+                            periodSelectorUnselectedContainerColor = PharmTheme.colors.surface,
+                            periodSelectorUnselectedContentColor = PharmTheme.colors.tertiary,
+                            periodSelectorBorderColor = PharmTheme.colors.tertiary
                         )
                     )
                 }
             }
         },
         shape = RoundedCornerShape(10.dp),
-        containerColor = White
+        containerColor = PharmTheme.colors.surface
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@ThemePreviews
+@Composable
+private fun TimePickerDialogPreview() {
+    PharmMasterTheme {
+        TimePickerDialog(
+            title = "복용 시간 설정",
+            onConfirm = {},
+            onDismiss = {}
+        )
+    }
 }

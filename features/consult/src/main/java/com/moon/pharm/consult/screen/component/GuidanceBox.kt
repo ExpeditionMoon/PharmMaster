@@ -1,6 +1,7 @@
 package com.moon.pharm.consult.screen.component
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,28 +15,40 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.primaryLight
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 @Composable
 fun GuidanceBox(text: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, primaryLight, RoundedCornerShape(10.dp))
+            .border(1.dp, PharmTheme.colors.primary, RoundedCornerShape(10.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.Default.Info,
             contentDescription = null,
-            tint = primaryLight,
+            tint = PharmTheme.colors.primary,
             modifier = Modifier.padding(end = 12.dp)
         )
         Text(
             text = text,
             fontSize = 13.sp,
-            color = primaryLight,
+            color = PharmTheme.colors.primary,
             lineHeight = 20.sp
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun GuidanceBoxPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            GuidanceBox(text = "상담 내용은 약사에게만 공개되며, 다른 사용자들은 볼 수 없습니다.")
+        }
     }
 }

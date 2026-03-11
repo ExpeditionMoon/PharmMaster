@@ -5,12 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.domain.model.consult.ConsultStatus
+import com.moon.pharm.domain.repository.AuthRepository
+import com.moon.pharm.domain.repository.ConsultRepository
+import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
-import com.moon.pharm.domain.usecase.auth.LogoutUseCase
-import com.moon.pharm.domain.usecase.consult.GetMyAnsweredConsultUseCase
-import com.moon.pharm.domain.usecase.consult.GetMyConsultUseCase
-import com.moon.pharm.domain.usecase.user.GetUserUseCase
 import com.moon.pharm.domain.usecase.user.UpdateNicknameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,11 +23,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
-    private val getUserUseCase: GetUserUseCase,
-    private val getMyConsultUseCase: GetMyConsultUseCase,
-    private val getMyAnsweredConsultUseCase: GetMyAnsweredConsultUseCase,
-    private val logoutUseCase: LogoutUseCase,
+    private val authRepository: AuthRepository,
+    private val consultRepository: ConsultRepository,
+    private val userRepository: UserRepository,
     private val updateNicknameUseCase: UpdateNicknameUseCase
 ) : ViewModel() {
 
@@ -66,21 +62,23 @@ class MyPageViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun loadData() {
-        val userId = getCurrentUserIdUseCase()
-        if (userId.isNullOrEmpty()) {
-            _uiState.value = MyPageUiState(isLoading = false, userMessage = UiMessage.LoginRequired)
-            return
-        }
+        val userId = authRepository.getCurrentUserId() ?: return
 
         viewModelScope.launch {
-            getUserUseCase(userId).flatMapLatest { userResult ->
-                val user = if (userResult is DataResourceResult.Success) userResult.resultData else null
-                val isPharmacist = user?.userType == UserType.PHARMACIST
+            userRepository.getUser(userId).flatMapLatest { userResult ->
+                if (userResult !is DataResourceResult.Success) {
+                    return@flatMapLatest kotlinx.coroutines.flow.flowOf(
+                        Pair(userResult, DataResourceResult.Loading)
+                    )
+                }
+
+                val user = userResult.resultData
+                val isPharmacist = user.userType == UserType.PHARMACIST
 
                 val consultFlow = if (isPharmacist) {
-                    getMyAnsweredConsultUseCase(userId)
+                    consultRepository.getMyAnsweredConsultList(userId)
                 } else {
-                    getMyConsultUseCase(userId)
+                    consultRepository.getMyConsult(userId)
                 }
 
                 consultFlow.map { consultResult ->
@@ -122,7 +120,7 @@ class MyPageViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch {
-            logoutUseCase()
+            authRepository.logout()
         }
     }
 }

@@ -14,8 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.toggle.CustomSwitch
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 
 @Composable
@@ -35,7 +36,7 @@ fun ConsultPrivacyToggle(
         Column {
             Text(
                 text = stringResource(R.string.consult_write_public_setting_title),
-                color = Primary,
+                color = PharmTheme.colors.primary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
@@ -43,7 +44,7 @@ fun ConsultPrivacyToggle(
                 text = if (isPublic) stringResource(R.string.consult_write_public_desc_all)
                 else stringResource(R.string.consult_write_public_desc_private),
                 fontSize = 12.sp,
-                color = SecondFont
+                color = PharmTheme.colors.secondFont
             )
         }
         CustomSwitch(
@@ -52,5 +53,16 @@ fun ConsultPrivacyToggle(
                 onVisibilityChange(!isChecked)
             }
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun ConsultPrivacyTogglePreview() {
+    PharmMasterTheme {
+        Column(modifier = Modifier.padding(16.dp)) {
+            ConsultPrivacyToggle(isPublic = true, onVisibilityChange = {})
+            ConsultPrivacyToggle(isPublic = false, onVisibilityChange = {})
+        }
     }
 }

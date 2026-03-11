@@ -15,8 +15,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.screen.section.AnswerSection
 import com.moon.pharm.consult.screen.section.PharmacistAnswerInputSection
@@ -40,13 +41,13 @@ fun ConsultDetailContent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundLight)
+            .background(PharmTheme.colors.background)
     ) {
         if (item != null) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(backgroundLight)
+                    .background(PharmTheme.colors.background)
                     .padding(horizontal = 24.dp, vertical = 20.dp)
             ) {
                 item {
@@ -82,7 +83,7 @@ fun ConsultDetailContent(
             ) {
                 Text(
                     text = stringResource(R.string.consult_detail_error_load),
-                    color = SecondFont,
+                    color = PharmTheme.colors.secondFont,
                     fontSize = 16.sp
                 )
             }
@@ -91,5 +92,18 @@ fun ConsultDetailContent(
         if (isLoading) {
             CircularProgressBar(modifier = Modifier.align(Alignment.Center))
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun ConsultDetailContentPreview() {
+    PharmMasterTheme {
+        ConsultDetailContent(
+            isLoading = false,
+            item = ConsultItem(id = "1", userId = "u1", pharmacistId = "p1", nickName = "질문자", title = "두통약 문의", content = "어떻게 먹나요?", isPublic = true, status = ConsultStatus.WAITING, createdAt = System.currentTimeMillis()),
+            pharmacist = null,
+            pharmacistImageUrl = null
+        )
     }
 }

@@ -23,8 +23,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.theme.Black
-import com.moon.pharm.component_ui.theme.SecondFont
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toDisplayString
 import com.moon.pharm.component_ui.util.toQueryString
 import com.moon.pharm.profile.medication.screen.component.HistoryRecordItem
@@ -95,7 +96,7 @@ fun MedicationHistoryContent(
                 modifier = Modifier.padding(horizontal = 20.dp),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                color = Black
+                color = PharmTheme.colors.onSurface
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -112,7 +113,7 @@ fun MedicationHistoryContent(
                         Text(
                             text = "복약 기록이 없습니다.",
                             modifier = Modifier.padding(top = 20.dp),
-                            color = SecondFont
+                            color = PharmTheme.colors.secondFont
                         )
                     }
                 }
@@ -131,5 +132,23 @@ fun MedicationHistoryContent(
                 }
             }
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MedicationHistoryContentPreview() {
+    PharmMasterTheme {
+        MedicationHistoryContent(
+            uiState = MedicationHistoryUiState(
+                selectedMonth = YearMonth.now(),
+                selectedDate = LocalDate.now(),
+                recordsByDate = emptyMap()
+            ),
+            onBackClick = {},
+            onMonthChanged = {},
+            onDateClick = {},
+            onToggleRecord = { _, _, _ -> }
+        )
     }
 }

@@ -1,30 +1,43 @@
 package com.moon.pharm.component_ui.component.map
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import com.moon.pharm.component_ui.component.item.PharmacyListItem
-import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.component.item.PharmacyListItem
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
+import com.moon.pharm.component_ui.util.ThemePreviews
+import com.moon.pharm.domain.model.pharmacy.Pharmacy
 
 @Composable
 fun PharmacyListPanel(
     pharmacies: List<Pharmacy>,
-    onPharmacyClick: (Pharmacy) -> Unit
+    onPharmacyClick: (Pharmacy) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .heightIn(max = 400.dp)
             .padding(horizontal = 16.dp)
@@ -42,7 +55,7 @@ fun PharmacyListPanel(
                     .height(100.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = stringResource(R.string.search_result_empty), color = Color.Gray)
+                Text(text = stringResource(R.string.search_result_empty), color = PharmTheme.colors.placeholder)
             }
         } else {
             LazyColumn(
@@ -59,6 +72,18 @@ fun PharmacyListPanel(
                     )
                 }
             }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacyListPanelPreview(
+    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<Pharmacy>
+) {
+    PharmMasterTheme {
+        Box(modifier = Modifier.background(PharmTheme.colors.background)) {
+            PharmacyListPanel(pharmacies = pharmacies, onPharmacyClick = {})
         }
     }
 }

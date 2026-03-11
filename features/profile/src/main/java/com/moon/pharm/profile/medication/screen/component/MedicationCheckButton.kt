@@ -2,8 +2,10 @@ package com.moon.pharm.profile.medication.screen.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,9 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.primaryLight
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.profile.R
 
 /**
@@ -37,10 +39,10 @@ fun MedicationCheckButton(
     OutlinedButton(
         onClick = onClick,
         shape = RoundedCornerShape(10.dp),
-        border = if (isTaken) null else BorderStroke(1.dp, primaryLight),
+        border = if (isTaken) null else BorderStroke(1.dp, PharmTheme.colors.primary),
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = if (isTaken) Primary else Color.Transparent,
-            contentColor = if (isTaken) White else primaryLight
+            containerColor = if (isTaken) PharmTheme.colors.primary else Color.Transparent,
+            contentColor = if (isTaken) PharmTheme.colors.surface else PharmTheme.colors.primary
         ),
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
         modifier = Modifier.height(36.dp)
@@ -48,7 +50,7 @@ fun MedicationCheckButton(
         Icon(
             imageVector = if (isTaken) Icons.Filled.CheckCircle else Icons.Outlined.RadioButtonUnchecked,
             contentDescription = null,
-            tint = if (isTaken) White else primaryLight,
+            tint = if (isTaken) PharmTheme.colors.surface else PharmTheme.colors.primary,
             modifier = Modifier.size(16.dp)
         )
         Spacer(Modifier.width(4.dp))
@@ -60,5 +62,17 @@ fun MedicationCheckButton(
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MedicationCheckButtonPreview() {
+    PharmMasterTheme {
+        Row(modifier = Modifier.padding(16.dp)) {
+            MedicationCheckButton(isTaken = true, onClick = {})
+            Spacer(modifier = Modifier.width(8.dp))
+            MedicationCheckButton(isTaken = false, onClick = {})
+        }
     }
 }

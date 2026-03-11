@@ -1,6 +1,7 @@
 package com.moon.pharm.consult.screen.section
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,13 +19,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.StatusBadge
-import com.moon.pharm.component_ui.theme.Black
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.Secondary
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.screen.component.ConsultImageItem
+import com.moon.pharm.consult.screen.component.ConsultPreviewData
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.consult.ConsultStatus
 
@@ -39,7 +39,7 @@ fun QuestionSection(item: ConsultItem) {
             Text(
                 text = "${item.nickName} • ${item.createdAt.toDisplayDateTimeString()}",
                 fontSize = 13.sp,
-                color = SecondFont,
+                color = PharmTheme.colors.secondFont,
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp),
@@ -48,8 +48,8 @@ fun QuestionSection(item: ConsultItem) {
             )
             StatusBadge(
                 text = item.status.label,
-                statusColor = if (item.status == ConsultStatus.WAITING) Secondary else Primary,
-                contentColor = White
+                statusColor = if (item.status == ConsultStatus.WAITING) PharmTheme.colors.secondary else PharmTheme.colors.primary,
+                contentColor = PharmTheme.colors.surface
             )
         }
 
@@ -59,7 +59,7 @@ fun QuestionSection(item: ConsultItem) {
             text = item.title,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = Black,
+            color = PharmTheme.colors.onSurface,
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -67,7 +67,7 @@ fun QuestionSection(item: ConsultItem) {
         Text(
             text = item.content,
             fontSize = 15.sp,
-            color = SecondFont,
+            color = PharmTheme.colors.secondFont,
             lineHeight = 20.sp
         )
 
@@ -80,6 +80,18 @@ fun QuestionSection(item: ConsultItem) {
                     ConsultImageItem(imageUrl = image.imageUrl)
                 }
             }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun QuestionSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            QuestionSection(
+                item = ConsultPreviewData.dummyConsultItems.first()
+            )
         }
     }
 }

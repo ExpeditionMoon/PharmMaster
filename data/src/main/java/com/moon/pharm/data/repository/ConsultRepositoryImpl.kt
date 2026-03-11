@@ -9,13 +9,13 @@ import com.moon.pharm.data.common.NotificationConstants.MSG_NEW_CONSULT_BODY
 import com.moon.pharm.data.common.NotificationConstants.MSG_NEW_CONSULT_TITLE
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.ImageDataSource
+import com.moon.pharm.data.datasource.remote.dto.toDomain
+import com.moon.pharm.data.datasource.remote.dto.toDto
 import com.moon.pharm.data.datasource.remote.fcm.FcmApi
 import com.moon.pharm.data.datasource.remote.fcm.FcmSendRequest
 import com.moon.pharm.data.di.IoDispatcher
-import com.moon.pharm.data.mapper.toDomain
-import com.moon.pharm.data.mapper.toDto
 import com.moon.pharm.domain.model.consult.ConsultAnswer
-import com.moon.pharm.domain.model.consult.ConsultError
+import com.moon.pharm.domain.model.consult.ConsultException
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.result.DataResourceResult
@@ -26,6 +26,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 class ConsultRepositoryImpl @Inject constructor(
@@ -35,29 +37,44 @@ class ConsultRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ConsultRepository {
 
+    private fun Throwable.toConsultException(): ConsultException = when {
+        this is FirebaseFirestoreException && this.code == FirebaseFirestoreException.Code.NOT_FOUND -> ConsultException.NotFound()
+        this is FirebaseFirestoreException -> ConsultException.Network()
+        else -> ConsultException.Unknown(this.message)
+    }
+
     private fun <T> wrapOperation(
         operation: suspend () -> T
     ): Flow<DataResourceResult<T>> = flow {
         emit(DataResourceResult.Loading)
-        val result = operation()
-        emit(DataResourceResult.Success(result))
-    }.catch { e ->
-        if (e is FirebaseFirestoreException && e.code == FirebaseFirestoreException.Code.NOT_FOUND) {
-            emit(DataResourceResult.Failure(ConsultError.NotFound()))
-        } else {
-            emit(DataResourceResult.Failure(e))
-        }
+
+        val result = runCatching {
+            withTimeout(10000L) {
+                operation()
+            }
+        }.fold(
+            onSuccess = { DataResourceResult.Success(it) },
+            onFailure = { e ->
+                DataResourceResult.Failure(e.toConsultException())
+            }
+        )
+        emit(result)
     }.flowOn(ioDispatcher)
+
+    private fun <T> Flow<T>.asDataResourceResult(): Flow<DataResourceResult<T>> {
+        return this
+            .map { DataResourceResult.Success(it) as DataResourceResult<T> }
+            .onStart { emit(DataResourceResult.Loading) }
+            .catch { e ->
+                emit(DataResourceResult.Failure(e.toConsultException()))
+            }
+            .flowOn(ioDispatcher)
+    }
 
     override fun getConsultItems(): Flow<DataResourceResult<List<ConsultItem>>> {
         return dataSource.getConsultItems()
-            .map { dtoList ->
-                val domainList = dtoList.map { it.toDomain() }
-                DataResourceResult.Success(domainList) as DataResourceResult<List<ConsultItem>>
-            }
-            .onStart { emit(DataResourceResult.Loading) }
-            .catch { emit(DataResourceResult.Failure(it)) }
-            .flowOn(ioDispatcher)
+            .map { dtoList -> dtoList.map { it.toDomain() } }
+            .asDataResourceResult()
     }
 
     override fun createConsult(consultInfo: ConsultItem) =
@@ -65,38 +82,20 @@ class ConsultRepositoryImpl @Inject constructor(
 
     override fun getConsultDetail(id: String): Flow<DataResourceResult<ConsultItem>> {
         return dataSource.getConsultDetail(id)
-            .map { dto ->
-                if (dto != null) {
-                    DataResourceResult.Success(dto.toDomain())
-                } else {
-                    DataResourceResult.Failure(ConsultError.NotFound())
-                }
-            }
-            .onStart { emit(DataResourceResult.Loading) }
-            .catch { e -> emit(DataResourceResult.Failure(e)) }
-            .flowOn(ioDispatcher)
+            .map { dto -> dto?.toDomain() ?: throw ConsultException.NotFound() }
+            .asDataResourceResult()
     }
 
     override fun getMyConsult(userId: String): Flow<DataResourceResult<List<ConsultItem>>> {
         return dataSource.getMyConsults(userId)
-            .map { dtoList ->
-                val domainList = dtoList.map { it.toDomain() }
-                DataResourceResult.Success(domainList) as DataResourceResult<List<ConsultItem>>
-            }
-            .onStart { emit(DataResourceResult.Loading) }
-            .catch { emit(DataResourceResult.Failure(it)) }
-            .flowOn(ioDispatcher)
+            .map { dtoList -> dtoList.map { it.toDomain() } }
+            .asDataResourceResult()
     }
 
     override fun getMyAnsweredConsultList(userId: String): Flow<DataResourceResult<List<ConsultItem>>> {
         return dataSource.getMyAnsweredConsults(userId)
-            .map { dtoList ->
-                val domainList = dtoList.map { it.toDomain() }
-                DataResourceResult.Success(domainList) as DataResourceResult<List<ConsultItem>>
-            }
-            .onStart { emit(DataResourceResult.Loading) }
-            .catch { emit(DataResourceResult.Failure(it)) }
-            .flowOn(ioDispatcher)
+            .map { dtoList -> dtoList.map { it.toDomain() } }
+            .asDataResourceResult()
     }
 
     override fun registerAnswer(
@@ -137,37 +136,40 @@ class ConsultRepositoryImpl @Inject constructor(
     }
 
     private suspend fun sendFcmNotification(
-        targetToken: String,
-        title: String,
-        body: String,
-        consultId: String
-    ): DataResourceResult<Unit> {
-        return try {
+        targetToken: String, title: String, body: String, consultId: String
+    ): DataResourceResult<Unit> = withContext(ioDispatcher) {
+        runCatching {
             val request = FcmSendRequest(
-                targetToken = targetToken,
-                title = title,
-                body = body,
-                consultId = consultId
+                targetToken = targetToken, title = title, body = body, consultId = consultId
             )
-            val response = fcmApi.sendNotification(request)
-
-            if (response.success) {
-                DataResourceResult.Success(Unit)
-            } else {
-                val errorMsg = response.error ?: ERR_UNKNOWN_SERVER
-                DataResourceResult.Failure(Exception("$ERR_FCM_FAILED$errorMsg"))
+            val response = withTimeout(5000L) {
+                fcmApi.sendNotification(request)
             }
-        } catch (e: Exception) {
-            DataResourceResult.Failure(e)
-        }
+
+            if (!response.success) {
+                val errorMsg = response.error ?: ERR_UNKNOWN_SERVER
+                throw ConsultException.Unknown("$ERR_FCM_FAILED$errorMsg")
+            }
+        }.fold(
+            onSuccess = { DataResourceResult.Success(Unit) },
+            onFailure = { e ->
+                val error = e as? ConsultException ?: ConsultException.Unknown(e.message)
+                DataResourceResult.Failure(error)
+            }
+        )
     }
 
-    override suspend fun updatePharmacistNicknameInAnswers(userId: String, newNickname: String): DataResourceResult<Unit> {
-        return try {
+    override suspend fun updatePharmacistNicknameInAnswers(
+        userId: String, newNickname: String
+    ): DataResourceResult<Unit> = runCatching {
+        withTimeout(10000L) {
             dataSource.updatePharmacistNicknameInAnswers(userId, newNickname)
-            DataResourceResult.Success(Unit)
-        } catch (e: Exception) {
-            DataResourceResult.Failure(e)
         }
-    }
+    }.fold(
+        onSuccess = { DataResourceResult.Success(Unit) },
+        onFailure = { e ->
+            val error = e as? ConsultException ?: ConsultException.Unknown(e.message)
+            DataResourceResult.Failure(error)
+        }
+    )
 }

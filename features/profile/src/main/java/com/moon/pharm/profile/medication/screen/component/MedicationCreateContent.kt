@@ -15,7 +15,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.screen.section.MedicationAlarmSection
 import com.moon.pharm.profile.medication.screen.section.MedicationInfoSection
@@ -35,7 +37,7 @@ fun MedicationCreateContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundLight)
+            .background(PharmTheme.colors.background)
             .verticalScroll(scrollState)
             .padding(horizontal = 24.dp, vertical = 20.dp)
     ) {
@@ -80,5 +82,22 @@ fun MedicationCreateContent(
         )
 
         Spacer(modifier = Modifier.height(50.dp))
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MedicationCreateContentPreview() {
+    PharmMasterTheme {
+        MedicationCreateContent(
+            forms = listOf(
+                MedicationFormState(
+                    medicationName = "타이레놀",
+                    medicationDosage = "1알"
+                )
+            ),
+            isLoading = false,
+            onEvent = {}
+        )
     }
 }

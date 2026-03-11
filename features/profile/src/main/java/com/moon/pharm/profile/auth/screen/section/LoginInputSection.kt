@@ -1,9 +1,11 @@
 package com.moon.pharm.profile.auth.screen.section
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
@@ -14,6 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.profile.R
 
 @Composable
@@ -45,5 +49,20 @@ fun LoginInputSection(
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun LoginInputSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(24.dp)) {
+            LoginInputSection(
+                email = "user@moon.pharm",
+                password = "password123",
+                onEmailChange = {},
+                onPasswordChange = {}
+            )
+        }
     }
 }

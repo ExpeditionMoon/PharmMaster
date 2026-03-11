@@ -1,5 +1,8 @@
 package com.moon.pharm.component_ui.component.bar
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -11,17 +14,19 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.model.BottomBarUiModel
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 @Composable
 fun PharmBottomBar(
     items: List<BottomBarUiModel>,
-    currentRoute: String?
+    currentRoute: String?,
+    modifier: Modifier = Modifier
 ) {
     NavigationBar (
-        containerColor = backgroundLight,
-        modifier = Modifier.shadow(elevation = 10.dp)
+        containerColor = PharmTheme.colors.background,
+        modifier = modifier.shadow(elevation = 10.dp)
     ){
         items.forEach { item ->
             val isSelected = item.tabName == currentRoute
@@ -38,13 +43,27 @@ fun PharmBottomBar(
                     Text(text = item.tabName)
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Primary,
-                    selectedTextColor = Primary,
-                    unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray,
+                    selectedIconColor = PharmTheme.colors.primary,
+                    selectedTextColor = PharmTheme.colors.primary,
+                    unselectedIconColor = PharmTheme.colors.placeholder,
+                    unselectedTextColor = PharmTheme.colors.placeholder,
                     indicatorColor = Color.Transparent
                 )
             )
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmBottomBarPreview() {
+    PharmMasterTheme {
+        PharmBottomBar(
+            items = listOf(
+                BottomBarUiModel(tabName = "홈", icon = Icons.Default.Home, onClick = {}),
+                BottomBarUiModel(tabName = "마이페이지", icon = Icons.Default.Person, onClick = {})
+            ),
+            currentRoute = "home"
+        )
     }
 }

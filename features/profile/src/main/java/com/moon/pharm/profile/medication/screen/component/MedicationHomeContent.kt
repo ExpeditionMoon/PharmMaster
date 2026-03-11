@@ -13,7 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.bar.PharmPrimaryTabRow
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.medication.MedicationTimeGroup
 import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
@@ -32,7 +34,7 @@ fun MedicationHomeContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundLight)
+            .background(PharmTheme.colors.background)
     ) {
         PharmPrimaryTabRow(
             selectedTabIndex = selectedTab.index,
@@ -55,5 +57,20 @@ fun MedicationHomeContent(
 
             item { Spacer(modifier = Modifier.height(50.dp)) }
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MedicationHomeContentPreview() {
+    PharmMasterTheme {
+        MedicationHomeContent(
+            selectedTab = MedicationPrimaryTab.ALL,
+            currentList = emptyList(),
+            totalCount = 3,
+            completedCount = 1,
+            onTabSelected = {},
+            onTakeClick = {}
+        )
     }
 }

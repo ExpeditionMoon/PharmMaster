@@ -2,7 +2,15 @@ package com.moon.pharm.component_ui.component.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -11,32 +19,34 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 
 @Composable
 fun PharmacyListItem(
     pharmacy: Pharmacy,
-    onClick: (Pharmacy) -> Unit
+    onClick: (Pharmacy) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onClick(pharmacy) }
-            .background(White, RoundedCornerShape(10.dp))
+            .background(PharmTheme.colors.surface, RoundedCornerShape(10.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.Default.LocationOn,
             contentDescription = null,
-            tint = Primary,
+            tint = PharmTheme.colors.primary,
             modifier = Modifier.size(24.dp)
         )
         Spacer(modifier = Modifier.width(12.dp))
@@ -45,13 +55,32 @@ fun PharmacyListItem(
                 text = pharmacy.name,
                 fontWeight = FontWeight.Bold,
                 fontSize = 15.sp,
-                color = Color.Black
+                color = PharmTheme.colors.onSurface
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = pharmacy.address,
-                color = SecondFont,
+                color = PharmTheme.colors.secondFont,
                 fontSize = 13.sp
+            )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacyListItemPreview(
+    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<Pharmacy>
+) {
+    PharmMasterTheme {
+        Box(
+            modifier = Modifier
+                .background(PharmTheme.colors.background)
+                .padding(16.dp)
+        ) {
+            PharmacyListItem(
+                pharmacy = pharmacies.first(),
+                onClick = {}
             )
         }
     }

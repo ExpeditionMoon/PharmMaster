@@ -1,10 +1,13 @@
 package com.moon.pharm.profile.medication.screen.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
@@ -15,13 +18,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.card.DateSettingCard
 import com.moon.pharm.component_ui.component.dialog.DatePickerModal
 import com.moon.pharm.component_ui.component.toggle.CustomSwitch
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toDisplayDateString
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
@@ -40,75 +45,108 @@ fun PeriodInputSection(
     var showStartPicker by remember { mutableStateOf(false) }
     var showEndPicker by remember { mutableStateOf(false) }
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        DateSettingCard(
-            placeholder = stringResource(R.string.medication_start_date),
-            value = startDate.toDisplayDateString(),
-            showCalendarIcon = true,
-            onClick = { showStartPicker = true },
-            modifier = Modifier.weight(1f)
-        )
-        if (!noEndDate) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             DateSettingCard(
-                placeholder = stringResource(R.string.medication_end_date),
-                value = endDate.toDisplayDateString(),
+                placeholder = stringResource(R.string.medication_start_date),
+                value = startDate.toDisplayDateString(),
                 showCalendarIcon = true,
-                onClick = { showEndPicker = true },
+                onClick = { showStartPicker = true },
                 modifier = Modifier.weight(1f)
+            )
+            if (!noEndDate) {
+                DateSettingCard(
+                    placeholder = stringResource(R.string.medication_end_date),
+                    value = endDate.toDisplayDateString(),
+                    showCalendarIcon = true,
+                    onClick = { showEndPicker = true },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+        if (showStartPicker) {
+            DatePickerModal(
+                state = startDatePickerState,
+                onDateSelected = { millis ->
+                    onEvent(MedicationUiEvent.UpdateStartDate(index = medicationIndex, millis = millis))
+                    showStartPicker = false
+                },
+                onDismiss = { showStartPicker = false }
+            )
+        }
+
+        if (showEndPicker) {
+            DatePickerModal(
+                state = endDatePickerState,
+                onDateSelected = { millis ->
+                    onEvent(MedicationUiEvent.UpdateEndDate(index = medicationIndex, millis = millis))
+                    showEndPicker = false
+                },
+                onDismiss = { showEndPicker = false }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(30.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.medication_no_end_date),
+                fontSize = 12.sp,
+                color = PharmTheme.colors.onSurface
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            CustomSwitch(
+                checked = noEndDate,
+                onCheckedChange = { checked ->
+                    onEvent(MedicationUiEvent.UpdatePeriod(
+                        index = medicationIndex,
+                        start = startDate,
+                        end = if (checked) null else endDate,
+                        noEnd = checked
+                    ))
+                }
             )
         }
     }
+}
 
-    if (showStartPicker) {
-        DatePickerModal(
-            state = startDatePickerState,
-            onDateSelected = { millis ->
-                onEvent(MedicationUiEvent.UpdateStartDate(index = medicationIndex, millis = millis))
-                showStartPicker = false
-            },
-            onDismiss = { showStartPicker = false }
-        )
-    }
+@ThemePreviews
+@Composable
+private fun PeriodInputSectionPreview() {
+    PharmMasterTheme {
+        Column(
+            modifier = Modifier
+                .background(PharmTheme.colors.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(32.dp)
+        ) {
+            // 종료일 없음
+            PeriodInputSection(
+                medicationIndex = 0,
+                startDate = System.currentTimeMillis(),
+                endDate = null,
+                noEndDate = true,
+                onEvent = {}
+            )
 
-    if (showEndPicker) {
-        DatePickerModal(
-            state = endDatePickerState,
-            onDateSelected = { millis ->
-                onEvent(MedicationUiEvent.UpdateEndDate(index = medicationIndex, millis = millis))
-                showEndPicker = false
-            },
-            onDismiss = { showEndPicker = false }
-        )
-    }
-
-    Spacer(modifier = Modifier.height(10.dp))
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(30.dp),
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = stringResource(R.string.medication_no_end_date),
-            fontSize = 12.sp,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        CustomSwitch(
-            checked = noEndDate,
-            onCheckedChange = { checked ->
-                onEvent(MedicationUiEvent.UpdatePeriod(
-                    index = medicationIndex,
-                    start = startDate,
-                    end = if (checked) null else endDate,
-                    noEnd = checked
-                ))
-            }
-        )
+            // 종료일 있음
+            PeriodInputSection(
+                medicationIndex = 0,
+                startDate = System.currentTimeMillis(),
+                endDate = System.currentTimeMillis() + (1000L * 60 * 60 * 24 * 7),
+                noEndDate = false,
+                onEvent = {}
+            )
+        }
     }
 }

@@ -49,6 +49,8 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
         if (snapshot.exists()) {
             val dto = snapshot.toObject(ConsultItemDTO::class.java)
             emit(dto)
+        } else {
+            emit(null)
         }
     }
 

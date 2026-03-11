@@ -1,6 +1,7 @@
 package com.moon.pharm.consult.screen.section
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,9 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.component.input.PrimaryTextField
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.primaryLight
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 
 @Composable
@@ -32,14 +33,14 @@ fun PharmacistAnswerInputSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(White, RoundedCornerShape(10.dp))
+            .background(PharmTheme.colors.surface, RoundedCornerShape(10.dp))
             .padding(16.dp)
     ) {
         Text(
             text = "약사님, 답변을 등록해주세요",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Primary
+            color = PharmTheme.colors.primary
         )
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -49,7 +50,7 @@ fun PharmacistAnswerInputSection(
             placeholder = stringResource(R.string.consult_answer_write_placeholder_content),
             textStyle = TextStyle(
                 fontSize = 16.sp,
-                color = primaryLight,
+                color = PharmTheme.colors.primary,
                 lineHeight = 24.sp
             ),
             singleLine = false,
@@ -67,5 +68,19 @@ fun PharmacistAnswerInputSection(
             modifier = Modifier.fillMaxWidth(),
             enabled = input.isNotBlank()
         )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacistAnswerInputSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            PharmacistAnswerInputSection(
+                input = "",
+                onValueChange = {},
+                onSubmit = {}
+            )
+        }
     }
 }

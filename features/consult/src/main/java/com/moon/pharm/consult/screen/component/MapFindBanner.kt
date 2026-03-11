@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,7 +25,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Primary
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 
 @Composable
@@ -39,8 +42,8 @@ fun MapFindBanner(
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(
-                        Color(0xFFE3F2FD),
-                        Color(0xFFF3E5F5)
+                        PharmTheme.colors.infoContainer,
+                        PharmTheme.colors.primaryContainer
                     )
                 )
             )
@@ -54,7 +57,7 @@ fun MapFindBanner(
             Icon(
                 imageVector = Icons.Default.Map,
                 contentDescription = stringResource(R.string.desc_map_icon),
-                tint = Primary,
+                tint = PharmTheme.colors.primary,
                 modifier = Modifier.size(32.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -62,8 +65,18 @@ fun MapFindBanner(
                 text = stringResource(R.string.consult_map_search_placeholder),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
-                color = Primary
+                color = PharmTheme.colors.primary
             )
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MapFindBannerPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MapFindBanner(onClick = {})
         }
     }
 }

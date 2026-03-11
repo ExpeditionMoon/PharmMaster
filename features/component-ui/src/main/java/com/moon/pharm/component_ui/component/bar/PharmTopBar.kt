@@ -1,6 +1,8 @@
 package com.moon.pharm.component_ui.component.bar
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -9,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -17,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
@@ -27,13 +31,12 @@ import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.theme.OnSurface
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 
 /**
- * 앱 표준 상단바.
- * ([TopBarData]를 통해 UI 구성)
+ * 앱 표준 상단바
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,10 +44,12 @@ fun PharmTopBar(
     data: TopBarData,
     modifier: Modifier = Modifier
 ) {
-    val titleContent: @Composable () -> Unit = if (data.isLogoTitle) {
-        { PharmLogoTitle() }
-    } else {
-        { PharmTextTitle(title = data.title) }
+    val titleContent: @Composable () -> Unit = remember(data.isLogoTitle, data.title) {
+        if (data.isLogoTitle) {
+            { PharmLogoTitle() }
+        } else {
+            { PharmTextTitle(title = data.title) }
+        }
     }
 
     CenterAlignedTopAppBar(
@@ -59,7 +64,7 @@ fun PharmTopBar(
             PharmActions(actions = data.actions)
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = backgroundLight
+            containerColor = PharmTheme.colors.background
         ),
         windowInsets = WindowInsets.statusBars,
         modifier = modifier
@@ -83,7 +88,7 @@ private fun PharmTextTitle(title: String) {
         text = title,
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        color = Primary
+        color = PharmTheme.colors.primary
     )
 }
 
@@ -103,7 +108,7 @@ private fun PharmNavigationIcon(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Primary
+            tint = PharmTheme.colors.primary
         )
     }
 }
@@ -116,16 +121,41 @@ private fun PharmActions(actions: List<TopBarAction>) {
                 Icon(
                     imageVector = action.icon,
                     contentDescription = action.text,
-                    tint = Primary
+                    tint = PharmTheme.colors.primary
                 )
             }
         } else if (action.text != null) {
             TextButton(onClick = action.onClick) {
                 Text(
                     text = action.text,
-                    color = OnSurface
+                    color = PharmTheme.colors.onSurface
                 )
             }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmTopBarPreview() {
+    PharmMasterTheme {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            PharmTopBar(
+                data = TopBarData(
+                    title = "상세 화면",
+                    navigationType = TopBarNavigationType.Back
+                )
+            )
+            PharmTopBar(
+                data = TopBarData(
+                    title = "",
+                    isLogoTitle = true,
+                    navigationType = TopBarNavigationType.Menu,
+                    actions = listOf(TopBarAction(icon = Icons.Default.Notifications, onClick = {}))
+                )
+            )
         }
     }
 }

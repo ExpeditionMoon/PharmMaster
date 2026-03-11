@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,9 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.moon.pharm.component_ui.component.button.PharmOutlinedButton
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.profile.R
@@ -49,7 +48,7 @@ fun MyPageProfileCard(
         stringResource(R.string.mypage_general_member)
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = White),
+        colors = CardDefaults.cardColors(containerColor = PharmTheme.colors.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth()
@@ -60,7 +59,7 @@ fun MyPageProfileCard(
                     modifier = Modifier
                         .size(60.dp)
                         .clip(CircleShape)
-                        .background(Color.LightGray),
+                        .background(PharmTheme.colors.placeholder),
                     contentAlignment = Alignment.Center
                 ) {
                     if (!user.profileImageUrl.isNullOrEmpty()) {
@@ -71,7 +70,7 @@ fun MyPageProfileCard(
                             modifier = Modifier.fillMaxSize()
                         )
                     } else {
-                        Icon(Icons.Default.Face, contentDescription = null, tint = White)
+                        Icon(Icons.Default.Face, contentDescription = null, tint = PharmTheme.colors.surface)
                     }
                 }
 
@@ -82,9 +81,9 @@ fun MyPageProfileCard(
                         text = "${user.nickName}${stringResource(R.string.mypage_user_suffix)}",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Primary
+                        color = PharmTheme.colors.primary
                     )
-                    Text(text = userTypeLabel, fontSize = 14.sp, color = SecondFont)
+                    Text(text = userTypeLabel, fontSize = 14.sp, color = PharmTheme.colors.secondFont)
                 }
             }
 
@@ -99,6 +98,27 @@ fun MyPageProfileCard(
                     fontWeight = FontWeight.SemiBold
                 )
             }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun MyPageProfileCardPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            MyPageProfileCard(
+                user = User(
+                    id = "test_id",
+                    email = "test@email.com",
+                    nickName = "보름달",
+                    userType = UserType.PHARMACIST,
+                    profileImageUrl = null,
+                    createdAt = 0L,
+                    fcmToken = null
+                ),
+                onEditProfileClick = {}
+            )
         }
     }
 }

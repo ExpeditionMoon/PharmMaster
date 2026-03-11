@@ -30,12 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.Black
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.SecondFont
-import com.moon.pharm.component_ui.theme.Success
-import com.moon.pharm.component_ui.theme.Warning
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toDisplayString
 import com.moon.pharm.component_ui.util.toQueryString
 import com.moon.pharm.profile.medication.model.HistoryRecordUiModel
@@ -53,7 +50,7 @@ fun HistoryCalendarSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(White)
+            .background(PharmTheme.colors.surface)
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         CalendarHeader(
@@ -90,7 +87,7 @@ private fun CalendarHeader(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = "이전 달",
-                tint = Black
+                tint = PharmTheme.colors.onSurface
             )
         }
 
@@ -98,14 +95,14 @@ private fun CalendarHeader(
             text = currentMonth.toDisplayString(),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Black
+            color = PharmTheme.colors.onSurface
         )
 
         IconButton(onClick = { onMonthChanged(currentMonth.plusMonths(1)) }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "다음 달",
-                tint = Black
+                tint = PharmTheme.colors.onSurface
             )
         }
     }
@@ -120,7 +117,7 @@ private fun DayOfWeekHeader() {
                 text = day,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
-                color = SecondFont,
+                color = PharmTheme.colors.secondFont,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -175,8 +172,8 @@ private fun DayCell(
 ) {
     val dotColor = when {
         dailyRecords.isEmpty() -> Color.Transparent
-        dailyRecords.all { it.record.isTaken } -> Success
-        dailyRecords.any { !it.record.isTaken } -> Warning
+        dailyRecords.all { it.record.isTaken } -> PharmTheme.colors.success
+        dailyRecords.any { !it.record.isTaken } -> PharmTheme.colors.warning
         else -> Color.Transparent
     }
 
@@ -185,7 +182,7 @@ private fun DayCell(
             .aspectRatio(1f)
             .padding(4.dp)
             .clip(CircleShape)
-            .background(if (isSelected) Primary else Color.Transparent)
+            .background(if (isSelected) PharmTheme.colors.primary else Color.Transparent)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -195,7 +192,7 @@ private fun DayCell(
         ) {
             Text(
                 text = day.toString(),
-                color = if (isSelected) White else Black,
+                color = if (isSelected) PharmTheme.colors.surface else PharmTheme.colors.onSurface,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                 fontSize = 14.sp
             )
@@ -206,9 +203,23 @@ private fun DayCell(
                     modifier = Modifier
                         .size(4.dp)
                         .clip(CircleShape)
-                        .background(if (isSelected) White else dotColor)
+                        .background(if (isSelected) PharmTheme.colors.surface else dotColor)
                 )
             }
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun HistoryCalendarSectionPreview() {
+    PharmMasterTheme {
+        HistoryCalendarSection(
+            currentMonth = YearMonth.now(),
+            recordsByDate = emptyMap(),
+            selectedDate = LocalDate.now(),
+            onMonthChanged = {},
+            onDateClick = {}
+        )
     }
 }

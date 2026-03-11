@@ -23,7 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.profile.auth.mapper.asString
 import com.moon.pharm.profile.auth.model.SignUpStep
@@ -111,7 +113,7 @@ fun SignUpScreenContent(
     onNextClick: () -> Unit
 ) {
     Scaffold(
-        containerColor = White,
+        containerColor = PharmTheme.colors.surface,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { innerPadding ->
         Column(
@@ -165,5 +167,37 @@ fun SignUpScreenContent(
                 onNextClick = onNextClick
             )
         }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun SignUpScreenContentPreview() {
+    PharmMasterTheme {
+        SignUpScreenContent(
+            uiState = SignUpUiState(
+                currentStep = SignUpStep.TYPE,
+                userType = UserType.GENERAL,
+                email = "",
+                password = "",
+                isEmailAvailable = false,
+                isEmailChecking = false,
+                nickName = "",
+                profileImageUri = null,
+                pharmacyName = "",
+                pharmacistBio = "",
+                isComplete = false
+            ),
+            snackbarHostState = SnackbarHostState(),
+            onUpdateUserType = {},
+            onUpdateEmail = {},
+            onCheckEmail = {},
+            onUpdatePassword = {},
+            onUpdateNickName = {},
+            onSearchPharmacyClick = {},
+            onUpdatePharmacistBio = {},
+            onImageClick = {},
+            onNextClick = {}
+        )
     }
 }

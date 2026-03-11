@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -31,8 +30,9 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.moon.pharm.component_ui.component.button.PharmOutlinedButton
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 
 @Composable
@@ -74,23 +74,37 @@ fun PhotoAttachmentSection(
                                 .align(Alignment.BottomStart)
                                 .size(80.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(Color.LightGray)
+                                .background(PharmTheme.colors.placeholder)
                         )
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = stringResource(R.string.consult_photo_delete_desc),
-                            tint = White,
+                            tint = PharmTheme.colors.surface,
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .size(20.dp)
                                 .clip(CircleShape)
-                                .background(Primary)
+                                .background(PharmTheme.colors.primary)
                                 .clickable { onRemoveImage(imageUrl) }
                                 .padding(4.dp)
                         )
                     }
                 }
             }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PhotoAttachmentSectionPreview() {
+    PharmMasterTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            PhotoAttachmentSection(
+                images = listOf("", ""),
+                onCameraClick = {},
+                onRemoveImage = {}
+            )
         }
     }
 }

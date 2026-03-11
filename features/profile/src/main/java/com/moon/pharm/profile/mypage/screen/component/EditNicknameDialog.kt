@@ -11,13 +11,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.moon.pharm.component_ui.theme.Primary
-import com.moon.pharm.component_ui.theme.White
-import com.moon.pharm.component_ui.theme.backgroundLight
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.profile.R
 import com.moon.pharm.component_ui.R as UiR
 
@@ -31,9 +30,9 @@ fun EditNicknameDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = backgroundLight,
-        titleContentColor = Color.Black,
-        textContentColor = Color.Black,
+        containerColor = PharmTheme.colors.background,
+        titleContentColor = PharmTheme.colors.onSurface,
+        textContentColor = PharmTheme.colors.onSurface,
         shape = RoundedCornerShape(10.dp),
         text = {
             OutlinedTextField(
@@ -42,11 +41,11 @@ fun EditNicknameDialog(
                 label = { Text(stringResource(R.string.signup_nickname_label)) },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Primary,
-                    focusedLabelColor = Primary,
-                    cursorColor = Primary,
-                    unfocusedContainerColor = White,
-                    focusedContainerColor = White
+                    focusedBorderColor = PharmTheme.colors.primary,
+                    focusedLabelColor = PharmTheme.colors.primary,
+                    cursorColor = PharmTheme.colors.primary,
+                    unfocusedContainerColor = PharmTheme.colors.surface,
+                    focusedContainerColor = PharmTheme.colors.surface
                 )
             )
         },
@@ -62,7 +61,7 @@ fun EditNicknameDialog(
             ) {
                 Text(
                     text = stringResource(UiR.string.common_confirm),
-                    color = Primary,
+                    color = PharmTheme.colors.primary,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -71,9 +70,21 @@ fun EditNicknameDialog(
             TextButton(onClick = onDismiss) {
                 Text(
                     text = stringResource(UiR.string.common_cancel),
-                    color = Primary
+                    color = PharmTheme.colors.primary
                 )
             }
         }
     )
+}
+
+@ThemePreviews
+@Composable
+private fun EditNicknameDialogPreview() {
+    PharmMasterTheme {
+        EditNicknameDialog(
+            currentNickname = "기존닉네임",
+            onDismiss = {},
+            onConfirm = {}
+        )
+    }
 }

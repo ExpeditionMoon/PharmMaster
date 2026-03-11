@@ -11,6 +11,7 @@ interface UserRepository {
     suspend fun isEmailDuplicated(email: String): Boolean
 
     fun getUser(userId: String): Flow<DataResourceResult<User>>
+    suspend fun getUserOnce(userId: String): DataResourceResult<User>
     suspend fun getFcmToken(): String
     suspend fun updateFcmToken(userId: String, token: String): DataResourceResult<Unit>
 }

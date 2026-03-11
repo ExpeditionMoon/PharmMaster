@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -22,7 +24,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.component_ui.theme.White
+import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.component_ui.theme.PharmTheme
+import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.prescription.ocr.TextRecognitionAnalyzer
 import com.moon.pharm.prescription.viewmodel.PrescriptionUiEvent
 import com.moon.pharm.prescription.viewmodel.PrescriptionViewModel
@@ -58,6 +62,25 @@ fun CameraPreviewRoute(
 fun CameraPreviewScreen(
     onTextRecognized: (String) -> Unit
 ) {
+    val isInspectionMode = LocalInspectionMode.current
+
+    if (isInspectionMode) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(androidx.compose.ui.graphics.Color.Black)
+        ) {
+            Text(
+                text = "약 봉투나 처방전을 비춰주세요 (프리뷰 모드)",
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(32.dp),
+                color = PharmTheme.colors.surface
+            )
+        }
+        return
+    }
+
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraController = remember { LifecycleCameraController(context) }
@@ -106,7 +129,17 @@ fun CameraPreviewScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(32.dp),
-            color = White
+            color = PharmTheme.colors.surface
+        )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun CameraPreviewScreenPreview() {
+    PharmMasterTheme {
+        CameraPreviewScreen(
+            onTextRecognized = {}
         )
     }
 }

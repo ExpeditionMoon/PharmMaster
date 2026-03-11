@@ -1,85 +1,105 @@
 package com.moon.pharm.component_ui.theme
 
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
-// 사용자가 정의한 핵심 색상
-val Primary = Color(0xFF1F3B58)
-val Secondary = Color(0xFF5E4B3B)
-val Tertiary = Color(0xFFB1CBDC)
-val White = Color(0xFFFFFFFF) // 기본 흰색 추가
-val Black = Color(0xFF000000) // 기본 검은색 추가
-val Background = Color(0xFFF2F4F7)
-val SecondFont = Color(0xFF767676)
-val OnSurface = Color(0xFF1F3B58)
-val Placeholder = Color(0xFFBDBDBD)
+// Primitive Colors
+private val BluePrimary = Color(0xFF1F3B58)
+private val BrownSecondary = Color(0xFF5E4B3B)
+private val BlueTertiary = Color(0xFFB1CBDC)
+private val WhiteColor = Color(0xFFFFFFFF)
+private val BlackColor = Color(0xFF000000)
+private val BackgroundColor = Color(0xFFF2F4F7)
+private val GraySecondFont = Color(0xFF767676)
+private val GrayPlaceholder = Color(0xFFBDBDBD)
+// --- 스낵바 및 상태 표시용 원시 색상 ---
+private val GreenSuccess = Color(0xFF2E7D32)
+private val GreenSuccessContainer = Color(0xFFE8F5E9)
+private val BlueInfoContainer = Color(0xFFE3F2FD)
+private val OrangeWarning = Color(0xFFF57C00)
+private val OrangeWarningContainer = Color(0xFFFFF3E0)
 
-// Material3 Color Scheme에 맞춘 매핑 (Light Theme 기준)
-/* Primary: 화면에서 가장 많이 쓰이는 주요 색상 (버튼, 활성 탭, 주요 아이콘 등) */
-val primaryLight = Primary
+// Semantic Colors
+data class PharmColorPalette(
+    val primary: Color,
+    val onPrimary: Color,
+    val primaryContainer: Color,
+    val onPrimaryContainer: Color,
 
-/* OnPrimary: Primary 색상 위에 올라가는 텍스트나 아이콘 색상 (보통 흰색) */
-val onPrimaryLight = White
+    val secondary: Color,
+    val onSecondary: Color,
+    val secondaryContainer: Color,
+    val onSecondaryContainer: Color,
 
-/* PrimaryContainer: Primary보다 연한 배경색 (강조 박스, 선택된 아이템 배경 등) */
-val primaryContainerLight = Tertiary // Primary와 어울리는 연한 톤으로 Tertiary 활용
+    val tertiary: Color,
+    val onTertiary: Color,
+    val tertiaryContainer: Color,
+    val onTertiaryContainer: Color,
 
-/* OnPrimaryContainer: PrimaryContainer 위에 올라가는 텍스트 색상 */
-val onPrimaryContainerLight = Color(0xFF001E30) // Primary보다 더 진한 텍스트
+    val error: Color,
+    val onError: Color,
+    val errorContainer: Color,
+    val onErrorContainer: Color,
 
-/* Secondary: Primary 다음으로 강조하고 싶은 요소 (FAB, 보조 버튼, 선택 컨트롤 등) */
-val secondaryLight = Secondary
+    val background: Color,
+    val onBackground: Color,
+    val surface: Color,
+    val onSurface: Color,
+    val placeholder: Color,
+    val secondFont: Color,
 
-/* OnSecondary: Secondary 색상 위에 올라가는 텍스트나 아이콘 색상 */
-val onSecondaryLight = White
+    // 커스텀 상태 색상
+    val success: Color,
+    val successContainer: Color,
+    val infoContainer: Color,
+    val onInfoContainer: Color,
+    val warning: Color,
+    val warningContainer: Color
+)
 
-/* SecondaryContainer: Secondary보다 연한 배경색 (보조 강조 박스 등) */
-val secondaryContainerLight = Color(0xFFE6DED5) // Secondary의 연한 파생색 (임의 생성)
+// 라이트 모드
+val LightColorPalette = PharmColorPalette(
+    primary = BluePrimary,
+    onPrimary = WhiteColor,
+    primaryContainer = BlueTertiary,
+    onPrimaryContainer = Color(0xFF001E30),
 
-/* OnSecondaryContainer: SecondaryContainer 위에 올라가는 텍스트 색상 */
-val onSecondaryContainerLight = Color(0xFF24190F) // Secondary보다 진한 텍스트
+    secondary = BrownSecondary,
+    onSecondary = WhiteColor,
+    secondaryContainer = Color(0xFFE6DED5),
+    onSecondaryContainer = Color(0xFF24190F),
 
-/* Tertiary: Primary, Secondary와 대조를 이루거나 포인트를 줄 때 사용 (차트, 강조 등) */
-val tertiaryLight = Tertiary
+    tertiary = BlueTertiary,
+    onTertiary = Color(0xFF00344D),
+    tertiaryContainer = Color(0xFFCDE6F6),
+    onTertiaryContainer = Color(0xFF001E30),
 
-/* OnTertiary: Tertiary 색상 위에 올라가는 텍스트나 아이콘 색상 */
-val onTertiaryLight = Color(0xFF00344D) // Tertiary 위에서의 텍스트
+    error = Color(0xFFBA1A1A),
+    onError = WhiteColor,
+    errorContainer = Color(0xFFFFDAD6),
+    onErrorContainer = Color(0xFF410002),
 
-/* TertiaryContainer: Tertiary보다 연한 배경색 */
-val tertiaryContainerLight = Color(0xFFCDE6F6) // 더 연한 Tertiary
+    background = BackgroundColor,
+    onBackground = BlackColor,
+    surface = WhiteColor,
+    onSurface = BlackColor,
+    placeholder = GrayPlaceholder,
+    secondFont = GraySecondFont,
 
-/* OnTertiaryContainer: TertiaryContainer 위에 올라가는 텍스트 색상 */
-val onTertiaryContainerLight = Color(0xFF001E30)
+    success = GreenSuccess,
+    successContainer = GreenSuccessContainer,
+    infoContainer = BlueInfoContainer,
+    onInfoContainer = BluePrimary,
+    warning = OrangeWarning,
+    warningContainer = OrangeWarningContainer
+)
 
-/* Error: 오류 상태를 나타내는 색상 (경고 문구, 삭제 버튼 등) */
-val errorLight = Color(0xFFBA1A1A)
+// 다크 모드
+val DarkColorPalette = LightColorPalette.copy(
+    // TODO: 향후 다크 모드용 색상으로 덮어쓰기
+)
 
-/* OnError: Error 색상 위에 올라가는 텍스트 색상 */
-val onErrorLight = White
-
-/* ErrorContainer: Error보다 연한 배경색 (오류 메시지 박스 배경 등) */
-val errorContainerLight = Color(0xFFFFDAD6)
-
-/* OnErrorContainer: ErrorContainer 위에 올라가는 텍스트 색상 */
-val onErrorContainerLight = Color(0xFF410002)
-
-/* Background: 앱의 전체적인 배경색 (Scaffold의 기본 배경) */
-val backgroundLight = Background // 배경색
-
-/* OnBackground: Background 위에 올라가는 텍스트나 아이콘 색상 (일반 텍스트) */
-val onBackgroundLight = Black
-
-/* Surface: 카드, 시트, 메뉴 등 표면 요소의 배경색 */
-val surfaceLight = White
-
-/* OnSurface: Surface 위에 올라가는 텍스트나 아이콘 색상 */
-val onSurfaceLight = Black
-
-/* --- 스낵바 및 상태 표시용 추가 색상 --- */
-val Success = Color(0xFF2E7D32)       // 아이콘/텍스트용 진한 녹색
-val SuccessContainer = Color(0xFFE8F5E9) // 배경용 아주 연한 녹색
-
-val InfoContainer = Color(0xFFE3F2FD) // 배경용 아주 연한 하늘색
-val OnInfoContainer = Primary // 텍스트용
-
-val Warning = Color(0xFFF57C00)
-val WarningContainer = Color(0xFFFFF3E0)
+// CompositionLocal
+val LocalPharmColors = staticCompositionLocalOf<PharmColorPalette> {
+    error("PharmColors not provided. Did you wrap your content in PharmMasterTheme?")
+}
