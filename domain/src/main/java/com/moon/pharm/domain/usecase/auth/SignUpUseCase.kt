@@ -5,9 +5,9 @@ import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.domain.repository.AuthRepository
+import com.moon.pharm.domain.repository.PharmacistRepository
+import com.moon.pharm.domain.repository.PharmacyRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.pharmacist.SavePharmacistUseCase
-import com.moon.pharm.domain.usecase.pharmacy.SavePharmacyUseCase
 import com.moon.pharm.domain.usecase.user.SaveUserUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,8 +16,8 @@ import javax.inject.Inject
 class SignUpUseCase @Inject constructor(
     private val authRepository: AuthRepository,
     private val saveUserUseCase: SaveUserUseCase,
-    private val savePharmacyUseCase: SavePharmacyUseCase,
-    private val savePharmacistUseCase: SavePharmacistUseCase
+    private val pharmacyRepository: PharmacyRepository,
+    private val pharmacistRepository: PharmacistRepository
 ) {
     operator fun invoke(
         user: User,
@@ -52,13 +52,13 @@ class SignUpUseCase @Inject constructor(
 
             if (user.userType == UserType.PHARMACIST && pharmacist != null) {
                 if (pharmacy != null) {
-                    val savePharmacyResult = savePharmacyUseCase(pharmacy)
+                    val savePharmacyResult = pharmacyRepository.savePharmacy(pharmacy)
                     if (savePharmacyResult is DataResourceResult.Failure) {
                         throw Exception("약국 저장 실패: ${savePharmacyResult.exception.message}")
                     }
                 }
                 val pharmacistWithId = pharmacist.copy(userId = uid)
-                val savePharmResult = savePharmacistUseCase(pharmacistWithId)
+                val savePharmResult = pharmacistRepository.savePharmacist(pharmacistWithId)
 
                 if (savePharmResult is DataResourceResult.Failure) {
                     throw savePharmResult.exception

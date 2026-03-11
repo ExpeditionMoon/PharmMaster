@@ -2,8 +2,8 @@ package com.moon.pharm.profile.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.auth.LoginUseCase
 import com.moon.pharm.domain.usecase.auth.ValidateLoginFormUseCase
 import com.moon.pharm.domain.usecase.user.SyncFcmTokenUseCase
 import com.moon.pharm.profile.auth.model.LoginUiMessage
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase,
+    private val authRepository: AuthRepository,
     private val validateLoginFormUseCase: ValidateLoginFormUseCase,
     private val syncFcmTokenUseCase: SyncFcmTokenUseCase
 ) : ViewModel() {
@@ -52,7 +52,7 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val result = loginUseCase(currentState.email, currentState.password)
+            val result = authRepository.login(currentState.email, currentState.password)
             if (result is DataResourceResult.Success) { syncFcmTokenUseCase() }
             _uiState.update { state ->
                 when (result) {

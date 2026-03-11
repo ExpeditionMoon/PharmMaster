@@ -10,11 +10,11 @@ import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.model.medication.MedicationProgress
 import com.moon.pharm.domain.model.medication.MedicationTimeGroup
+import com.moon.pharm.domain.repository.AuthRepository
+import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.medication.GetDailyIntakeRecordsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
-import com.moon.pharm.domain.usecase.medication.SaveMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
 import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
@@ -43,10 +43,10 @@ import kotlin.reflect.typeOf
 class MedicationViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getMedicationsUseCase: GetMedicationsUseCase,
-    private val saveMedicationUseCase: SaveMedicationUseCase,
+    private val medicationRepository: MedicationRepository,
     private val getDailyIntakeRecordsUseCase: GetDailyIntakeRecordsUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
-    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
+    private val authRepository: AuthRepository,
     private val validateMedicationEntryUseCase: ValidateMedicationEntryUseCase,
     private val alarmScheduler: AlarmScheduler,
 ) : ViewModel() {
@@ -220,7 +220,7 @@ class MedicationViewModel @Inject constructor(
 
     // region 3. Actions
     private fun fetchMedicationList() {
-        val userId = getCurrentUserIdUseCase() ?: return
+        val userId = authRepository.getCurrentUserId() ?: return
         val todayDate = LocalDate.now().toString()
 
         viewModelScope.launch {
@@ -310,7 +310,7 @@ class MedicationViewModel @Inject constructor(
             return
         }
 
-        val userId = getCurrentUserIdUseCase()
+        val userId = authRepository.getCurrentUserId()
         if (userId == null) {
             _uiState.update { it.copy(userMessage = MedicationUiMessage.NotLoggedIn) }
             return
@@ -324,7 +324,7 @@ class MedicationViewModel @Inject constructor(
             forms.forEach { form ->
                 val newItem = MedicationUiMapper.toDomain(form, userId)
 
-                val result = saveMedicationUseCase(newItem)
+                val result = medicationRepository.saveMedication(newItem)
                     .filter { it !is DataResourceResult.Loading }
                     .first()
 
@@ -353,7 +353,7 @@ class MedicationViewModel @Inject constructor(
     }
 
     fun toggleMedicationTaken(medicationId: String, scheduleId: String) {
-        val userId = getCurrentUserIdUseCase() ?: return
+        val userId = authRepository.getCurrentUserId() ?: return
 
         val currentList = _uiState.value.medicationList
         val targetItem = currentList.find {

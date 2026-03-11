@@ -4,15 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.model.ConsultUiMessage
+import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
-import com.moon.pharm.domain.usecase.consult.SendAnswerNotificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,7 +20,7 @@ import javax.inject.Inject
 class ConsultDetailViewModel @Inject constructor(
     private val consultUseCases: ConsultUseCases,
     private val userRepository: UserRepository,
-    private val sendAnswerNotificationUseCase: SendAnswerNotificationUseCase,
+    private val consultRepository: ConsultRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ConsultDetailUiState())
@@ -95,12 +94,12 @@ class ConsultDetailViewModel @Inject constructor(
 
     private fun sendNotificationToUser(userId: String, consultId: String) {
         viewModelScope.launch {
-            val userResult = userRepository.getUser(userId).first()
+            val userResult = userRepository.getUserOnce(userId)
 
             if (userResult is DataResourceResult.Success) {
                 val token = userResult.resultData.fcmToken
                 if (!token.isNullOrEmpty()) {
-                    sendAnswerNotificationUseCase(token, consultId)
+                    consultRepository.sendAnswerNotification(token, consultId)
                 }
             }
         }

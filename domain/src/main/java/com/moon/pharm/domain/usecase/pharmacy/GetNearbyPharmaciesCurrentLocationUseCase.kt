@@ -2,8 +2,9 @@ package com.moon.pharm.domain.usecase.pharmacy
 
 import com.moon.pharm.domain.model.map.GeoLocation
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
+import com.moon.pharm.domain.repository.LocationRepository
+import com.moon.pharm.domain.repository.PharmacyRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.location.GetCurrentLocationUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -11,15 +12,15 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class GetNearbyPharmaciesCurrentLocationUseCase @Inject constructor(
-    private val getCurrentLocationUseCase: GetCurrentLocationUseCase,
-    private val searchNearbyPharmaciesUseCase: SearchNearbyPharmaciesUseCase
+    private val locationRepository: LocationRepository,
+    private val pharmacyRepository: PharmacyRepository
 ) {
     data class Result(val location: GeoLocation, val pharmacies: List<Pharmacy>)
 
     operator fun invoke(): Flow<DataResourceResult<Result>> = flow {
         emit(DataResourceResult.Loading)
 
-        val locationResult = getCurrentLocationUseCase()
+        val locationResult = locationRepository.getCurrentLocation()
 
         val myLocation = if (locationResult is DataResourceResult.Success) {
             val (lat, lng) = locationResult.resultData
@@ -28,7 +29,7 @@ class GetNearbyPharmaciesCurrentLocationUseCase @Inject constructor(
             GeoLocation.DEFAULT
         }
 
-        searchNearbyPharmaciesUseCase(
+        pharmacyRepository.searchNearbyPharmacies(
             myLocation.lat,
             myLocation.lng
         ).collectLatest { searchResult ->

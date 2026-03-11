@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 class MedicationRepositoryImpl @Inject constructor(
@@ -34,10 +35,15 @@ class MedicationRepositoryImpl @Inject constructor(
         operation: suspend () -> Unit
     ): Flow<DataResourceResult<Unit>> = flow {
         emit(DataResourceResult.Loading)
-        operation()
-        emit(DataResourceResult.Success(Unit))
-    }.catch { e ->
-        emit(DataResourceResult.Failure(e.toMedicationException()))
+        val result = runCatching {
+            withTimeout(10000L) {
+                operation()
+            }
+        }.fold(
+            onSuccess = { DataResourceResult.Success(Unit) },
+            onFailure = { e -> DataResourceResult.Failure(e.toMedicationException()) }
+        )
+        emit(result)
     }.flowOn(ioDispatcher)
 
     private fun <T> Flow<T>.asDataResourceResult(): Flow<DataResourceResult<T>> {
