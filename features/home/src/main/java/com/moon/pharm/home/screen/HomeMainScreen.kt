@@ -65,7 +65,7 @@ fun HomeMainScreen(
                     navigationType = TopBarNavigationType.Menu,
                     isLogoTitle = true,
                     actions = listOf(
-                        TopBarAction(icon = Icons.Filled.Search, onClick = {}),
+                        TopBarAction(icon = Icons.Filled.Search, onClick = {navController.navigate(ContentNavigationRoute.Search)}),
                         TopBarAction(icon = Icons.Filled.Notifications, onClick = {})
                     )
                 )

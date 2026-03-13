@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface ContentNavigationRoute : PharmNavigation {
+    // 공통 및 인증
     @Serializable
     data object MainBase : ContentNavigationRoute
     @Serializable
@@ -13,6 +14,8 @@ sealed interface ContentNavigationRoute : PharmNavigation {
     data object SignUpScreen : ContentNavigationRoute
     @Serializable
     data object HomeTab : ContentNavigationRoute
+
+    // 복약 관리
     @Serializable
     data object MedicationTab : ContentNavigationRoute
     @Serializable
@@ -22,6 +25,7 @@ sealed interface ContentNavigationRoute : PharmNavigation {
     @Serializable
     data object MedicationTabHistoryScreen : ContentNavigationRoute
 
+    // 상담
     @Serializable
     data object ConsultGraph : ContentNavigationRoute
     @Serializable
@@ -37,6 +41,7 @@ sealed interface ContentNavigationRoute : PharmNavigation {
     @Serializable
     data class ConsultTabDetailScreen(val id: String) : ContentNavigationRoute
 
+    // 내정보 및 기타
     @Serializable
     data object ProfileTab : ContentNavigationRoute
     @Serializable
@@ -45,4 +50,8 @@ sealed interface ContentNavigationRoute : PharmNavigation {
     data object PrescriptionCapture : ContentNavigationRoute
     @Serializable
     data object PrescriptionCamera : ContentNavigationRoute
+
+    // 약 검색
+    @Serializable
+    data object Search : ContentNavigationRoute
 }

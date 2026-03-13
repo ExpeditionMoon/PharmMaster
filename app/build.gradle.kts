@@ -58,6 +58,7 @@ dependencies {
     implementation(project(":features:consult"))
     implementation(project(":features:profile"))
     implementation(project(":features:prescription"))
+    implementation(project(":features:search"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.bundles.runtime.lifecycle.libraries)

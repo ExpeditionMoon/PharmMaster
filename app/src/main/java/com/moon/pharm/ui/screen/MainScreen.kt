@@ -25,6 +25,7 @@ import com.moon.pharm.consult.navigation.consultNavGraph
 import com.moon.pharm.home.navigation.homeNavGraph
 import com.moon.pharm.prescription.navigation.prescriptionNavGraph
 import com.moon.pharm.profile.navigation.profileNavGraph
+import com.moon.pharm.search.navigation.searchNavGraph
 import com.moon.pharm.ui.navigation.BottomAppBarItem
 import kotlinx.coroutines.flow.collectLatest
 
@@ -53,7 +54,8 @@ fun MainScreen(
     val navBackStackEntry by mainNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val isFullScreen = currentRoute?.contains("PrescriptionCapture") == true
+    val isFullScreen = currentRoute?.contains("PrescriptionCapture") == true ||
+            currentRoute?.contains("Search") == true
 
     var isMapMode by remember { mutableStateOf(false) }
     val shouldShowBars = !isFullScreen && !isMapMode
@@ -97,6 +99,7 @@ fun MainScreen(
                 consultNavGraph(mainNavController, onMapModeChanged = { isMapVisible -> isMapMode = isMapVisible })
                 profileNavGraph(mainNavController, onLogout = onLogout)
                 prescriptionNavGraph(mainNavController)
+                searchNavGraph(mainNavController)
             }
         }
     }

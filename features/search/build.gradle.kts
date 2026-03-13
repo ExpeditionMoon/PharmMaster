@@ -52,6 +52,10 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose.libs)
 
+    // Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
     // Hilt Core
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
