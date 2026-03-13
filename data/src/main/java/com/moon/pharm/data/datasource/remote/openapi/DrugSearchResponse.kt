@@ -1,5 +1,6 @@
 package com.moon.pharm.data.datasource.remote.openapi
 
+import com.moon.pharm.domain.model.drug.Drug
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -33,3 +34,15 @@ data class DrugSearchItem(
     @Json(name = "intrcQesitm") val intrcQesitm: String?,
     @Json(name = "itemImage") val itemImage: String?
 )
+
+// 매퍼
+fun DrugSearchItem.toDomain(): Drug {
+    return Drug(
+        itemSeq = this.itemSeq ?: "",
+        itemName = this.itemName ?: OpenApiConst.DEFAULT_ITEM_NAME,
+        companyName = this.entpName ?: OpenApiConst.DEFAULT_COMPANY_NAME,
+        efficacy = this.efcyQesitm?.removeHtmlTags() ?: OpenApiConst.DEFAULT_EFFICACY,
+        interaction = this.intrcQesitm?.removeHtmlTags() ?: OpenApiConst.DEFAULT_INTERACTION,
+        imageUrl = this.itemImage ?: ""
+    )
+}
