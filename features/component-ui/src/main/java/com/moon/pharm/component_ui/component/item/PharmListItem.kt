@@ -1,6 +1,7 @@
 package com.moon.pharm.component_ui.component.item
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,8 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
@@ -34,6 +37,9 @@ import com.moon.pharm.component_ui.util.ThemePreviews
 @Composable
 fun PharmListItem(
     modifier: Modifier = Modifier,
+    containerColor: Color = PharmTheme.colors.surface,
+    borderColor: Color? = null,
+    contentPadding: Dp = 16.dp,
     leading: @Composable (() -> Unit)? = null,
     headline: String,
     subhead: String? = null,
@@ -41,13 +47,18 @@ fun PharmListItem(
     trailing: @Composable (() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ) {
+    val borderModifier = if (borderColor != null) {
+        Modifier.border(1.dp, borderColor, RoundedCornerShape(10.dp))
+    } else Modifier
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
-            .background(PharmTheme.colors.surface)
+            .then(borderModifier)
+            .background(containerColor)
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
-            .padding(16.dp),
+            .padding(contentPadding),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (leading != null) {
