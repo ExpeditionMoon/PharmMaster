@@ -2,13 +2,8 @@ package com.moon.pharm.component_ui.component.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -44,15 +39,9 @@ fun PharmacistListItem(
 ) {
     val textToDisplay = btnText ?: stringResource(R.string.btn_select)
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(PharmTheme.colors.surface, RoundedCornerShape(10.dp))
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+    PharmListItem(
+        modifier = modifier,
+        leading = {
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -68,38 +57,27 @@ fun PharmacistListItem(
                     modifier = Modifier.size(24.dp)
                 )
             }
-            Spacer(modifier = Modifier.width(10.dp))
-            Column {
+        },
+        headline = pharmacist.name,
+        subhead = pharmacist.bio,
+        trailing = {
+            Button(
+                onClick = { onSelect(pharmacist) },
+                colors = ButtonDefaults.buttonColors(containerColor = PharmTheme.colors.primary),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier
+                    .height(36.dp)
+                    .width(64.dp),
+                contentPadding = PaddingValues(0.dp)
+            ) {
                 Text(
-                    text = pharmacist.name,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = PharmTheme.colors.onSurface
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = pharmacist.bio,
+                    text = textToDisplay,
                     fontSize = 13.sp,
-                    color = PharmTheme.colors.secondFont
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
-        Button(
-            onClick = { onSelect(pharmacist) },
-            colors = ButtonDefaults.buttonColors(containerColor = PharmTheme.colors.primary),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier
-                .height(36.dp)
-                .width(64.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            Text(
-                text = textToDisplay,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
-    }
+    )
 }
 
 @ThemePreviews

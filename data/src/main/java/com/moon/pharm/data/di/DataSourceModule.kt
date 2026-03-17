@@ -2,6 +2,7 @@ package com.moon.pharm.data.di
 
 import com.moon.pharm.data.datasource.AuthDataSource
 import com.moon.pharm.data.datasource.ConsultDataSource
+import com.moon.pharm.data.datasource.DrugSearchDataSource
 import com.moon.pharm.data.datasource.ImageDataSource
 import com.moon.pharm.data.datasource.MedicationDataSource
 import com.moon.pharm.data.datasource.PharmacistDataSource
@@ -15,6 +16,8 @@ import com.moon.pharm.data.datasource.remote.firebase.FirestoreMedicationDataSou
 import com.moon.pharm.data.datasource.remote.firebase.FirestorePharmacistDataSourceImpl
 import com.moon.pharm.data.datasource.remote.firebase.FirestorePharmacyDataSourceImpl
 import com.moon.pharm.data.datasource.remote.firebase.FirestoreUserDataSourceImpl
+import com.moon.pharm.data.datasource.remote.kakao.KakaoPharmacyDataSourceImpl
+import com.moon.pharm.data.datasource.remote.openapi.OpenApiDrugDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -58,7 +61,7 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindPharmacySearchDataSource(
-        impl: com.moon.pharm.data.datasource.remote.kakao.KakaoPharmacyDataSourceImpl
+        impl: KakaoPharmacyDataSourceImpl
     ): PharmacySearchDataSource
 
     @Binds
@@ -72,4 +75,10 @@ abstract class DataSourceModule {
     abstract fun bindImageDataSource(
         impl: FirebaseImageDataSourceImpl
     ): ImageDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindDrugSearchDataSource(
+        impl: OpenApiDrugDataSourceImpl
+    ): DrugSearchDataSource
 }

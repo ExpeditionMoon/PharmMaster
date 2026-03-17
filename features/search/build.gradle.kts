@@ -1,28 +1,23 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-
-    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.kotlin.android.ksp)
-    alias(libs.plugins.secrets.gradle.plugin)
 }
 
 android {
-    namespace = "com.moon.pharm"
+    namespace = "com.moon.pharm.search"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.moon.pharm"
         minSdk = 26
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -39,39 +34,23 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
-        buildConfig = true
         compose = true
     }
 }
-kotlin {
+kotlin{
     jvmToolchain(21)
-}
-secrets {
-    propertiesFileName = "secret.properties"
 }
 
 dependencies {
     implementation(project(":domain"))
-    implementation(project(":data"))
-    implementation(project(":features:home"))
     implementation(project(":features:component-ui"))
-    implementation(project(":features:consult"))
-    implementation(project(":features:profile"))
-    implementation(project(":features:prescription"))
-    implementation(project(":features:search"))
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.bundles.runtime.lifecycle.libraries)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose.libs)
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.messaging)
-
-    // Splash
-    implementation(libs.androidx.core.splashscreen)
 
     // Coil
     implementation(libs.coil.compose)
@@ -80,14 +59,9 @@ dependencies {
     // Hilt Core
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    // Hilt Navigation
     implementation(libs.hilt.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

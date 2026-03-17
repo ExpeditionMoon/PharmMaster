@@ -4,6 +4,8 @@ import com.moon.pharm.data.BuildConfig
 import com.moon.pharm.data.datasource.remote.fcm.FcmApi
 import com.moon.pharm.data.datasource.remote.kakao.KakaoApiConst
 import com.moon.pharm.data.datasource.remote.kakao.KakaoApiService
+import com.moon.pharm.data.datasource.remote.openapi.OpenApiConst
+import com.moon.pharm.data.datasource.remote.openapi.OpenApiService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -66,5 +68,19 @@ object NetworkModule {
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create(FcmApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOpenApiService(
+        moshi: Moshi,
+        client: OkHttpClient
+    ): OpenApiService {
+        return Retrofit.Builder()
+            .baseUrl(OpenApiConst.BASE_URL)
+            .client(client)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+            .create(OpenApiService::class.java)
     }
 }
