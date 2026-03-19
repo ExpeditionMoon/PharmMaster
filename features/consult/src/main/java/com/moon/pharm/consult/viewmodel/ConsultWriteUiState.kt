@@ -18,5 +18,7 @@ data class ConsultWriteUiState(
     val searchResults: List<Pharmacy> = emptyList(),
     val selectedPharmacy: Pharmacy? = null,
     val availablePharmacists: List<Pharmacist> = emptyList(),
-    val selectedPharmacistId: String? = null
+    val selectedPharmacistId: String? = null,
+
+    val isEditMode: Boolean = false
 )

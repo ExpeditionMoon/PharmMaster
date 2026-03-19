@@ -19,6 +19,7 @@ import com.moon.pharm.consult.R
 fun ConsultWriteBottomBar(
     isPublic: Boolean,
     isButtonEnabled: Boolean,
+    isEditMode: Boolean,
     onVisibilityChange: (Boolean) -> Unit,
     onNextClick: () -> Unit
 ) {
@@ -31,7 +32,7 @@ fun ConsultWriteBottomBar(
         Spacer(modifier = Modifier.height(10.dp))
 
         PharmPrimaryButton(
-            text = stringResource(R.string.consult_button_next),
+            text = if (isEditMode) stringResource(R.string.consult_button_edit) else stringResource(R.string.consult_button_next),
             onClick = onNextClick,
             enabled = isButtonEnabled
         )
@@ -46,6 +47,7 @@ private fun ConsultWriteBottomBarPreview() {
             ConsultWriteBottomBar(
                 isPublic = true,
                 isButtonEnabled = true,
+                isEditMode = true,
                 onVisibilityChange = {},
                 onNextClick = {}
             )

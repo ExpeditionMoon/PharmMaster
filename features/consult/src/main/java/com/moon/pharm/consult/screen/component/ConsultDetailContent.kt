@@ -34,9 +34,16 @@ fun ConsultDetailContent(
     pharmacistImageUrl: String?,
 
     isPharmacistMode: Boolean = false,
+    isEditingAnswer: Boolean = false,
     answerInput: String = "",
     onAnswerChange: (String) -> Unit = {},
-    onSubmitAnswer: () -> Unit = {}
+    onSubmitAnswer: () -> Unit = {},
+
+    currentUserId: String?,
+    onEditQuestion: () -> Unit = {},
+    onDeleteQuestion: () -> Unit = {},
+    onEditAnswer: () -> Unit = {},
+    onDeleteAnswer: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -51,21 +58,39 @@ fun ConsultDetailContent(
                     .padding(horizontal = 24.dp, vertical = 20.dp)
             ) {
                 item {
-                    QuestionSection(item)
+                    QuestionSection(
+                        item = item,
+                        currentUserId = currentUserId,
+                        onEditClick = onEditQuestion,
+                        onDeleteClick = onDeleteQuestion)
                     Spacer(modifier = Modifier.height(24.dp))
                 }
                 item {
                     if (item.status == ConsultStatus.COMPLETED && item.answer != null) {
-                        AnswerSection(
-                            pharmacist = pharmacist,
-                            pharmacistImageUrl = pharmacistImageUrl,
-                            item = item
-                        )
+                        if (isEditingAnswer) {
+                            Spacer(modifier = Modifier.height(20.dp))
+                            PharmacistAnswerInputSection(
+                                input = answerInput,
+                                isEditMode = true,
+                                onValueChange = onAnswerChange,
+                                onSubmit = onSubmitAnswer
+                            )
+                        } else {
+                            AnswerSection(
+                                pharmacist = pharmacist,
+                                pharmacistImageUrl = pharmacistImageUrl,
+                                item = item,
+                                currentUserId = currentUserId,
+                                onEditClick = onEditAnswer,
+                                onDeleteClick = onDeleteAnswer
+                            )
+                        }
                     } else if (item.status == ConsultStatus.WAITING) {
                         Spacer(modifier = Modifier.height(20.dp))
                         if (isPharmacistMode) {
                             PharmacistAnswerInputSection(
                                 input = answerInput,
+                                isEditMode = false,
                                 onValueChange = onAnswerChange,
                                 onSubmit = onSubmitAnswer
                             )
@@ -101,9 +126,25 @@ private fun ConsultDetailContentPreview() {
     PharmMasterTheme {
         ConsultDetailContent(
             isLoading = false,
-            item = ConsultItem(id = "1", userId = "u1", pharmacistId = "p1", nickName = "질문자", title = "두통약 문의", content = "어떻게 먹나요?", isPublic = true, status = ConsultStatus.WAITING, createdAt = System.currentTimeMillis()),
+            item = ConsultItem(
+                id = "1",
+                userId = "u1",
+                pharmacistId = "p1",
+                nickName = "질문자",
+                title = "두통약 문의",
+                content = "어떻게 먹나요?",
+                isPublic = true,
+                status = ConsultStatus.WAITING,
+                createdAt = System.currentTimeMillis()
+            ),
             pharmacist = null,
-            pharmacistImageUrl = null
+            pharmacistImageUrl = null,
+
+            currentUserId = "u1",
+            onEditQuestion = {},
+            onDeleteQuestion = {},
+            onEditAnswer = {},
+            onDeleteAnswer = {}
         )
     }
 }

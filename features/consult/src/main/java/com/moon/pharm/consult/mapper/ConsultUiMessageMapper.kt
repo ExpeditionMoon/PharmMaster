@@ -12,6 +12,9 @@ fun ConsultUiMessage.asString(): String {
         ConsultUiMessage.TitleTooShort -> stringResource(R.string.consult_error_title_short)
         ConsultUiMessage.PharmacistRequired -> stringResource(R.string.consult_error_pharmacist_required)
         ConsultUiMessage.CreateFailed -> stringResource(R.string.consult_create_failed)
+        ConsultUiMessage.ConsultUpdateSuccess -> stringResource(R.string.consult_update_success)
+        ConsultUiMessage.ConsultDeleteSuccess -> stringResource(R.string.consult_delete_success)
         ConsultUiMessage.AnswerRegisterSuccess -> stringResource(R.string.consult_answer_success)
+        ConsultUiMessage.AnswerDeleteSuccess ->stringResource(R.string.consult_delete_success)
     }
 }

@@ -11,7 +11,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,11 +38,18 @@ fun ConsultWriteScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    var currentSnackbarType by remember { mutableStateOf(SnackbarType.INFO) }
     val userMessage = uiState.userMessage
     val messageText = (userMessage as? ConsultUiMessage)?.asString()
 
     LaunchedEffect(userMessage) {
         if (userMessage != null && messageText != null) {
+            currentSnackbarType = when (userMessage) {
+                is ConsultUiMessage.AnswerRegisterSuccess,
+                is ConsultUiMessage.ConsultDeleteSuccess,
+                is ConsultUiMessage.AnswerDeleteSuccess -> SnackbarType.INFO
+                else -> SnackbarType.ERROR
+            }
             snackbarHostState.showSnackbar(messageText)
             viewModel.userMessageShown()
         }
@@ -51,6 +60,9 @@ fun ConsultWriteScreen(
             when (event) {
                 is ConsultWriteViewModel.WriteEvent.MoveToPharmacist -> {
                     navController.navigate(ContentNavigationRoute.ConsultTabPharmacistScreen)
+                }
+                is ConsultWriteViewModel.WriteEvent.UpdateSuccess -> {
+                    navController.navigateUp()
                 }
             }
         }
@@ -78,7 +90,7 @@ fun ConsultWriteScreen(
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
-                CustomSnackbar(snackbarData = data, type = SnackbarType.ERROR)
+                CustomSnackbar(snackbarData = data, type = currentSnackbarType)
             }
         }
     ) { innerPadding ->
@@ -89,6 +101,7 @@ fun ConsultWriteScreen(
                 images = uiState.images,
                 isPublic = uiState.isPublic,
                 isButtonEnabled = isFormValid,
+                isEditMode = uiState.isEditMode,
                 onTitleChange = viewModel::onTitleChanged,
                 onContentChange = viewModel::onContentChanged,
                 onImageRemove = { removedUrl ->

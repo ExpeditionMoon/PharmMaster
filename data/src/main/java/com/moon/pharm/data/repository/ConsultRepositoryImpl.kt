@@ -92,6 +92,16 @@ class ConsultRepositoryImpl @Inject constructor(
             .asDataResourceResult()
     }
 
+    override fun updateConsult(
+        consultId: String, title: String, content: String, isPublic: Boolean
+    ): Flow<DataResourceResult<Unit>> = wrapOperation {
+        dataSource.updateConsult(consultId, title, content, isPublic)
+    }
+
+    override fun deleteConsult(consultId: String): Flow<DataResourceResult<Unit>> = wrapOperation {
+        dataSource.deleteConsult(consultId)
+    }
+
     override fun getMyAnsweredConsultList(userId: String): Flow<DataResourceResult<List<ConsultItem>>> {
         return dataSource.getMyAnsweredConsults(userId)
             .map { dtoList -> dtoList.map { it.toDomain() } }
@@ -105,6 +115,10 @@ class ConsultRepositoryImpl @Inject constructor(
         val answerDto = answer.toDto()
         val updatedDto = dataSource.updateConsultAnswer(consultId, answerDto)
         updatedDto.toDomain()
+    }
+
+    override fun deleteConsultAnswer(consultId: String): Flow<DataResourceResult<Unit>> = wrapOperation {
+        dataSource.deleteConsultAnswer(consultId)
     }
 
     override suspend fun uploadImage(uri: String, userId: String): String {
