@@ -31,7 +31,8 @@ import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
 @Composable
 fun MedicationGroupItem(
     group: MedicationTimeGroup,
-    onTakeClick: (TodayMedicationUiModel) -> Unit
+    onTakeClick: (TodayMedicationUiModel) -> Unit,
+    onDeleteClick: (String) -> Unit
 ) {
     val displayTime = group.time?.toLongOrNull()?.toDisplayTimeString() ?: group.time
 
@@ -59,7 +60,7 @@ fun MedicationGroupItem(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             group.items.forEach { item ->
-                MedicationItemCard(item = item, onTakeClick = onTakeClick)
+                MedicationItemCard(item = item, onTakeClick = onTakeClick, onDeleteClick = onDeleteClick)
             }
         }
     }
@@ -87,7 +88,8 @@ private fun MedicationGroupItemPreview() {
                         ),
                     )
                 ),
-                onTakeClick = {}
+                onTakeClick = {},
+                onDeleteClick = {}
             )
         }
     }

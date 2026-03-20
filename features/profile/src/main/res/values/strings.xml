@@ -106,4 +106,14 @@
 
     <string name="medication_time_label">%1$s 복용</string>
     <string name="medication_progress_today">오늘 복용 %1$d/%2$d회 완료</string>
+
+    <string name="medication_history_title">나의 복약 기록</string>
+    <string name="medication_history_detail_title">%1$s 복약 상세</string>
+    <string name="medication_history_empty">복약 기록이 없습니다.</string>
+
+    <string name="medication_delete">삭제하기</string>
+    <string name="medication_delete_dialog_title">복약 삭제</string>
+    <string name="medication_delete_dialog_content">이 약을 삭제하시겠습니까?\n 묶음 설정된 모든 시간대의 스케줄이 함께 삭제됩니다.</string>
+    <string name="medication_option_menu_desc">옵션 메뉴</string>
+    <string name="medication_delete_desc">삭제</string>
 </resources>

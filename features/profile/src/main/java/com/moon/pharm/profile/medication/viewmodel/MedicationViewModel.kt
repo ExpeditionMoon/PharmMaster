@@ -202,6 +202,7 @@ class MedicationViewModel @Inject constructor(
 
             // 2. 주요 비즈니스 로직
             MedicationUiEvent.SaveAllMedications -> saveAllMedications()
+            is MedicationUiEvent.DeleteMedication -> deleteMedication(event.medicationId)
             is MedicationUiEvent.ToggleTaken -> toggleMedicationTaken(
                 medicationId = event.medicationId,
                 scheduleId = event.scheduleId
@@ -398,6 +399,19 @@ class MedicationViewModel @Inject constructor(
             ).collectLatest { result ->
                 if (result is DataResourceResult.Failure) {
                     result.exception.printStackTrace()
+                }
+            }
+        }
+    }
+
+    private fun deleteMedication(medicationId: String) {
+        viewModelScope.launch {
+            medicationRepository.deleteMedication(medicationId).collectLatest { result ->
+                when (result) {
+                    is DataResourceResult.Failure -> {
+                        result.exception.printStackTrace()
+                    }
+                    else -> { }
                 }
             }
         }
