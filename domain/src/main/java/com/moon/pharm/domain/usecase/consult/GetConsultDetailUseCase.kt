@@ -18,7 +18,8 @@ import javax.inject.Inject
 data class ConsultDetailResult(
     val consult: ConsultItem,
     val pharmacist: Pharmacist?,
-    val isMyConsultToAnswer: Boolean
+    val isMyConsultToAnswer: Boolean,
+    val currentUserId: String? = null
 )
 
 class GetConsultDetailUseCase @Inject constructor(
@@ -59,7 +60,7 @@ class GetConsultDetailUseCase @Inject constructor(
                     currentUserId == originConsult.pharmacistId &&
                     originConsult.status == ConsultStatus.WAITING
 
-            emit(DataResourceResult.Success(ConsultDetailResult(consult, pharmacist, canAnswer)))
+            emit(DataResourceResult.Success(ConsultDetailResult(consult, pharmacist, canAnswer, currentUserId)))
         } else if (consultResult is DataResourceResult.Failure) {
             emit(DataResourceResult.Failure(consultResult.exception))
         }

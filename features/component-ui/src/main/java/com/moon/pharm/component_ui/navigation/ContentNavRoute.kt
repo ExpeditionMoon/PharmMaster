@@ -29,7 +29,7 @@ sealed interface ContentNavigationRoute : PharmNavigation {
     @Serializable
     data object ConsultGraph : ContentNavigationRoute
     @Serializable
-    data object ConsultWriteGraph : ContentNavigationRoute
+    data class ConsultWriteGraph(val consultId: String? = null) : ContentNavigationRoute
     @Serializable
     data object ConsultTab : ContentNavigationRoute
     @Serializable

@@ -202,6 +202,7 @@ class MedicationViewModel @Inject constructor(
 
             // 2. 주요 비즈니스 로직
             MedicationUiEvent.SaveAllMedications -> saveAllMedications()
+            is MedicationUiEvent.DeleteMedication -> deleteMedication(event.medicationId)
             is MedicationUiEvent.ToggleTaken -> toggleMedicationTaken(
                 medicationId = event.medicationId,
                 scheduleId = event.scheduleId
@@ -219,9 +220,25 @@ class MedicationViewModel @Inject constructor(
     // endregion
 
     // region 3. Actions
+    private fun isActiveDate(medication: com.moon.pharm.domain.model.medication.Medication, date: LocalDate): Boolean {
+        val startDate = java.time.Instant.ofEpochMilli(medication.startDate ?: 0)
+            .atZone(java.time.ZoneId.systemDefault())
+            .toLocalDate()
+        if (date.isBefore(startDate)) return false
+
+        if (medication.endDate != null) {
+            val endDate = java.time.Instant.ofEpochMilli(medication.endDate!!)
+                .atZone(java.time.ZoneId.systemDefault())
+                .toLocalDate()
+            if (date.isAfter(endDate)) return false
+        }
+        return true
+    }
+
     private fun fetchMedicationList() {
         val userId = authRepository.getCurrentUserId() ?: return
-        val todayDate = LocalDate.now().toString()
+        val today = LocalDate.now()
+        val todayDate = today.toString()
 
         viewModelScope.launch {
             combine(
@@ -231,10 +248,10 @@ class MedicationViewModel @Inject constructor(
 
                 when {
                     medsResult is DataResourceResult.Success && recordsResult is DataResourceResult.Success -> {
-                        val medications = medsResult.resultData
+                        val activeMedications = medsResult.resultData.filter { isActiveDate(it, today) }
                         val todayRecords = recordsResult.resultData
 
-                        val finalUiModels = MedicationUiMapper.toUiModelList(medications).map { uiModel ->
+                        val finalUiModels = MedicationUiMapper.toUiModelList(activeMedications).map { uiModel ->
                             val isTakenToday = todayRecords.any { record ->
                                 record.medicationId == uiModel.medicationId &&
                                         record.scheduleId == uiModel.scheduleId &&
@@ -382,6 +399,19 @@ class MedicationViewModel @Inject constructor(
             ).collectLatest { result ->
                 if (result is DataResourceResult.Failure) {
                     result.exception.printStackTrace()
+                }
+            }
+        }
+    }
+
+    private fun deleteMedication(medicationId: String) {
+        viewModelScope.launch {
+            medicationRepository.deleteMedication(medicationId).collectLatest { result ->
+                when (result) {
+                    is DataResourceResult.Failure -> {
+                        result.exception.printStackTrace()
+                    }
+                    else -> { }
                 }
             }
         }

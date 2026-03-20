@@ -7,5 +7,8 @@ sealed interface ConsultUiMessage : UiMessage {
     data object TitleTooShort : ConsultUiMessage
     data object PharmacistRequired : ConsultUiMessage
     data object CreateFailed : ConsultUiMessage
+    data object ConsultUpdateSuccess : ConsultUiMessage
+    data object ConsultDeleteSuccess : ConsultUiMessage
     data object AnswerRegisterSuccess : ConsultUiMessage
+    data object AnswerDeleteSuccess : ConsultUiMessage
 }

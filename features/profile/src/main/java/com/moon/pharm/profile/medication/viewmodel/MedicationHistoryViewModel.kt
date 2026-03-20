@@ -6,6 +6,7 @@ import com.moon.pharm.component_ui.util.toQueryString
 import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.repository.AuthRepository
+import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMonthlyIntakeRecordsUseCase
@@ -26,6 +27,7 @@ import javax.inject.Inject
 class MedicationHistoryViewModel @Inject constructor(
     private val getMonthlyIntakeRecordsUseCase: GetMonthlyIntakeRecordsUseCase,
     private val getMedicationsUseCase: GetMedicationsUseCase,
+    private val medicationRepository: MedicationRepository,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
     private val authRepository: AuthRepository
 ) : ViewModel() {
@@ -143,6 +145,19 @@ class MedicationHistoryViewModel @Inject constructor(
                 record = record,
                 isTaken = isNowTaken
             ).collectLatest { }
+        }
+    }
+
+    fun deleteMedication(medicationId: String) {
+        viewModelScope.launch {
+            medicationRepository.deleteMedication(medicationId).collectLatest { result ->
+                when (result) {
+                    is DataResourceResult.Failure -> {
+                        result.exception.printStackTrace()
+                    }
+                    else -> { }
+                }
+            }
         }
     }
 

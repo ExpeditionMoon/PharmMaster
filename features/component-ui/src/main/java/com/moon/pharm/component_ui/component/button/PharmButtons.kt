@@ -10,15 +10,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults.outlinedIconButtonColors
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
@@ -114,6 +122,40 @@ fun PharmOutlinedButton(
     }
 }
 
+/**
+ * 아이콘 버튼 (기본 36dp).
+ * (0.3초 내 중복 클릭 무시)
+ */
+@Composable
+fun PharmIconButton(
+    icon: ImageVector,
+    contentDescription: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    iconSize: Dp = 24.dp,
+    buttonSize: Dp = 36.dp,
+    shape: Shape = RoundedCornerShape(10.dp),
+    color: Color = PharmTheme.colors.secondFont
+) {
+    val multipleEventsCutter = remember { MultipleEventsCutter.get() }
+
+    OutlinedIconButton(
+        onClick = { multipleEventsCutter.processEvent { onClick() } },
+        modifier = modifier.size(buttonSize),
+        shape = shape,
+        border = BorderStroke(1.dp, color),
+        colors = outlinedIconButtonColors(
+            contentColor = color
+        )
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(iconSize)
+        )
+    }
+}
+
 @ThemePreviews
 @Composable
 private fun PharmButtonsPreview() {
@@ -129,6 +171,11 @@ private fun PharmButtonsPreview() {
             PharmOutlinedButton(onClick = {}) {
                 Text(text = "테두리 버튼")
             }
+            PharmIconButton(
+                icon = Icons.Default.Edit,
+                contentDescription = "수정",
+                onClick = {}
+            )
         }
     }
 }

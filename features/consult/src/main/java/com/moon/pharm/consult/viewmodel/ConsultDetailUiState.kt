@@ -11,5 +11,7 @@ data class ConsultDetailUiState(
     val selectedItem: ConsultItem? = null,
     val answerPharmacist: Pharmacist? = null,
     val answerPharmacistProfileUrl: String? = null,
-    val canAnswer: Boolean = false
+    val canAnswer: Boolean = false,
+    val currentUserId: String? = null,
+    val isEditingAnswer: Boolean = false
 )

@@ -33,6 +33,15 @@
     <string name="consult_secret_icon_desc">비공개</string>
     <string name="consult_secret_hidden_title">비공개 상담입니다.</string>
 
+    <string name="consult_update_success">수정이 완료되었습니다.</string>
+
+    <string name="consult_delete_title">상담글 삭제</string>
+    <string name="consult_delete_content">정말 삭제하시겠습니까?\n삭제된 글은 복구할 수 없습니다.</string>
+    <string name="consult_delete_confirm">삭제</string>
+
+    <string name="consult_delete_success">삭제되었습니다.</string>
+    <string name="consult_delete_failed">삭제에 실패했습니다. 다시 시도해주세요.</string>
+
     <!--  WriteScreen  -->
     <string name="consult_write_placeholder_title">제목을 입력해주세요</string>
     <string name="consult_write_placeholder_content">구체적인 증상, 복용 중인 다른 약물 정보 등을 자세히 작성해주세요.</string>
@@ -45,6 +54,7 @@
     <string name="consult_photo_delete_desc">삭제</string>
 
     <string name="consult_button_next">다음</string>
+    <string name="consult_button_edit">수정하기</string>
 
     <!--  PharmacistScreen  -->
     <string name="consult_search_select_pharmacist">약사 선택</string>
@@ -79,4 +89,11 @@
     <!--  Answer  -->
     <string name="consult_answer_success">답변이 등록되었습니다.</string>
     <string name="consult_answer_write_placeholder_content">답변을 작성해주세요.</string>
+
+    <string name="consult_answer_input_title">약사님, 답변을 작성해주세요</string>
+    <string name="consult_answer_edit_button">답변 수정하기</string>
+    <string name="consult_answer_register_button">답변 등록하기</string>
+
+    <string name="answer_delete_title">답변 삭제</string>
+    <string name="answer_delete_content">등록한 답변을 삭제하시겠습니까?</string>
 </resources>

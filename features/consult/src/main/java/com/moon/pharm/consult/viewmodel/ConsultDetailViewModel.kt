@@ -39,7 +39,8 @@ class ConsultDetailViewModel @Inject constructor(
                             isLoading = false,
                             selectedItem = result.resultData.consult,
                             answerPharmacist = result.resultData.pharmacist,
-                            canAnswer = result.resultData.isMyConsultToAnswer
+                            canAnswer = result.resultData.isMyConsultToAnswer,
+                            currentUserId = result.resultData.currentUserId
                         )
                         is DataResourceResult.Failure -> state.copy(
                             isLoading = false,
@@ -53,6 +54,12 @@ class ConsultDetailViewModel @Inject constructor(
 
     fun onAnswerContentChanged(content: String) {
         _answerContent.value = content
+    }
+
+    fun startEditingAnswer() {
+        val currentAnswer = _uiState.value.selectedItem?.answer?.content ?: ""
+        _answerContent.value = currentAnswer
+        _uiState.update { it.copy(isEditingAnswer = true) }
     }
 
     fun registerAnswer(consultId: String) {
@@ -78,6 +85,7 @@ class ConsultDetailViewModel @Inject constructor(
                                 isLoading = false,
                                 selectedItem = result.resultData,
                                 canAnswer = false,
+                                isEditingAnswer = false,
                                 userMessage = ConsultUiMessage.AnswerRegisterSuccess
                             )
                         }
@@ -87,6 +95,42 @@ class ConsultDetailViewModel @Inject constructor(
                     is DataResourceResult.Failure -> {
                         _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed) }
                     }
+                }
+            }
+        }
+    }
+
+
+    fun deleteConsult(consultId: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            consultRepository.deleteConsult(consultId).collectLatest { result ->
+                when (result) {
+                    is DataResourceResult.Success -> {
+                        _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.ConsultDeleteSuccess) }
+                    }
+                    is DataResourceResult.Failure -> {
+                        _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed) }
+                    }
+                    is DataResourceResult.Loading -> { /* 로딩 처리 */ }
+                }
+            }
+        }
+    }
+
+    fun deleteAnswer(consultId: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            consultRepository.deleteConsultAnswer(consultId).collectLatest { result ->
+                when (result) {
+                    is DataResourceResult.Success -> {
+                        _uiState.update { it.copy(isLoading = false, canAnswer = true, userMessage = ConsultUiMessage.ConsultDeleteSuccess) }
+                        getConsultDetail(consultId)
+                    }
+                    is DataResourceResult.Failure -> {
+                        _uiState.update { it.copy(isLoading = false) }
+                    }
+                    is DataResourceResult.Loading -> { }
                 }
             }
         }
@@ -108,4 +152,5 @@ class ConsultDetailViewModel @Inject constructor(
     fun userMessageShown() {
         _uiState.update { it.copy(userMessage = null) }
     }
+
 }
