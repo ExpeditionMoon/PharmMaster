@@ -92,6 +92,7 @@ private fun ConsultWriteContentPreview() {
             images = emptyList(),
             isPublic = true,
             isButtonEnabled = false,
+            isEditMode = true,
             onTitleChange = {},
             onContentChange = {},
             onImageRemove = {},

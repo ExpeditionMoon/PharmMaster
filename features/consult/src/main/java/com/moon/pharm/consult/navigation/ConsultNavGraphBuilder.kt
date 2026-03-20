@@ -1,6 +1,7 @@
 package com.moon.pharm.consult.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -61,6 +62,15 @@ private inline fun <reified T : ContentNavigationRoute> NavGraphBuilder.consultW
             navController.getBackStackEntry<ContentNavigationRoute.ConsultWriteGraph>()
         }
         val sharedViewModel: ConsultWriteViewModel = hiltViewModel(parentEntry)
+
+        val routeParams = parentEntry.toRoute<ContentNavigationRoute.ConsultWriteGraph>()
+        val editConsultId = routeParams.consultId
+
+        LaunchedEffect(editConsultId) {
+            if (editConsultId != null) {
+                sharedViewModel.setEditMode(editConsultId)
+            }
+        }
         content(sharedViewModel)
     }
 }

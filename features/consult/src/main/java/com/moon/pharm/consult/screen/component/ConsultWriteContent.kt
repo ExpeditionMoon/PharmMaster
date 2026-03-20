@@ -22,6 +22,7 @@ fun ConsultWriteContent(
     images: List<String>,
     isPublic: Boolean,
     isButtonEnabled: Boolean,
+    isEditMode: Boolean,
     onTitleChange: (String) -> Unit,
     onContentChange: (String) -> Unit,
     onImageRemove: (String) -> Unit,
@@ -55,6 +56,7 @@ fun ConsultWriteContent(
         ConsultWriteBottomBar(
             isPublic = isPublic,
             isButtonEnabled = isButtonEnabled,
+            isEditMode = isEditMode,
             onVisibilityChange = onVisibilityChange,
             onNextClick = onNextClick
         )

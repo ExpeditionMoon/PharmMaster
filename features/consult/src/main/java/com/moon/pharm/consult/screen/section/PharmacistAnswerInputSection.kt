@@ -27,6 +27,7 @@ import com.moon.pharm.consult.R
 @Composable
 fun PharmacistAnswerInputSection(
     input: String,
+    isEditMode: Boolean = false,
     onValueChange: (String) -> Unit,
     onSubmit: () -> Unit
 ) {
@@ -37,7 +38,7 @@ fun PharmacistAnswerInputSection(
             .padding(16.dp)
     ) {
         Text(
-            text = "약사님, 답변을 등록해주세요",
+            text = "약사님, 답변을 작성해주세요",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = PharmTheme.colors.primary
@@ -63,7 +64,7 @@ fun PharmacistAnswerInputSection(
         Spacer(modifier = Modifier.height(16.dp))
 
         PharmPrimaryButton(
-            text = "답변 등록하기",
+            text = if (isEditMode) stringResource(R.string.consult_answer_edit_button) else stringResource(R.string.consult_answer_register_button),
             onClick = onSubmit,
             modifier = Modifier.fillMaxWidth(),
             enabled = input.isNotBlank()

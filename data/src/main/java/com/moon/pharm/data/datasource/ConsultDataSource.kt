@@ -9,8 +9,11 @@ interface ConsultDataSource {
     fun getConsultItems(): Flow<List<ConsultItemDTO>>
     fun getConsultDetail(id: String): Flow<ConsultItemDTO?>
     fun getMyConsults(userId: String): Flow<List<ConsultItemDTO>>
-    fun getMyAnsweredConsults(pharmacistId: String): Flow<List<ConsultItemDTO>>
+    suspend fun updateConsult(consultId: String, title: String, content: String, isPublic: Boolean)
+    suspend fun deleteConsult(consultId: String)
 
+    fun getMyAnsweredConsults(pharmacistId: String): Flow<List<ConsultItemDTO>>
     suspend fun updateConsultAnswer(consultId: String, answerDto: ConsultAnswerDTO): ConsultItemDTO
+    suspend fun deleteConsultAnswer(consultId: String)
     suspend fun updatePharmacistNicknameInAnswers(pharmacistId: String, newNickname: String)
 }

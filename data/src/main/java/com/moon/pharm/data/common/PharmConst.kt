@@ -32,6 +32,9 @@ const val FIELD_STATUS = "status"
 const val FIELD_ANSWER = "answer"
 const val FIELD_ANSWER_PHARMACIST_NAME = "answer.pharmacistName"
 const val FIELD_FCM_TOKEN = "fcmToken"
+const val FIELD_TITLE = "title"
+const val FIELD_CONTENT = "content"
+const val FIELD_PUBLIC = "public"
 
 // 에러 메시지 (Error Messages)
 const val ERROR_MSG_PHARMACY_NOT_FOUND = "Pharmacy not found"

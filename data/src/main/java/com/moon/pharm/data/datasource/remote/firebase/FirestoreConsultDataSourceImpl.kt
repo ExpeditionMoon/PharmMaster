@@ -1,5 +1,6 @@
 package com.moon.pharm.data.datasource.remote.firebase
 
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
@@ -8,9 +9,12 @@ import com.moon.pharm.data.common.CONSULT_COLLECTION
 import com.moon.pharm.data.common.ERROR_MSG_CONSULT_NOT_FOUND
 import com.moon.pharm.data.common.FIELD_ANSWER
 import com.moon.pharm.data.common.FIELD_ANSWER_PHARMACIST_NAME
+import com.moon.pharm.data.common.FIELD_CONTENT
 import com.moon.pharm.data.common.FIELD_CREATED_AT
 import com.moon.pharm.data.common.FIELD_PHARMACIST_ID
+import com.moon.pharm.data.common.FIELD_PUBLIC
 import com.moon.pharm.data.common.FIELD_STATUS
+import com.moon.pharm.data.common.FIELD_TITLE
 import com.moon.pharm.data.common.FIELD_USER_ID
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.remote.dto.ConsultAnswerDTO
@@ -62,6 +66,20 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
             .map { snapshot ->
                 snapshot.toObjects(ConsultItemDTO::class.java)
             }
+    override suspend fun updateConsult(consultId: String, title: String, content: String, isPublic: Boolean) {
+        collection.document(consultId).update(
+            mapOf(
+                FIELD_TITLE to title,
+                FIELD_CONTENT to content,
+                FIELD_PUBLIC to isPublic
+            )
+        ).await()
+    }
+
+    override suspend fun deleteConsult(consultId: String) {
+        collection.document(consultId).delete().await()
+    }
+
 
     override fun getMyAnsweredConsults(pharmacistId: String): Flow<List<ConsultItemDTO>> =
         collection
@@ -89,6 +107,15 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
                 status = ConsultStatus.COMPLETED.name
             )
         }.await()
+    }
+
+    override suspend fun deleteConsultAnswer(consultId: String) {
+        collection.document(consultId).update(
+            mapOf(
+                FIELD_ANSWER to FieldValue.delete(),
+                FIELD_STATUS to ConsultStatus.WAITING.name
+            )
+        ).await()
     }
 
     override suspend fun updatePharmacistNicknameInAnswers(pharmacistId: String, newNickname: String) {

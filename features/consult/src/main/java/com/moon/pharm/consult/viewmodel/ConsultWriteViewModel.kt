@@ -44,6 +44,7 @@ class ConsultWriteViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
+    private var editingConsultId: String? = null
     private val _searchQuery = MutableStateFlow("")
 
     private val _uiState = MutableStateFlow(ConsultWriteUiState())
@@ -57,6 +58,7 @@ class ConsultWriteViewModel @Inject constructor(
 
     sealed interface WriteEvent {
         data object MoveToPharmacist : WriteEvent
+        data object UpdateSuccess : WriteEvent
     }
 
     init {
@@ -66,6 +68,36 @@ class ConsultWriteViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .filter { it.isNotBlank() }
                 .collectLatest { query -> searchPharmacies(query) }
+        }
+    }
+
+    fun setEditMode(consultId: String) {
+        if (editingConsultId == consultId) return
+        editingConsultId = consultId
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            consultRepository.getConsultDetail(consultId).collectLatest { result ->
+                when (result) {
+                    is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
+                    is DataResourceResult.Success -> {
+                        val consult = result.resultData
+                        _uiState.update { state ->
+                            state.copy(
+                                isLoading = false,
+                                isEditMode = true,
+                                title = consult.title,
+                                content = consult.content,
+                                isPublic = consult.isPublic,
+                                images = consult.images.map { it.imageUrl }
+                            )
+                        }
+                    }
+                    is DataResourceResult.Failure -> {
+                        _uiState.update { it.copy(isLoading = false, userMessage = UiMessage.LoadDataFailed) }
+                    }
+                }
+            }
         }
     }
 
@@ -175,8 +207,12 @@ class ConsultWriteViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch {
-            _writeEvent.emit(WriteEvent.MoveToPharmacist)
+        if (state.isEditMode) {
+            submitConsult()
+        } else {
+            viewModelScope.launch {
+                _writeEvent.emit(WriteEvent.MoveToPharmacist)
+            }
         }
     }
 
@@ -186,6 +222,34 @@ class ConsultWriteViewModel @Inject constructor(
 
     fun submitConsult() {
         val state = _uiState.value
+
+        // Update
+        val editId = editingConsultId
+        if (editId != null) {
+            viewModelScope.launch {
+                _uiState.update { it.copy(isLoading = true) }
+                consultRepository.updateConsult(
+                    consultId = editId,
+                    title = state.title,
+                    content = state.content,
+                    isPublic = state.isPublic
+                ).collectLatest { result ->
+                    when (result) {
+                        is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
+                        is DataResourceResult.Success -> {
+                            _uiState.update { it.copy(isLoading = false, isConsultCreated = true) }
+                            _writeEvent.emit(WriteEvent.UpdateSuccess)
+                        }
+                        is DataResourceResult.Failure -> {
+                            _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed) }
+                        }
+                    }
+                }
+            }
+            return
+        }
+
+        // Create
         val userId = validateAndGetUserId(state) ?: return
 
         viewModelScope.launch {

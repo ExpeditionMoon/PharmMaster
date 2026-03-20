@@ -1,17 +1,26 @@
 package com.moon.pharm.consult.screen.section
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moon.pharm.component_ui.component.button.PharmIconButton
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
@@ -26,7 +35,10 @@ import com.moon.pharm.domain.model.consult.ConsultItem
 fun AnswerSection(
     pharmacist: Pharmacist?,
     pharmacistImageUrl: String?,
-    item: ConsultItem
+    item: ConsultItem,
+    currentUserId: String? = null,
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     val answer = item.answer ?: return
 
@@ -48,6 +60,27 @@ fun AnswerSection(
         AnswerContentCard(
             answer = answer
         )
+
+        if (currentUserId == answer.pharmacistId) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PharmIconButton(
+                    icon = Icons.Default.Edit,
+                    contentDescription = stringResource(R.string.consult_confirm_edit_btn),
+                    onClick = onEditClick
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                PharmIconButton(
+                    icon = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.consult_delete_confirm),
+                    onClick = onDeleteClick
+                )
+            }
+        }
     }
 }
 
@@ -69,7 +102,10 @@ private fun AnswerSectionPreview() {
             AnswerSection(
                 pharmacist = Pharmacist(userId = "p1", name = "김약사", bio = "상담 가능", placeId = "1", pharmacyName = "달빛약국"),
                 pharmacistImageUrl = null,
-                item = dummyItemWithAnswer
+                item = dummyItemWithAnswer,
+                currentUserId = "p1",
+                onEditClick = {},
+                onDeleteClick = {}
             )
         }
     }
