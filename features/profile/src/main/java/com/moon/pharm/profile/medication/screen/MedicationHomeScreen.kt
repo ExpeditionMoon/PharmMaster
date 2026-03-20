@@ -79,6 +79,9 @@ fun MedicationScreen(
                             scheduleId = item.scheduleId
                         )
                     )
+                },
+                onDeleteClick = { medicationId ->
+                    viewModel.onEvent(MedicationUiEvent.DeleteMedication(medicationId))
                 }
             )
         }

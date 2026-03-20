@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +29,7 @@ import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toDisplayString
 import com.moon.pharm.component_ui.util.toQueryString
+import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.screen.component.HistoryRecordItem
 import com.moon.pharm.profile.medication.screen.section.HistoryCalendarSection
 import com.moon.pharm.profile.medication.viewmodel.MedicationHistoryUiState
@@ -53,6 +55,9 @@ fun MedicationHistoryScreen(
         onDateClick = { viewModel.onDateSelected(it) },
         onToggleRecord = { medId, schId, isTaken ->
             viewModel.toggleRecord(medId, schId, isTaken, uiState.selectedDate)
+        },
+        onDeleteClick = { medicationId ->
+            viewModel.deleteMedication(medicationId)
         }
     )
 }
@@ -63,13 +68,14 @@ fun MedicationHistoryContent(
     onBackClick: () -> Unit,
     onMonthChanged: (YearMonth) -> Unit,
     onDateClick: (LocalDate) -> Unit,
-    onToggleRecord: (String, String, Boolean) -> Unit
+    onToggleRecord: (String, String, Boolean) -> Unit,
+    onDeleteClick: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
             PharmTopBar(
                 data = TopBarData(
-                    title = "나의 복약 기록",
+                    title = stringResource(R.string.medication_history_title),
                     navigationType = TopBarNavigationType.Back,
                     onNavigationClick = onBackClick
                 )
@@ -92,7 +98,7 @@ fun MedicationHistoryContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "${uiState.selectedDate.toDisplayString()} 복약 상세",
+                text = stringResource(R.string.medication_history_detail_title, uiState.selectedDate.toDisplayString()),
                 modifier = Modifier.padding(horizontal = 20.dp),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -111,7 +117,7 @@ fun MedicationHistoryContent(
                 if (dailyRecords.isEmpty()) {
                     item {
                         Text(
-                            text = "복약 기록이 없습니다.",
+                            text = stringResource(R.string.medication_history_empty),
                             modifier = Modifier.padding(top = 20.dp),
                             color = PharmTheme.colors.secondFont
                         )
@@ -127,7 +133,8 @@ fun MedicationHistoryContent(
                                 uiModel.record.scheduleId,
                                 !uiModel.record.isTaken
                             )
-                        }
+                        },
+                        onDeleteClick = { onDeleteClick(uiModel.record.medicationId) }
                     )
                 }
             }
@@ -148,7 +155,8 @@ private fun MedicationHistoryContentPreview() {
             onBackClick = {},
             onMonthChanged = {},
             onDateClick = {},
-            onToggleRecord = { _, _, _ -> }
+            onToggleRecord = { _, _, _ -> },
+            onDeleteClick = {}
         )
     }
 }

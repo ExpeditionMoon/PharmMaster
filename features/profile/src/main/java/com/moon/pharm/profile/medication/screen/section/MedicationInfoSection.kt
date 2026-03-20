@@ -81,7 +81,7 @@ fun MedicationInfoSection(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "삭제",
+                            contentDescription = stringResource(R.string.medication_delete_desc),
                             tint = PharmTheme.colors.placeholder
                         )
                     }
