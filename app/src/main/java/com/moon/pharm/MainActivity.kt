@@ -9,6 +9,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.firebase.messaging.FirebaseMessaging
@@ -26,11 +30,17 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        checkNotificationIntent()
+        val isBenchmarkTest = intent.getBooleanExtra("IS_BENCHMARK_TEST", false)
 
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                viewModel.refreshFcmToken()
+        if (isBenchmarkTest) {
+            viewModel.setMockLoginStateForTest()
+        } else {
+            checkNotificationIntent()
+
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    viewModel.refreshFcmToken()
+                }
             }
         }
 
@@ -53,10 +63,17 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             PharmMasterTheme {
-                EntryPointScreen()
+                Surface(
+                    modifier = Modifier.semantics {
+                        testTagsAsResourceId = true
+                    }
+                ) {
+                    EntryPointScreen()
+                }
             }
         }
     }
+
 
     private fun checkNotificationIntent() {
         val isFromAlarm = intent.getBooleanExtra(AlarmConstants.KEY_IS_FROM_ALARM, false)

@@ -18,5 +18,6 @@ enum class TopBarNavigationType {
 data class TopBarAction(
     val icon: ImageVector? = null,
     val text: String? = null,
+    val contentDescription: String? = null,
     val onClick: () -> Unit = {}
 )

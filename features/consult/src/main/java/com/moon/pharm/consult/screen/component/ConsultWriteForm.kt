@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -41,6 +43,7 @@ fun ConsultWriteForm(
         PrimaryTextField(
             value = title,
             onValueChange = onTitleChange,
+            modifier = Modifier.semantics { contentDescription = "title_input" },
             placeholder = stringResource(R.string.consult_write_placeholder_title),
             textStyle = TextStyle(
                 fontSize = 18.sp,
@@ -66,7 +69,8 @@ fun ConsultWriteForm(
             singleLine = false,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp),
+                .height(250.dp)
+                .semantics { contentDescription = "content_input" },
             contentAlignment = Alignment.TopStart
         )
 

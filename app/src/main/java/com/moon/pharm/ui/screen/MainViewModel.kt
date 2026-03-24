@@ -29,14 +29,24 @@ class MainViewModel @Inject constructor(
     private val _navigationEvent = Channel<ContentNavigationRoute>(Channel.BUFFERED)
     val navigationEvent = _navigationEvent.receiveAsFlow()
 
+    private var isBenchmark = false
+
     init {
         checkLoginStatus()
         syncToken()
     }
 
+    fun setMockLoginStateForTest() {
+        isBenchmark = true
+        _startDestination.value = ContentNavigationRoute.MainBase
+        _isSplashLoading.value = false
+    }
+
     private fun checkLoginStatus() {
         viewModelScope.launch {
             val userId = authRepository.getCurrentUserId()
+
+            if (isBenchmark) return@launch
 
             if (userId != null) {
                 _startDestination.value = ContentNavigationRoute.MainBase

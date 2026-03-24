@@ -67,6 +67,12 @@ espressoCore = "3.7.0"
 appcompat = "1.7.1"
 material = "1.13.0"
 material3 = "1.4.0"
+uiautomator = "2.3.0"
+benchmarkMacroJunit4 = "1.4.1"
+
+#Benchmark
+androidx-benchmark-macro-junit4 = "1.4.1"
+androidx-profileinstaller = "1.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -148,6 +154,11 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
+
+#benchmark
+androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "androidx-benchmark-macro-junit4" }
+androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "androidx-profileinstaller" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -162,6 +173,11 @@ kotlin-android-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 secrets-gradle-plugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+android-test = { id = "com.android.test", version.ref = "agp" }
+
+# 벤치마크 및 Baseline Profile 플러그인
+androidx-benchmark = { id = "androidx.benchmark", version.ref = "androidx-benchmark-macro-junit4" }
+androidx-baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidx-benchmark-macro-junit4" }
 
 [bundles]
 runtime-lifecycle-libraries = [

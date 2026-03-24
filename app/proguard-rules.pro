@@ -19,3 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-dontwarn com.google.devtools.ksp.processing.SymbolProcessorProvider
+
+-keep class com.moon.pharm.domain.model.** { *; }
+-keep class com.moon.pharm.data.datasource.** { *; }
+-keep class com.moon.pharm.data.common.** { *; }
+
+-keep @androidx.annotation.Keep class * { *; }
+-keepclassmembers @androidx.annotation.Keep class * { *; }

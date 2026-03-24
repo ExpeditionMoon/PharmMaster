@@ -1,5 +1,6 @@
 package com.moon.pharm.consult.screen
 
+import android.R.attr.action
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -66,6 +67,7 @@ fun ConsultScreen(
                     actions = listOf(
                         TopBarAction(
                             icon = Icons.Filled.Add,
+                            contentDescription = "consult_add_button",
                             onClick = {
                                 multipleEventsCutter.processEvent {
                                     navController?.navigate(ContentNavigationRoute.ConsultTabWriteScreen)

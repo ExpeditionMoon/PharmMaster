@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
@@ -31,11 +33,17 @@ fun ConsultWriteBottomBar(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        PharmPrimaryButton(
-            text = if (isEditMode) stringResource(R.string.consult_button_edit) else stringResource(R.string.consult_button_next),
-            onClick = onNextClick,
-            enabled = isButtonEnabled
-        )
+        Box(
+            modifier = Modifier.semantics { contentDescription = "next_button" }
+        ) {
+            PharmPrimaryButton(
+                text = if (isEditMode) stringResource(R.string.consult_button_edit) else stringResource(
+                    R.string.consult_button_next
+                ),
+                onClick = onNextClick,
+                enabled = isButtonEnabled
+            )
+        }
     }
 }
 

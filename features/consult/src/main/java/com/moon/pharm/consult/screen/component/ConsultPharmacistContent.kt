@@ -1,6 +1,11 @@
 package com.moon.pharm.consult.screen.component
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -30,27 +35,33 @@ fun ConsultPharmacistContent(
     onBackFromMap: () -> Unit
 ) {
     if (isMapView) {
-        PharmacySelector(
-            pharmacies = searchResults,
-            selectedPharmacy = selectedPharmacy,
-            onPharmacyClick = onPharmacySelect,
-            onSearch = onSearchQueryChange,
-            onSearchArea = onSearchArea,
-            onBackClick = onBackFromMap,
-            cameraPositionState = cameraPositionState,
-            cameraMoveEvent = cameraMoveEvent,
-            sheetContent = if (selectedPharmacy != null) {
-                {
-                    PharmacistListPanel(
-                        pharmacyName = selectedPharmacy.name,
-                        pharmacists = availablePharmacists,
-                        onPharmacistSelect = { pharmacist ->
-                            onPharmacistSelect(pharmacist.userId)
-                        }
-                    )
-                }
-            } else null
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .semantics { contentDescription = "map_view" }
+        ) {
+            PharmacySelector(
+                pharmacies = searchResults,
+                selectedPharmacy = selectedPharmacy,
+                onPharmacyClick = onPharmacySelect,
+                onSearch = onSearchQueryChange,
+                onSearchArea = onSearchArea,
+                onBackClick = onBackFromMap,
+                cameraPositionState = cameraPositionState,
+                cameraMoveEvent = cameraMoveEvent,
+                sheetContent = if (selectedPharmacy != null) {
+                    {
+                        PharmacistListPanel(
+                            pharmacyName = selectedPharmacy.name,
+                            pharmacists = availablePharmacists,
+                            onPharmacistSelect = { pharmacist ->
+                                onPharmacistSelect(pharmacist.userId)
+                            }
+                        )
+                    }
+                } else null
+            )
+        }
     } else {
         PharmacistSearchView(
             searchText = searchQuery,

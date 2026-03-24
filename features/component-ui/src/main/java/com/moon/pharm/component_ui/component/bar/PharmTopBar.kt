@@ -24,6 +24,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -117,15 +119,29 @@ private fun PharmNavigationIcon(
 private fun PharmActions(actions: List<TopBarAction>) {
     actions.forEach { action ->
         if (action.icon != null) {
-            IconButton(onClick = action.onClick) {
+            IconButton(
+                onClick = action.onClick,
+                modifier = Modifier.semantics {
+                    if (action.contentDescription != null) {
+                        contentDescription = action.contentDescription
+                    }
+                }
+            ) {
                 Icon(
                     imageVector = action.icon,
-                    contentDescription = action.text,
+                    contentDescription = null,
                     tint = PharmTheme.colors.primary
                 )
             }
         } else if (action.text != null) {
-            TextButton(onClick = action.onClick) {
+            TextButton(
+                onClick = action.onClick,
+                modifier = Modifier.semantics {
+                    if (action.contentDescription != null) {
+                        contentDescription = action.contentDescription
+                    }
+                }
+            ) {
                 Text(
                     text = action.text,
                     color = PharmTheme.colors.onSurface

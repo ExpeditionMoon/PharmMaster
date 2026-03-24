@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.kotlin.android.ksp)
     alias(libs.plugins.secrets.gradle.plugin)
+
+    alias(libs.plugins.androidx.baselineprofile)
 }
 
 android {
@@ -32,6 +34,17 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        create("benchmark") {
+            initWith(buildTypes.getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+        }
+    }
+    baselineProfile {
+        filter {
+            include("com.moon.pharm.**")
         }
     }
     compileOptions {
@@ -60,6 +73,9 @@ dependencies {
     implementation(project(":features:prescription"))
     implementation(project(":features:search"))
 
+    // benchmark 모듈을 연결
+    baselineProfile(project(":benchmark"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.bundles.runtime.lifecycle.libraries)
 
@@ -82,6 +98,9 @@ dependencies {
     ksp(libs.hilt.compiler)
     // Hilt Navigation
     implementation(libs.hilt.navigation.compose)
+
+    // Profile Installer
+    implementation(libs.androidx.profileinstaller)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

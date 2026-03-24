@@ -11,4 +11,8 @@ plugins {
     alias(libs.plugins.google.gms.google.services) apply false
     alias(libs.plugins.kotlin.android.ksp) apply false
     alias(libs.plugins.secrets.gradle.plugin) apply false
+
+    alias(libs.plugins.android.test) apply false
+    alias(libs.plugins.androidx.benchmark) apply false
+    alias(libs.plugins.androidx.baselineprofile) apply false
 }
