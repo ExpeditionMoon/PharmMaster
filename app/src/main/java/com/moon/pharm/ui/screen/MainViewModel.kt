@@ -36,10 +36,17 @@ class MainViewModel @Inject constructor(
         syncToken()
     }
 
-    fun setMockLoginStateForTest() {
+    fun setMockLoginStateForTest(targetScreen: String? = null) {
         isBenchmark = true
         _startDestination.value = ContentNavigationRoute.MainBase
         _isSplashLoading.value = false
+
+        if (targetScreen == "MAP") {
+            viewModelScope.launch {
+                delay(300)
+                _navigationEvent.send(ContentNavigationRoute.ConsultTabPharmacistScreen)
+            }
+        }
     }
 
     private fun checkLoginStatus() {

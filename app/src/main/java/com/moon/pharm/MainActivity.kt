@@ -31,9 +31,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val isBenchmarkTest = intent.getBooleanExtra("IS_BENCHMARK_TEST", false)
+        val targetScreen = intent.getStringExtra("TARGET_SCREEN")
 
         if (isBenchmarkTest) {
-            viewModel.setMockLoginStateForTest()
+            viewModel.setMockLoginStateForTest(targetScreen)
         } else {
             checkNotificationIntent()
 
@@ -64,11 +65,24 @@ class MainActivity : ComponentActivity() {
         setContent {
             PharmMasterTheme {
                 Surface(
-                    modifier = Modifier.semantics {
-                        testTagsAsResourceId = true
-                    }
+                    modifier = Modifier.semantics { testTagsAsResourceId = true }
                 ) {
-                    EntryPointScreen()
+                    val isBenchmarkTest = intent.getBooleanExtra("IS_BENCHMARK_TEST", false)
+                    val targetScreen = intent.getStringExtra("TARGET_SCREEN")
+
+                    if (isBenchmarkTest && targetScreen == "MAP") {
+                        val testNavController = androidx.navigation.compose.rememberNavController()
+                        val testViewModel: com.moon.pharm.consult.viewmodel.ConsultWriteViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+
+                        com.moon.pharm.consult.screen.ConsultPharmacistScreen(
+                            navController = testNavController,
+                            viewModel = testViewModel,
+                            onMapModeChanged = {},
+                            startWithMap = true
+                        )
+                    } else {
+                        EntryPointScreen()
+                    }
                 }
             }
         }

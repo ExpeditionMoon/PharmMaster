@@ -43,11 +43,12 @@ import kotlinx.coroutines.launch
 fun ConsultPharmacistScreen(
     navController: NavController,
     viewModel: ConsultWriteViewModel,
-    onMapModeChanged: (Boolean) -> Unit
+    onMapModeChanged: (Boolean) -> Unit,
+    startWithMap: Boolean = false
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    var isMapView by remember { mutableStateOf(false) }
+    var isMapView by remember { mutableStateOf(startWithMap) }
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
 
