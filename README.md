@@ -40,7 +40,7 @@
 각 항목을 클릭하면 상세 실행 화면을 볼 수 있습니다.
 
 <details>
-<summary><b>🧾 1. 회원가입 (Authentication)</b></summary>
+<summary><a id="1-auth"></a><b>🧾 1. 회원가입 (Authentication)</b></summary>
 <br>
 
 | 일반 회원가입 | 약사 회원가입 (약국 선택) |
@@ -49,7 +49,7 @@
 </details>
 
 <details>
-<summary><b>💊 2. 복약 관리 & OCR 복약 등록 (Medication)</b></summary>
+<summary><a id="2-medication"></a><b>💊 2. 복약 관리 & OCR 복약 등록 (Medication)</b></summary>
 <br>
 
 | 복약 설정 | 복약 알람 | 복약 기록 (캘린더) |
@@ -62,7 +62,7 @@
 </details>
 
 <details>
-<summary><b>💬 3. 약사 상담 (Consultation)</b></summary>
+<summary><a id="3-consultation"></a><b>💬 3. 약사 상담 (Consultation)</b></summary>
 <br>
 
 | 상담글 작성 | 약사: 글 알림 & 답장 | 일반: 답장 알림 | 상담 게시판 | 
@@ -71,7 +71,7 @@
 </details>
 
 <details>
-<summary><b>👤 4. 내 정보 (My Page)</b></summary>
+<summary><a id="4-mypage"></a><b>👤 4. 내 정보 (My Page)</b></summary>
 <br>
 
 | 약사: 나의 답변 내역 | 일반: 나의 상담 내역 | 나의 복약 기록 | 닉네임 수정 & 로그아웃 |
@@ -80,7 +80,7 @@
 </details>
 
 <details>
-<summary><b>🔎 5. 약 검색(Search)</b></summary>
+<summary><a id="5-search"></a><b>🔎 5. 약 검색(Search)</b></summary>
 <br>
 
 | 약 검색 |
@@ -172,23 +172,27 @@ NoSQL 기반의 데이터 구조를 시각화한 초기 설계도입니다. <br>
 
 ## 🩺 트러블슈팅
 
-### 1. Flow 스트림 충돌로 인한 데이터 누락 및 무한 로딩 해결
-- **문제**: 일부 데이터 누락 및 네트워크 지연 시 무한 로딩 발생  
-- **원인**: `onStart { emit(Loading) }` 적용 후, `.first()`가 실제 데이터가 아닌 Loading 상태를 수신하고 종료  
+### 1. Flow 스트림 충돌로 인한 데이터 누락 해결
+- **문제**: Flow 연산자 오용으로 인한 일부 데이터 누락 발생  
+- **원인**: `onStart { emit(Loading) }` 적용 후, `.first()`가 실제 데이터가 아닌 Loading 상태를 수신하고 스트림을 종료함  
 - **해결**:
-  - 단발성 조회용 `suspend` 함수 분리 (`getUserOnce()`)
-  - `withTimeout(5000L)` 적용으로 무한 대기 방지  
+  - 단발성 조회용 `suspend` 함수(`getUserOnce()`) 분리로 **데이터 누락 문제 해결 및 안정성 확보**
+  - `withTimeout(5000L)` 적용으로 **잠재적인 무한 로딩 및 ANR 위험 사전 제거**
 
 ---
 
 ### 2. Google Maps 초기화 타이밍 이슈 (Race Condition)
 - **문제**: 지도 진입 시 `CameraUpdateFactory is not initialized` 크래시 발생  
 - **원인**: Compose 렌더링이 SDK 초기화보다 빨라 발생한 타이밍 충돌  
-- **해결**: `Application.onCreate()`에서 `MapsInitializer` 선행 호출  
+- **해결**:
+  - `Application.onCreate()`에서 `MapsInitializer` 선행 호출하여 **명시적인 초기화 순서 보장**
+  - 이를 통해 지도 화면 진입 시 간헐적으로 발생하던 **크래시를 원천 차단하고 안정적인 사용자 경험(UX) 제공**
 
 ---
 
 ### 3. ViewModel 분리 후 상태 동기화 단절 문제 해결
 - **문제**: 글 작성 후 목록 화면 복귀 시 데이터 갱신되지 않음  
-- **원인**: ViewModel 분리로 인한 상태 공유 단절  
-- **해결**: `SavedStateHandle`을 활용해 이전 화면에 refresh 플래그 전달 및 구독 처리  
+- **원인**: 화면별로 ViewModel을 분리하면서, 화면 간 상태(State) 공유가 단절되어 갱신 트리거 누락
+- **해결**:
+  - `SavedStateHandle`을 활용해 이전 화면에 `refresh` 플래그 전달 및 구독 처리
+  - 불필요한 전역 상태(Global State) 남용 없이, **화면 간 결합도를 낮게 유지하면서도 매끄러운 실시간 데이터 동기화 달성**
