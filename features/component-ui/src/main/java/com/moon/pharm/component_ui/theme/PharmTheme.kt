@@ -38,10 +38,9 @@ object PharmTheme {
         @Composable
         get() = LocalPharmColors.current
 
-    // 향후 Typography 작업 시 주석 해제하여 사용
-    // val typography: PharmTypography
-    //     @Composable
-    //     get() = LocalPharmTypography.current
+     val typography: PharmTypography
+         @Composable
+         get() = LocalPharmTypography.current
 }
 
 @Composable
@@ -50,14 +49,15 @@ fun PharmMasterTheme(
     content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) DarkColorPalette else LightColorPalette
+    val typography = PharmTypography()
 
     CompositionLocalProvider(
         LocalPharmColors provides colors,
-        LocalContentColor provides colors.onBackground
+        LocalContentColor provides colors.onBackground,
+        LocalPharmTypography provides typography
     ) {
         MaterialTheme(
             colorScheme = colors.toMaterialColorScheme(),
-//            typography = Typography,
             content = content
         )
     }
