@@ -40,7 +40,7 @@ fun MainScreen(
         viewModel.navigationEvent.collectLatest { route ->
             if (route is ContentNavigationRoute.MedicationTab) {
                 mainNavController.navigate(ContentNavigationRoute.MedicationTab) {
-                    popUpTo(mainNavController.graph.findStartDestination().id) {
+                    popUpTo(ContentNavigationRoute.HomeTab) {
                         saveState = true
                     }
                     launchSingleTop = true
@@ -70,12 +70,16 @@ fun MainScreen(
                         tabName = navItem.tabName,
                         icon = navItem.icon,
                         onClick = {
+                            val isHome = navItem.destination is ContentNavigationRoute.HomeTab
+
                             mainNavController.navigate(navItem.destination) {
                                 popUpTo(mainNavController.graph.findStartDestination().id) {
                                     saveState = true
                                 }
                                 launchSingleTop = true
-                                restoreState = true
+                                if (!isHome) {
+                                    restoreState = true
+                                }
                             }
                         }
                     )
