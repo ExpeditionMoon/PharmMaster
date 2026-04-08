@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,11 +36,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
+import com.moon.pharm.component_ui.component.card.InfoCardType
+import com.moon.pharm.component_ui.component.card.PharmInfoCard
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
+import com.moon.pharm.prescription.R
 import com.moon.pharm.prescription.viewmodel.PrescriptionUiEvent
 import com.moon.pharm.prescription.viewmodel.PrescriptionViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -52,6 +56,7 @@ fun PrescriptionScreen(
     val context = LocalContext.current
     var showCamera by remember { mutableStateOf(false) }
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val permissionRequiredMessage = stringResource(id = R.string.toast_camera_permission_required)
 
     LaunchedEffect(true) {
         viewModel.uiEvent.collectLatest { event ->
@@ -84,7 +89,7 @@ fun PrescriptionScreen(
         if (isGranted) {
             showCamera = true
         } else {
-            Toast.makeText(context, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, permissionRequiredMessage, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -103,11 +108,11 @@ fun PrescriptionScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("처방전을 어떻게 등록할까요?", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(id = R.string.prescription_select_method_title), fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(30.dp))
 
             PharmPrimaryButton(
-                text = "📸 카메라로 촬영",
+                text = stringResource(id = R.string.prescription_btn_camera),
                 onClick = {
                     val permission = Manifest.permission.CAMERA
                     if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
@@ -122,13 +127,20 @@ fun PrescriptionScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             PharmPrimaryButton(
-                text = "🖼️ 앨범에서 선택",
+                text = stringResource(id = R.string.prescription_btn_gallery),
                 onClick = {
                     photoPickerLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
                 },
                 enabled = !isLoading
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            PharmInfoCard(
+                message = stringResource(id = R.string.prescription_security_notice),
+                type = InfoCardType.NOTICE
             )
         }
     }
@@ -149,7 +161,7 @@ fun PrescriptionScreen(
                 CircularProgressBar()
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "처방전을 분석하고 있어요...",
+                    text = stringResource(id = R.string.prescription_analyzing_loading),
                     color = PharmTheme.colors.surface,
                     fontWeight = FontWeight.Bold
                 )
@@ -171,7 +183,7 @@ private fun PrescriptionScreenDefaultPreview() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "처방전을 어떻게 등록할까요?",
+                    text = stringResource(id = R.string.prescription_select_method_title),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = PharmTheme.colors.onSurface
@@ -179,7 +191,7 @@ private fun PrescriptionScreenDefaultPreview() {
                 Spacer(modifier = Modifier.height(30.dp))
 
                 PharmPrimaryButton(
-                    text = "📸 카메라로 촬영",
+                    text = stringResource(id = R.string.prescription_btn_camera),
                     onClick = {},
                     enabled = true
                 )
@@ -187,9 +199,16 @@ private fun PrescriptionScreenDefaultPreview() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 PharmPrimaryButton(
-                    text = "🖼️ 앨범에서 선택",
+                    text = stringResource(id = R.string.prescription_btn_gallery),
                     onClick = {},
                     enabled = true
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                PharmInfoCard(
+                    message = stringResource(id = R.string.prescription_security_notice),
+                    type = InfoCardType.NOTICE
                 )
             }
         }

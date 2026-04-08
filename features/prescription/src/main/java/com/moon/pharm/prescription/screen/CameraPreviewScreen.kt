@@ -5,8 +5,11 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,6 +34,7 @@ import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
+import com.moon.pharm.prescription.R
 import com.moon.pharm.prescription.ocr.TextRecognitionAnalyzer
 import com.moon.pharm.prescription.viewmodel.PrescriptionUiEvent
 import com.moon.pharm.prescription.viewmodel.PrescriptionViewModel
@@ -70,13 +78,27 @@ fun CameraPreviewScreen(
                 .fillMaxSize()
                 .background(androidx.compose.ui.graphics.Color.Black)
         ) {
-            Text(
-                text = "약 봉투나 처방전을 비춰주세요 (프리뷰 모드)",
+            Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(32.dp),
-                color = PharmTheme.colors.surface
-            )
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.camera_preview_guide_title),
+                    color = PharmTheme.colors.surface,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = stringResource(id = R.string.camera_preview_security_notice),
+                    color = PharmTheme.colors.surface.copy(alpha = 0.7f),
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
         return
     }
@@ -124,13 +146,27 @@ fun CameraPreviewScreen(
             }
         }
 
-        Text(
-            text = "약 봉투나 처방전을 비춰주세요",
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(32.dp),
-            color = PharmTheme.colors.surface
-        )
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.camera_preview_guide_title),
+                color = PharmTheme.colors.surface,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = stringResource(id = R.string.camera_preview_security_notice),
+                color = PharmTheme.colors.surface.copy(alpha = 0.7f),
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
