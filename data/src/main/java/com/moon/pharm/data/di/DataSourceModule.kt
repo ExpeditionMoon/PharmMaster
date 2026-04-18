@@ -1,5 +1,6 @@
 package com.moon.pharm.data.di
 
+import com.moon.pharm.data.datasource.AiDataSource
 import com.moon.pharm.data.datasource.AuthDataSource
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.DrugSearchDataSource
@@ -9,6 +10,7 @@ import com.moon.pharm.data.datasource.PharmacistDataSource
 import com.moon.pharm.data.datasource.PharmacySearchDataSource
 import com.moon.pharm.data.datasource.PharmacyStorageDataSource
 import com.moon.pharm.data.datasource.UserDataSource
+import com.moon.pharm.data.datasource.remote.ai.FirebaseAiDataSourceImpl
 import com.moon.pharm.data.datasource.remote.firebase.FirebaseAuthDataSourceImpl
 import com.moon.pharm.data.datasource.remote.firebase.FirebaseImageDataSourceImpl
 import com.moon.pharm.data.datasource.remote.firebase.FirestoreConsultDataSourceImpl
@@ -81,4 +83,10 @@ abstract class DataSourceModule {
     abstract fun bindDrugSearchDataSource(
         impl: OpenApiDrugDataSourceImpl
     ): DrugSearchDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindAiDataSource(
+        impl: FirebaseAiDataSourceImpl
+    ): AiDataSource
 }

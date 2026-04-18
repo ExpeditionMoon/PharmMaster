@@ -2,6 +2,7 @@ package com.moon.pharm.data.di
 
 import com.moon.pharm.data.repository.AuthRepositoryImpl
 import com.moon.pharm.data.repository.ConsultRepositoryImpl
+import com.moon.pharm.data.repository.DdiAiRepositoryImpl
 import com.moon.pharm.data.repository.DrugSearchRepositoryImpl
 import com.moon.pharm.data.repository.LocationRepositoryImpl
 import com.moon.pharm.data.repository.MedicationRepositoryImpl
@@ -10,6 +11,7 @@ import com.moon.pharm.data.repository.PharmacyRepositoryImpl
 import com.moon.pharm.data.repository.UserRepositoryImpl
 import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.repository.ConsultRepository
+import com.moon.pharm.domain.repository.DdiRepository
 import com.moon.pharm.domain.repository.DrugSearchRepository
 import com.moon.pharm.domain.repository.LocationRepository
 import com.moon.pharm.domain.repository.MedicationRepository
@@ -73,4 +75,10 @@ abstract class RepositoryModule {
     abstract fun bindDrugRepository(
         impl: DrugSearchRepositoryImpl
     ): DrugSearchRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDdiRepository(
+        impl: DdiAiRepositoryImpl
+    ): DdiRepository
 }

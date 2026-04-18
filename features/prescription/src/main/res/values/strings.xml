@@ -1,0 +1,13 @@
+<resources>
+    <string name="toast_camera_permission_required">카메라 권한이 필요합니다.</string>
+
+    <string name="camera_preview_guide_title">약 봉투나 처방전을 비춰주세요</string>
+    <string name="camera_preview_security_notice">🔒 개인정보는 서버로 전송되지 않고\n처방전 정보만 안전하게 분석됩니다.</string>
+
+    <string name="prescription_select_method_title">처방전을 어떻게 등록할까요?</string>
+    <string name="prescription_btn_camera">📸 카메라로 촬영</string>
+    <string name="prescription_btn_gallery">🖼️ 앨범에서 선택</string>
+
+    <string name="prescription_security_notice">개인정보는 서버로 전송되지 않고 처방전 정보만 안전하게 분석됩니다.</string>
+    <string name="prescription_analyzing_loading">✨ 처방전을 분석하고 있어요...</string>
+</resources>
