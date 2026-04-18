@@ -1,10 +1,11 @@
 package com.moon.pharm.prescription.viewmodel
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.model.ScannedMedication
+import com.moon.pharm.domain.result.DataResourceResult
+import com.moon.pharm.domain.usecase.prescription.ExtractDrugNamesFromOcrUseCase
 import com.moon.pharm.prescription.ocr.TextRecognitionHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PrescriptionViewModel @Inject constructor(
-    private val ocrHelper: TextRecognitionHelper
+    private val ocrHelper: TextRecognitionHelper,
+    private val extractDrugNamesUseCase: ExtractDrugNamesFromOcrUseCase
 ) : ViewModel() {
 
     private val _uiEvent = MutableSharedFlow<PrescriptionUiEvent>()
@@ -27,104 +29,48 @@ class PrescriptionViewModel @Inject constructor(
     val isLoading = _isLoading.asStateFlow()
 
     private var isProcessing = false
+
     fun onTextRecognized(text: String) {
         if (isProcessing) return
         if (text.length > 10 && (text.contains("정") || text.contains("회") || text.contains("캡슐"))) {
             isProcessing = true
             viewModelScope.launch {
                 _isLoading.value = true
-                delay(1000)
-                processAndNavigate(text)
+                delay(500)
+                processTextWithAi(text)
             }
         }
     }
 
     fun analyzeImageFromUri(uri: Uri) {
+        if (isProcessing) return
+        isProcessing = true
         viewModelScope.launch {
             _isLoading.value = true
-            val result = ocrHelper.extractTextFromUri(uri)
-            result.onSuccess { text ->
-                processAndNavigate(text)
-            }.onFailure {
-                it.printStackTrace()
-                _isLoading.value = false
-                isProcessing = false
-            }
+            ocrHelper.extractTextFromUri(uri)
+                .onSuccess { rawText ->
+                    processTextWithAi(rawText)
+                }
+                .onFailure { exception ->
+                    exception.printStackTrace()
+                    _isLoading.value = false
+                    isProcessing = false
+                }
         }
     }
 
-    private fun processAndNavigate(rawText: String) {
-        val scannedList = mutableListOf<ScannedMedication>()
-        val lines = rawText.lines().map { it.trim() }.filter { it.isNotEmpty() }
-
-        val drugKeywords = listOf("정", "캡슐", "연고", "시럽", "액", "겔", "크림", "mg", "g", "ml", "mL", "서방정", "tab", "cap")
-        val frequencyRegex = Regex("1일\\s*(\\d+)회|(\\d+)회")
-
-        val candidateNames = ArrayDeque<String>()
-
-        for (line in lines) {
-            val isNoise = listOf(
-                "약국", "처방", "조제", "환자", "병원", "합계", "계산서", "납부",
-                "영수증", "전화", "Tel", "Fax", "발행", "교부", "번호", "성명", "면허",
-                "식후", "식전", "분복", "투약"
-            ).any { line.contains(it, ignoreCase = true) }
-
-            val freqMatch = frequencyRegex.find(line)
-            val hasDrugKeyword = drugKeywords.any { line.contains(it, ignoreCase = true) }
-
-            if (freqMatch != null) {
-                val count = freqMatch.groupValues[1].toIntOrNull()
-                    ?: freqMatch.groupValues[2].toIntOrNull()
-                    ?: 1
-
-                var pairedName: String? = null
-
-                if (hasDrugKeyword && !isNoise) {
-                    pairedName = line.split("\\s+".toRegex())
-                        .firstOrNull { w -> drugKeywords.any { k -> w.contains(k, ignoreCase = true) } }
-                }
-
-                if (pairedName == null && candidateNames.isNotEmpty()) {
-                    pairedName = candidateNames.removeFirst()
-                }
-
-                if (pairedName != null) {
-                    val cleanName = cleanDrugName(pairedName)
-                    if (scannedList.none { it.name == cleanName } && cleanName.length > 1) {
-                        scannedList.add(ScannedMedication(cleanName, count))
-                    }
-                }
-
-            } else {
-                if (hasDrugKeyword && !isNoise) {
-                    val possibleName = line.split("\\s+".toRegex())
-                        .firstOrNull { w -> drugKeywords.any { k -> w.contains(k, ignoreCase = true) } }
-                        ?: line
-
-                    if (possibleName.length in 2..40) {
-                        candidateNames.add(possibleName)
-                    }
-                }
+    private suspend fun processTextWithAi(rawText: String) {
+        when(val result = extractDrugNamesUseCase(rawText)) {
+            is DataResourceResult.Success -> {
+                val scannedList = result.resultData.map { ScannedMedication(name = it, dailyCount = 1) }
+                _uiEvent.emit(PrescriptionUiEvent.NavigateToCreate(scannedList))
             }
-        }
-
-        while (candidateNames.isNotEmpty()) {
-            val name = cleanDrugName(candidateNames.removeFirst())
-            if (scannedList.none { it.name == name } && name.length > 1) {
-                scannedList.add(ScannedMedication(name, 3))
+            is DataResourceResult.Failure -> {
+                result.exception.printStackTrace()
             }
+            is DataResourceResult.Loading -> { }
         }
-
-        viewModelScope.launch {
-            _uiEvent.emit(PrescriptionUiEvent.NavigateToCreate(scannedList))
-            _isLoading.value = false
-            isProcessing = false
-        }
-    }
-
-    private fun cleanDrugName(rawName: String): String {
-        return rawName.split("(")[0]
-            .replace(Regex("[^가-힣a-zA-Z0-9\\s]"), "")
-            .trim()
+        _isLoading.value = false
+        isProcessing = false
     }
 }

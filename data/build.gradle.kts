@@ -59,6 +59,8 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.data)
     implementation(libs.firebase.messaging)
+    // Firebase Vertex AI
+    implementation(libs.firebase.vertexai)
 
     // Map
     implementation(libs.bundles.google.maps.libs)

@@ -38,6 +38,8 @@ javaxInject = "1"
 # Firestore
 firebaseBom = "34.6.0"
 googleGmsServices = "4.4.4"
+# Firebase Vertex AI
+firebase-vertexai = "16.0.0"
 
 # REST
 retrofit = "3.0.0"
@@ -58,7 +60,6 @@ cameraXVersion = "1.5.2"
 accompanistPermissions = "0.37.3"
 # ML Kit
 mlkitTextKorean = "16.0.1"
-
 
 # Test Toolebox
 junit = "4.13.2"
@@ -114,6 +115,8 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
+# Firebase Vertex AI
+firebase-vertexai = { module = "com.google.firebase:firebase-vertexai", version.ref = "firebase-vertexai" }
 
 # REST
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
