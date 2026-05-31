@@ -9,8 +9,10 @@ import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -27,12 +29,11 @@ class MyConsultListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MyConsultListUiState(isLoading = true))
     val uiState: StateFlow<MyConsultListUiState> = _uiState.asStateFlow()
 
+    private val _effect = MutableSharedFlow<MyConsultListEffect>()
+    val effect = _effect.asSharedFlow()
+
     init {
         fetchMyConsultList()
-    }
-
-    fun userMessageShown() {
-        _uiState.update { it.copy(userMessage = null) }
     }
 
     private fun fetchMyConsultList() {
@@ -59,28 +60,33 @@ class MyConsultListViewModel @Inject constructor(
                 }
 
                 consultFlow.collectLatest { result ->
-                    _uiState.update { state ->
-                        when (result) {
-                            is DataResourceResult.Loading -> state.copy(isLoading = true)
-                            is DataResourceResult.Success -> {
-                                val displayedConsults =
-                                    if (!isPharmacist && currentNickname.isNotEmpty()) {
-                                        result.resultData.map { item ->
-                                            item.copy(nickName = currentNickname)
-                                        }
-                                    } else {
-                                        result.resultData
+                    when (result) {
+                        is DataResourceResult.Loading -> {
+                            _uiState.update { it.copy(isLoading = true) }
+                        }
+                        is DataResourceResult.Success -> {
+                            val displayedConsults =
+                                if (!isPharmacist && currentNickname.isNotEmpty()) {
+                                    result.resultData.map { item ->
+                                        item.copy(nickName = currentNickname)
                                     }
-                                state.copy(
+                                } else {
+                                    result.resultData
+                                }
+
+                            _uiState.update {
+                                it.copy(
                                     isLoading = false,
-                                    myConsults = displayedConsults,
-                                    userMessage = null
+                                    myConsults = displayedConsults
                                 )
                             }
-                            is DataResourceResult.Failure -> state.copy(
-                                isLoading = false,
-                                userMessage = if (state.myConsults.isEmpty()) UiMessage.LoadDataFailed else null
-                            )
+                        }
+                        is DataResourceResult.Failure -> {
+                            val shouldShowMessage = _uiState.value.myConsults.isEmpty()
+                            _uiState.update { it.copy(isLoading = false) }
+                            if (shouldShowMessage) {
+                                _effect.emit(MyConsultListEffect.ShowMessage(UiMessage.LoadDataFailed))
+                            }
                         }
                     }
                 }

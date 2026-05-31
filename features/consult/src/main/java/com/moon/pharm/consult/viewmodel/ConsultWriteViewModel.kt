@@ -2,7 +2,6 @@ package com.moon.pharm.consult.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.maps.model.LatLng
 import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
 import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.common.UiMessage
@@ -50,16 +49,8 @@ class ConsultWriteViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ConsultWriteUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _moveCameraEvent = MutableSharedFlow<LatLng>()
-    val moveCameraEvent = _moveCameraEvent.asSharedFlow()
-
-    private val _writeEvent = MutableSharedFlow<WriteEvent>()
-    val writeEvent = _writeEvent.asSharedFlow()
-
-    sealed interface WriteEvent {
-        data object MoveToPharmacist : WriteEvent
-        data object UpdateSuccess : WriteEvent
-    }
+    private val _effect = MutableSharedFlow<ConsultWriteEffect>()
+    val effect = _effect.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -94,7 +85,8 @@ class ConsultWriteViewModel @Inject constructor(
                         }
                     }
                     is DataResourceResult.Failure -> {
-                        _uiState.update { it.copy(isLoading = false, userMessage = UiMessage.LoadDataFailed) }
+                        _uiState.update { it.copy(isLoading = false) }
+                        showMessage(UiMessage.LoadDataFailed)
                     }
                 }
             }
@@ -121,11 +113,12 @@ class ConsultWriteViewModel @Inject constructor(
                     is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
                     is DataResourceResult.Success -> {
                         val location = result.resultData.location
-                        _moveCameraEvent.emit(LatLng(location.lat, location.lng))
+                        _effect.emit(ConsultWriteEffect.MoveCamera(location.lat, location.lng))
                         _uiState.update { it.copy(isLoading = false, searchResults = result.resultData.pharmacies) }
                     }
                     is DataResourceResult.Failure -> {
-                        _uiState.update { it.copy(isLoading = false, userMessage = UiMessage.LoadDataFailed) }
+                        _uiState.update { it.copy(isLoading = false) }
+                        showMessage(UiMessage.LoadDataFailed)
                         fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
                     }
                 }
@@ -143,7 +136,7 @@ class ConsultWriteViewModel @Inject constructor(
                         _uiState.update { it.copy(isLoading = false, searchResults = pharmacies) }
                         if (pharmacies.isNotEmpty()) {
                             val first = pharmacies.first()
-                            _moveCameraEvent.emit(LatLng(first.latitude, first.longitude))
+                            _effect.emit(ConsultWriteEffect.MoveCamera(first.latitude, first.longitude))
                         }
                     }
                     is DataResourceResult.Failure -> _uiState.update { it.copy(isLoading = false) }
@@ -203,7 +196,7 @@ class ConsultWriteViewModel @Inject constructor(
                 ValidateConsultFormUseCase.ErrorType.EMPTY_INPUT -> ConsultUiMessage.InputRequired
                 ValidateConsultFormUseCase.ErrorType.TITLE_TOO_SHORT -> ConsultUiMessage.TitleTooShort
             }
-            _uiState.update { it.copy(userMessage = error) }
+            showMessage(error)
             return
         }
 
@@ -211,7 +204,7 @@ class ConsultWriteViewModel @Inject constructor(
             submitConsult()
         } else {
             viewModelScope.launch {
-                _writeEvent.emit(WriteEvent.MoveToPharmacist)
+                _effect.emit(ConsultWriteEffect.MoveToPharmacist)
             }
         }
     }
@@ -237,11 +230,12 @@ class ConsultWriteViewModel @Inject constructor(
                     when (result) {
                         is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
                         is DataResourceResult.Success -> {
-                            _uiState.update { it.copy(isLoading = false, isConsultCreated = true) }
-                            _writeEvent.emit(WriteEvent.UpdateSuccess)
+                            _uiState.update { it.copy(isLoading = false) }
+                            _effect.emit(ConsultWriteEffect.UpdateSuccess)
                         }
                         is DataResourceResult.Failure -> {
-                            _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed) }
+                            _uiState.update { it.copy(isLoading = false) }
+                            _effect.emit(ConsultWriteEffect.ShowMessage(ConsultUiMessage.CreateFailed))
                         }
                     }
                 }
@@ -271,7 +265,8 @@ class ConsultWriteViewModel @Inject constructor(
                 createConsult(newItem)
             } catch (e: Exception) {
                 e.printStackTrace()
-                _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed) }
+                _uiState.update { it.copy(isLoading = false) }
+                _effect.emit(ConsultWriteEffect.ShowMessage(ConsultUiMessage.CreateFailed))
             }
         }
     }
@@ -294,20 +289,24 @@ class ConsultWriteViewModel @Inject constructor(
         }
     }
 
-    fun userMessageShown() {
-        _uiState.update { it.copy(userMessage = null) }
-    }
     // endregion
 
     // region Private Helpers
     private fun fetchPharmacistsInPharmacy(pharmacy: Pharmacy) {
         viewModelScope.launch {
             consultUseCases.pharmacistRepository.getPharmacistsByPlaceId(pharmacy.placeId).collectLatest { result ->
-                _uiState.update { state ->
-                    when (result) {
-                        is DataResourceResult.Loading -> state.copy(isLoading = true)
-                        is DataResourceResult.Success -> state.copy(isLoading = false, availablePharmacists = result.resultData)
-                        is DataResourceResult.Failure -> state.copy(isLoading = false, userMessage = UiMessage.LoadDataFailed)
+                when (result) {
+                    is DataResourceResult.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+                    is DataResourceResult.Success -> {
+                        _uiState.update {
+                            it.copy(isLoading = false, availablePharmacists = result.resultData)
+                        }
+                    }
+                    is DataResourceResult.Failure -> {
+                        _uiState.update { it.copy(isLoading = false) }
+                        _effect.emit(ConsultWriteEffect.ShowMessage(UiMessage.LoadDataFailed))
                     }
                 }
             }
@@ -318,24 +317,24 @@ class ConsultWriteViewModel @Inject constructor(
         _uiState.update { ConsultWriteUiState() }
     }
 
-    fun resetConsultState() {
-        _uiState.update { it.copy(isConsultCreated = false) }
-    }
-
     private fun createConsult(consultInfo: ConsultItem) {
         viewModelScope.launch {
             consultRepository.createConsult(consultInfo).collectLatest { result ->
-                _uiState.update { state ->
-                    when (result) {
-                        is DataResourceResult.Loading -> state.copy(isLoading = true)
-                        is DataResourceResult.Success -> {
-                            val pharmacistId = consultInfo.pharmacistId
-                            if (pharmacistId != null) {
-                                sendNotificationToPharmacist(pharmacistId, consultInfo.id)
-                            }
-                            state.copy(isLoading = false, isConsultCreated = true)
+                when (result) {
+                    is DataResourceResult.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+                    is DataResourceResult.Success -> {
+                        val pharmacistId = consultInfo.pharmacistId
+                        if (pharmacistId != null) {
+                            sendNotificationToPharmacist(pharmacistId, consultInfo.id)
                         }
-                        is DataResourceResult.Failure -> state.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed)
+                        _uiState.update { it.copy(isLoading = false) }
+                        _effect.emit(ConsultWriteEffect.CreateSuccess)
+                    }
+                    is DataResourceResult.Failure -> {
+                        _uiState.update { it.copy(isLoading = false) }
+                        _effect.emit(ConsultWriteEffect.ShowMessage(ConsultUiMessage.CreateFailed))
                     }
                 }
             }
@@ -349,19 +348,25 @@ class ConsultWriteViewModel @Inject constructor(
                 ValidateConsultFormUseCase.ErrorType.EMPTY_INPUT -> ConsultUiMessage.InputRequired
                 ValidateConsultFormUseCase.ErrorType.TITLE_TOO_SHORT -> ConsultUiMessage.TitleTooShort
             }
-            _uiState.update { it.copy(userMessage = error) }
+            showMessage(error)
             return null
         }
         if (state.selectedPharmacistId == null) {
-            _uiState.update { it.copy(userMessage = ConsultUiMessage.PharmacistRequired) }
+            showMessage(ConsultUiMessage.PharmacistRequired)
             return null
         }
         val userId = consultUseCases.authRepository.getCurrentUserId()
         if (userId == null) {
-            _uiState.update { it.copy(userMessage = UiMessage.LoginRequired) }
+            showMessage(UiMessage.LoginRequired)
             return null
         }
         return userId
+    }
+
+    private fun showMessage(message: UiMessage) {
+        viewModelScope.launch {
+            _effect.emit(ConsultWriteEffect.ShowMessage(message))
+        }
     }
     // endregion
 }

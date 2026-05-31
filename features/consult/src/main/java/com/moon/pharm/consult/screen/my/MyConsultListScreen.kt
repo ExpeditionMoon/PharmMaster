@@ -13,10 +13,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.moon.pharm.component_ui.common.asString
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
@@ -25,10 +25,12 @@ import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
+import com.moon.pharm.consult.mapper.asConsultString
 import com.moon.pharm.consult.screen.component.MyConsultEmptyView
 import com.moon.pharm.consult.screen.component.MyConsultListContent
 import com.moon.pharm.consult.util.myConsultListEmptyTextRes
 import com.moon.pharm.consult.util.myConsultListTitleRes
+import com.moon.pharm.consult.viewmodel.MyConsultListEffect
 import com.moon.pharm.consult.viewmodel.MyConsultListUiState
 import com.moon.pharm.consult.viewmodel.MyConsultListViewModel
 import com.moon.pharm.domain.model.auth.UserType
@@ -42,13 +44,15 @@ fun MyConsultListRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val userMessage = uiState.userMessage
-    val messageText = userMessage?.asString()
+    val context = LocalContext.current
 
-    LaunchedEffect(userMessage) {
-        if (userMessage != null && messageText != null) {
-            snackbarHostState.showSnackbar(messageText)
-            viewModel.userMessageShown()
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is MyConsultListEffect.ShowMessage -> {
+                    snackbarHostState.showSnackbar(effect.message.asConsultString(context))
+                }
+            }
         }
     }
 

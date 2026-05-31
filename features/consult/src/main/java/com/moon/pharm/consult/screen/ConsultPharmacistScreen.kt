@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -35,6 +36,7 @@ import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.screen.component.ConsultPharmacistContent
+import com.moon.pharm.consult.viewmodel.ConsultWriteEffect
 import com.moon.pharm.consult.viewmodel.ConsultWriteViewModel
 import kotlinx.coroutines.launch
 
@@ -81,6 +83,19 @@ fun ConsultPharmacistScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            if (effect is ConsultWriteEffect.MoveCamera) {
+                cameraPositionState.animate(
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(effect.lat, effect.lng),
+                        16f
+                    )
+                )
+            }
+        }
+    }
+
     val handleBackPress = {
         if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
             scope.launch { scaffoldState.bottomSheetState.partialExpand() }
@@ -115,7 +130,6 @@ fun ConsultPharmacistScreen(
                 selectedPharmacy = uiState.selectedPharmacy,
                 availablePharmacists = uiState.availablePharmacists,
                 cameraPositionState = cameraPositionState,
-                cameraMoveEvent = viewModel.moveCameraEvent,
                 onSearchQueryChange = viewModel::onSearchQueryChanged,
                 onSearchArea = viewModel::fetchNearbyPharmacies,
                 onPharmacySelect = viewModel::selectPharmacy,

@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -22,10 +23,11 @@ import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.consult.R
-import com.moon.pharm.consult.mapper.asString
-import com.moon.pharm.consult.model.ConsultUiMessage
+import com.moon.pharm.consult.mapper.asConsultString
+import com.moon.pharm.consult.mapper.toConsultSnackbarType
 import com.moon.pharm.consult.navigation.ConsultNavKeys.REFRESH_CONSULT_LIST
 import com.moon.pharm.consult.screen.component.ConsultConfirmContent
+import com.moon.pharm.consult.viewmodel.ConsultWriteEffect
 import com.moon.pharm.consult.viewmodel.ConsultWriteViewModel
 
 @Composable
@@ -36,42 +38,38 @@ fun ConsultConfirmScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
     var currentSnackbarType by remember { mutableStateOf(SnackbarType.INFO) }
-    val userMessage = uiState.userMessage
-    val messageText = (userMessage as? ConsultUiMessage)?.asString()
 
-    LaunchedEffect(userMessage) {
-        if (userMessage != null && messageText != null) {
-            currentSnackbarType = when (userMessage) {
-                is ConsultUiMessage.AnswerRegisterSuccess,
-                is ConsultUiMessage.ConsultDeleteSuccess,
-                is ConsultUiMessage.AnswerDeleteSuccess -> SnackbarType.INFO
-                else -> SnackbarType.ERROR
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is ConsultWriteEffect.ShowMessage -> {
+                    currentSnackbarType = effect.message.toConsultSnackbarType()
+                    snackbarHostState.showSnackbar(effect.message.asConsultString(context))
+                }
+                is ConsultWriteEffect.CreateSuccess -> {
+                    try {
+                        navController.getBackStackEntry(ContentNavigationRoute.ConsultTab)
+                            .savedStateHandle[REFRESH_CONSULT_LIST] = true
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+
+                    navController.navigate(ContentNavigationRoute.ConsultTab) {
+                        popUpTo(ContentNavigationRoute.ConsultTab) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+                is ConsultWriteEffect.MoveCamera,
+                is ConsultWriteEffect.MoveToPharmacist,
+                is ConsultWriteEffect.UpdateSuccess -> Unit
             }
-            snackbarHostState.showSnackbar(messageText)
-            viewModel.userMessageShown()
         }
     }
 
     val selectedPharmacist = remember(uiState.selectedPharmacistId, uiState.availablePharmacists) {
         uiState.availablePharmacists.find { it.userId == uiState.selectedPharmacistId }
-    }
-
-    LaunchedEffect(uiState.isConsultCreated) {
-        if (uiState.isConsultCreated) {
-            try {
-                navController.getBackStackEntry(ContentNavigationRoute.ConsultTab)
-                    .savedStateHandle[REFRESH_CONSULT_LIST] = true
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            viewModel.resetConsultState()
-            navController.navigate(ContentNavigationRoute.ConsultTab) {
-                popUpTo(ContentNavigationRoute.ConsultTab) { inclusive = false }
-                launchSingleTop = true
-            }
-        }
     }
 
     Scaffold(

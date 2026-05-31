@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,14 +22,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
+import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
+import com.moon.pharm.component_ui.component.snackbar.SnackbarType
 import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.util.MultipleEventsCutter
 import com.moon.pharm.consult.R
+import com.moon.pharm.consult.mapper.asConsultString
 import com.moon.pharm.consult.navigation.ConsultNavKeys.REFRESH_CONSULT_LIST
 import com.moon.pharm.consult.screen.component.ConsultContent
+import com.moon.pharm.consult.viewmodel.ConsultListEffect
 import com.moon.pharm.consult.viewmodel.ConsultListViewModel
 
 @Composable
@@ -38,6 +44,17 @@ fun ConsultScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is ConsultListEffect.ShowMessage -> {
+                    snackbarHostState.showSnackbar(effect.message.asConsultString(context))
+                }
+            }
+        }
+    }
 
     if (navController != null) {
         val refreshFlow = navController.currentBackStackEntry
@@ -75,6 +92,11 @@ fun ConsultScreen(
                     )
                 )
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                CustomSnackbar(snackbarData = data, type = SnackbarType.ERROR)
+            }
         }
     ) { innerPadding ->
         Box(

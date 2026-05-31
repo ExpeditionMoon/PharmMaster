@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -25,9 +26,10 @@ import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.consult.R
-import com.moon.pharm.consult.mapper.asString
-import com.moon.pharm.consult.model.ConsultUiMessage
+import com.moon.pharm.consult.mapper.asConsultString
+import com.moon.pharm.consult.mapper.toConsultSnackbarType
 import com.moon.pharm.consult.screen.component.ConsultWriteContent
+import com.moon.pharm.consult.viewmodel.ConsultWriteEffect
 import com.moon.pharm.consult.viewmodel.ConsultWriteViewModel
 
 @Composable
@@ -38,32 +40,24 @@ fun ConsultWriteScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
     var currentSnackbarType by remember { mutableStateOf(SnackbarType.INFO) }
-    val userMessage = uiState.userMessage
-    val messageText = (userMessage as? ConsultUiMessage)?.asString()
-
-    LaunchedEffect(userMessage) {
-        if (userMessage != null && messageText != null) {
-            currentSnackbarType = when (userMessage) {
-                is ConsultUiMessage.AnswerRegisterSuccess,
-                is ConsultUiMessage.ConsultDeleteSuccess,
-                is ConsultUiMessage.AnswerDeleteSuccess -> SnackbarType.INFO
-                else -> SnackbarType.ERROR
-            }
-            snackbarHostState.showSnackbar(messageText)
-            viewModel.userMessageShown()
-        }
-    }
 
     LaunchedEffect(Unit) {
-        viewModel.writeEvent.collect { event ->
-            when (event) {
-                is ConsultWriteViewModel.WriteEvent.MoveToPharmacist -> {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is ConsultWriteEffect.ShowMessage -> {
+                    currentSnackbarType = effect.message.toConsultSnackbarType()
+                    snackbarHostState.showSnackbar(effect.message.asConsultString(context))
+                }
+                is ConsultWriteEffect.MoveToPharmacist -> {
                     navController.navigate(ContentNavigationRoute.ConsultTabPharmacistScreen)
                 }
-                is ConsultWriteViewModel.WriteEvent.UpdateSuccess -> {
+                is ConsultWriteEffect.UpdateSuccess -> {
                     navController.navigateUp()
                 }
+                is ConsultWriteEffect.CreateSuccess,
+                is ConsultWriteEffect.MoveCamera -> Unit
             }
         }
     }

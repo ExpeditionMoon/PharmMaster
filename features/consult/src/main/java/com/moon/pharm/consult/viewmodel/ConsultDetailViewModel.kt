@@ -9,7 +9,9 @@ import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -26,8 +28,8 @@ class ConsultDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ConsultDetailUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _answerContent = MutableStateFlow("")
-    val answerContent = _answerContent.asStateFlow()
+    private val _effect = MutableSharedFlow<ConsultDetailEffect>()
+    val effect = _effect.asSharedFlow()
 
     fun getConsultDetail(id: String) {
         viewModelScope.launch {
@@ -42,35 +44,40 @@ class ConsultDetailViewModel @Inject constructor(
                             canAnswer = result.resultData.isMyConsultToAnswer,
                             currentUserId = result.resultData.currentUserId
                         )
-                        is DataResourceResult.Failure -> state.copy(
-                            isLoading = false,
-                            userMessage = UiMessage.LoadDataFailed
-                        )
+                        is DataResourceResult.Failure -> state.copy(isLoading = false)
                     }
+                }
+
+                if (result is DataResourceResult.Failure) {
+                    showMessage(UiMessage.LoadDataFailed)
                 }
             }
         }
     }
 
     fun onAnswerContentChanged(content: String) {
-        _answerContent.value = content
+        _uiState.update { it.copy(answerContent = content) }
     }
 
     fun startEditingAnswer() {
         val currentAnswer = _uiState.value.selectedItem?.answer?.content ?: ""
-        _answerContent.value = currentAnswer
-        _uiState.update { it.copy(isEditingAnswer = true) }
+        _uiState.update {
+            it.copy(
+                isEditingAnswer = true,
+                answerContent = currentAnswer
+            )
+        }
     }
 
     fun registerAnswer(consultId: String) {
-        val content = _answerContent.value
+        val content = _uiState.value.answerContent
         val questionerId = _uiState.value.selectedItem?.userId
         val pharmacist = _uiState.value.answerPharmacist
 
         if (content.isBlank() || questionerId == null) return
 
         if (pharmacist == null) {
-            _uiState.update { it.copy(userMessage = UiMessage.LoadDataFailed) }
+            showMessage(UiMessage.LoadDataFailed)
             return
         }
 
@@ -78,7 +85,9 @@ class ConsultDetailViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             consultUseCases.registerAnswer(consultId, content, pharmacist).collectLatest { result ->
                 when (result) {
-                    is DataResourceResult.Loading -> { _uiState.update { it.copy(isLoading = true) } }
+                    is DataResourceResult.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
                     is DataResourceResult.Success -> {
                         _uiState.update {
                             it.copy(
@@ -86,20 +95,20 @@ class ConsultDetailViewModel @Inject constructor(
                                 selectedItem = result.resultData,
                                 canAnswer = false,
                                 isEditingAnswer = false,
-                                userMessage = ConsultUiMessage.AnswerRegisterSuccess
+                                answerContent = ""
                             )
                         }
-                        _answerContent.value = ""
+                        _effect.emit(ConsultDetailEffect.ShowMessage(ConsultUiMessage.AnswerRegisterSuccess))
                         sendNotificationToUser(questionerId, consultId)
                     }
                     is DataResourceResult.Failure -> {
-                        _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed) }
+                        _uiState.update { it.copy(isLoading = false) }
+                        _effect.emit(ConsultDetailEffect.ShowMessage(ConsultUiMessage.CreateFailed))
                     }
                 }
             }
         }
     }
-
 
     fun deleteConsult(consultId: String) {
         viewModelScope.launch {
@@ -107,12 +116,15 @@ class ConsultDetailViewModel @Inject constructor(
             consultRepository.deleteConsult(consultId).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Success -> {
-                        _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.ConsultDeleteSuccess) }
+                        _uiState.update { it.copy(isLoading = false) }
+                        _effect.emit(ConsultDetailEffect.ShowMessage(ConsultUiMessage.ConsultDeleteSuccess))
+                        _effect.emit(ConsultDetailEffect.NavigateBack)
                     }
                     is DataResourceResult.Failure -> {
-                        _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed) }
+                        _uiState.update { it.copy(isLoading = false) }
+                        _effect.emit(ConsultDetailEffect.ShowMessage(ConsultUiMessage.CreateFailed))
                     }
-                    is DataResourceResult.Loading -> { /* 로딩 처리 */ }
+                    is DataResourceResult.Loading -> Unit
                 }
             }
         }
@@ -124,13 +136,15 @@ class ConsultDetailViewModel @Inject constructor(
             consultRepository.deleteConsultAnswer(consultId).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Success -> {
-                        _uiState.update { it.copy(isLoading = false, canAnswer = true, userMessage = ConsultUiMessage.ConsultDeleteSuccess) }
+                        _uiState.update { it.copy(isLoading = false, canAnswer = true) }
+                        _effect.emit(ConsultDetailEffect.ShowMessage(ConsultUiMessage.AnswerDeleteSuccess))
                         getConsultDetail(consultId)
                     }
                     is DataResourceResult.Failure -> {
                         _uiState.update { it.copy(isLoading = false) }
+                        _effect.emit(ConsultDetailEffect.ShowMessage(ConsultUiMessage.CreateFailed))
                     }
-                    is DataResourceResult.Loading -> { }
+                    is DataResourceResult.Loading -> Unit
                 }
             }
         }
@@ -149,8 +163,9 @@ class ConsultDetailViewModel @Inject constructor(
         }
     }
 
-    fun userMessageShown() {
-        _uiState.update { it.copy(userMessage = null) }
+    private fun showMessage(message: UiMessage) {
+        viewModelScope.launch {
+            _effect.emit(ConsultDetailEffect.ShowMessage(message))
+        }
     }
-
 }
