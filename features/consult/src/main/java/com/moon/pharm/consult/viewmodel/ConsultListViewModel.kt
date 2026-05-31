@@ -5,9 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.model.ConsultPrimaryTab
 import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.consult.ConsultUseCases
+import com.moon.pharm.domain.usecase.consult.GetConsultItemsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ConsultListViewModel @Inject constructor(
-    private val consultUseCases: ConsultUseCases,
+    private val authRepository: AuthRepository,
+    private val getConsultItemsUseCase: GetConsultItemsUseCase,
     private val userRepository: UserRepository
 ) : ViewModel() {
     private var fetchConsultListJob: Job? = null
@@ -43,7 +45,7 @@ class ConsultListViewModel @Inject constructor(
     fun fetchConsultList() {
         fetchConsultListJob?.cancel()
         fetchConsultListJob = viewModelScope.launch {
-            val userId = consultUseCases.authRepository.getCurrentUserId()
+            val userId = authRepository.getCurrentUserId()
             var isPharmacist = false
 
             if (userId != null) {
@@ -57,7 +59,7 @@ class ConsultListViewModel @Inject constructor(
                 it.copy(currentUserId = userId, isPharmacist = isPharmacist)
             }
 
-            consultUseCases.getConsultList().collectLatest { result ->
+            getConsultItemsUseCase().collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Loading -> {
                         _uiState.update { it.copy(isLoading = true) }

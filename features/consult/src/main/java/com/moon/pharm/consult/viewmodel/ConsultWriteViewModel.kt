@@ -9,14 +9,16 @@ import com.moon.pharm.consult.mapper.ConsultUiMapper
 import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
+import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.repository.PharmacyRepository
+import com.moon.pharm.domain.repository.PharmacistRepository
 import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.consult.ConsultUseCases
 import com.moon.pharm.domain.usecase.consult.UploadConsultImagesUseCase
 import com.moon.pharm.domain.usecase.consult.ValidateConsultFormUseCase
 import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocationUseCase
+import com.moon.pharm.domain.usecase.pharmacy.SearchPharmacyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -35,11 +37,14 @@ import javax.inject.Inject
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class ConsultWriteViewModel @Inject constructor(
-    private val consultUseCases: ConsultUseCases,
+    private val authRepository: AuthRepository,
     private val getLocationUseCase: GetNearbyPharmaciesCurrentLocationUseCase,
+    private val searchPharmacyUseCase: SearchPharmacyUseCase,
     private val uploadImagesUseCase: UploadConsultImagesUseCase,
+    private val validateConsultFormUseCase: ValidateConsultFormUseCase,
     private val consultRepository: ConsultRepository,
     private val pharmacyRepository: PharmacyRepository,
+    private val pharmacistRepository: PharmacistRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
 
@@ -128,7 +133,7 @@ class ConsultWriteViewModel @Inject constructor(
     }
 
     private suspend fun searchPharmacies(query: String) {
-        consultUseCases.searchPharmacy(query).collectLatest { result ->
+        searchPharmacyUseCase(query).collectLatest { result ->
             when (result) {
                 is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
                 is DataResourceResult.Success -> {
@@ -192,7 +197,7 @@ class ConsultWriteViewModel @Inject constructor(
     fun onNextClick() {
         val state = _uiState.value
 
-        val validationResult = consultUseCases.validateConsultForm(state.title, state.content)
+        val validationResult = validateConsultFormUseCase(state.title, state.content)
 
         if (validationResult is ValidateConsultFormUseCase.Result.Invalid) {
             val error = when (validationResult.error) {
@@ -303,7 +308,7 @@ class ConsultWriteViewModel @Inject constructor(
     private fun fetchPharmacistsInPharmacy(pharmacy: Pharmacy) {
         pharmacistSearchJob?.cancel()
         pharmacistSearchJob = viewModelScope.launch {
-            consultUseCases.pharmacistRepository.getPharmacistsByPlaceId(pharmacy.placeId).collectLatest { result ->
+            pharmacistRepository.getPharmacistsByPlaceId(pharmacy.placeId).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Loading -> {
                         _uiState.update { it.copy(isLoading = true) }
@@ -349,7 +354,7 @@ class ConsultWriteViewModel @Inject constructor(
     }
 
     private fun validateAndGetUserId(state: ConsultWriteUiState): String? {
-        val validationResult = consultUseCases.validateConsultForm(state.title, state.content)
+        val validationResult = validateConsultFormUseCase(state.title, state.content)
         if (validationResult is ValidateConsultFormUseCase.Result.Invalid) {
             val error = when (validationResult.error) {
                 ValidateConsultFormUseCase.ErrorType.EMPTY_INPUT -> ConsultUiMessage.InputRequired
@@ -362,7 +367,7 @@ class ConsultWriteViewModel @Inject constructor(
             showMessage(ConsultUiMessage.PharmacistRequired)
             return null
         }
-        val userId = consultUseCases.authRepository.getCurrentUserId()
+        val userId = authRepository.getCurrentUserId()
         if (userId == null) {
             showMessage(UiMessage.LoginRequired)
             return null

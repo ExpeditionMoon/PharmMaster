@@ -7,7 +7,8 @@ import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.consult.ConsultUseCases
+import com.moon.pharm.domain.usecase.consult.GetConsultDetailUseCase
+import com.moon.pharm.domain.usecase.consult.RegisterAnswerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ConsultDetailViewModel @Inject constructor(
-    private val consultUseCases: ConsultUseCases,
+    private val getConsultDetailUseCase: GetConsultDetailUseCase,
+    private val registerAnswerUseCase: RegisterAnswerUseCase,
     private val userRepository: UserRepository,
     private val consultRepository: ConsultRepository
 ) : ViewModel() {
@@ -41,7 +43,7 @@ class ConsultDetailViewModel @Inject constructor(
     }
 
     private suspend fun collectConsultDetail(id: String) {
-        consultUseCases.getConsultDetail(id).collectLatest { result ->
+        getConsultDetailUseCase(id).collectLatest { result ->
             _uiState.update { state ->
                 when (result) {
                     is DataResourceResult.Loading -> state.copy(isLoading = true)
@@ -90,7 +92,7 @@ class ConsultDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            consultUseCases.registerAnswer(consultId, content, pharmacist).collectLatest { result ->
+            registerAnswerUseCase(consultId, content, pharmacist).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Loading -> {
                         _uiState.update { it.copy(isLoading = true) }
