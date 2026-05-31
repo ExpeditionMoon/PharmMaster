@@ -9,6 +9,7 @@ import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -24,6 +25,7 @@ class ConsultDetailViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val consultRepository: ConsultRepository
 ) : ViewModel() {
+    private var consultDetailJob: Job? = null
 
     private val _uiState = MutableStateFlow(ConsultDetailUiState())
     val uiState = _uiState.asStateFlow()
@@ -32,25 +34,30 @@ class ConsultDetailViewModel @Inject constructor(
     val effect = _effect.asSharedFlow()
 
     fun getConsultDetail(id: String) {
-        viewModelScope.launch {
-            consultUseCases.getConsultDetail(id).collectLatest { result ->
-                _uiState.update { state ->
-                    when (result) {
-                        is DataResourceResult.Loading -> state.copy(isLoading = true)
-                        is DataResourceResult.Success -> state.copy(
-                            isLoading = false,
-                            selectedItem = result.resultData.consult,
-                            answerPharmacist = result.resultData.pharmacist,
-                            canAnswer = result.resultData.isMyConsultToAnswer,
-                            currentUserId = result.resultData.currentUserId
-                        )
-                        is DataResourceResult.Failure -> state.copy(isLoading = false)
-                    }
-                }
+        consultDetailJob?.cancel()
+        consultDetailJob = viewModelScope.launch {
+            collectConsultDetail(id)
+        }
+    }
 
-                if (result is DataResourceResult.Failure) {
-                    showMessage(UiMessage.LoadDataFailed)
+    private suspend fun collectConsultDetail(id: String) {
+        consultUseCases.getConsultDetail(id).collectLatest { result ->
+            _uiState.update { state ->
+                when (result) {
+                    is DataResourceResult.Loading -> state.copy(isLoading = true)
+                    is DataResourceResult.Success -> state.copy(
+                        isLoading = false,
+                        selectedItem = result.resultData.consult,
+                        answerPharmacist = result.resultData.pharmacist,
+                        canAnswer = result.resultData.isMyConsultToAnswer,
+                        currentUserId = result.resultData.currentUserId
+                    )
+                    is DataResourceResult.Failure -> state.copy(isLoading = false)
                 }
+            }
+
+            if (result is DataResourceResult.Failure) {
+                showMessage(UiMessage.LoadDataFailed)
             }
         }
     }

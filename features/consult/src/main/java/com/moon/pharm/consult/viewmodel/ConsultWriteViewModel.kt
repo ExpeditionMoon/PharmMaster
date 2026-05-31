@@ -18,8 +18,8 @@ import com.moon.pharm.domain.usecase.consult.UploadConsultImagesUseCase
 import com.moon.pharm.domain.usecase.consult.ValidateConsultFormUseCase
 import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -44,6 +44,7 @@ class ConsultWriteViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var editingConsultId: String? = null
+    private var pharmacistSearchJob: Job? = null
     private val _searchQuery = MutableStateFlow("")
 
     private val _uiState = MutableStateFlow(ConsultWriteUiState())
@@ -58,7 +59,7 @@ class ConsultWriteViewModel @Inject constructor(
                 .debounce(500L)
                 .distinctUntilChanged()
                 .filter { it.isNotBlank() }
-                .collectLatest { query -> searchPharmacies(query) }
+                .collectLatest(::searchPharmacies)
         }
     }
 
@@ -119,41 +120,43 @@ class ConsultWriteViewModel @Inject constructor(
                     is DataResourceResult.Failure -> {
                         _uiState.update { it.copy(isLoading = false) }
                         showMessage(UiMessage.LoadDataFailed)
-                        fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
+                        fetchNearbyPharmaciesInternal(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
                     }
                 }
             }
         }
     }
 
-    private fun searchPharmacies(query: String) {
-        viewModelScope.launch {
-            consultUseCases.searchPharmacy(query).collectLatest { result ->
-                when (result) {
-                    is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
-                    is DataResourceResult.Success -> {
-                        val pharmacies = result.resultData
-                        _uiState.update { it.copy(isLoading = false, searchResults = pharmacies) }
-                        if (pharmacies.isNotEmpty()) {
-                            val first = pharmacies.first()
-                            _effect.emit(ConsultWriteEffect.MoveCamera(first.latitude, first.longitude))
-                        }
+    private suspend fun searchPharmacies(query: String) {
+        consultUseCases.searchPharmacy(query).collectLatest { result ->
+            when (result) {
+                is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
+                is DataResourceResult.Success -> {
+                    val pharmacies = result.resultData
+                    _uiState.update { it.copy(isLoading = false, searchResults = pharmacies) }
+                    if (pharmacies.isNotEmpty()) {
+                        val first = pharmacies.first()
+                        _effect.emit(ConsultWriteEffect.MoveCamera(first.latitude, first.longitude))
                     }
-                    is DataResourceResult.Failure -> _uiState.update { it.copy(isLoading = false) }
                 }
+                is DataResourceResult.Failure -> _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
 
     fun fetchNearbyPharmacies(lat: Double, lng: Double) {
         viewModelScope.launch {
-            pharmacyRepository.searchNearbyPharmacies(lat, lng).collectLatest { result ->
-                _uiState.update { state ->
-                    when (result) {
-                        is DataResourceResult.Loading -> state.copy(isLoading = true)
-                        is DataResourceResult.Success -> state.copy(isLoading = false, searchResults = result.resultData)
-                        is DataResourceResult.Failure -> state.copy(isLoading = false)
-                    }
+            fetchNearbyPharmaciesInternal(lat, lng)
+        }
+    }
+
+    private suspend fun fetchNearbyPharmaciesInternal(lat: Double, lng: Double) {
+        pharmacyRepository.searchNearbyPharmacies(lat, lng).collectLatest { result ->
+            _uiState.update { state ->
+                when (result) {
+                    is DataResourceResult.Loading -> state.copy(isLoading = true)
+                    is DataResourceResult.Success -> state.copy(isLoading = false, searchResults = result.resultData)
+                    is DataResourceResult.Failure -> state.copy(isLoading = false)
                 }
             }
         }
@@ -215,85 +218,91 @@ class ConsultWriteViewModel @Inject constructor(
 
     fun submitConsult() {
         val state = _uiState.value
-
-        // Update
         val editId = editingConsultId
+
         if (editId != null) {
             viewModelScope.launch {
-                _uiState.update { it.copy(isLoading = true) }
-                consultRepository.updateConsult(
-                    consultId = editId,
-                    title = state.title,
-                    content = state.content,
-                    isPublic = state.isPublic
-                ).collectLatest { result ->
-                    when (result) {
-                        is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
-                        is DataResourceResult.Success -> {
-                            _uiState.update { it.copy(isLoading = false) }
-                            _effect.emit(ConsultWriteEffect.UpdateSuccess)
-                        }
-                        is DataResourceResult.Failure -> {
-                            _uiState.update { it.copy(isLoading = false) }
-                            _effect.emit(ConsultWriteEffect.ShowMessage(ConsultUiMessage.CreateFailed))
-                        }
-                    }
-                }
+                updateExistingConsult(editId, state)
             }
             return
         }
 
-        // Create
         val userId = validateAndGetUserId(state) ?: return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            try {
-                val userResult = userRepository.getUserOnce(userId)
-                val nickname = if (userResult is DataResourceResult.Success) userResult.resultData.nickName else ""
-                val uploadedUrls = if (state.images.isNotEmpty()) {
-                    uploadImagesUseCase(state.images, userId)
-                } else emptyList()
-
-                val newItem = ConsultUiMapper.toDomainModel(
-                    writeState = state,
-                    currentUserId = userId,
-                    currentUserNickname = nickname,
-                    selectedPharmacistId = state.selectedPharmacistId!!,
-                    uploadedImageUrls = uploadedUrls
-                )
-                createConsult(newItem)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _uiState.update { it.copy(isLoading = false) }
-                _effect.emit(ConsultWriteEffect.ShowMessage(ConsultUiMessage.CreateFailed))
-            }
+            createNewConsult(state, userId)
         }
     }
 
-    private fun sendNotificationToPharmacist(pharmacistId: String, consultId: String) {
-        CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
-            try {
-                val pharmacistResult = userRepository.getUserOnce(pharmacistId)
+    private suspend fun sendNotificationToPharmacist(pharmacistId: String, consultId: String) {
+        try {
+            val pharmacistResult = userRepository.getUserOnce(pharmacistId)
 
-                if (pharmacistResult is DataResourceResult.Success) {
-                    val user = pharmacistResult.resultData
-                    val token = user.fcmToken
-                    if (!token.isNullOrEmpty()) {
-                        consultRepository.sendNewConsultNotification(token, consultId)
-                    }
+            if (pharmacistResult is DataResourceResult.Success) {
+                val token = pharmacistResult.resultData.fcmToken
+                if (!token.isNullOrEmpty()) {
+                    consultRepository.sendNewConsultNotification(token, consultId)
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     // endregion
 
     // region Private Helpers
+    private suspend fun updateExistingConsult(consultId: String, state: ConsultWriteUiState) {
+        _uiState.update { it.copy(isLoading = true) }
+        consultRepository.updateConsult(
+            consultId = consultId,
+            title = state.title,
+            content = state.content,
+            isPublic = state.isPublic
+        ).collectLatest { result ->
+            when (result) {
+                is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
+                is DataResourceResult.Success -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    _effect.emit(ConsultWriteEffect.UpdateSuccess)
+                }
+                is DataResourceResult.Failure -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    _effect.emit(ConsultWriteEffect.ShowMessage(ConsultUiMessage.CreateFailed))
+                }
+            }
+        }
+    }
+
+    private suspend fun createNewConsult(state: ConsultWriteUiState, userId: String) {
+        _uiState.update { it.copy(isLoading = true) }
+        try {
+            val userResult = userRepository.getUserOnce(userId)
+            val nickname = if (userResult is DataResourceResult.Success) userResult.resultData.nickName else ""
+            val uploadedUrls = if (state.images.isNotEmpty()) {
+                uploadImagesUseCase(state.images, userId)
+            } else {
+                emptyList()
+            }
+
+            val newItem = ConsultUiMapper.toDomainModel(
+                writeState = state,
+                currentUserId = userId,
+                currentUserNickname = nickname,
+                selectedPharmacistId = state.selectedPharmacistId!!,
+                uploadedImageUrls = uploadedUrls
+            )
+            createConsultItem(newItem)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            _uiState.update { it.copy(isLoading = false) }
+            _effect.emit(ConsultWriteEffect.ShowMessage(ConsultUiMessage.CreateFailed))
+        }
+    }
+
     private fun fetchPharmacistsInPharmacy(pharmacy: Pharmacy) {
-        viewModelScope.launch {
+        pharmacistSearchJob?.cancel()
+        pharmacistSearchJob = viewModelScope.launch {
             consultUseCases.pharmacistRepository.getPharmacistsByPlaceId(pharmacy.placeId).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Loading -> {
@@ -317,25 +326,23 @@ class ConsultWriteViewModel @Inject constructor(
         _uiState.update { ConsultWriteUiState() }
     }
 
-    private fun createConsult(consultInfo: ConsultItem) {
-        viewModelScope.launch {
-            consultRepository.createConsult(consultInfo).collectLatest { result ->
-                when (result) {
-                    is DataResourceResult.Loading -> {
-                        _uiState.update { it.copy(isLoading = true) }
+    private suspend fun createConsultItem(consultInfo: ConsultItem) {
+        consultRepository.createConsult(consultInfo).collectLatest { result ->
+            when (result) {
+                is DataResourceResult.Loading -> {
+                    _uiState.update { it.copy(isLoading = true) }
+                }
+                is DataResourceResult.Success -> {
+                    val pharmacistId = consultInfo.pharmacistId
+                    if (pharmacistId != null) {
+                        sendNotificationToPharmacist(pharmacistId, consultInfo.id)
                     }
-                    is DataResourceResult.Success -> {
-                        val pharmacistId = consultInfo.pharmacistId
-                        if (pharmacistId != null) {
-                            sendNotificationToPharmacist(pharmacistId, consultInfo.id)
-                        }
-                        _uiState.update { it.copy(isLoading = false) }
-                        _effect.emit(ConsultWriteEffect.CreateSuccess)
-                    }
-                    is DataResourceResult.Failure -> {
-                        _uiState.update { it.copy(isLoading = false) }
-                        _effect.emit(ConsultWriteEffect.ShowMessage(ConsultUiMessage.CreateFailed))
-                    }
+                    _uiState.update { it.copy(isLoading = false) }
+                    _effect.emit(ConsultWriteEffect.CreateSuccess)
+                }
+                is DataResourceResult.Failure -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    _effect.emit(ConsultWriteEffect.ShowMessage(ConsultUiMessage.CreateFailed))
                 }
             }
         }

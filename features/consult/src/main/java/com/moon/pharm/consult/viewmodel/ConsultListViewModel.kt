@@ -9,6 +9,7 @@ import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -23,6 +24,8 @@ class ConsultListViewModel @Inject constructor(
     private val consultUseCases: ConsultUseCases,
     private val userRepository: UserRepository
 ) : ViewModel() {
+    private var fetchConsultListJob: Job? = null
+
     private val _uiState = MutableStateFlow(ConsultListUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -38,7 +41,8 @@ class ConsultListViewModel @Inject constructor(
     }
 
     fun fetchConsultList() {
-        viewModelScope.launch {
+        fetchConsultListJob?.cancel()
+        fetchConsultListJob = viewModelScope.launch {
             val userId = consultUseCases.authRepository.getCurrentUserId()
             var isPharmacist = false
 
