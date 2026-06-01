@@ -11,10 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,14 +30,14 @@ import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PharmacySelector(
     pharmacies: List<Pharmacy>,
     selectedPharmacy: Pharmacy?,
+    searchText: String,
+    onSearchTextChange: (String) -> Unit,
     onPharmacyClick: (Pharmacy) -> Unit,
     onSearch: (String) -> Unit,
     onSearchArea: (Double, Double) -> Unit,
@@ -49,7 +46,6 @@ fun PharmacySelector(
     isLocationEnabled: Boolean = false,
     sheetContent: (@Composable () -> Unit)? = null,
     bottomContent: @Composable () -> Unit = {},
-    cameraMoveEvent: SharedFlow<LatLng>? = null,
     cameraPositionState: CameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
             LatLng(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL),
@@ -57,23 +53,12 @@ fun PharmacySelector(
         )
     }
 ) {
-    var searchText by remember { mutableStateOf("") }
     val scaffoldState = rememberBottomSheetScaffoldState()
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(pharmacies, selectedPharmacy) {
         if (pharmacies.isNotEmpty() || selectedPharmacy != null) {
             scaffoldState.bottomSheetState.expand()
-        }
-    }
-
-    if (cameraMoveEvent != null) {
-        LaunchedEffect(Unit) {
-            cameraMoveEvent.collectLatest { latLng ->
-                cameraPositionState.animate(
-                    CameraUpdateFactory.newLatLngZoom(latLng, 16f)
-                )
-            }
         }
     }
 
@@ -111,7 +96,6 @@ fun PharmacySelector(
         ) {
             PharmacyMap(
                 pharmacies = pharmacies,
-                selectedPharmacy = selectedPharmacy,
                 onPharmacyClick = onPharmacyClick,
                 onBackClick = onBackClick,
                 showBackButton = false,
@@ -129,7 +113,7 @@ fun PharmacySelector(
 
             MapSearchBar(
                 value = searchText,
-                onValueChange = { searchText = it },
+                onValueChange = onSearchTextChange,
                 onSearch = onSearch,
                 onBackClick = onBackClick,
                 modifier = Modifier.align(Alignment.TopCenter)
@@ -163,6 +147,8 @@ private fun PharmacySelectorPreview(
         PharmacySelector(
             pharmacies = pharmacies,
             selectedPharmacy = null,
+            searchText = "",
+            onSearchTextChange = {},
             onPharmacyClick = {},
             onSearch = {},
             onSearchArea = { _, _ -> },

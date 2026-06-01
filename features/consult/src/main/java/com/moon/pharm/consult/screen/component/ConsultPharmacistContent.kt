@@ -29,6 +29,8 @@ fun ConsultPharmacistContent(
         PharmacySelector(
             pharmacies = searchResults,
             selectedPharmacy = selectedPharmacy,
+            searchText = searchQuery,
+            onSearchTextChange = onSearchQueryChange,
             onPharmacyClick = onPharmacySelect,
             onSearch = onSearchQueryChange,
             onSearchArea = onSearchArea,

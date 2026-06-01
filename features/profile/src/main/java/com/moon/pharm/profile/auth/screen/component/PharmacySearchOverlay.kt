@@ -42,6 +42,7 @@ fun PharmacySearchOverlay(
 ) {
     var tempSelectedPharmacy by remember { mutableStateOf<Pharmacy?>(null) }
     var isLocationGranted by remember { mutableStateOf(false) }
+    var searchText by remember { mutableStateOf("") }
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL), 15f)
@@ -75,6 +76,8 @@ fun PharmacySearchOverlay(
     PharmacySelector(
         pharmacies = uiState.pharmacySearchResults,
         selectedPharmacy = tempSelectedPharmacy,
+        searchText = searchText,
+        onSearchTextChange = { searchText = it },
         isLocationEnabled = isLocationGranted,
         onPharmacyClick = { tempSelectedPharmacy = it },
         cameraPositionState = cameraPositionState,

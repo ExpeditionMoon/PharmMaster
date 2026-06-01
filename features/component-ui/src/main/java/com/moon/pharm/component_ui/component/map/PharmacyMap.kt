@@ -42,7 +42,6 @@ fun PharmacyMap(
     onBackClick: () -> Unit,
     cameraPositionState: CameraPositionState,
     modifier: Modifier = Modifier,
-    selectedPharmacy: Pharmacy? = null,
     showBackButton: Boolean = true,
     isLocationEnabled: Boolean = false
 ) {
