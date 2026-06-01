@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.component.SectionHeader
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
@@ -42,7 +41,6 @@ import com.moon.pharm.component_ui.component.fab.PharmPrescriptionFAB
 import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
@@ -50,7 +48,8 @@ import com.moon.pharm.home.viewmodel.HomeViewModel
 
 @Composable
 fun HomeMainScreen(
-    navController: NavController,
+    onNavigateToSearch: () -> Unit,
+    onNavigateToPrescription: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val scrollState = rememberScrollState()
@@ -65,7 +64,7 @@ fun HomeMainScreen(
                     navigationType = TopBarNavigationType.Menu,
                     isLogoTitle = true,
                     actions = listOf(
-                        TopBarAction(icon = Icons.Filled.Search, onClick = {navController.navigate(ContentNavigationRoute.Search)}),
+                        TopBarAction(icon = Icons.Filled.Search, onClick = onNavigateToSearch),
                         TopBarAction(icon = Icons.Filled.Notifications, onClick = {})
                     )
                 )
@@ -73,9 +72,7 @@ fun HomeMainScreen(
         },
         floatingActionButton = {
             PharmPrescriptionFAB(
-                onClick = {
-                    navController.navigate(ContentNavigationRoute.PrescriptionCapture)
-                }
+                onClick = onNavigateToPrescription
             )
         }
 

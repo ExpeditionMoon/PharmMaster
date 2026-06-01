@@ -29,8 +29,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.navigation.NavController
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
+import com.moon.pharm.component_ui.model.ScannedMedication
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
@@ -43,19 +42,13 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun CameraPreviewRoute(
     viewModel: PrescriptionViewModel = hiltViewModel(),
-    navController: NavController? = null
+    onNavigateToMedicationCreate: (List<ScannedMedication>) -> Unit
 ) {
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is PrescriptionEffect.NavigateToCreate -> {
-                    navController?.navigate(
-                        ContentNavigationRoute.MedicationTabCreateScreen(
-                            scannedList = effect.scannedList
-                        )
-                    ) {
-                        popUpTo(ContentNavigationRoute.PrescriptionCapture) { inclusive = false }
-                    }
+                    onNavigateToMedicationCreate(effect.scannedList)
                 }
             }
         }

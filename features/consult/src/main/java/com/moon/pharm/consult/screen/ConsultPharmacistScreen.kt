@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -33,7 +32,6 @@ import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.screen.component.ConsultPharmacistContent
 import com.moon.pharm.consult.viewmodel.ConsultWriteEffect
@@ -43,9 +41,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConsultPharmacistScreen(
-    navController: NavController,
     viewModel: ConsultWriteViewModel,
-    onMapModeChanged: (Boolean) -> Unit
+    onMapModeChanged: (Boolean) -> Unit,
+    onNavigateBack: () -> Unit,
+    onNavigateToConfirm: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -102,7 +101,7 @@ fun ConsultPharmacistScreen(
         } else if (isMapView) {
             isMapView = false
         } else {
-            navController.popBackStack()
+            onNavigateBack()
         }
     }
 
@@ -136,7 +135,7 @@ fun ConsultPharmacistScreen(
                 onPharmacistSelect = { pharmacistId ->
                     viewModel.selectPharmacist(pharmacistId)
                     isMapView = false
-                    navController.navigate(ContentNavigationRoute.ConsultTabConfirmScreen)
+                    onNavigateToConfirm()
                 },
                 onMapModeChange = { isMap -> isMapView = isMap },
                 onBackFromMap = {

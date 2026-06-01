@@ -15,14 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.component.dialog.PharmConfirmDialog
 import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
 import com.moon.pharm.component_ui.component.snackbar.SnackbarType
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.mapper.asConsultString
 import com.moon.pharm.consult.mapper.toConsultSnackbarType
@@ -32,9 +30,10 @@ import com.moon.pharm.consult.viewmodel.ConsultDetailViewModel
 
 @Composable
 fun ConsultDetailScreen(
-    navController: NavController,
     consultId: String,
-    viewModel: ConsultDetailViewModel
+    viewModel: ConsultDetailViewModel,
+    onNavigateBack: () -> Unit,
+    onNavigateToEdit: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isPharmacistMode = uiState.canAnswer || uiState.isEditingAnswer
@@ -59,7 +58,7 @@ fun ConsultDetailScreen(
                     snackbarHostState.showSnackbar(effect.message.asConsultString(context))
                 }
                 is ConsultDetailEffect.NavigateBack -> {
-                    navController.popBackStack()
+                    onNavigateBack()
                 }
             }
         }
@@ -71,7 +70,7 @@ fun ConsultDetailScreen(
                 data = TopBarData(
                     title = stringResource(R.string.consult_board_title),
                     navigationType = TopBarNavigationType.Back,
-                    onNavigationClick = { navController.popBackStack() }
+                    onNavigationClick = onNavigateBack
                 )
             )
         },
@@ -96,7 +95,7 @@ fun ConsultDetailScreen(
 
                 currentUserId = uiState.currentUserId,
                 onEditQuestion = {
-                    navController.navigate(ContentNavigationRoute.ConsultWriteGraph(consultId = consultId))
+                    onNavigateToEdit(consultId)
                 },
                 onDeleteQuestion = {
                     showDeleteConsultDialog = true

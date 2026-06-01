@@ -10,9 +10,29 @@ import com.moon.pharm.prescription.screen.PrescriptionScreen
 fun NavGraphBuilder.prescriptionNavGraph(navController: NavController) {
 
     composable<ContentNavigationRoute.PrescriptionCapture>{
-        PrescriptionScreen(navController = navController)
+        PrescriptionScreen(
+            onNavigateToMedicationCreate = { scannedList ->
+                navController.navigate(
+                    ContentNavigationRoute.MedicationTabCreateScreen(
+                        scannedList = scannedList
+                    )
+                ) {
+                    popUpTo(ContentNavigationRoute.PrescriptionCapture) { inclusive = false }
+                }
+            }
+        )
     }
     composable<ContentNavigationRoute.PrescriptionCamera>{
-        CameraPreviewRoute(navController = navController)
+        CameraPreviewRoute(
+            onNavigateToMedicationCreate = { scannedList ->
+                navController.navigate(
+                    ContentNavigationRoute.MedicationTabCreateScreen(
+                        scannedList = scannedList
+                    )
+                ) {
+                    popUpTo(ContentNavigationRoute.PrescriptionCapture) { inclusive = false }
+                }
+            }
+        )
     }
 }

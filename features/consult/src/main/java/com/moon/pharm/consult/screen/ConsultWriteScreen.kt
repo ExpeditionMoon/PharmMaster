@@ -18,13 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
 import com.moon.pharm.component_ui.component.snackbar.SnackbarType
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.mapper.asConsultString
 import com.moon.pharm.consult.mapper.toConsultSnackbarType
@@ -34,8 +32,10 @@ import com.moon.pharm.consult.viewmodel.ConsultWriteViewModel
 
 @Composable
 fun ConsultWriteScreen(
-    navController: NavController,
-    viewModel: ConsultWriteViewModel
+    viewModel: ConsultWriteViewModel,
+    onNavigateBack: () -> Unit,
+    onNavigateUp: () -> Unit,
+    onNavigateToPharmacist: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -51,10 +51,10 @@ fun ConsultWriteScreen(
                     snackbarHostState.showSnackbar(effect.message.asConsultString(context))
                 }
                 is ConsultWriteEffect.MoveToPharmacist -> {
-                    navController.navigate(ContentNavigationRoute.ConsultTabPharmacistScreen)
+                    onNavigateToPharmacist()
                 }
                 is ConsultWriteEffect.UpdateSuccess -> {
-                    navController.navigateUp()
+                    onNavigateUp()
                 }
                 is ConsultWriteEffect.CreateSuccess,
                 is ConsultWriteEffect.MoveCamera -> Unit
@@ -78,7 +78,7 @@ fun ConsultWriteScreen(
                 data = TopBarData(
                     title = stringResource(R.string.consult_write_title),
                     navigationType = TopBarNavigationType.Close,
-                    onNavigationClick = { navController.popBackStack() }
+                    onNavigationClick = onNavigateBack
                 )
             )
         },

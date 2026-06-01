@@ -72,7 +72,15 @@ fun NavGraphBuilder.profileNavGraph(navController: NavController, onLogout: () -
 
     composable<ContentNavigationRoute.MedicationTab>{
         val viewModel: MedicationViewModel = hiltViewModel()
-        MedicationScreen(navController = navController, viewModel)
+        MedicationScreen(
+            viewModel = viewModel,
+            onNavigateToHistory = {
+                navController.navigate(ContentNavigationRoute.MedicationTabHistoryScreen)
+            },
+            onNavigateToCreate = {
+                navController.navigate(ContentNavigationRoute.MedicationTabCreateScreen())
+            }
+        )
     }
     composable<ContentNavigationRoute.MedicationTabCreateScreen>(
         typeMap = mapOf(
@@ -80,7 +88,18 @@ fun NavGraphBuilder.profileNavGraph(navController: NavController, onLogout: () -
         )
     ){
         val viewModel: MedicationViewModel = hiltViewModel()
-        MedicationCreateScreen(navController = navController, viewModel)
+        MedicationCreateScreen(
+            viewModel = viewModel,
+            onNavigateBack = {
+                navController.popBackStack()
+            },
+            onNavigateToMedicationHome = {
+                navController.navigate(ContentNavigationRoute.MedicationTab) {
+                    popUpTo(ContentNavigationRoute.MedicationTab) { inclusive = false }
+                    launchSingleTop = true
+                }
+            }
+        )
     }
     composable<ContentNavigationRoute.MedicationTabHistoryScreen>{
         MedicationHistoryScreen(onBackClick = { navController.popBackStack() })

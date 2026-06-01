@@ -15,25 +15,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
 import com.moon.pharm.component_ui.component.snackbar.SnackbarType
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.mapper.asConsultString
 import com.moon.pharm.consult.mapper.toConsultSnackbarType
-import com.moon.pharm.consult.navigation.ConsultNavKeys.REFRESH_CONSULT_LIST
 import com.moon.pharm.consult.screen.component.ConsultConfirmContent
 import com.moon.pharm.consult.viewmodel.ConsultWriteEffect
 import com.moon.pharm.consult.viewmodel.ConsultWriteViewModel
 
 @Composable
 fun ConsultConfirmScreen(
-    navController: NavController,
-    viewModel: ConsultWriteViewModel
+    viewModel: ConsultWriteViewModel,
+    onNavigateBack: () -> Unit,
+    onCreateSuccess: () -> Unit,
+    onEditTitleOrContent: () -> Unit,
+    onEditPharmacist: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -49,17 +49,7 @@ fun ConsultConfirmScreen(
                     snackbarHostState.showSnackbar(effect.message.asConsultString(context))
                 }
                 is ConsultWriteEffect.CreateSuccess -> {
-                    try {
-                        navController.getBackStackEntry(ContentNavigationRoute.ConsultTab)
-                            .savedStateHandle[REFRESH_CONSULT_LIST] = true
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-
-                    navController.navigate(ContentNavigationRoute.ConsultTab) {
-                        popUpTo(ContentNavigationRoute.ConsultTab) { inclusive = false }
-                        launchSingleTop = true
-                    }
+                    onCreateSuccess()
                 }
                 is ConsultWriteEffect.MoveCamera,
                 is ConsultWriteEffect.MoveToPharmacist,
@@ -78,7 +68,7 @@ fun ConsultConfirmScreen(
                 data = TopBarData(
                     title = stringResource(R.string.consult_write_title),
                     navigationType = TopBarNavigationType.Back,
-                    onNavigationClick = { navController.popBackStack() }
+                    onNavigationClick = onNavigateBack
                 )
             )
         },
@@ -93,15 +83,8 @@ fun ConsultConfirmScreen(
                 title = uiState.title,
                 content = uiState.content,
                 selectedPharmacistName = selectedPharmacist?.name ?: stringResource(R.string.consult_confirm_no_pharmacist),
-                onEditTitleOrContent = {
-                    navController.popBackStack(ContentNavigationRoute.ConsultTabWriteScreen, false)
-                },
-                onEditPharmacist = {
-                    navController.popBackStack(
-                        ContentNavigationRoute.ConsultTabPharmacistScreen,
-                        false
-                    )
-                },
+                onEditTitleOrContent = onEditTitleOrContent,
+                onEditPharmacist = onEditPharmacist,
                 onSubmit = {
                     viewModel.submitConsult()
                 }

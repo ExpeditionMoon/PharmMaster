@@ -34,12 +34,11 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.component.card.InfoCardType
 import com.moon.pharm.component_ui.component.card.PharmInfoCard
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
+import com.moon.pharm.component_ui.model.ScannedMedication
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
@@ -50,7 +49,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun PrescriptionScreen(
-    navController: NavController,
+    onNavigateToMedicationCreate: (List<ScannedMedication>) -> Unit,
     viewModel: PrescriptionViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -62,13 +61,7 @@ fun PrescriptionScreen(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is PrescriptionEffect.NavigateToCreate -> {
-                    navController.navigate(
-                        ContentNavigationRoute.MedicationTabCreateScreen(
-                            scannedList = effect.scannedList
-                        )
-                    ) {
-                        popUpTo(ContentNavigationRoute.PrescriptionCapture) { inclusive = false }
-                    }
+                    onNavigateToMedicationCreate(effect.scannedList)
                 }
             }
         }

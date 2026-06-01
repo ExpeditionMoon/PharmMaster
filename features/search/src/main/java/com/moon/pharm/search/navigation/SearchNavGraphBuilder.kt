@@ -9,6 +9,10 @@ import com.moon.pharm.search.screen.SearchMainScreen
 fun NavGraphBuilder.searchNavGraph(navController: NavController) {
 
     composable<ContentNavigationRoute.Search>{
-        SearchMainScreen(navController = navController)
+        SearchMainScreen(
+            onNavigateBack = {
+                navController.popBackStack()
+            }
+        )
     }
 }

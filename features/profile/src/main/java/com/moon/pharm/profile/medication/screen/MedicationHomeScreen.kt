@@ -16,14 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
 import com.moon.pharm.component_ui.component.snackbar.SnackbarType
 import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.util.MultipleEventsCutter
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.mapper.asMedicationString
@@ -34,8 +32,9 @@ import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 
 @Composable
 fun MedicationScreen(
-    navController: NavController? = null,
-    viewModel: MedicationViewModel
+    viewModel: MedicationViewModel,
+    onNavigateToHistory: () -> Unit,
+    onNavigateToCreate: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val groupedList by viewModel.groupedMedications.collectAsStateWithLifecycle()
@@ -67,7 +66,7 @@ fun MedicationScreen(
                             icon = Icons.Default.Storage,
                             onClick = {
                                 multipleEventsCutter.processEvent {
-                                    navController?.navigate(ContentNavigationRoute.MedicationTabHistoryScreen)
+                                    onNavigateToHistory()
                                 }
                             }
                         ),
@@ -75,7 +74,7 @@ fun MedicationScreen(
                             icon = Icons.Default.Add,
                             onClick = {
                                 multipleEventsCutter.processEvent {
-                                    navController?.navigate(ContentNavigationRoute.MedicationTabCreateScreen())
+                                    onNavigateToCreate()
                                 }
                             }
                         )

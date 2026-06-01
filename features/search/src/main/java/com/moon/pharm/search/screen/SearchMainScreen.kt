@@ -25,7 +25,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.model.TopBarData
@@ -43,7 +42,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SearchMainScreen(
-    navController: NavController,
+    onNavigateBack: () -> Unit,
     viewModel: SearchMainViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -67,7 +66,7 @@ fun SearchMainScreen(
                 data = TopBarData(
                     title = "의약품 검색",
                     navigationType = TopBarNavigationType.Back,
-                    onNavigationClick = { navController.popBackStack() },
+                    onNavigationClick = onNavigateBack,
                     actions = emptyList()
                 )
             )
