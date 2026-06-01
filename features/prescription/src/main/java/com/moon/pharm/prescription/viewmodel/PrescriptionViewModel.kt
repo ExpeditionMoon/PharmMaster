@@ -11,8 +11,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,11 +25,11 @@ class PrescriptionViewModel @Inject constructor(
     private val extractDrugNamesUseCase: ExtractDrugNamesFromOcrUseCase
 ) : ViewModel() {
 
-    private val _uiEvent = MutableSharedFlow<PrescriptionUiEvent>()
-    val uiEvent = _uiEvent.asSharedFlow()
+    private val _effect = MutableSharedFlow<PrescriptionEffect>()
+    val effect: SharedFlow<PrescriptionEffect> = _effect.asSharedFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
+    private val _uiState = MutableStateFlow(PrescriptionUiState())
+    val uiState: StateFlow<PrescriptionUiState> = _uiState.asStateFlow()
 
     private var isProcessing = false
 
@@ -35,7 +38,7 @@ class PrescriptionViewModel @Inject constructor(
         if (text.length > 10 && (text.contains("정") || text.contains("회") || text.contains("캡슐"))) {
             isProcessing = true
             viewModelScope.launch {
-                _isLoading.value = true
+                setLoading(true)
                 delay(500)
                 processTextWithAi(text)
             }
@@ -46,31 +49,35 @@ class PrescriptionViewModel @Inject constructor(
         if (isProcessing) return
         isProcessing = true
         viewModelScope.launch {
-            _isLoading.value = true
+            setLoading(true)
             ocrHelper.extractTextFromUri(uri)
                 .onSuccess { rawText ->
                     processTextWithAi(rawText)
                 }
                 .onFailure { exception ->
                     exception.printStackTrace()
-                    _isLoading.value = false
+                    setLoading(false)
                     isProcessing = false
                 }
         }
     }
 
     private suspend fun processTextWithAi(rawText: String) {
-        when(val result = extractDrugNamesUseCase(rawText)) {
+        when (val result = extractDrugNamesUseCase(rawText)) {
             is DataResourceResult.Success -> {
                 val scannedList = result.resultData.map { ScannedMedication(name = it, dailyCount = 1) }
-                _uiEvent.emit(PrescriptionUiEvent.NavigateToCreate(scannedList))
+                _effect.emit(PrescriptionEffect.NavigateToCreate(scannedList))
             }
             is DataResourceResult.Failure -> {
                 result.exception.printStackTrace()
             }
             is DataResourceResult.Loading -> { }
         }
-        _isLoading.value = false
+        setLoading(false)
         isProcessing = false
+    }
+
+    private fun setLoading(isLoading: Boolean) {
+        _uiState.update { it.copy(isLoading = isLoading) }
     }
 }

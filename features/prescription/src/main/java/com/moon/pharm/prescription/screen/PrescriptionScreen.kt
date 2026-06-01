@@ -44,7 +44,7 @@ import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.prescription.R
-import com.moon.pharm.prescription.viewmodel.PrescriptionUiEvent
+import com.moon.pharm.prescription.viewmodel.PrescriptionEffect
 import com.moon.pharm.prescription.viewmodel.PrescriptionViewModel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -55,16 +55,16 @@ fun PrescriptionScreen(
 ) {
     val context = LocalContext.current
     var showCamera by remember { mutableStateOf(false) }
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val permissionRequiredMessage = stringResource(id = R.string.toast_camera_permission_required)
 
-    LaunchedEffect(true) {
-        viewModel.uiEvent.collectLatest { event ->
-            when (event) {
-                is PrescriptionUiEvent.NavigateToCreate -> {
+    LaunchedEffect(Unit) {
+        viewModel.effect.collectLatest { effect ->
+            when (effect) {
+                is PrescriptionEffect.NavigateToCreate -> {
                     navController.navigate(
                         ContentNavigationRoute.MedicationTabCreateScreen(
-                            scannedList = event.scannedList
+                            scannedList = effect.scannedList
                         )
                     ) {
                         popUpTo(ContentNavigationRoute.PrescriptionCapture) { inclusive = false }
@@ -121,7 +121,7 @@ fun PrescriptionScreen(
                         permissionLauncher.launch(permission)
                     }
                 },
-                enabled = !isLoading
+                enabled = !uiState.isLoading
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -133,7 +133,7 @@ fun PrescriptionScreen(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
                 },
-                enabled = !isLoading
+                enabled = !uiState.isLoading
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -145,7 +145,7 @@ fun PrescriptionScreen(
         }
     }
 
-    if (isLoading) {
+    if (uiState.isLoading) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
