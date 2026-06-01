@@ -21,13 +21,8 @@ import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 class ConsultRepositoryImpl @Inject constructor(
@@ -38,37 +33,25 @@ class ConsultRepositoryImpl @Inject constructor(
 ) : ConsultRepository {
 
     private fun Throwable.toConsultException(): ConsultException = when {
+        this is ConsultException -> this
         this is FirebaseFirestoreException && this.code == FirebaseFirestoreException.Code.NOT_FOUND -> ConsultException.NotFound()
         this is FirebaseFirestoreException -> ConsultException.Network()
-        else -> ConsultException.Unknown(this.message)
+        else -> ConsultException.Unknown(message)
     }
 
     private fun <T> wrapOperation(
         operation: suspend () -> T
-    ): Flow<DataResourceResult<T>> = flow {
-        emit(DataResourceResult.Loading)
-
-        val result = runCatching {
-            withTimeout(10000L) {
-                operation()
-            }
-        }.fold(
-            onSuccess = { DataResourceResult.Success(it) },
-            onFailure = { e ->
-                DataResourceResult.Failure(e.toConsultException())
-            }
-        )
-        emit(result)
-    }.flowOn(ioDispatcher)
+    ): Flow<DataResourceResult<T>> = dataResourceFlow(
+        dispatcher = ioDispatcher,
+        errorMapper = { it.toConsultException() },
+        operation = operation
+    )
 
     private fun <T> Flow<T>.asDataResourceResult(): Flow<DataResourceResult<T>> {
-        return this
-            .map { DataResourceResult.Success(it) as DataResourceResult<T> }
-            .onStart { emit(DataResourceResult.Loading) }
-            .catch { e ->
-                emit(DataResourceResult.Failure(e.toConsultException()))
-            }
-            .flowOn(ioDispatcher)
+        return asDataResourceResult(
+            dispatcher = ioDispatcher,
+            errorMapper = { it.toConsultException() }
+        )
     }
 
     override fun getConsultItems(): Flow<DataResourceResult<List<ConsultItem>>> {
@@ -122,7 +105,9 @@ class ConsultRepositoryImpl @Inject constructor(
     }
 
     override suspend fun uploadImage(uri: String, userId: String): String {
-        return imageDataSource.uploadImage(uri, userId)
+        return withContext(ioDispatcher) {
+            imageDataSource.uploadImage(uri, userId)
+        }
     }
 
     override suspend fun sendAnswerNotification(
@@ -151,39 +136,30 @@ class ConsultRepositoryImpl @Inject constructor(
 
     private suspend fun sendFcmNotification(
         targetToken: String, title: String, body: String, consultId: String
-    ): DataResourceResult<Unit> = withContext(ioDispatcher) {
-        runCatching {
+    ): DataResourceResult<Unit> =
+        runDataResourceOperation(
+            dispatcher = ioDispatcher,
+            timeoutMillis = 5_000L,
+            errorMapper = { it.toConsultException() }
+        ) {
             val request = FcmSendRequest(
                 targetToken = targetToken, title = title, body = body, consultId = consultId
             )
-            val response = withTimeout(5000L) {
-                fcmApi.sendNotification(request)
-            }
+            val response = fcmApi.sendNotification(request)
 
             if (!response.success) {
                 val errorMsg = response.error ?: ERR_UNKNOWN_SERVER
                 throw ConsultException.Unknown("$ERR_FCM_FAILED$errorMsg")
             }
-        }.fold(
-            onSuccess = { DataResourceResult.Success(Unit) },
-            onFailure = { e ->
-                val error = e as? ConsultException ?: ConsultException.Unknown(e.message)
-                DataResourceResult.Failure(error)
-            }
-        )
-    }
+        }
 
     override suspend fun updatePharmacistNicknameInAnswers(
         userId: String, newNickname: String
-    ): DataResourceResult<Unit> = runCatching {
-        withTimeout(10000L) {
+    ): DataResourceResult<Unit> =
+        runDataResourceOperation(
+            dispatcher = ioDispatcher,
+            errorMapper = { it.toConsultException() }
+        ) {
             dataSource.updatePharmacistNicknameInAnswers(userId, newNickname)
         }
-    }.fold(
-        onSuccess = { DataResourceResult.Success(Unit) },
-        onFailure = { e ->
-            val error = e as? ConsultException ?: ConsultException.Unknown(e.message)
-            DataResourceResult.Failure(error)
-        }
-    )
 }

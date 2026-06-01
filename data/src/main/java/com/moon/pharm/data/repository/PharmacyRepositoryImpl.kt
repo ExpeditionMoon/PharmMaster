@@ -12,12 +12,7 @@ import com.moon.pharm.domain.repository.PharmacyRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 class PharmacyRepositoryImpl @Inject constructor(
@@ -27,30 +22,24 @@ class PharmacyRepositoryImpl @Inject constructor(
 ) : PharmacyRepository {
 
     private fun Throwable.toPharmacyException(): PharmacyException = when {
+        this is PharmacyException -> this
         this is FirebaseFirestoreException && this.code == FirebaseFirestoreException.Code.NOT_FOUND -> PharmacyException.NotFound()
         this is FirebaseFirestoreException -> PharmacyException.NetworkError()
-        else -> PharmacyException.Unknown(this.message)
+        else -> PharmacyException.Unknown(message)
     }
 
-    private suspend fun <T> wrapPharmacyOperation(
-        operation: suspend () -> T
-    ): DataResourceResult<T> = withContext(ioDispatcher) {
-        runCatching {
-            withTimeout(10000L) {
-                operation()
-            }
-        }.fold(
-            onSuccess = { DataResourceResult.Success(it) },
-            onFailure = { e -> DataResourceResult.Failure(e.toPharmacyException()) }
+    private suspend fun <T> wrapPharmacyOperation(operation: suspend () -> T): DataResourceResult<T> =
+        runDataResourceOperation(
+            dispatcher = ioDispatcher,
+            errorMapper = { it.toPharmacyException() },
+            operation = operation
         )
-    }
 
     private fun <T> Flow<T>.asDataResourceResult(): Flow<DataResourceResult<T>> {
-        return this
-            .map { DataResourceResult.Success(it) as DataResourceResult<T> }
-            .onStart { emit(DataResourceResult.Loading) }
-            .catch { e -> emit(DataResourceResult.Failure(e.toPharmacyException())) }
-            .flowOn(ioDispatcher)
+        return asDataResourceResult(
+            dispatcher = ioDispatcher,
+            errorMapper = { it.toPharmacyException() }
+        )
     }
 
     override fun searchPharmacies(query: String): Flow<DataResourceResult<List<Pharmacy>>> {

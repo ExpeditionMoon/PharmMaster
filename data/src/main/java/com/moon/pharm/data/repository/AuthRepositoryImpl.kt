@@ -9,8 +9,6 @@ import com.moon.pharm.domain.model.auth.AuthException
 import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -18,26 +16,20 @@ class AuthRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : AuthRepository {
 
-    private suspend fun <T> wrapAuthOperation(
-        operation: suspend () -> T
-    ): DataResourceResult<T> = withContext(ioDispatcher) {
-        withTimeout(10000L) {
-            runCatching {
-                operation()
-            }.fold(
-                onSuccess = { DataResourceResult.Success(it) },
-                onFailure = { e ->
-                    val domainError = when (e) {
-                        is FirebaseAuthInvalidCredentialsException -> AuthException.InvalidCredentials()
-                        is FirebaseAuthUserCollisionException -> AuthException.EmailDuplicated()
-                        is FirebaseNetworkException -> AuthException.NetworkError()
-                        else -> AuthException.Unknown(e.message)
-                    }
-                    DataResourceResult.Failure(domainError)
-                }
-            )
-        }
+    private fun Throwable.toAuthException(): AuthException = when (this) {
+        is AuthException -> this
+        is FirebaseAuthInvalidCredentialsException -> AuthException.InvalidCredentials()
+        is FirebaseAuthUserCollisionException -> AuthException.EmailDuplicated()
+        is FirebaseNetworkException -> AuthException.NetworkError()
+        else -> AuthException.Unknown(message)
     }
+
+    private suspend fun <T> wrapAuthOperation(operation: suspend () -> T): DataResourceResult<T> =
+        runDataResourceOperation(
+            dispatcher = ioDispatcher,
+            errorMapper = { it.toAuthException() },
+            operation = operation
+        )
 
     override suspend fun createAccount(
         email: String, password: String

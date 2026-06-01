@@ -8,6 +8,7 @@ import com.moon.pharm.data.repository.LocationRepositoryImpl
 import com.moon.pharm.data.repository.MedicationRepositoryImpl
 import com.moon.pharm.data.repository.PharmacistRepositoryImpl
 import com.moon.pharm.data.repository.PharmacyRepositoryImpl
+import com.moon.pharm.data.repository.UserLifeStyleRepositoryImpl
 import com.moon.pharm.data.repository.UserRepositoryImpl
 import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.repository.ConsultRepository
@@ -17,6 +18,7 @@ import com.moon.pharm.domain.repository.LocationRepository
 import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.repository.PharmacistRepository
 import com.moon.pharm.domain.repository.PharmacyRepository
+import com.moon.pharm.domain.repository.UserLifeStyleRepository
 import com.moon.pharm.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
@@ -39,6 +41,12 @@ abstract class RepositoryModule {
     abstract fun bindUserRepository(
         impl: UserRepositoryImpl
     ): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindUserLifeStyleRepository(
+        impl: UserLifeStyleRepositoryImpl
+    ): UserLifeStyleRepository
 
     @Binds
     @Singleton

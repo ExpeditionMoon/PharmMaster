@@ -10,6 +10,7 @@ import com.moon.pharm.data.datasource.PharmacistDataSource
 import com.moon.pharm.data.datasource.PharmacySearchDataSource
 import com.moon.pharm.data.datasource.PharmacyStorageDataSource
 import com.moon.pharm.data.datasource.UserDataSource
+import com.moon.pharm.data.datasource.UserLifeStyleDataSource
 import com.moon.pharm.data.datasource.remote.ai.FirebaseAiDataSourceImpl
 import com.moon.pharm.data.datasource.remote.firebase.FirebaseAuthDataSourceImpl
 import com.moon.pharm.data.datasource.remote.firebase.FirebaseImageDataSourceImpl
@@ -18,6 +19,7 @@ import com.moon.pharm.data.datasource.remote.firebase.FirestoreMedicationDataSou
 import com.moon.pharm.data.datasource.remote.firebase.FirestorePharmacistDataSourceImpl
 import com.moon.pharm.data.datasource.remote.firebase.FirestorePharmacyDataSourceImpl
 import com.moon.pharm.data.datasource.remote.firebase.FirestoreUserDataSourceImpl
+import com.moon.pharm.data.datasource.remote.firebase.FirestoreUserLifeStyleDataSourceImpl
 import com.moon.pharm.data.datasource.remote.kakao.KakaoPharmacyDataSourceImpl
 import com.moon.pharm.data.datasource.remote.openapi.OpenApiDrugDataSourceImpl
 import dagger.Binds
@@ -41,6 +43,12 @@ abstract class DataSourceModule {
     abstract fun bindUserDataSource(
         impl: FirestoreUserDataSourceImpl
     ): UserDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindUserLifeStyleDataSource(
+        impl: FirestoreUserLifeStyleDataSourceImpl
+    ): UserLifeStyleDataSource
 
     @Binds
     @Singleton

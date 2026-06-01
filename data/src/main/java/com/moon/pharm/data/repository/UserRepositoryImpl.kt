@@ -12,13 +12,9 @@ import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -27,30 +23,24 @@ class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
 
     private fun Throwable.toUserException(): UserException = when {
+        this is UserException -> this
         this is FirebaseFirestoreException && this.code == FirebaseFirestoreException.Code.NOT_FOUND -> UserException.NotFound()
         this is FirebaseFirestoreException -> UserException.NetworkError()
-        else -> UserException.Unknown(this.message)
+        else -> UserException.Unknown(message)
     }
 
-    private suspend fun <T> wrapUserOperation(
-        operation: suspend () -> T
-    ): DataResourceResult<T> = withContext(ioDispatcher) {
-        runCatching {
-            withTimeout(10000L) {
-                operation()
-            }
-        }.fold(
-            onSuccess = { DataResourceResult.Success(it) },
-            onFailure = { e -> DataResourceResult.Failure(e.toUserException()) }
+    private suspend fun <T> wrapUserOperation(operation: suspend () -> T): DataResourceResult<T> =
+        runDataResourceOperation(
+            dispatcher = ioDispatcher,
+            errorMapper = { it.toUserException() },
+            operation = operation
         )
-    }
 
     private fun <T> Flow<T>.asDataResourceResult(): Flow<DataResourceResult<T>> {
-        return this
-            .map { DataResourceResult.Success(it) as DataResourceResult<T> }
-            .onStart { emit(DataResourceResult.Loading) }
-            .catch { e -> emit(DataResourceResult.Failure(e.toUserException())) }
-            .flowOn(ioDispatcher)
+        return asDataResourceResult(
+            dispatcher = ioDispatcher,
+            errorMapper = { it.toUserException() }
+        )
     }
 
     override suspend fun saveUser(user: User): DataResourceResult<Unit> =
@@ -74,10 +64,12 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getUserOnce(userId: String): DataResourceResult<User> =
-        wrapUserOperation {
-            withTimeout(5000L) {
-                dataSource.getUserById(userId).first().toDomain()
-            }
+        runDataResourceOperation(
+            dispatcher = ioDispatcher,
+            timeoutMillis = 5_000L,
+            errorMapper = { it.toUserException() }
+        ) {
+            dataSource.getUserById(userId).first().toDomain()
         }
 
     override suspend fun getFcmToken(): String {

@@ -11,12 +11,7 @@ import com.moon.pharm.domain.repository.PharmacistRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 class PharmacistRepositoryImpl @Inject constructor(
@@ -25,30 +20,24 @@ class PharmacistRepositoryImpl @Inject constructor(
 ) : PharmacistRepository {
 
     private fun Throwable.toPharmacistException(): PharmacistException = when {
+        this is PharmacistException -> this
         this is FirebaseFirestoreException && this.code == FirebaseFirestoreException.Code.NOT_FOUND -> PharmacistException.NotFound()
         this is FirebaseFirestoreException -> PharmacistException.NetworkError()
-        else -> PharmacistException.Unknown(this.message)
+        else -> PharmacistException.Unknown(message)
     }
 
-    private suspend fun <T> wrapPharmacistOperation(
-        operation: suspend () -> T
-    ): DataResourceResult<T> = withContext(ioDispatcher) {
-        runCatching {
-            withTimeout(10000L) {
-                operation()
-            }
-        }.fold(
-            onSuccess = { DataResourceResult.Success(it) },
-            onFailure = { e -> DataResourceResult.Failure(e.toPharmacistException()) }
+    private suspend fun <T> wrapPharmacistOperation(operation: suspend () -> T): DataResourceResult<T> =
+        runDataResourceOperation(
+            dispatcher = ioDispatcher,
+            errorMapper = { it.toPharmacistException() },
+            operation = operation
         )
-    }
 
     private fun <T> Flow<T>.asDataResourceResult(): Flow<DataResourceResult<T>> {
-        return this
-            .map { DataResourceResult.Success(it) as DataResourceResult<T> }
-            .onStart { emit(DataResourceResult.Loading) }
-            .catch { e -> emit(DataResourceResult.Failure(e.toPharmacistException())) }
-            .flowOn(ioDispatcher)
+        return asDataResourceResult(
+            dispatcher = ioDispatcher,
+            errorMapper = { it.toPharmacistException() }
+        )
     }
 
     override suspend fun savePharmacist(pharmacist: Pharmacist): DataResourceResult<Unit> =
