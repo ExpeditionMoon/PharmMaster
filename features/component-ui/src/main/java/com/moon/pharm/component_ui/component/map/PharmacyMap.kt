@@ -28,17 +28,17 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.model.PharmacyUiModel
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.pharmacy.Pharmacy
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun PharmacyMap(
-    pharmacies: List<Pharmacy>,
-    onPharmacyClick: (Pharmacy) -> Unit,
+    pharmacies: List<PharmacyUiModel>,
+    onPharmacyClick: (PharmacyUiModel) -> Unit,
     onBackClick: () -> Unit,
     cameraPositionState: CameraPositionState,
     modifier: Modifier = Modifier,
@@ -96,7 +96,7 @@ fun PharmacyMap(
 @ThemePreviews
 @Composable
 private fun PharmacyMapPreview(
-    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<Pharmacy>
+    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<PharmacyUiModel>
 ) {
     PharmMasterTheme {
         val cameraPositionState = rememberCameraPositionState()

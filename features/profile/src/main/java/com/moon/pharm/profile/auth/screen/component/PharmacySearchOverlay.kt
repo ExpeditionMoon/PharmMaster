@@ -23,6 +23,7 @@ import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
 import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.component.map.PharmacySelector
+import com.moon.pharm.component_ui.model.PharmacyUiModel
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.auth.screen.SignUpUiState
@@ -43,6 +44,8 @@ fun PharmacySearchOverlay(
     var tempSelectedPharmacy by remember { mutableStateOf<Pharmacy?>(null) }
     var isLocationGranted by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
+    val pharmacyUiModels = uiState.pharmacySearchResults.map { pharmacy -> pharmacy.toUiModel() }
+    val selectedPharmacyUiModel = tempSelectedPharmacy?.toUiModel()
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL), 15f)
@@ -74,12 +77,14 @@ fun PharmacySearchOverlay(
     }
 
     PharmacySelector(
-        pharmacies = uiState.pharmacySearchResults,
-        selectedPharmacy = tempSelectedPharmacy,
+        pharmacies = pharmacyUiModels,
+        selectedPharmacy = selectedPharmacyUiModel,
         searchText = searchText,
         onSearchTextChange = { searchText = it },
         isLocationEnabled = isLocationGranted,
-        onPharmacyClick = { tempSelectedPharmacy = it },
+        onPharmacyClick = { selected ->
+            tempSelectedPharmacy = uiState.pharmacySearchResults.findByUiModel(selected)
+        },
         cameraPositionState = cameraPositionState,
         onSearch = onSearchPharmacies,
         onSearchArea = onFetchNearbyPharmacies,
@@ -109,3 +114,16 @@ fun PharmacySearchOverlay(
         onClose()
     }
 }
+
+private fun Pharmacy.toUiModel(): PharmacyUiModel =
+    PharmacyUiModel(
+        id = id,
+        placeId = placeId,
+        name = name,
+        address = address,
+        latitude = latitude,
+        longitude = longitude
+    )
+
+private fun List<Pharmacy>.findByUiModel(pharmacy: PharmacyUiModel): Pharmacy? =
+    firstOrNull { it.placeId == pharmacy.placeId }

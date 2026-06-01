@@ -1,30 +1,28 @@
-package com.moon.pharm.component_ui.util
+﻿package com.moon.pharm.component_ui.util
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.moon.pharm.domain.model.pharmacy.Pharmacy
+import com.moon.pharm.component_ui.model.PharmacyUiModel
 
 /**
  * Preview
- * 약국 리스트 더미 데이터를 공급하는 Provider 클래스
+ * ?쎄뎅 由ъ뒪???붾? ?곗씠?곕? 怨듦툒?섎뒗 Provider ?대옒??
  */
-class PharmacyListPreviewProvider : PreviewParameterProvider<List<Pharmacy>> {
+class PharmacyListPreviewProvider : PreviewParameterProvider<List<PharmacyUiModel>> {
     override val values = sequenceOf(
         listOf(
-            Pharmacy(
+            PharmacyUiModel(
                 id = "pharm_001",
                 placeId = "place_001",
-                name = "달빛약국",
-                address = "서울특별시 강남구 테헤란로 123",
-                tel = "02-1234-5678",
+                name = "?щ튆?쎄뎅",
+                address = "?쒖슱?밸퀎??媛뺣궓援??뚰뿤?濡?123",
                 latitude = 37.498095,
                 longitude = 127.027610
             ),
-            Pharmacy(
+            PharmacyUiModel(
                 id = "pharm_002",
                 placeId = "place_002",
-                name = "별빛약국",
-                address = "서울특별시 서초구 서초대로 456",
-                tel = "02-9876-5432",
+                name = "蹂꾨튆?쎄뎅",
+                address = "?쒖슱?밸퀎???쒖큹援??쒖큹?濡?456",
                 latitude = 37.495000,
                 longitude = 127.015000
             )

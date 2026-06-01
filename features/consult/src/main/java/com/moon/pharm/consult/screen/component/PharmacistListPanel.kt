@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.item.PharmacistListItem
+import com.moon.pharm.component_ui.model.PharmacistUiModel
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
@@ -66,8 +67,8 @@ fun PharmacistListPanel(
             ) {
                 items(pharmacists) { pharmacist ->
                     PharmacistListItem(
-                        pharmacist = pharmacist,
-                        onSelect = onPharmacistSelect
+                        pharmacist = pharmacist.toUiModel(),
+                        onSelect = { onPharmacistSelect(pharmacist) }
                     )
                 }
             }
@@ -88,3 +89,10 @@ private fun PharmacistListPanelPreview() {
         )
     }
 }
+
+private fun Pharmacist.toUiModel(): PharmacistUiModel =
+    PharmacistUiModel(
+        id = userId,
+        name = name,
+        bio = bio
+    )

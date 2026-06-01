@@ -1,4 +1,4 @@
-package com.moon.pharm.component_ui.component.item
+﻿package com.moon.pharm.component_ui.component.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,15 +25,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.model.PharmacistUiModel
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.auth.Pharmacist
 
 @Composable
 fun PharmacistListItem(
-    pharmacist: Pharmacist,
-    onSelect: (Pharmacist) -> Unit,
+    pharmacist: PharmacistUiModel,
+    onSelect: (PharmacistUiModel) -> Unit,
     modifier: Modifier = Modifier,
     btnText: String? = null
 ) {
@@ -90,17 +90,15 @@ private fun PharmacistListItemPreview() {
                 .padding(16.dp)
         ) {
             PharmacistListItem(
-                pharmacist = Pharmacist(
-                    userId = "user_12345",
-                    name = "김약사",
-                    bio = "복약 지도를 꼼꼼하게 해드립니다.",
-                    placeId = "place_001",
-                    pharmacyName = "달빛약국",
-                    isApproved = true
+                pharmacist = PharmacistUiModel(
+                    id = "user_12345",
+                    name = "源?쎌궗",
+                    bio = "蹂듭빟 吏?꾨? 瑗쇨세?섍쾶 ?대뱶由쎈땲??"
                 ),
                 onSelect = {},
-                btnText = "선택하기"
+                btnText = "?좏깮?섍린"
             )
         }
     }
 }
+

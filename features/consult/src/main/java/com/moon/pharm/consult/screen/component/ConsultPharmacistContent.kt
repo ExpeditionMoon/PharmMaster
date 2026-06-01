@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.moon.pharm.component_ui.component.map.PharmacySelector
+import com.moon.pharm.component_ui.model.PharmacyUiModel
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.auth.Pharmacist
@@ -25,13 +26,18 @@ fun ConsultPharmacistContent(
     onMapModeChange: (Boolean) -> Unit,
     onBackFromMap: () -> Unit
 ) {
+    val pharmacyUiModels = searchResults.map { pharmacy -> pharmacy.toUiModel() }
+    val selectedPharmacyUiModel = selectedPharmacy?.toUiModel()
+
     if (isMapView) {
         PharmacySelector(
-            pharmacies = searchResults,
-            selectedPharmacy = selectedPharmacy,
+            pharmacies = pharmacyUiModels,
+            selectedPharmacy = selectedPharmacyUiModel,
             searchText = searchQuery,
             onSearchTextChange = onSearchQueryChange,
-            onPharmacyClick = onPharmacySelect,
+            onPharmacyClick = { selected ->
+                searchResults.findByUiModel(selected)?.let(onPharmacySelect)
+            },
             onSearch = onSearchQueryChange,
             onSearchArea = onSearchArea,
             onBackClick = onBackFromMap,
@@ -82,3 +88,16 @@ private fun ConsultPharmacistContentPreview() {
         )
     }
 }
+
+private fun Pharmacy.toUiModel(): PharmacyUiModel =
+    PharmacyUiModel(
+        id = id,
+        placeId = placeId,
+        name = name,
+        address = address,
+        latitude = latitude,
+        longitude = longitude
+    )
+
+private fun List<Pharmacy>.findByUiModel(pharmacy: PharmacyUiModel): Pharmacy? =
+    firstOrNull { it.placeId == pharmacy.placeId }

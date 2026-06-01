@@ -1,4 +1,4 @@
-package com.moon.pharm.consult.screen.component
+﻿package com.moon.pharm.consult.screen.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,15 +15,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.chip.FilterChip
 import com.moon.pharm.component_ui.component.input.SearchBar
 import com.moon.pharm.component_ui.component.item.PharmacyListItem
+import com.moon.pharm.component_ui.model.PharmacyUiModel
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
@@ -71,8 +70,8 @@ fun PharmacistSearchView(
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items (pharmacies){ pharmacy ->
                     PharmacyListItem(
-                        pharmacy = pharmacy,
-                        onClick = onPharmacySelect
+                        pharmacy = pharmacy.toUiModel(),
+                        onClick = { onPharmacySelect(pharmacy) }
                     )
                 }
             }
@@ -84,16 +83,34 @@ fun PharmacistSearchView(
 
 @ThemePreviews
 @Composable
-private fun PharmacistSearchViewPreview(
-    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<Pharmacy>
-) {
+private fun PharmacistSearchViewPreview() {
     PharmMasterTheme {
         PharmacistSearchView(
-            searchText = "달빛",
-            pharmacies = pharmacies,
+            searchText = "?щ튆",
+            pharmacies = listOf(
+                Pharmacy(
+                    id = "pharm_001",
+                    placeId = "place_001",
+                    name = "?щ튆?쎄뎅",
+                    address = "?쒖슱?밸퀎??媛뺣궓援??뚰뿤?濡?123",
+                    tel = "02-1234-5678",
+                    latitude = 37.498095,
+                    longitude = 127.027610
+                )
+            ),
             onSearchChange = {},
             onNavigateToMap = {},
             onPharmacySelect = {}
         )
     }
 }
+
+private fun Pharmacy.toUiModel(): PharmacyUiModel =
+    PharmacyUiModel(
+        id = id,
+        placeId = placeId,
+        name = name,
+        address = address,
+        latitude = latitude,
+        longitude = longitude
+    )

@@ -22,16 +22,16 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.component.item.PharmacyListItem
+import com.moon.pharm.component_ui.model.PharmacyUiModel
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.pharmacy.Pharmacy
 
 @Composable
 fun PharmacyListPanel(
-    pharmacies: List<Pharmacy>,
-    onPharmacyClick: (Pharmacy) -> Unit,
+    pharmacies: List<PharmacyUiModel>,
+    onPharmacyClick: (PharmacyUiModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
@@ -79,7 +79,7 @@ fun PharmacyListPanel(
 @ThemePreviews
 @Composable
 private fun PharmacyListPanelPreview(
-    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<Pharmacy>
+    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<PharmacyUiModel>
 ) {
     PharmMasterTheme {
         Box(modifier = Modifier.background(PharmTheme.colors.background)) {
