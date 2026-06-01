@@ -4,8 +4,8 @@ import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.domain.model.medication.MealTiming
 import com.moon.pharm.domain.model.medication.MedicationType
 import com.moon.pharm.domain.model.medication.RepeatType
-import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
+import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 
 data class MedicationUiState(
     val isLoading: Boolean = false,

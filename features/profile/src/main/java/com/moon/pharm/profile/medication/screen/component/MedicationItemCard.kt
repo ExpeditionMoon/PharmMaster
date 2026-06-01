@@ -37,8 +37,8 @@ import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.medication.MealTiming
 import com.moon.pharm.domain.model.medication.MedicationType
 import com.moon.pharm.domain.model.medication.RepeatType
-import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 
 @Composable
 fun MedicationItemCard(

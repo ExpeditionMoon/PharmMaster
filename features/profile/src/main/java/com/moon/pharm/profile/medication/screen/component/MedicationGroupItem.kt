@@ -23,14 +23,14 @@ import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toDisplayTimeString
 import com.moon.pharm.domain.model.medication.MealTiming
-import com.moon.pharm.domain.model.medication.MedicationTimeGroup
 import com.moon.pharm.domain.model.medication.MedicationType
 import com.moon.pharm.domain.model.medication.RepeatType
-import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
+import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
+import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 
 @Composable
 fun MedicationGroupItem(
-    group: MedicationTimeGroup,
+    group: MedicationTimeGroupUiModel,
     onTakeClick: (TodayMedicationUiModel) -> Unit,
     onDeleteClick: (String) -> Unit
 ) {
@@ -72,7 +72,7 @@ private fun MedicationGroupItemPreview() {
     PharmMasterTheme {
         Box(modifier = Modifier.padding(16.dp)) {
             MedicationGroupItem(
-                group = MedicationTimeGroup(
+                group = MedicationTimeGroupUiModel(
                     time = "08:00",
                     items = listOf(
                         TodayMedicationUiModel(

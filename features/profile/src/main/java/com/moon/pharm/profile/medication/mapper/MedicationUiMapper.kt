@@ -4,7 +4,7 @@ import com.moon.pharm.component_ui.util.toScheduleTimeString
 import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.model.medication.MedicationSchedule
-import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
+import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
 import java.time.LocalDate
 import java.util.UUID

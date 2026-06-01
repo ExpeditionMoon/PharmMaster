@@ -9,7 +9,6 @@ import com.moon.pharm.component_ui.model.ScannedMedication
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.model.medication.MedicationProgress
-import com.moon.pharm.domain.model.medication.MedicationTimeGroup
 import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
@@ -19,8 +18,10 @@ import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
 import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
 import com.moon.pharm.profile.medication.mapper.toUiMessage
+import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 import com.moon.pharm.profile.medication.model.MedicationUiMessage
+import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 import com.moon.pharm.profile.navigation.ScannedMedicationListNavType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,11 +58,11 @@ class MedicationViewModel @Inject constructor(
 
     private var isSaving = false
 
-    val groupedMedications: StateFlow<List<MedicationTimeGroup>> = uiState
+    val groupedMedications: StateFlow<List<MedicationTimeGroupUiModel>> = uiState
         .map { state ->
             state.medicationList
                 .groupBy { it.time }
-                .map { (time, items) -> MedicationTimeGroup(time = time, items = items) }
+                .map { (time, items) -> MedicationTimeGroupUiModel(time = time, items = items) }
                 .sortedBy { it.time }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -429,7 +430,7 @@ class MedicationViewModel @Inject constructor(
         }
     }
 
-    private fun calculateProgress(list: List<com.moon.pharm.domain.model.medication.TodayMedicationUiModel>): MedicationProgress {
+    private fun calculateProgress(list: List<TodayMedicationUiModel>): MedicationProgress {
         val total = list.size
         val completed = list.count { it.isTaken }
         if (total == 0) return MedicationProgress(0f, 0, 0)

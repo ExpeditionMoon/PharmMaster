@@ -1,4 +1,8 @@
-package com.moon.pharm.domain.model.medication
+package com.moon.pharm.profile.medication.model
+
+import com.moon.pharm.domain.model.medication.MealTiming
+import com.moon.pharm.domain.model.medication.MedicationType
+import com.moon.pharm.domain.model.medication.RepeatType
 
 data class TodayMedicationUiModel(
     val medicationId: String,
