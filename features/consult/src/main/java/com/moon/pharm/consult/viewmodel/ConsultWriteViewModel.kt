@@ -18,7 +18,6 @@ import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.UploadConsultImagesUseCase
 import com.moon.pharm.domain.usecase.consult.ValidateConsultFormUseCase
 import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocationUseCase
-import com.moon.pharm.domain.usecase.pharmacy.SearchPharmacyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -39,7 +38,6 @@ import javax.inject.Inject
 class ConsultWriteViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val getLocationUseCase: GetNearbyPharmaciesCurrentLocationUseCase,
-    private val searchPharmacyUseCase: SearchPharmacyUseCase,
     private val uploadImagesUseCase: UploadConsultImagesUseCase,
     private val validateConsultFormUseCase: ValidateConsultFormUseCase,
     private val consultRepository: ConsultRepository,
@@ -133,11 +131,11 @@ class ConsultWriteViewModel @Inject constructor(
     }
 
     private suspend fun searchPharmacies(query: String) {
-        searchPharmacyUseCase(query).collectLatest { result ->
+        pharmacyRepository.searchPharmacies(query).collectLatest { result ->
             when (result) {
                 is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
                 is DataResourceResult.Success -> {
-                    val pharmacies = result.resultData
+                    val pharmacies = result.resultData.sortedBy { it.name }
                     _uiState.update { it.copy(isLoading = false, searchResults = pharmacies) }
                     if (pharmacies.isNotEmpty()) {
                         val first = pharmacies.first()

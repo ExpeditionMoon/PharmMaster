@@ -13,8 +13,6 @@ import com.moon.pharm.domain.model.medication.MedicationTimeGroup
 import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.medication.GetDailyIntakeRecordsUseCase
-import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
 import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
@@ -44,9 +42,7 @@ import kotlin.reflect.typeOf
 @HiltViewModel
 class MedicationViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val getMedicationsUseCase: GetMedicationsUseCase,
     private val medicationRepository: MedicationRepository,
-    private val getDailyIntakeRecordsUseCase: GetDailyIntakeRecordsUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
     private val authRepository: AuthRepository,
     private val validateMedicationEntryUseCase: ValidateMedicationEntryUseCase,
@@ -246,14 +242,16 @@ class MedicationViewModel @Inject constructor(
 
         viewModelScope.launch {
             combine(
-                getMedicationsUseCase(userId),
-                getDailyIntakeRecordsUseCase(userId, todayDate)
+                medicationRepository.getMedications(userId),
+                medicationRepository.getIntakeRecords(userId, todayDate)
             ) { medsResult, recordsResult ->
 
                 when {
                     medsResult is DataResourceResult.Success && recordsResult is DataResourceResult.Success -> {
-                        val activeMedications = medsResult.resultData.filter { isActiveDate(it, today) }
-                        val todayRecords = recordsResult.resultData
+                        val activeMedications = medsResult.resultData
+                            .sortedBy { it.name }
+                            .filter { isActiveDate(it, today) }
+                        val todayRecords = recordsResult.resultData.sortedBy { it.scheduleId }
 
                         val finalUiModels = MedicationUiMapper.toUiModelList(activeMedications).map { uiModel ->
                             val isTakenToday = todayRecords.any { record ->

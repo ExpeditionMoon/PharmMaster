@@ -8,8 +8,6 @@ import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
-import com.moon.pharm.domain.usecase.medication.GetMonthlyIntakeRecordsUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.profile.medication.model.HistoryRecordUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,8 +23,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MedicationHistoryViewModel @Inject constructor(
-    private val getMonthlyIntakeRecordsUseCase: GetMonthlyIntakeRecordsUseCase,
-    private val getMedicationsUseCase: GetMedicationsUseCase,
     private val medicationRepository: MedicationRepository,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
     private val authRepository: AuthRepository
@@ -52,15 +48,19 @@ class MedicationHistoryViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, selectedMonth = yearMonth) }
 
-            val recordsFlow = getMonthlyIntakeRecordsUseCase(userId, yearMonth.toString())
-            val medicationsFlow = getMedicationsUseCase(userId)
+            val recordsFlow = medicationRepository.getIntakeRecordsByRange(
+                userId = userId,
+                startDate = yearMonth.atDay(1).toString(),
+                endDate = yearMonth.atEndOfMonth().toString()
+            )
+            val medicationsFlow = medicationRepository.getMedications(userId)
 
             combine(recordsFlow, medicationsFlow) { recordsResult, medsResult ->
                 when {
                     recordsResult is DataResourceResult.Success && medsResult is DataResourceResult.Success -> {
                         generateFullHistory(
                             yearMonth = yearMonth,
-                            medications = medsResult.resultData,
+                            medications = medsResult.resultData.sortedBy { it.name },
                             realRecords = recordsResult.resultData
                         )
                     }

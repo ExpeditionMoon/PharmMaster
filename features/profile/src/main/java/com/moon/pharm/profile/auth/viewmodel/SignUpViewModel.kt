@@ -14,7 +14,6 @@ import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.SignUpUseCase
 import com.moon.pharm.domain.usecase.auth.ValidateSignUpFormUseCase
 import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocationUseCase
-import com.moon.pharm.domain.usecase.pharmacy.SearchPharmacyUseCase
 import com.moon.pharm.profile.auth.mapper.SignUpUiMapper
 import com.moon.pharm.profile.auth.model.SignUpStep
 import com.moon.pharm.profile.auth.model.SignUpUiMessage
@@ -38,7 +37,6 @@ import javax.inject.Inject
 class SignUpViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase,
     private val userRepository: UserRepository,
-    private val searchPharmacyUseCase: SearchPharmacyUseCase,
     private val pharmacyRepository: PharmacyRepository,
     private val getNearbyPharmaciesUseCase: GetNearbyPharmaciesCurrentLocationUseCase,
     private val validateSignUpFormUseCase: ValidateSignUpFormUseCase
@@ -229,13 +227,14 @@ class SignUpViewModel @Inject constructor(
 
     private fun executeSearch(query: String) {
         viewModelScope.launch {
-            searchPharmacyUseCase(query).collectLatest { result ->
+            pharmacyRepository.searchPharmacies(query).collectLatest { result ->
                 when(result) {
                     is DataResourceResult.Loading -> {}
                     is DataResourceResult.Success -> {
-                        _uiState.update { it.copy(pharmacySearchResults = result.resultData) }
-                        if (result.resultData.isNotEmpty()) {
-                            val first = result.resultData.first()
+                        val pharmacies = result.resultData.sortedBy { it.name }
+                        _uiState.update { it.copy(pharmacySearchResults = pharmacies) }
+                        if (pharmacies.isNotEmpty()) {
+                            val first = pharmacies.first()
                             _effect.emit(SignUpEffect.MoveCamera(LatLng(first.latitude, first.longitude)))
                         }
                     }
