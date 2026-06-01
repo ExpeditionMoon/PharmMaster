@@ -12,12 +12,15 @@ import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.user.UpdateNicknameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,6 +35,9 @@ class MyPageViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MyPageUiState())
     val uiState: StateFlow<MyPageUiState> = _uiState.asStateFlow()
 
+    private val _effect = MutableSharedFlow<MyPageEffect>()
+    val effect = _effect.asSharedFlow()
+
     init {
         loadData()
     }
@@ -40,22 +46,22 @@ class MyPageViewModel @Inject constructor(
         val currentUser = uiState.value.user ?: return
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
+            _uiState.update { it.copy(isLoading = true) }
 
             val result = updateNicknameUseCase(currentUser, newNickname)
 
             if (result is DataResourceResult.Failure) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    userMessage = UiMessage.LoadDataFailed
-                )
+                _uiState.update { it.copy(isLoading = false) }
+                _effect.emit(MyPageEffect.ShowMessage(UiMessage.LoadDataFailed))
             } else {
                 val updatedUser = currentUser.copy(nickName = newNickname)
 
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    user = updatedUser
-                )
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = false,
+                        user = updatedUser
+                    )
+                }
             }
         }
     }
@@ -92,7 +98,7 @@ class MyPageViewModel @Inject constructor(
                     _uiState.value.myConsults
                 }
                 val isLoading = userResult is DataResourceResult.Loading || consultResult is DataResourceResult.Loading
-                val errorMsg: UiMessage? = when {
+                val message: UiMessage? = when {
                     userResult is DataResourceResult.Failure -> UiMessage.LoadDataFailed
                     consultResult is DataResourceResult.Failure -> UiMessage.LoadDataFailed
                     else -> null
@@ -111,16 +117,20 @@ class MyPageViewModel @Inject constructor(
                     isLoading = isLoading,
                     user = user,
                     myConsults = consults,
-                    userMessage = errorMsg,
                     consultHistoryText = countText
                 )
+                message?.let { _effect.emit(MyPageEffect.ShowMessage(it)) }
             }
         }
     }
 
     fun logout() {
         viewModelScope.launch {
-            authRepository.logout()
+            when (authRepository.logout()) {
+                is DataResourceResult.Success -> _effect.emit(MyPageEffect.NavigateLogin)
+                is DataResourceResult.Failure -> _effect.emit(MyPageEffect.ShowMessage(UiMessage.LoadDataFailed))
+                else -> Unit
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,10 +27,10 @@ import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.auth.mapper.asString
-import com.moon.pharm.profile.auth.model.LoginUiMessage
 import com.moon.pharm.profile.auth.screen.component.LoginHeader
 import com.moon.pharm.profile.auth.screen.section.LoginFooterSection
 import com.moon.pharm.profile.auth.screen.section.LoginInputSection
+import com.moon.pharm.profile.auth.viewmodel.LoginEffect
 import com.moon.pharm.profile.auth.viewmodel.LoginViewModel
 
 @Composable
@@ -40,20 +41,16 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
-    val userMessage = uiState.userMessage
-    val messageText = (userMessage as? LoginUiMessage)?.asString()
-
-    LaunchedEffect(uiState.isLoginSuccess) {
-        if (uiState.isLoginSuccess) {
-            onNavigateToHome()
-        }
-    }
-
-    LaunchedEffect(userMessage) {
-        if (userMessage != null && messageText != null) {
-            snackbarHostState.showSnackbar(messageText)
-            viewModel.userMessageShown()
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is LoginEffect.ShowMessage -> snackbarHostState.showSnackbar(
+                    effect.message.asString(context)
+                )
+                LoginEffect.NavigateHome -> onNavigateToHome()
+            }
         }
     }
 

@@ -21,15 +21,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.auth.UserType
-import com.moon.pharm.profile.auth.mapper.asString
+import com.moon.pharm.profile.auth.mapper.asSignUpString
 import com.moon.pharm.profile.auth.model.SignUpStep
-import com.moon.pharm.profile.auth.model.SignUpUiMessage
 import com.moon.pharm.profile.auth.screen.component.PharmacySearchOverlay
 import com.moon.pharm.profile.auth.screen.component.SignUpHeader
 import com.moon.pharm.profile.auth.screen.section.EmailPasswordSection
@@ -37,31 +37,31 @@ import com.moon.pharm.profile.auth.screen.section.NickNameSection
 import com.moon.pharm.profile.auth.screen.section.PharmacistInfoSection
 import com.moon.pharm.profile.auth.screen.section.SignUpButtonSection
 import com.moon.pharm.profile.auth.screen.section.UserTypeSection
+import com.moon.pharm.profile.auth.viewmodel.SignUpEffect
 import com.moon.pharm.profile.auth.viewmodel.SignUpViewModel
 
 private const val ANIMATION_LABEL_STEP = "SignUpStep"
 
 @Composable
 fun SignUpScreen(
-    onNavigateToHome: () -> Unit, viewModel: SignUpViewModel
+    onNavigateToHome: () -> Unit,
+    viewModel: SignUpViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showPharmacySearch by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val userMessage = uiState.userMessage
-    val messageText = (userMessage as? SignUpUiMessage)?.asString()
+    val context = LocalContext.current
 
-    LaunchedEffect(uiState.isComplete) {
-        if (uiState.isComplete) {
-            onNavigateToHome()
-        }
-    }
-
-    LaunchedEffect(userMessage) {
-        if (userMessage != null && messageText != null) {
-            snackbarHostState.showSnackbar(messageText)
-            viewModel.userMessageShown()
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is SignUpEffect.ShowMessage -> snackbarHostState.showSnackbar(
+                    effect.message.asSignUpString(context)
+                )
+                SignUpEffect.NavigateHome -> onNavigateToHome()
+                is SignUpEffect.MoveCamera -> Unit
+            }
         }
     }
 
@@ -74,7 +74,12 @@ fun SignUpScreen(
     if (showPharmacySearch) {
         PharmacySearchOverlay(
             uiState = uiState,
-            viewModel = viewModel,
+            effect = viewModel.effect,
+            onFetchCurrentLocationAndSearch = viewModel::fetchCurrentLocationAndSearch,
+            onFetchNearbyPharmacies = viewModel::fetchNearbyPharmacies,
+            onSearchPharmacies = viewModel::searchPharmacies,
+            onUpdatePharmacy = viewModel::updatePharmacy,
+            onClearSearchResults = viewModel::clearSearchResults,
             onClose = { showPharmacySearch = false }
         )
     } else {
@@ -185,8 +190,7 @@ private fun SignUpScreenContentPreview() {
                 nickName = "",
                 profileImageUri = null,
                 pharmacyName = "",
-                pharmacistBio = "",
-                isComplete = false
+                pharmacistBio = ""
             ),
             snackbarHostState = SnackbarHostState(),
             onUpdateUserType = {},

@@ -48,8 +48,8 @@ class SignUpViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _moveCameraEvent = MutableSharedFlow<LatLng>()
-    val moveCameraEvent = _moveCameraEvent.asSharedFlow()
+    private val _effect = MutableSharedFlow<SignUpEffect>()
+    val effect = _effect.asSharedFlow()
 
     private val _searchQuery = MutableStateFlow("")
     // endregion
@@ -87,7 +87,7 @@ class SignUpViewModel @Inject constructor(
                 ValidateSignUpFormUseCase.ErrorType.INVALID_EMAIL_FORMAT -> SignUpUiMessage.InvalidEmailFormat
                 else -> null
             }
-            _uiState.update { it.copy(userMessage = errorMsg) }
+            errorMsg?.let(::showMessage)
             return
         }
 
@@ -97,10 +97,14 @@ class SignUpViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isEmailAvailable = !isDuplicated,
-                    isEmailChecking = false,
-                    userMessage = if (isDuplicated) SignUpUiMessage.EmailDuplicated else SignUpUiMessage.EmailAvailable
+                    isEmailChecking = false
                 )
             }
+            _effect.emit(
+                SignUpEffect.ShowMessage(
+                    if (isDuplicated) SignUpUiMessage.EmailDuplicated else SignUpUiMessage.EmailAvailable
+                )
+            )
         }
     }
 
@@ -124,11 +128,11 @@ class SignUpViewModel @Inject constructor(
                         ValidateSignUpFormUseCase.ErrorType.EMPTY_PASSWORD -> SignUpUiMessage.PasswordTooShort
                         else -> null
                     }
-                    _uiState.update { it.copy(userMessage = errorMsg) }
+                    errorMsg?.let(::showMessage)
                     return
                 }
                 if (currentState.isEmailAvailable != true) {
-                    _uiState.update { it.copy(userMessage = SignUpUiMessage.EmailDuplicated) }
+                    showMessage(SignUpUiMessage.EmailDuplicated)
                     return
                 }
                 _uiState.update { it.copy(currentStep = SignUpStep.NICKNAME) }
@@ -137,7 +141,7 @@ class SignUpViewModel @Inject constructor(
             SignUpStep.NICKNAME -> {
                 val validation = validateSignUpFormUseCase.validateNickname(currentState.nickName)
                 if (validation is ValidateSignUpFormUseCase.Result.Invalid) {
-                    _uiState.update { it.copy(userMessage = SignUpUiMessage.EmptyNickname) }
+                    showMessage(SignUpUiMessage.EmptyNickname)
                     return
                 }
                 if (currentState.userType == UserType.PHARMACIST) {
@@ -158,7 +162,7 @@ class SignUpViewModel @Inject constructor(
                         ValidateSignUpFormUseCase.ErrorType.EMPTY_BIO -> SignUpUiMessage.EmptyBio
                         else -> null
                     }
-                    _uiState.update { it.copy(userMessage = errorMsg) }
+                    errorMsg?.let(::showMessage)
                     return
                 }
                 signUpUser()
@@ -208,14 +212,14 @@ class SignUpViewModel @Inject constructor(
                     is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
                     is DataResourceResult.Success -> {
                         val (location, pharmacies) = result.resultData
-                        _moveCameraEvent.emit(LatLng(location.lat, location.lng))
+                        _effect.emit(SignUpEffect.MoveCamera(LatLng(location.lat, location.lng)))
                         _uiState.update {
                             it.copy(isLoading = false, pharmacySearchResults = pharmacies)
                         }
                     }
                     is DataResourceResult.Failure -> {
                         result.exception.printStackTrace()
-                        _uiState.update { it.copy(userMessage = UiMessage.LoadDataFailed) }
+                        showMessage(UiMessage.LoadDataFailed)
                         fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
                     }
                 }
@@ -232,7 +236,7 @@ class SignUpViewModel @Inject constructor(
                         _uiState.update { it.copy(pharmacySearchResults = result.resultData) }
                         if (result.resultData.isNotEmpty()) {
                             val first = result.resultData.first()
-                            _moveCameraEvent.emit(LatLng(first.latitude, first.longitude))
+                            _effect.emit(SignUpEffect.MoveCamera(LatLng(first.latitude, first.longitude)))
                         }
                     }
                     is DataResourceResult.Failure -> {
@@ -247,7 +251,11 @@ class SignUpViewModel @Inject constructor(
     // endregion
 
     // region 5. System Actions
-    fun userMessageShown() { _uiState.update { it.copy(userMessage = null) } }
+    private fun showMessage(message: UiMessage) {
+        viewModelScope.launch {
+            _effect.emit(SignUpEffect.ShowMessage(message))
+        }
+    }
     // endregion
 
     // region 6. Private Implementation
@@ -263,12 +271,12 @@ class SignUpViewModel @Inject constructor(
                     when (result) {
                         is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
                         is DataResourceResult.Success -> {
-                            _uiState.update { it.copy(isLoading = false, isComplete = true) }
+                            _uiState.update { it.copy(isLoading = false) }
+                            _effect.emit(SignUpEffect.NavigateHome)
                         }
                         is DataResourceResult.Failure -> {
-                            _uiState.update {
-                                it.copy(isLoading = false, userMessage = SignUpUiMessage.SignUpFailed)
-                            }
+                            _uiState.update { it.copy(isLoading = false) }
+                            _effect.emit(SignUpEffect.ShowMessage(SignUpUiMessage.SignUpFailed))
                         }
                     }
                 }

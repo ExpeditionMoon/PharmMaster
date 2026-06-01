@@ -1,6 +1,4 @@
 package com.moon.pharm.profile.auth.screen
-
-import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.profile.auth.model.SignUpStep
@@ -25,11 +23,7 @@ data class SignUpUiState(
     val isLoading: Boolean = false,
     val isEmailChecking: Boolean = false,
     val isEmailAvailable: Boolean? = null,
-    val isComplete: Boolean = false,
 
     // 5. 검색 데이터
-    val pharmacySearchResults: List<Pharmacy> = emptyList(),
-
-    // 6. 에러 메시지
-    val userMessage: UiMessage? = null
+    val pharmacySearchResults: List<Pharmacy> = emptyList()
 )

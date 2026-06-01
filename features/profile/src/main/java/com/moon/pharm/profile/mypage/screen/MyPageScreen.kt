@@ -14,19 +14,25 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
+import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
+import com.moon.pharm.component_ui.component.snackbar.SnackbarType
 import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
@@ -41,10 +47,12 @@ import com.moon.pharm.profile.mypage.screen.component.MyPageFooterSection
 import com.moon.pharm.profile.mypage.screen.component.MyPageMenuItemData
 import com.moon.pharm.profile.mypage.screen.component.MyPageMenuSection
 import com.moon.pharm.profile.mypage.screen.component.MyPageProfileCard
+import com.moon.pharm.profile.mypage.mapper.asMyPageString
+import com.moon.pharm.profile.mypage.viewmodel.MyPageEffect
 import com.moon.pharm.profile.mypage.viewmodel.MyPageUiState
 import com.moon.pharm.profile.mypage.viewmodel.MyPageViewModel
 import com.moon.pharm.profile.util.myPageConsultMenuTitleRes
-import com.moon.pharm.component_ui.R as UiR
+import com.moon.pharm.component_ui.R as ComponentUiR
 
 @Composable
 fun MyPageRoute(
@@ -53,16 +61,27 @@ fun MyPageRoute(
     onNavigateToLogin: () -> Unit,
     viewModel: MyPageViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is MyPageEffect.ShowMessage -> snackbarHostState.showSnackbar(
+                    effect.message.asMyPageString(context)
+                )
+                MyPageEffect.NavigateLogin -> onNavigateToLogin()
+            }
+        }
+    }
 
     MyPageScreen(
         uiState = uiState,
+        snackbarHostState = snackbarHostState,
         onNavigateToMyConsultation = onNavigateToMyConsultation,
         onNavigateToMedicationHistory = onNavigateToMedicationHistory,
-        onLogout = {
-            viewModel.logout()
-            onNavigateToLogin()
-        },
+        onLogout = viewModel::logout,
         onUpdateNickname = viewModel::updateNickname
     )
 }
@@ -70,6 +89,7 @@ fun MyPageRoute(
 @Composable
 fun MyPageScreen(
     uiState: MyPageUiState,
+    snackbarHostState: SnackbarHostState,
     onNavigateToMyConsultation: () -> Unit,
     onNavigateToMedicationHistory: () -> Unit,
     onLogout: () -> Unit,
@@ -104,6 +124,11 @@ fun MyPageScreen(
                 )
             )
         },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                CustomSnackbar(snackbarData = data, type = SnackbarType.ERROR)
+            }
+        }
     ) { paddingValues ->
         if (uiState.isLoading && uiState.user == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -152,7 +177,7 @@ fun MyPageScreen(
                 }
             } ?: run {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(stringResource(UiR.string.error_load_data))
+                    Text(stringResource(ComponentUiR.string.error_load_data))
                 }
             }
         }
@@ -225,6 +250,7 @@ private fun MyPageScreenPreview() {
                 ),
                 myConsults = emptyList()
             ),
+            snackbarHostState = SnackbarHostState(),
             onNavigateToMyConsultation = {},
             onNavigateToMedicationHistory = {},
             onLogout = {},

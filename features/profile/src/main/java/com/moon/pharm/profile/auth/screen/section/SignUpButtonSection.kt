@@ -64,8 +64,7 @@ private fun SignUpButtonSectionPreview() {
                     nickName = "",
                     profileImageUri = null,
                     pharmacyName = "",
-                    pharmacistBio = "",
-                    isComplete = false
+                    pharmacistBio = ""
                 ),
                 onNextClick = {}
             )

@@ -9,7 +9,9 @@ import com.moon.pharm.domain.usecase.user.SyncFcmTokenUseCase
 import com.moon.pharm.profile.auth.model.LoginUiMessage
 import com.moon.pharm.profile.auth.screen.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,6 +27,9 @@ class LoginViewModel @Inject constructor(
     // region 1. State
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.asStateFlow()
+
+    private val _effect = MutableSharedFlow<LoginEffect>()
+    val effect = _effect.asSharedFlow()
     // endregion
 
     // region 2. User Actions
@@ -46,7 +51,7 @@ class LoginViewModel @Inject constructor(
                 ValidateLoginFormUseCase.ErrorType.EMPTY_PASSWORD -> LoginUiMessage.EmptyPassword
             }
 
-            _uiState.update { it.copy(userMessage = errorState) }
+            showMessage(errorState)
             return
         }
 
@@ -54,27 +59,26 @@ class LoginViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             val result = authRepository.login(currentState.email, currentState.password)
             if (result is DataResourceResult.Success) { syncFcmTokenUseCase() }
-            _uiState.update { state ->
-                when (result) {
-                    is DataResourceResult.Success -> state.copy(
-                        isLoading = false,
-                        isLoginSuccess = true,
-                        userMessage = null
-                    )
-                    is DataResourceResult.Failure -> state.copy(
-                        isLoading = false,
-                        userMessage = LoginUiMessage.LoginFailed
-                    )
-                    else -> state.copy(isLoading = false)
+            when (result) {
+                is DataResourceResult.Success -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    _effect.emit(LoginEffect.NavigateHome)
                 }
+                is DataResourceResult.Failure -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    _effect.emit(LoginEffect.ShowMessage(LoginUiMessage.LoginFailed))
+                }
+                else -> _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
     // endregion
 
     // region 3. System Actions
-    fun userMessageShown() {
-        _uiState.update { it.copy(userMessage = null) }
+    private fun showMessage(message: LoginUiMessage) {
+        viewModelScope.launch {
+            _effect.emit(LoginEffect.ShowMessage(message))
+        }
     }
     // endregion
 }
