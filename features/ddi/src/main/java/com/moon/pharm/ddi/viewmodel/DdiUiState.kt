@@ -6,6 +6,6 @@ import com.moon.pharm.ddi.model.DdiUiMessage
 data class DdiUiState(
     val selectedDrugs: List<String> = emptyList(),
     val isLoading: Boolean = false,
-    val userMessage: DdiUiMessage? = null,
+    val errorMessage: DdiUiMessage? = null,
     val result: DdiResultUiModel? = null
 )

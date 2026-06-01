@@ -31,7 +31,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
@@ -60,7 +60,7 @@ fun DdiResultRoute(
     onNavigateToConsult: (String, List<String>) -> Unit,
     onBackClick: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     DdiResultScreen(
         uiState = uiState,
@@ -178,9 +178,9 @@ fun DdiResultScreen(
                             )
                         }
                     }
-                    uiState.userMessage != null -> {
+                    uiState.errorMessage != null -> {
                         Text(
-                            text = uiState.userMessage.asString(),
+                            text = uiState.errorMessage.asString(),
                             color = PharmTheme.colors.error,
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(top = 40.dp)

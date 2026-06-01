@@ -27,19 +27,15 @@ class DdiSharedViewModel @Inject constructor(
     fun addDrug(drugName: String) {
         _uiState.update { state ->
             val updatedList = (state.selectedDrugs + drugName).distinct()
-            state.copy(selectedDrugs = updatedList, result = null, userMessage = null)
+            state.copy(selectedDrugs = updatedList, result = null, errorMessage = null)
         }
     }
 
     fun removeDrug(drugName: String) {
         _uiState.update { state ->
             val updatedList = state.selectedDrugs.filter { it != drugName }
-            state.copy(selectedDrugs = updatedList, result = null, userMessage = null)
+            state.copy(selectedDrugs = updatedList, result = null, errorMessage = null)
         }
-    }
-
-    fun clearMessage() {
-        _uiState.update { it.copy(userMessage = null) }
     }
 
     fun clearAll() {
@@ -50,11 +46,11 @@ class DdiSharedViewModel @Inject constructor(
         val drugsToAnalyze = _uiState.value.selectedDrugs
 
         if (drugsToAnalyze.size < 2) {
-            _uiState.update { it.copy(userMessage = DdiUiMessage.DynamicError("비교할 약물을 2개 이상 담아주세요.")) }
+            _uiState.update { it.copy(errorMessage = DdiUiMessage.DynamicError("비교할 약물을 2개 이상 담아주세요.")) }
             return
         }
 
-        _uiState.update { it.copy(isLoading = true, userMessage = null, result = null) }
+        _uiState.update { it.copy(isLoading = true, errorMessage = null, result = null) }
 
         viewModelScope.launch {
             when (val result = analyzeDdiUseCase(drugsToAnalyze)) {
@@ -71,7 +67,7 @@ class DdiSharedViewModel @Inject constructor(
                         ?: DdiUiMessage.Unknown
 
                     _uiState.update {
-                        it.copy(isLoading = false, userMessage = uiMessage)
+                        it.copy(isLoading = false, errorMessage = uiMessage)
                     }
                 }
             }
