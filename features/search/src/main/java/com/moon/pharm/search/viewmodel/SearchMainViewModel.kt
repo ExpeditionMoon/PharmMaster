@@ -6,7 +6,9 @@ import com.moon.pharm.domain.repository.DrugSearchRepository
 import com.moon.pharm.search.model.SearchUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -27,16 +29,15 @@ class SearchMainViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val _effect = MutableSharedFlow<SearchEffect>()
+    val effect = _effect.asSharedFlow()
+
     init {
         observeSearchQuery()
     }
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
-    }
-
-    fun userMessageShown() {
-        _uiState.update { it.copy(userMessage = null) }
     }
 
     private fun observeSearchQuery() {
@@ -56,7 +57,7 @@ class SearchMainViewModel @Inject constructor(
     }
 
     private suspend fun searchDrugs(query: String) {
-        _uiState.update { it.copy(isLoading = true, userMessage = null) }
+        _uiState.update { it.copy(isLoading = true) }
 
         val result = drugSearchRepository.searchDrugByName(itemName = query)
 
@@ -67,12 +68,13 @@ class SearchMainViewModel @Inject constructor(
                 )
             }
         }.onFailure { error ->
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    userMessage = error.message?.let { msg -> SearchUiMessage.DynamicError(msg) }
-                        ?: SearchUiMessage.SearchFailed)
-            }
+            _uiState.update { it.copy(isLoading = false) }
+            _effect.emit(
+                SearchEffect.ShowMessage(
+                    error.message?.let { msg -> SearchUiMessage.DynamicError(msg) }
+                        ?: SearchUiMessage.SearchFailed
+                )
+            )
         }
     }
 }

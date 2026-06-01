@@ -36,6 +36,7 @@ import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.domain.model.drug.Drug
 import com.moon.pharm.search.mapper.asString
 import com.moon.pharm.search.screen.component.DrugListItem
+import com.moon.pharm.search.viewmodel.SearchEffect
 import com.moon.pharm.search.viewmodel.SearchMainViewModel
 import com.moon.pharm.search.viewmodel.SearchUiState
 
@@ -48,11 +49,15 @@ fun SearchMainScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    uiState.userMessage?.let { message ->
-        val messageString = message.asString()
-        LaunchedEffect(message) {
-            Toast.makeText(context, messageString, Toast.LENGTH_SHORT).show()
-            viewModel.userMessageShown()
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is SearchEffect.ShowMessage -> Toast.makeText(
+                    context,
+                    effect.message.asString(context),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
