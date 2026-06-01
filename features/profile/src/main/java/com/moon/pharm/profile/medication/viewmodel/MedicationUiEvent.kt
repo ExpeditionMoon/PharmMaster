@@ -26,5 +26,4 @@ sealed interface MedicationUiEvent {
 
     // 3. UI 상태 및 시스템 이벤트 (UI State & System)
     data class SelectTab(val tab: MedicationPrimaryTab) : MedicationUiEvent
-    object MessageShown : MedicationUiEvent
 }

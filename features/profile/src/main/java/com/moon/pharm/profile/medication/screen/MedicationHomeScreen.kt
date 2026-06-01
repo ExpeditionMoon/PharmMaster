@@ -6,34 +6,53 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
+import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
+import com.moon.pharm.component_ui.component.snackbar.SnackbarType
 import com.moon.pharm.component_ui.model.TopBarAction
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.component_ui.util.MultipleEventsCutter
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.medication.mapper.asMedicationString
 import com.moon.pharm.profile.medication.screen.component.MedicationHomeContent
+import com.moon.pharm.profile.medication.viewmodel.MedicationEffect
 import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 
 @Composable
 fun MedicationScreen(
-    navController: NavController? = null, viewModel: MedicationViewModel
+    navController: NavController? = null,
+    viewModel: MedicationViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val groupedList by viewModel.groupedMedications.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     val totalCount = uiState.medicationList.size
     val completedCount = uiState.medicationList.count { it.isTaken }
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            if (effect is MedicationEffect.ShowMessage) {
+                snackbarHostState.showSnackbar(effect.message.asMedicationString(context))
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -63,6 +82,11 @@ fun MedicationScreen(
                     )
                 )
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                CustomSnackbar(snackbarData = data, type = SnackbarType.ERROR)
+            }
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {

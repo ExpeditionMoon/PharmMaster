@@ -23,9 +23,11 @@ import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 import com.moon.pharm.profile.medication.model.MedicationUiMessage
 import com.moon.pharm.profile.navigation.ScannedMedicationListNavType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -54,6 +56,9 @@ class MedicationViewModel @Inject constructor(
     // region 1. State & Derived State
     private val _uiState = MutableStateFlow(MedicationUiState())
     val uiState = _uiState.asStateFlow()
+
+    private val _effect = MutableSharedFlow<MedicationEffect>()
+    val effect = _effect.asSharedFlow()
 
     private var isSaving = false
 
@@ -210,7 +215,6 @@ class MedicationViewModel @Inject constructor(
 
             // 3. UI 상태 및 시스템 이벤트
             is MedicationUiEvent.SelectTab -> _uiState.update { it.copy(selectedTab = event.tab) }
-            MedicationUiEvent.MessageShown -> _uiState.update { it.copy(userMessage = null) }
         }
     }
 
@@ -271,8 +275,7 @@ class MedicationViewModel @Inject constructor(
                 _uiState.update { currentState ->
                     when (result) {
                         is DataResourceResult.Loading -> currentState.copy(
-                            isLoading = true,
-                            userMessage = null
+                            isLoading = true
                         )
                         is DataResourceResult.Success -> {
                             currentState.copy(
@@ -282,11 +285,13 @@ class MedicationViewModel @Inject constructor(
                         }
                         is DataResourceResult.Failure -> {
                             currentState.copy(
-                                isLoading = false,
-                                userMessage = UiMessage.LoadDataFailed
+                                isLoading = false
                             )
                         }
                     }
+                }
+                if (result is DataResourceResult.Failure) {
+                    _effect.emit(MedicationEffect.ShowMessage(UiMessage.LoadDataFailed))
                 }
             }
         }
@@ -323,13 +328,13 @@ class MedicationViewModel @Inject constructor(
 
         if (invalidForm != null) {
             val result = validateMedicationEntryUseCase(invalidForm.medicationName) as ValidateMedicationEntryUseCase.Result.Error
-            _uiState.update { it.copy(userMessage = result.error.toUiMessage()) }
+            showMessage(result.error.toUiMessage())
             return
         }
 
         val userId = authRepository.getCurrentUserId()
         if (userId == null) {
-            _uiState.update { it.copy(userMessage = MedicationUiMessage.NotLoggedIn) }
+            showMessage(MedicationUiMessage.NotLoggedIn)
             return
         }
 
@@ -356,15 +361,19 @@ class MedicationViewModel @Inject constructor(
                 isSaving = false
                 if (isAllSuccess) {
                     currentState.copy(
-                        isLoading = false,
-                        isMedicationCreated = true
+                        isLoading = false
                     )
                 } else {
                     currentState.copy(
-                        isLoading = false,
-                        userMessage = MedicationUiMessage.CreateFailed
+                        isLoading = false
                     )
                 }
+            }
+
+            if (isAllSuccess) {
+                _effect.emit(MedicationEffect.NavigateMedicationHome)
+            } else {
+                _effect.emit(MedicationEffect.ShowMessage(MedicationUiMessage.CreateFailed))
             }
         }
     }
@@ -438,6 +447,12 @@ class MedicationViewModel @Inject constructor(
             completed = completed,
             total = total
         )
+    }
+
+    private fun showMessage(message: UiMessage) {
+        viewModelScope.launch {
+            _effect.emit(MedicationEffect.ShowMessage(message))
+        }
     }
     // endregion
 }

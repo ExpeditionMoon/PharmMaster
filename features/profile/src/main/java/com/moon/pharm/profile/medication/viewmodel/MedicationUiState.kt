@@ -1,6 +1,5 @@
 package com.moon.pharm.profile.medication.viewmodel
 
-import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.domain.model.medication.MealTiming
 import com.moon.pharm.domain.model.medication.MedicationType
 import com.moon.pharm.domain.model.medication.RepeatType
@@ -9,8 +8,6 @@ import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 
 data class MedicationUiState(
     val isLoading: Boolean = false,
-    val userMessage: UiMessage? = null,
-    val isMedicationCreated: Boolean = false,
 
     val medicationList: List<TodayMedicationUiModel> = emptyList(),
     val selectedTab: MedicationPrimaryTab = MedicationPrimaryTab.ALL,
