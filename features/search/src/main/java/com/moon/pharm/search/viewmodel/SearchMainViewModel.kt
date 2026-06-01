@@ -8,11 +8,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,30 +26,33 @@ class SearchMainViewModel @Inject constructor(
     private val drugSearchRepository: DrugSearchRepository
 ) : ViewModel() {
 
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery = _searchQuery.asStateFlow()
-
     private val _uiState = MutableStateFlow(SearchUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     private val _effect = MutableSharedFlow<SearchEffect>()
-    val effect = _effect.asSharedFlow()
+    val effect: SharedFlow<SearchEffect> = _effect.asSharedFlow()
 
     init {
         observeSearchQuery()
     }
 
     fun updateSearchQuery(query: String) {
-        _searchQuery.value = query
+        _uiState.update { it.copy(searchQuery = query) }
     }
 
     private fun observeSearchQuery() {
         viewModelScope.launch {
-            _searchQuery.debounce(500L).distinctUntilChanged().collectLatest { query ->
+            uiState
+                .map { it.searchQuery }
+                .debounce(500L)
+                .distinctUntilChanged()
+                .collectLatest { query ->
                     if (query.isBlank()) {
                         _uiState.update {
                             it.copy(
-                                isLoading = false, drugs = emptyList(), isSearchExecuted = false
+                                isLoading = false,
+                                drugs = emptyList(),
+                                isSearchExecuted = false
                             )
                         }
                         return@collectLatest
@@ -64,7 +70,9 @@ class SearchMainViewModel @Inject constructor(
         result.onSuccess { drugs ->
             _uiState.update {
                 it.copy(
-                    isLoading = false, drugs = drugs, isSearchExecuted = true
+                    isLoading = false,
+                    drugs = drugs,
+                    isSearchExecuted = true
                 )
             }
         }.onFailure { error ->

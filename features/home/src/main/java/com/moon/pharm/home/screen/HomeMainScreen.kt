@@ -25,7 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.moon.pharm.component_ui.R
 import com.moon.pharm.component_ui.component.SectionHeader
@@ -54,8 +54,8 @@ fun HomeMainScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val scrollState = rememberScrollState()
-    val nickname by viewModel.nickname.collectAsState()
-    val displayName = nickname.ifEmpty { "회원" }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val displayName = uiState.nickname.ifEmpty { "회원" }
 
     Scaffold(
         topBar = {

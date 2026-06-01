@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,8 +20,8 @@ class HomeViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _nickname = MutableStateFlow("")
-    val nickname: StateFlow<String> = _nickname.asStateFlow()
+    private val _uiState = MutableStateFlow(HomeUiState())
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
         loadUserNickname()
@@ -33,7 +34,7 @@ class HomeViewModel @Inject constructor(
             if (userId != null) {
                 userRepository.getUser(userId).collectLatest { result ->
                     if (result is DataResourceResult.Success) {
-                        _nickname.value = result.resultData.nickName
+                        _uiState.update { it.copy(nickname = result.resultData.nickName) }
                     }
                 }
             }

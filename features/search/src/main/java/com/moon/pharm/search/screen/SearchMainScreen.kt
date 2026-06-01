@@ -39,18 +39,18 @@ import com.moon.pharm.search.screen.component.DrugListItem
 import com.moon.pharm.search.viewmodel.SearchEffect
 import com.moon.pharm.search.viewmodel.SearchMainViewModel
 import com.moon.pharm.search.viewmodel.SearchUiState
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SearchMainScreen(
     navController: NavController,
     viewModel: SearchMainViewModel = hiltViewModel()
 ) {
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
+        viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is SearchEffect.ShowMessage -> Toast.makeText(
                     context,
@@ -75,7 +75,6 @@ fun SearchMainScreen(
     ) { innerPadding ->
         SearchMainContent(
             modifier = Modifier.padding(innerPadding),
-            searchQuery = searchQuery,
             uiState = uiState,
             onSearchQueryChange = viewModel::updateSearchQuery,
             onItemClick = { drug ->
@@ -88,7 +87,6 @@ fun SearchMainScreen(
 @Composable
 fun SearchMainContent(
     modifier: Modifier = Modifier,
-    searchQuery: String,
     uiState: SearchUiState,
     onSearchQueryChange: (String) -> Unit,
     onItemClick: (Drug) -> Unit
@@ -99,7 +97,7 @@ fun SearchMainContent(
             .padding(16.dp)
     ) {
         OutlinedTextField(
-            value = searchQuery,
+            value = uiState.searchQuery,
             onValueChange = onSearchQueryChange,
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text("약 이름을 검색해보세요 (예: 타이레놀)") },
@@ -172,8 +170,8 @@ private fun SearchMainContentPreview_Success() {
     PharmMasterTheme {
         Box(modifier = Modifier.background(PharmTheme.colors.background)) {
             SearchMainContent(
-                searchQuery = "타이레놀",
                 uiState = SearchUiState(
+                    searchQuery = "타이레놀",
                     isLoading = false,
                     drugs = dummyDrugs,
                     isSearchExecuted = true
@@ -191,8 +189,8 @@ private fun SearchMainContentPreview_Loading() {
     PharmMasterTheme {
         Box(modifier = Modifier.background(PharmTheme.colors.background)) {
             SearchMainContent(
-                searchQuery = "타이레놀",
                 uiState = SearchUiState(
+                    searchQuery = "타이레놀",
                     isLoading = true,
                     drugs = emptyList(),
                     isSearchExecuted = true
@@ -210,8 +208,8 @@ private fun SearchMainContentPreview_Empty() {
     PharmMasterTheme {
         Box(modifier = Modifier.background(PharmTheme.colors.background)) {
             SearchMainContent(
-                searchQuery = "없는약이름입니다",
                 uiState = SearchUiState(
+                    searchQuery = "없는약이름입니다",
                     isLoading = false,
                     drugs = emptyList(),
                     isSearchExecuted = true
