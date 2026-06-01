@@ -3,6 +3,7 @@ package com.moon.pharm.search.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.domain.repository.DrugSearchRepository
+import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.search.model.SearchUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
@@ -67,22 +68,28 @@ class SearchMainViewModel @Inject constructor(
 
         val result = drugSearchRepository.searchDrugByName(itemName = query)
 
-        result.onSuccess { drugs ->
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    drugs = drugs,
-                    isSearchExecuted = true
+        when (result) {
+            is DataResourceResult.Success -> {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        drugs = result.resultData,
+                        isSearchExecuted = true
+                    )
+                }
+            }
+            is DataResourceResult.Failure -> {
+                _uiState.update { it.copy(isLoading = false) }
+                _effect.emit(
+                    SearchEffect.ShowMessage(
+                        result.exception.message?.let { msg -> SearchUiMessage.DynamicError(msg) }
+                            ?: SearchUiMessage.SearchFailed
+                    )
                 )
             }
-        }.onFailure { error ->
-            _uiState.update { it.copy(isLoading = false) }
-            _effect.emit(
-                SearchEffect.ShowMessage(
-                    error.message?.let { msg -> SearchUiMessage.DynamicError(msg) }
-                        ?: SearchUiMessage.SearchFailed
-                )
-            )
+            DataResourceResult.Loading -> {
+                _uiState.update { it.copy(isLoading = true) }
+            }
         }
     }
 }
