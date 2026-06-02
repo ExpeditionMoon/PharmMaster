@@ -28,20 +28,20 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
 import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
+import com.moon.pharm.component_ui.model.PharmacyUiModel
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PharmacySelector(
-    pharmacies: List<Pharmacy>,
-    selectedPharmacy: Pharmacy?,
-    onPharmacyClick: (Pharmacy) -> Unit,
+    pharmacies: List<PharmacyUiModel>,
+    selectedPharmacy: PharmacyUiModel?,
+    onPharmacyClick: (PharmacyUiModel) -> Unit,
     onSearch: (String) -> Unit,
     onSearchArea: (Double, Double) -> Unit,
     onBackClick: () -> Unit,
@@ -157,7 +157,7 @@ fun PharmacySelector(
 @ThemePreviews
 @Composable
 private fun PharmacySelectorPreview(
-    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<Pharmacy>
+    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<PharmacyUiModel>
 ) {
     PharmMasterTheme {
         PharmacySelector(

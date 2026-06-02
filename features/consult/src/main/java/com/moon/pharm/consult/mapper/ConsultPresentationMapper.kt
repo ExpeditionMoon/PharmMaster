@@ -6,6 +6,8 @@ import com.moon.pharm.consult.model.ConsultStatusUiModel
 import com.moon.pharm.consult.model.ConsultUiModel
 import com.moon.pharm.consult.model.PharmacistUiModel
 import com.moon.pharm.consult.model.PharmacyUiModel
+import com.moon.pharm.component_ui.model.PharmacistUiModel as ComponentPharmacistUiModel
+import com.moon.pharm.component_ui.model.PharmacyUiModel as ComponentPharmacyUiModel
 import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.model.consult.ConsultAnswer
 import com.moon.pharm.domain.model.consult.ConsultImage
@@ -81,6 +83,28 @@ fun Pharmacist.toUiModel(): PharmacistUiModel {
 
 fun PharmacistUiModel.toDomainModel(): Pharmacist {
     return Pharmacist(
+        userId = userId,
+        name = name,
+        bio = bio,
+        placeId = placeId,
+        pharmacyName = pharmacyName
+    )
+}
+
+fun PharmacyUiModel.toComponentUiModel(): ComponentPharmacyUiModel {
+    return ComponentPharmacyUiModel(
+        id = id,
+        placeId = placeId,
+        name = name,
+        address = address,
+        tel = tel,
+        latitude = latitude,
+        longitude = longitude
+    )
+}
+
+fun PharmacistUiModel.toComponentUiModel(): ComponentPharmacistUiModel {
+    return ComponentPharmacistUiModel(
         userId = userId,
         name = name,
         bio = bio,

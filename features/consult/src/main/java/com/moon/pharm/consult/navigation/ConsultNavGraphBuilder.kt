@@ -18,6 +18,7 @@ import com.moon.pharm.consult.screen.ConsultDetailScreen
 import com.moon.pharm.consult.screen.ConsultPharmacistScreen
 import com.moon.pharm.consult.screen.ConsultScreen
 import com.moon.pharm.consult.screen.ConsultWriteScreen
+import com.moon.pharm.consult.screen.my.MyConsultListRoute
 import com.moon.pharm.consult.viewmodel.ConsultDetailViewModel
 import com.moon.pharm.consult.viewmodel.ConsultListViewModel
 import com.moon.pharm.consult.viewmodel.ConsultWriteViewModel
@@ -26,6 +27,15 @@ fun NavGraphBuilder.consultNavGraph(
     navController: NavController,
     onMapModeChanged: (Boolean) -> Unit
 ) {
+    composable<ContentNavigationRoute.MyConsultList> {
+        MyConsultListRoute(
+            onNavigateUp = { navController.popBackStack() },
+            onNavigateToDetail = { consultId ->
+                navController.navigate(ContentNavigationRoute.ConsultTabDetailScreen(id = consultId))
+            }
+        )
+    }
+
     navigation<ContentNavigationRoute.ConsultGraph>(
         startDestination = ContentNavigationRoute.ConsultTab
     ) {

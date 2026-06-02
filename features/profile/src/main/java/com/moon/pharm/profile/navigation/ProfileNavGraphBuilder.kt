@@ -6,7 +6,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.moon.pharm.component_ui.model.ScannedMedication
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.consult.screen.my.MyConsultListRoute
 import com.moon.pharm.profile.auth.screen.LoginScreen
 import com.moon.pharm.profile.auth.screen.SignUpScreen
 import com.moon.pharm.profile.auth.viewmodel.LoginViewModel
@@ -61,15 +60,6 @@ fun NavGraphBuilder.profileNavGraph(navController: NavController, onLogout: () -
             }
         )
     }
-    composable<ContentNavigationRoute.MyConsultList> {
-        MyConsultListRoute(
-            onNavigateUp = { navController.popBackStack() },
-            onNavigateToDetail = { consultId ->
-                navController.navigate(ContentNavigationRoute.ConsultTabDetailScreen(id = consultId))
-            }
-        )
-    }
-
     composable<ContentNavigationRoute.MedicationTab>{
         val viewModel: MedicationViewModel = hiltViewModel()
         MedicationScreen(

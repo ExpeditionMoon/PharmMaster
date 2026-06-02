@@ -24,7 +24,7 @@ import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
-import com.moon.pharm.consult.mapper.toDomainModel
+import com.moon.pharm.consult.mapper.toComponentUiModel
 import com.moon.pharm.consult.model.PharmacyUiModel
 
 @Composable
@@ -70,7 +70,7 @@ fun PharmacistSearchView(
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items (pharmacies){ pharmacy ->
                     PharmacyListItem(
-                        pharmacy = pharmacy.toDomainModel(),
+                        pharmacy = pharmacy.toComponentUiModel(),
                         onClick = { onPharmacySelect(pharmacy) }
                     )
                 }

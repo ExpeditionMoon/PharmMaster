@@ -24,7 +24,7 @@ import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
-import com.moon.pharm.consult.mapper.toDomainModel
+import com.moon.pharm.consult.mapper.toComponentUiModel
 import com.moon.pharm.consult.model.PharmacistUiModel
 
 @Composable
@@ -67,7 +67,7 @@ fun PharmacistListPanel(
             ) {
                 items(pharmacists) { pharmacist ->
                     PharmacistListItem(
-                        pharmacist = pharmacist.toDomainModel(),
+                        pharmacist = pharmacist.toComponentUiModel(),
                         onSelect = { onPharmacistSelect(pharmacist) }
                     )
                 }
