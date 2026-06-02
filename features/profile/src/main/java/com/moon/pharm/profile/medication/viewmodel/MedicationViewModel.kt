@@ -7,13 +7,10 @@ import androidx.navigation.toRoute
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.component_ui.model.ScannedMedication
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.domain.alarm.AlarmScheduler
-import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
-import com.moon.pharm.domain.usecase.medication.GetDailyIntakeRecordsUseCase
-import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
+import com.moon.pharm.domain.usecase.medication.ObserveTodayMedicationItemsUseCase
 import com.moon.pharm.domain.usecase.medication.SaveMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
@@ -31,7 +28,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -45,14 +41,12 @@ import kotlin.reflect.typeOf
 @HiltViewModel
 class MedicationViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val getMedicationsUseCase: GetMedicationsUseCase,
+    private val observeTodayMedicationItemsUseCase: ObserveTodayMedicationItemsUseCase,
     private val saveMedicationUseCase: SaveMedicationUseCase,
     private val deleteMedicationUseCase: DeleteMedicationUseCase,
-    private val getDailyIntakeRecordsUseCase: GetDailyIntakeRecordsUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     private val validateMedicationEntryUseCase: ValidateMedicationEntryUseCase,
-    private val alarmScheduler: AlarmScheduler,
 ) : ViewModel() {
 
     // region 1. State & Derived State
@@ -224,52 +218,12 @@ class MedicationViewModel @Inject constructor(
     // endregion
 
     // region 3. Actions
-    private fun isActiveDate(medication: Medication, date: LocalDate): Boolean {
-        val startDate = java.time.Instant.ofEpochMilli(medication.startDate ?: 0)
-            .atZone(java.time.ZoneId.systemDefault())
-            .toLocalDate()
-        if (date.isBefore(startDate)) return false
-
-        if (medication.endDate != null) {
-            val endDate = java.time.Instant.ofEpochMilli(medication.endDate!!)
-                .atZone(java.time.ZoneId.systemDefault())
-                .toLocalDate()
-            if (date.isAfter(endDate)) return false
-        }
-        return true
-    }
-
     private fun fetchMedicationList() {
         val userId = getCurrentUserIdUseCase() ?: return
         val today = LocalDate.now()
-        val todayDate = today.toString()
 
         viewModelScope.launch {
-            combine(
-                getMedicationsUseCase(userId),
-                getDailyIntakeRecordsUseCase(userId, todayDate)
-            ) { medsResult, recordsResult ->
-
-                when {
-                    medsResult is DataResourceResult.Success && recordsResult is DataResourceResult.Success -> {
-                        val activeMedications = medsResult.resultData.filter { isActiveDate(it, today) }
-                        val todayRecords = recordsResult.resultData
-
-                        val finalUiModels = MedicationUiMapper.toUiModelList(activeMedications).map { uiModel ->
-                            val isTakenToday = todayRecords.any { record ->
-                                record.medicationId == uiModel.medicationId &&
-                                        record.scheduleId == uiModel.scheduleId &&
-                                        record.isTaken
-                            }
-                            uiModel.copy(isTaken = isTakenToday)
-                        }
-                        DataResourceResult.Success(finalUiModels)
-                    }
-                    medsResult is DataResourceResult.Failure -> { DataResourceResult.Failure(medsResult.exception) }
-                    recordsResult is DataResourceResult.Failure -> { DataResourceResult.Failure(recordsResult.exception) }
-                    else -> { DataResourceResult.Loading }
-                }
-            }.collectLatest { result ->
+            observeTodayMedicationItemsUseCase(userId, today).collectLatest { result ->
                 if (isSaving) return@collectLatest
 
                 _uiState.update { currentState ->
@@ -281,7 +235,7 @@ class MedicationViewModel @Inject constructor(
                         is DataResourceResult.Success -> {
                             currentState.copy(
                                 isLoading = if (isSaving) true else false,
-                                medicationList = result.resultData
+                                medicationList = MedicationUiMapper.toUiModelList(result.resultData)
                             )
                         }
                         is DataResourceResult.Failure -> {
@@ -343,14 +297,13 @@ class MedicationViewModel @Inject constructor(
             var isAllSuccess = true
 
             forms.forEach { form ->
-                val newItem = MedicationUiMapper.toDomain(form, userId)
+                val command = MedicationUiMapper.toSaveCommand(form, userId)
 
-                val result = saveMedicationUseCase(newItem)
+                val result = saveMedicationUseCase(command)
                     .filter { it !is DataResourceResult.Loading }
                     .first()
 
                 if (result is DataResourceResult.Success) {
-                    alarmScheduler.schedule(newItem)
                 } else {
                     isAllSuccess = false
                 }
@@ -394,13 +347,13 @@ class MedicationViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val itemToSave = targetItem.copy(isTaken = newIsTaken)
-            val record = MedicationUiMapper.toIntakeRecord(itemToSave, userId)
-
-            toggleIntakeCheckUseCase(
-                record = record,
+            val command = MedicationUiMapper.toToggleCommand(
+                uiModel = targetItem,
+                userId = userId,
                 isTaken = newIsTaken
-            ).collectLatest { result ->
+            )
+
+            toggleIntakeCheckUseCase(command).collectLatest { result ->
                 if (result is DataResourceResult.Failure) {
                     result.exception.printStackTrace()
                 }

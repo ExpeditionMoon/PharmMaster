@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.moon.pharm.ddi.mapper.toUiMessage
 import com.moon.pharm.ddi.mapper.toUiModel
 import com.moon.pharm.ddi.model.DdiUiMessage
-import com.moon.pharm.domain.model.ddi.DdiException
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.ddi.AnalyzeDdiUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,11 +66,8 @@ class DdiSharedViewModel @Inject constructor(
                     }
                 }
                 is DataResourceResult.Failure -> {
-                    val uiMessage = (result.exception as? DdiException)?.toUiMessage()
-                        ?: DdiUiMessage.Unknown
-
                     _uiState.update {
-                        it.copy(isLoading = false, userMessage = uiMessage)
+                        it.copy(isLoading = false, userMessage = result.exception.toUiMessage())
                     }
                 }
             }

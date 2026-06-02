@@ -3,7 +3,6 @@ package com.moon.pharm.profile.mypage.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.LogoutUseCase
 import com.moon.pharm.domain.usecase.user.ObserveMyPageDataUseCase
@@ -28,19 +27,15 @@ class MyPageViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MyPageUiState())
     val uiState: StateFlow<MyPageUiState> = _uiState.asStateFlow()
 
-    private var currentUser: User? = null
-
     init {
         loadData()
     }
 
     fun updateNickname(newNickname: String) {
-        val user = currentUser ?: return
-
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
-            val result = updateNicknameUseCase(user, newNickname)
+            val result = updateNicknameUseCase(newNickname)
 
             if (result is DataResourceResult.Failure) {
                 _uiState.value = _uiState.value.copy(
@@ -48,12 +43,9 @@ class MyPageViewModel @Inject constructor(
                     userMessage = UiMessage.LoadDataFailed
                 )
             } else {
-                val updatedUser = user.copy(nickName = newNickname)
-                currentUser = updatedUser
-
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    user = updatedUser.toMyPageUiModel()
+                    user = _uiState.value.user?.copy(nickName = newNickname)
                 )
             }
         }
@@ -63,9 +55,6 @@ class MyPageViewModel @Inject constructor(
         viewModelScope.launch {
             observeMyPageDataUseCase().collectLatest { result ->
                 val currentState = _uiState.value
-                if (result is DataResourceResult.Success) {
-                    currentUser = result.resultData.user
-                }
                 val user = if (result is DataResourceResult.Success) {
                     result.resultData.user.toMyPageUiModel()
                 } else {

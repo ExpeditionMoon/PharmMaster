@@ -10,9 +10,9 @@ import com.moon.pharm.consult.mapper.ConsultUiMapper
 import com.moon.pharm.consult.mapper.toDomainModel
 import com.moon.pharm.consult.mapper.toUiModel
 import com.moon.pharm.consult.model.ConsultUiMessage
-import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.consult.model.PharmacyUiModel
 import com.moon.pharm.domain.result.DataResourceResult
+import com.moon.pharm.domain.usecase.consult.CreateConsultCommand
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
 import com.moon.pharm.domain.usecase.consult.UploadConsultImagesUseCase
 import com.moon.pharm.domain.usecase.consult.ValidateConsultFormUseCase
@@ -271,14 +271,14 @@ class ConsultWriteViewModel @Inject constructor(
                     uploadImagesUseCase(state.images, profile.userId)
                 } else emptyList()
 
-                val newItem = ConsultUiMapper.toDomainModel(
+                val command = ConsultUiMapper.toCreateCommand(
                     writeState = state,
                     currentUserId = profile.userId,
                     currentUserNickname = profile.nickname,
                     selectedPharmacistId = state.selectedPharmacistId!!,
                     uploadedImageUrls = uploadedUrls
                 )
-                createConsult(newItem)
+                createConsult(command)
             } catch (e: Exception) {
                 e.printStackTrace()
                 _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed) }
@@ -327,17 +327,14 @@ class ConsultWriteViewModel @Inject constructor(
         _uiState.update { it.copy(isConsultCreated = false) }
     }
 
-    private fun createConsult(consultInfo: ConsultItem) {
+    private fun createConsult(command: CreateConsultCommand) {
         viewModelScope.launch {
-            consultUseCases.createConsult(consultInfo).collectLatest { result ->
+            consultUseCases.createConsult(command).collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
                         is DataResourceResult.Success -> {
-                            val pharmacistId = consultInfo.pharmacistId
-                            if (pharmacistId != null) {
-                                sendNotificationToPharmacist(pharmacistId, consultInfo.id)
-                            }
+                            sendNotificationToPharmacist(command.pharmacistId, command.id)
                             state.copy(isLoading = false, isConsultCreated = true)
                         }
                         is DataResourceResult.Failure -> state.copy(isLoading = false, userMessage = ConsultUiMessage.CreateFailed)

@@ -2,6 +2,7 @@ package com.moon.pharm.domain.usecase.user
 
 import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.repository.PharmacistRepository
 import com.moon.pharm.domain.repository.UserRepository
@@ -10,11 +11,23 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
 class UpdateNicknameUseCase(
+    private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
     private val consultRepository: ConsultRepository,
     private val pharmacistRepository: PharmacistRepository
 ) {
-    suspend operator fun invoke(user: User, newNickname: String): DataResourceResult<Unit> = coroutineScope {
+    suspend operator fun invoke(newNickname: String): DataResourceResult<Unit> {
+        val userId = authRepository.getCurrentUserId()
+            ?: return DataResourceResult.Failure(IllegalStateException("User not logged in"))
+
+        return when (val userResult = userRepository.getUserOnce(userId)) {
+            is DataResourceResult.Failure -> DataResourceResult.Failure(userResult.exception)
+            is DataResourceResult.Loading -> DataResourceResult.Loading
+            is DataResourceResult.Success -> updateNickname(userResult.resultData, newNickname)
+        }
+    }
+
+    private suspend fun updateNickname(user: User, newNickname: String): DataResourceResult<Unit> = coroutineScope {
         val updatedUser = user.copy(nickName = newNickname)
         val userUpdateResult = userRepository.saveUser(updatedUser)
 

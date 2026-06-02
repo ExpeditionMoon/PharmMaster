@@ -1,5 +1,6 @@
 package com.moon.pharm.data.di
 
+import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.repository.DdiRepository
@@ -35,8 +36,10 @@ import com.moon.pharm.domain.usecase.ddi.AnalyzeDdiUseCase
 import com.moon.pharm.domain.usecase.drug.SearchDrugUseCase
 import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.GetDailyIntakeRecordsUseCase
+import com.moon.pharm.domain.usecase.medication.GetMedicationHistoryItemsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMonthlyIntakeRecordsUseCase
+import com.moon.pharm.domain.usecase.medication.ObserveTodayMedicationItemsUseCase
 import com.moon.pharm.domain.usecase.medication.SaveMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
@@ -124,6 +127,13 @@ object DomainUseCaseModule {
     }
 
     @Provides
+    fun provideObserveTodayMedicationItemsUseCase(
+        medicationRepository: MedicationRepository
+    ): ObserveTodayMedicationItemsUseCase {
+        return ObserveTodayMedicationItemsUseCase(medicationRepository)
+    }
+
+    @Provides
     fun provideGetMonthlyIntakeRecordsUseCase(
         medicationRepository: MedicationRepository
     ): GetMonthlyIntakeRecordsUseCase {
@@ -131,8 +141,18 @@ object DomainUseCaseModule {
     }
 
     @Provides
-    fun provideSaveMedicationUseCase(medicationRepository: MedicationRepository): SaveMedicationUseCase {
-        return SaveMedicationUseCase(medicationRepository)
+    fun provideGetMedicationHistoryItemsUseCase(
+        medicationRepository: MedicationRepository
+    ): GetMedicationHistoryItemsUseCase {
+        return GetMedicationHistoryItemsUseCase(medicationRepository)
+    }
+
+    @Provides
+    fun provideSaveMedicationUseCase(
+        medicationRepository: MedicationRepository,
+        alarmScheduler: AlarmScheduler
+    ): SaveMedicationUseCase {
+        return SaveMedicationUseCase(medicationRepository, alarmScheduler)
     }
 
     @Provides
@@ -218,11 +238,12 @@ object DomainUseCaseModule {
 
     @Provides
     fun provideUpdateNicknameUseCase(
+        authRepository: AuthRepository,
         userRepository: UserRepository,
         consultRepository: ConsultRepository,
         pharmacistRepository: PharmacistRepository
     ): UpdateNicknameUseCase {
-        return UpdateNicknameUseCase(userRepository, consultRepository, pharmacistRepository)
+        return UpdateNicknameUseCase(authRepository, userRepository, consultRepository, pharmacistRepository)
     }
 
     @Provides

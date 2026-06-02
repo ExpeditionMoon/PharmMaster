@@ -6,7 +6,7 @@ import com.moon.pharm.ddi.R
 import com.moon.pharm.ddi.model.DdiUiMessage
 import com.moon.pharm.domain.model.ddi.DdiException
 
-fun DdiException.toUiMessage(): DdiUiMessage {
+fun Throwable.toUiMessage(): DdiUiMessage {
     return when (this) {
         is DdiException.AnalysisFailed -> DdiUiMessage.AnalysisFailed
         is DdiException.Network -> DdiUiMessage.NetworkError
@@ -14,6 +14,7 @@ fun DdiException.toUiMessage(): DdiUiMessage {
         is DdiException.Unknown -> {
             this.message?.let { DdiUiMessage.DynamicError(it) } ?: DdiUiMessage.Unknown
         }
+        else -> DdiUiMessage.Unknown
     }
 }
 @Composable
