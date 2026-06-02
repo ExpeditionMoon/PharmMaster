@@ -11,9 +11,9 @@ import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.auth.model.SignUpStep
+import com.moon.pharm.profile.auth.model.UserTypeUiModel
 import com.moon.pharm.profile.auth.screen.SignUpUiState
 
 @Composable
@@ -25,7 +25,7 @@ fun SignUpButtonSection(
         SignUpStep.TYPE -> stringResource(R.string.signup_button_next)
         SignUpStep.EMAIL -> stringResource(R.string.signup_button_next)
         SignUpStep.NICKNAME ->
-            if (uiState.userType == UserType.PHARMACIST) stringResource(R.string.signup_button_next)
+            if (uiState.userType == UserTypeUiModel.Pharmacist) stringResource(R.string.signup_button_next)
             else stringResource(R.string.signup_button_complete)
         SignUpStep.PHARMACIST_INFO -> stringResource(R.string.signup_button_complete)
     }
@@ -56,7 +56,7 @@ private fun SignUpButtonSectionPreview() {
             SignUpButtonSection(
                 uiState = SignUpUiState(
                     currentStep = SignUpStep.EMAIL,
-                    userType = UserType.GENERAL,
+                    userType = UserTypeUiModel.General,
                     email = "",
                     password = "",
                     isEmailAvailable = true,

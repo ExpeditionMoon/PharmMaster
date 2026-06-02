@@ -8,7 +8,7 @@ import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.component_ui.model.ScannedMedication
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.domain.alarm.AlarmScheduler
-import com.moon.pharm.domain.model.medication.MedicationProgress
+import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
@@ -21,6 +21,7 @@ import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
 import com.moon.pharm.profile.medication.mapper.toUiMessage
 import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
+import com.moon.pharm.profile.medication.model.MedicationProgressUiModel
 import com.moon.pharm.profile.medication.model.MedicationUiMessage
 import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 import com.moon.pharm.profile.navigation.ScannedMedicationListNavType
@@ -69,9 +70,9 @@ class MedicationViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val progress: StateFlow<MedicationProgress> = uiState
+    val progress: StateFlow<MedicationProgressUiModel> = uiState
         .map { calculateProgress(it.medicationList) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MedicationProgress(0f, 0, 0))
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MedicationProgressUiModel(0f, 0, 0))
     // endregion
 
     init {
@@ -223,7 +224,7 @@ class MedicationViewModel @Inject constructor(
     // endregion
 
     // region 3. Actions
-    private fun isActiveDate(medication: com.moon.pharm.domain.model.medication.Medication, date: LocalDate): Boolean {
+    private fun isActiveDate(medication: Medication, date: LocalDate): Boolean {
         val startDate = java.time.Instant.ofEpochMilli(medication.startDate ?: 0)
             .atZone(java.time.ZoneId.systemDefault())
             .toLocalDate()
@@ -432,11 +433,11 @@ class MedicationViewModel @Inject constructor(
         }
     }
 
-    private fun calculateProgress(list: List<TodayMedicationUiModel>): MedicationProgress {
+    private fun calculateProgress(list: List<TodayMedicationUiModel>): MedicationProgressUiModel {
         val total = list.size
         val completed = list.count { it.isTaken }
-        if (total == 0) return MedicationProgress(0f, 0, 0)
-        return MedicationProgress(
+        if (total == 0) return MedicationProgressUiModel(0f, 0, 0)
+        return MedicationProgressUiModel(
             ratio = completed.toFloat() / total,
             completed = completed,
             total = total

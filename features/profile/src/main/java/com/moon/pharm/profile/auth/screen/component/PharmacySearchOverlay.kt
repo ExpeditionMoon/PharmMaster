@@ -23,7 +23,7 @@ import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.component.map.PharmacySelector
 import com.moon.pharm.component_ui.model.PharmacyUiModel
-import com.moon.pharm.domain.model.pharmacy.Pharmacy
+import com.moon.pharm.profile.auth.model.SignUpPharmacyUiModel
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.auth.screen.SignUpUiState
 import com.moon.pharm.profile.auth.viewmodel.SignUpViewModel
@@ -34,7 +34,7 @@ fun PharmacySearchOverlay(
     viewModel: SignUpViewModel,
     onClose: () -> Unit
 ) {
-    var tempSelectedPharmacy by remember { mutableStateOf<Pharmacy?>(null) }
+    var tempSelectedPharmacy by remember { mutableStateOf<SignUpPharmacyUiModel?>(null) }
     var isLocationGranted by remember { mutableStateOf(false) }
 
     val cameraPositionState = rememberCameraPositionState {
@@ -92,7 +92,7 @@ fun PharmacySearchOverlay(
     }
 }
 
-private fun Pharmacy.toComponentUiModel(): PharmacyUiModel {
+private fun SignUpPharmacyUiModel.toComponentUiModel(): PharmacyUiModel {
     return PharmacyUiModel(
         id = id,
         placeId = placeId,

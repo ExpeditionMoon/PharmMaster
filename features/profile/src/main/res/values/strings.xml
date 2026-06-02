@@ -76,6 +76,13 @@
     <string name="medication_category_prescription">처방약</string>
     <string name="medication_category_general">일반약</string>
     <string name="medication_category_supplements">비타민/영양제</string>
+    <string name="medication_meal_before">식전</string>
+    <string name="medication_meal_during">식사 중</string>
+    <string name="medication_meal_after">식후</string>
+    <string name="medication_meal_none">상관없음</string>
+    <string name="medication_repeat_daily">매일</string>
+    <string name="medication_repeat_weekly">매주</string>
+    <string name="medication_repeat_period">특정 기간</string>
 
     <string name="medication_board_title">복약 관리</string>
     <string name="medication_create_title">복약 알림 설정</string>

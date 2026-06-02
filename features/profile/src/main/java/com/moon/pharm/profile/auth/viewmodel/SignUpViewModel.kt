@@ -6,8 +6,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
 import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.domain.model.auth.UserType
-import com.moon.pharm.domain.model.pharmacy.Pharmacy
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.SignUpUseCase
 import com.moon.pharm.domain.usecase.auth.ValidateSignUpFormUseCase
@@ -16,8 +14,11 @@ import com.moon.pharm.domain.usecase.pharmacy.SearchNearbyPharmaciesUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SearchPharmacyUseCase
 import com.moon.pharm.domain.usecase.user.CheckEmailDuplicatedUseCase
 import com.moon.pharm.profile.auth.mapper.SignUpUiMapper
+import com.moon.pharm.profile.auth.mapper.toSignUpUiModel
+import com.moon.pharm.profile.auth.model.SignUpPharmacyUiModel
 import com.moon.pharm.profile.auth.model.SignUpStep
 import com.moon.pharm.profile.auth.model.SignUpUiMessage
+import com.moon.pharm.profile.auth.model.UserTypeUiModel
 import com.moon.pharm.profile.auth.screen.SignUpUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
@@ -67,12 +68,12 @@ class SignUpViewModel @Inject constructor(
     // endregion
 
     // region 3. User Actions (Input & Step)
-    fun updateUserType(type: UserType) { _uiState.update { it.copy(userType = type) } }
+    fun updateUserType(type: UserTypeUiModel) { _uiState.update { it.copy(userType = type) } }
     fun updateEmail(email: String) { _uiState.update { it.copy(email = email, isEmailAvailable = null) } }
     fun updatePassword(password: String) { _uiState.update { it.copy(password = password) } }
     fun updateNickName(name: String) { _uiState.update { it.copy(nickName = name) } }
     fun updateProfileImage(uriString: String?) { _uiState.update { it.copy(profileImageUri = uriString) } }
-    fun updatePharmacy(pharmacy: Pharmacy) {
+    fun updatePharmacy(pharmacy: SignUpPharmacyUiModel) {
         _uiState.update { it.copy(pharmacyName = pharmacy.name, selectedPharmacy = pharmacy) }
     }
     fun updatePharmacistBio(bio: String) { _uiState.update { it.copy(pharmacistBio = bio) } }
@@ -140,7 +141,7 @@ class SignUpViewModel @Inject constructor(
                     _uiState.update { it.copy(userMessage = SignUpUiMessage.EmptyNickname) }
                     return
                 }
-                if (currentState.userType == UserType.PHARMACIST) {
+                if (currentState.userType == UserTypeUiModel.Pharmacist) {
                     _uiState.update { it.copy(currentStep = SignUpStep.PHARMACIST_INFO) }
                 } else {
                     signUpUser()
@@ -189,7 +190,7 @@ class SignUpViewModel @Inject constructor(
                         is DataResourceResult.Success -> {
                             state.copy(
                                 isLoading = false,
-                                pharmacySearchResults = result.resultData
+                                pharmacySearchResults = result.resultData.map { it.toSignUpUiModel() }
                             )
                         }
                         is DataResourceResult.Failure -> state.copy(isLoading = false)
@@ -210,7 +211,7 @@ class SignUpViewModel @Inject constructor(
                         val (location, pharmacies) = result.resultData
                         _moveCameraEvent.emit(LatLng(location.lat, location.lng))
                         _uiState.update {
-                            it.copy(isLoading = false, pharmacySearchResults = pharmacies)
+                            it.copy(isLoading = false, pharmacySearchResults = pharmacies.map { pharmacy -> pharmacy.toSignUpUiModel() })
                         }
                     }
                     is DataResourceResult.Failure -> {
@@ -229,7 +230,7 @@ class SignUpViewModel @Inject constructor(
                 when(result) {
                     is DataResourceResult.Loading -> {}
                     is DataResourceResult.Success -> {
-                        _uiState.update { it.copy(pharmacySearchResults = result.resultData) }
+                        _uiState.update { it.copy(pharmacySearchResults = result.resultData.map { pharmacy -> pharmacy.toSignUpUiModel() }) }
                         if (result.resultData.isNotEmpty()) {
                             val first = result.resultData.first()
                             _moveCameraEvent.emit(LatLng(first.latitude, first.longitude))
@@ -256,9 +257,9 @@ class SignUpViewModel @Inject constructor(
         val user = SignUpUiMapper.toUser(currentState)
         val pharmacist = SignUpUiMapper.toPharmacist(currentState)
 
-        if (currentState.userType == UserType.PHARMACIST && pharmacist == null) return
+        if (currentState.userType == UserTypeUiModel.Pharmacist && pharmacist == null) return
         viewModelScope.launch {
-            signUpUseCase(user, currentState.password, pharmacist, currentState.selectedPharmacy)
+            signUpUseCase(user, currentState.password, pharmacist, SignUpUiMapper.toSelectedPharmacy(currentState))
                 .collectLatest { result ->
                     when (result) {
                         is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }

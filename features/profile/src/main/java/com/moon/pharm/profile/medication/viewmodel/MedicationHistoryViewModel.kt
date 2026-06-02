@@ -11,6 +11,7 @@ import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMonthlyIntakeRecordsUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
+import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
 import com.moon.pharm.profile.medication.model.HistoryRecordUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -111,7 +112,7 @@ class MedicationHistoryViewModel @Inject constructor(
                         )
 
                         dailyList.add(
-                            HistoryRecordUiModel(
+                            MedicationUiMapper.toHistoryUiModel(
                                 record = finalRecord,
                                 medicationName = medication.name,
                                 time = schedule.time
