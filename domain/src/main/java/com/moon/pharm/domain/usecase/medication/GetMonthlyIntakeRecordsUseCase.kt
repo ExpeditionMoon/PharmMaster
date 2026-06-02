@@ -5,9 +5,8 @@ import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.flow.Flow
 import java.time.YearMonth
-import javax.inject.Inject
 
-class GetMonthlyIntakeRecordsUseCase @Inject constructor(
+class GetMonthlyIntakeRecordsUseCase(
     private val repository: MedicationRepository
 ) {
     operator fun invoke(userId: String, yearMonthString: String): Flow<DataResourceResult<List<IntakeRecord>>> {

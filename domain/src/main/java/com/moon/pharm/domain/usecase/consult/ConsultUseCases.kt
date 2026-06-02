@@ -1,9 +1,8 @@
 package com.moon.pharm.domain.usecase.consult
 
 import com.moon.pharm.domain.usecase.pharmacy.SearchPharmacyUseCase
-import javax.inject.Inject
 
-data class ConsultUseCases @Inject constructor(
+data class ConsultUseCases(
     val getConsultList: GetConsultItemsUseCase,
     val getConsultDetail: GetConsultDetailUseCase,
     val registerAnswer: RegisterAnswerUseCase,

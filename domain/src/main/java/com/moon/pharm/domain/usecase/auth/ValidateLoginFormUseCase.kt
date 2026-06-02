@@ -1,8 +1,7 @@
 package com.moon.pharm.domain.usecase.auth
 
-import javax.inject.Inject
 
-class ValidateLoginFormUseCase @Inject constructor() {
+class ValidateLoginFormUseCase() {
 
     enum class ErrorType {
         EMPTY_EMAIL,

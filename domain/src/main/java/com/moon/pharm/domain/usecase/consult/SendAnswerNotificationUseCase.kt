@@ -3,9 +3,8 @@ package com.moon.pharm.domain.usecase.consult
 import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import javax.inject.Inject
 
-class SendAnswerNotificationUseCase @Inject constructor(
+class SendAnswerNotificationUseCase(
     private val userRepository: UserRepository,
     private val consultRepository: ConsultRepository
 ) {

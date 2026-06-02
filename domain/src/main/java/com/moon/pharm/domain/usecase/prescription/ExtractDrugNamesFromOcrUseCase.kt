@@ -2,14 +2,13 @@ package com.moon.pharm.domain.usecase.prescription
 
 import com.moon.pharm.domain.repository.DdiRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import javax.inject.Inject
 
-class ExtractDrugNamesFromOcrUseCase @Inject constructor(
+class ExtractDrugNamesFromOcrUseCase(
     private val ddiRepository: DdiRepository
 ) {
     suspend operator fun invoke(ocrRawText: String): DataResourceResult<List<String>> {
         if (ocrRawText.trim().length < 2) {
-            return DataResourceResult.Failure(IllegalArgumentException("인식된 텍스트가 너무 짧습니다."))
+            return DataResourceResult.Failure(IllegalArgumentException("?�식???�스?��? ?�무 짧습?�다."))
         }
         val safeText = maskSensitiveInfo(ocrRawText)
         return ddiRepository.extractDrugNamesFromText(safeText)

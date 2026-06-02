@@ -6,9 +6,8 @@ import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-class ObserveCurrentUserNicknameUseCase @Inject constructor(
+class ObserveCurrentUserNicknameUseCase(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository
 ) {

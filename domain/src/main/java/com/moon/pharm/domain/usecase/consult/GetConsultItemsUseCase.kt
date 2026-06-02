@@ -6,9 +6,8 @@ import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-class GetConsultItemsUseCase @Inject constructor(
+class GetConsultItemsUseCase(
     private val repository: ConsultRepository,
     private val userRepository: UserRepository
 ) {

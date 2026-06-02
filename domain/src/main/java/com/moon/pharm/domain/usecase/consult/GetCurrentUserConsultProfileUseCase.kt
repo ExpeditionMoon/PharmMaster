@@ -4,7 +4,6 @@ import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import javax.inject.Inject
 
 data class CurrentUserConsultProfile(
     val userId: String,
@@ -12,7 +11,7 @@ data class CurrentUserConsultProfile(
     val isPharmacist: Boolean
 )
 
-class GetCurrentUserConsultProfileUseCase @Inject constructor(
+class GetCurrentUserConsultProfileUseCase(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository
 ) {

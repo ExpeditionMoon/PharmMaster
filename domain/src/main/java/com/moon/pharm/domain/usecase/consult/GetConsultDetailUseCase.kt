@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withTimeout
-import javax.inject.Inject
 
 data class ConsultDetailResult(
     val consult: ConsultItem,
@@ -22,7 +21,7 @@ data class ConsultDetailResult(
     val currentUserId: String? = null
 )
 
-class GetConsultDetailUseCase @Inject constructor(
+class GetConsultDetailUseCase(
     private val consultRepository: ConsultRepository,
     private val userRepository: UserRepository,
     private val pharmacistRepository: PharmacistRepository,

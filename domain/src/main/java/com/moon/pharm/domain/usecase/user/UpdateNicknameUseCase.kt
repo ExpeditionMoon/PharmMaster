@@ -8,9 +8,8 @@ import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import javax.inject.Inject
 
-class UpdateNicknameUseCase @Inject constructor(
+class UpdateNicknameUseCase(
     private val userRepository: UserRepository,
     private val consultRepository: ConsultRepository,
     private val pharmacistRepository: PharmacistRepository

@@ -3,9 +3,8 @@ package com.moon.pharm.domain.usecase.user
 import com.moon.pharm.domain.repository.AuthRepository
 import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import javax.inject.Inject
 
-class SyncFcmTokenUseCase @Inject constructor(
+class SyncFcmTokenUseCase(
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository
 ) {

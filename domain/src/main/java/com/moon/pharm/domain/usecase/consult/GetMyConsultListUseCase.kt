@@ -9,9 +9,8 @@ import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-class GetMyConsultListUseCase @Inject constructor(
+class GetMyConsultListUseCase(
     private val authRepository: AuthRepository,
     private val consultRepository: ConsultRepository,
     private val userRepository: UserRepository

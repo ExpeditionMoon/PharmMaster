@@ -9,9 +9,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
-class GetNearbyPharmaciesCurrentLocationUseCase @Inject constructor(
+class GetNearbyPharmaciesCurrentLocationUseCase(
     private val locationRepository: LocationRepository,
     private val pharmacyRepository: PharmacyRepository
 ) {

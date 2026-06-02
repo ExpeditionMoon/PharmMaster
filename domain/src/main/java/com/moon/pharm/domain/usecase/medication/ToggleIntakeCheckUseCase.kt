@@ -4,9 +4,8 @@ import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
-class ToggleIntakeCheckUseCase @Inject constructor(
+class ToggleIntakeCheckUseCase(
     private val repository: MedicationRepository
 ) {
     operator fun invoke(record: IntakeRecord, isTaken: Boolean): Flow<DataResourceResult<Unit>> {
