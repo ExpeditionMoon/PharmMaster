@@ -30,14 +30,14 @@ import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.R
+import com.moon.pharm.consult.model.ConsultStatusUiModel
+import com.moon.pharm.consult.model.ConsultUiModel
 import com.moon.pharm.consult.screen.component.ConsultImageItem
 import com.moon.pharm.consult.screen.component.ConsultPreviewData
-import com.moon.pharm.domain.model.consult.ConsultItem
-import com.moon.pharm.domain.model.consult.ConsultStatus
 
 @Composable
 fun QuestionSection(
-    item: ConsultItem,
+    item: ConsultUiModel,
     currentUserId: String?,
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {}
@@ -60,7 +60,7 @@ fun QuestionSection(
             )
             StatusBadge(
                 text = item.status.label,
-                statusColor = if (item.status == ConsultStatus.WAITING) PharmTheme.colors.secondary else PharmTheme.colors.primary,
+                statusColor = if (item.status == ConsultStatusUiModel.Waiting) PharmTheme.colors.secondary else PharmTheme.colors.primary,
                 contentColor = PharmTheme.colors.surface
             )
         }

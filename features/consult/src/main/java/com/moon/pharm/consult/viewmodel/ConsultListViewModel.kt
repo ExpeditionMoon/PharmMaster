@@ -3,6 +3,7 @@ package com.moon.pharm.consult.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.consult.mapper.toUiModel
 import com.moon.pharm.consult.model.ConsultPrimaryTab
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
@@ -53,7 +54,7 @@ class ConsultListViewModel @Inject constructor(
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
                         is DataResourceResult.Success -> state.copy(
                             isLoading = false,
-                            consultList = result.resultData
+                            consultList = result.resultData.map { it.toUiModel() }
                         )
                         is DataResourceResult.Failure -> state.copy(
                             isLoading = false,

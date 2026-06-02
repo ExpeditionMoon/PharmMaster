@@ -24,18 +24,18 @@ import com.moon.pharm.component_ui.component.button.PharmIconButton
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
+import com.moon.pharm.consult.model.ConsultAnswerUiModel
+import com.moon.pharm.consult.model.ConsultUiModel
+import com.moon.pharm.consult.model.PharmacistUiModel
 import com.moon.pharm.consult.screen.component.AnswerContentCard
 import com.moon.pharm.consult.screen.component.ConsultPreviewData
 import com.moon.pharm.consult.screen.component.PharmacistProfileCard
-import com.moon.pharm.domain.model.auth.Pharmacist
-import com.moon.pharm.domain.model.consult.ConsultAnswer
-import com.moon.pharm.domain.model.consult.ConsultItem
 
 @Composable
 fun AnswerSection(
-    pharmacist: Pharmacist?,
+    pharmacist: PharmacistUiModel?,
     pharmacistImageUrl: String?,
-    item: ConsultItem,
+    item: ConsultUiModel,
     currentUserId: String? = null,
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {}
@@ -88,7 +88,7 @@ fun AnswerSection(
 @Composable
 private fun AnswerSectionPreview() {
     val dummyItemWithAnswer = ConsultPreviewData.dummyConsultItems[1].copy(
-        answer = ConsultAnswer(
+        answer = ConsultAnswerUiModel(
             answerId = "a1",
             pharmacistId = "p1",
             pharmacistName = "김약사",
@@ -100,7 +100,7 @@ private fun AnswerSectionPreview() {
     PharmMasterTheme {
         Box(modifier = Modifier.padding(16.dp)) {
             AnswerSection(
-                pharmacist = Pharmacist(userId = "p1", name = "김약사", bio = "상담 가능", placeId = "1", pharmacyName = "달빛약국"),
+                pharmacist = PharmacistUiModel(userId = "p1", name = "김약사", bio = "상담 가능", placeId = "1", pharmacyName = "달빛약국"),
                 pharmacistImageUrl = null,
                 item = dummyItemWithAnswer,
                 currentUserId = "p1",

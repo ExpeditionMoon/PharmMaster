@@ -7,9 +7,11 @@ import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
 import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.mapper.ConsultUiMapper
+import com.moon.pharm.consult.mapper.toDomainModel
+import com.moon.pharm.consult.mapper.toUiModel
 import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.domain.model.consult.ConsultItem
-import com.moon.pharm.domain.model.pharmacy.Pharmacy
+import com.moon.pharm.consult.model.PharmacyUiModel
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
 import com.moon.pharm.domain.usecase.consult.UploadConsultImagesUseCase
@@ -117,7 +119,12 @@ class ConsultWriteViewModel @Inject constructor(
                     is DataResourceResult.Success -> {
                         val location = result.resultData.location
                         _moveCameraEvent.emit(LatLng(location.lat, location.lng))
-                        _uiState.update { it.copy(isLoading = false, searchResults = result.resultData.pharmacies) }
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    searchResults = result.resultData.pharmacies.map { pharmacy -> pharmacy.toUiModel() }
+                                )
+                            }
                     }
                     is DataResourceResult.Failure -> {
                         _uiState.update { it.copy(isLoading = false, userMessage = UiMessage.LoadDataFailed) }
@@ -135,7 +142,7 @@ class ConsultWriteViewModel @Inject constructor(
                     is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
                     is DataResourceResult.Success -> {
                         val pharmacies = result.resultData
-                        _uiState.update { it.copy(isLoading = false, searchResults = pharmacies) }
+                        _uiState.update { it.copy(isLoading = false, searchResults = pharmacies.map { pharmacy -> pharmacy.toUiModel() }) }
                         if (pharmacies.isNotEmpty()) {
                             val first = pharmacies.first()
                             _moveCameraEvent.emit(LatLng(first.latitude, first.longitude))
@@ -153,7 +160,10 @@ class ConsultWriteViewModel @Inject constructor(
                 _uiState.update { state ->
                     when (result) {
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
-                        is DataResourceResult.Success -> state.copy(isLoading = false, searchResults = result.resultData)
+                        is DataResourceResult.Success -> state.copy(
+                            isLoading = false,
+                            searchResults = result.resultData.map { pharmacy -> pharmacy.toUiModel() }
+                        )
                         is DataResourceResult.Failure -> state.copy(isLoading = false)
                     }
                 }
@@ -161,7 +171,7 @@ class ConsultWriteViewModel @Inject constructor(
         }
     }
 
-    fun selectPharmacy(pharmacy: Pharmacy) {
+    fun selectPharmacy(pharmacy: PharmacyUiModel) {
         _uiState.update { it.copy(selectedPharmacy = pharmacy) }
         fetchPharmacistsInPharmacy(pharmacy)
     }
@@ -292,13 +302,16 @@ class ConsultWriteViewModel @Inject constructor(
     // endregion
 
     // region Private Helpers
-    private fun fetchPharmacistsInPharmacy(pharmacy: Pharmacy) {
+    private fun fetchPharmacistsInPharmacy(pharmacy: PharmacyUiModel) {
         viewModelScope.launch {
             consultUseCases.searchPharmacistsByPlaceId(pharmacy.placeId).collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
-                        is DataResourceResult.Success -> state.copy(isLoading = false, availablePharmacists = result.resultData)
+                        is DataResourceResult.Success -> state.copy(
+                            isLoading = false,
+                            availablePharmacists = result.resultData.map { pharmacist -> pharmacist.toUiModel() }
+                        )
                         is DataResourceResult.Failure -> state.copy(isLoading = false, userMessage = UiMessage.LoadDataFailed)
                     }
                 }

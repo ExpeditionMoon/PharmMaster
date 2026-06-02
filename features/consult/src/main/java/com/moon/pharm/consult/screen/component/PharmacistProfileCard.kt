@@ -21,11 +21,11 @@ import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
-import com.moon.pharm.domain.model.auth.Pharmacist
+import com.moon.pharm.consult.model.PharmacistUiModel
 
 @Composable
 fun PharmacistProfileCard(
-    pharmacist: Pharmacist?,
+    pharmacist: PharmacistUiModel?,
     pharmacistImageUrl: String?
 ) {
     Surface(
@@ -64,7 +64,7 @@ private fun PharmacistProfileCardPreview() {
     PharmMasterTheme {
         Column(modifier = Modifier.padding(16.dp)) {
             PharmacistProfileCard(
-                pharmacist = Pharmacist(userId = "p1", name = "김약사", bio = "상담 가능", placeId = "1", pharmacyName = "달빛약국"),
+                pharmacist = PharmacistUiModel(userId = "p1", name = "김약사", bio = "상담 가능", placeId = "1", pharmacyName = "달빛약국"),
                 pharmacistImageUrl = null
             )
             Spacer(modifier = Modifier.height(16.dp))

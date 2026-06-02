@@ -22,12 +22,12 @@ import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.mapper.toBackgroundColor
 import com.moon.pharm.consult.mapper.toTextColor
-import com.moon.pharm.domain.model.consult.ConsultItem
-import com.moon.pharm.domain.model.consult.ConsultStatus
+import com.moon.pharm.consult.model.ConsultStatusUiModel
+import com.moon.pharm.consult.model.ConsultUiModel
 
 @Composable
 fun ConsultItemCard(
-    item: ConsultItem,
+    item: ConsultUiModel,
     currentUserId: String?,
     isPharmacist: Boolean,
     onClick: () -> Unit,
@@ -76,14 +76,14 @@ private fun ConsultItemCardPreview() {
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 ConsultItemCard(
-                    item = ConsultItem(id = "1", userId = "u1", pharmacistId = "p1", nickName = "사용자", title = "일반 공개 상담입니다.", content = "...", isPublic = true, status = ConsultStatus.WAITING, createdAt = System.currentTimeMillis()),
+                    item = ConsultUiModel(id = "1", userId = "u1", pharmacistId = "p1", nickName = "사용자", title = "일반 공개 상담입니다.", content = "...", isPublic = true, status = ConsultStatusUiModel.Waiting, createdAt = System.currentTimeMillis()),
                     currentUserId = "u1",
                     isPharmacist = false,
                     onClick = {}
                 )
 
                 ConsultItemCard(
-                    item = ConsultItem(id = "2", userId = "u2", pharmacistId = "p1", nickName = "익명", title = "비밀글입니다", content = "...", isPublic = false, status = ConsultStatus.COMPLETED, createdAt = System.currentTimeMillis()),
+                    item = ConsultUiModel(id = "2", userId = "u2", pharmacistId = "p1", nickName = "익명", title = "비밀글입니다", content = "...", isPublic = false, status = ConsultStatusUiModel.Completed, createdAt = System.currentTimeMillis()),
                     currentUserId = "u1", // 권한 없는 유저
                     isPharmacist = false,
                     onClick = {}

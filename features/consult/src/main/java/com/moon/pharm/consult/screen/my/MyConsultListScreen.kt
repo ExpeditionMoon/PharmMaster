@@ -31,7 +31,6 @@ import com.moon.pharm.consult.util.myConsultListEmptyTextRes
 import com.moon.pharm.consult.util.myConsultListTitleRes
 import com.moon.pharm.consult.viewmodel.MyConsultListUiState
 import com.moon.pharm.consult.viewmodel.MyConsultListViewModel
-import com.moon.pharm.domain.model.auth.UserType
 
 @Composable
 fun MyConsultListRoute(
@@ -68,13 +67,11 @@ fun MyConsultListScreen(
     onNavigateUp: () -> Unit,
     onItemClick: (String) -> Unit
 ) {
-    val userType = if (uiState.isPharmacist) UserType.PHARMACIST else UserType.GENERAL
-
     Scaffold(
         topBar = {
             PharmTopBar(
                 data = TopBarData(
-                    title = stringResource(userType.myConsultListTitleRes),
+                    title = stringResource(uiState.isPharmacist.myConsultListTitleRes),
                     navigationType = TopBarNavigationType.Back,
                     onNavigationClick = onNavigateUp
                 )
@@ -97,7 +94,7 @@ fun MyConsultListScreen(
                 }
                 uiState.myConsults.isEmpty() -> {
                     MyConsultEmptyView(
-                        text = stringResource(userType.myConsultListEmptyTextRes),
+                        text = stringResource(uiState.isPharmacist.myConsultListEmptyTextRes),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }

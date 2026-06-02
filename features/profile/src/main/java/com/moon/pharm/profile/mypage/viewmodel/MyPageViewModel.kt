@@ -3,12 +3,13 @@ package com.moon.pharm.profile.mypage.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.domain.model.auth.UserType
-import com.moon.pharm.domain.model.consult.ConsultStatus
+import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.LogoutUseCase
 import com.moon.pharm.domain.usecase.user.ObserveMyPageDataUseCase
 import com.moon.pharm.domain.usecase.user.UpdateNicknameUseCase
+import com.moon.pharm.profile.mypage.mapper.toMyPageUiModel
+import com.moon.pharm.profile.mypage.model.MyPageConsultStatusUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,17 +28,19 @@ class MyPageViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MyPageUiState())
     val uiState: StateFlow<MyPageUiState> = _uiState.asStateFlow()
 
+    private var currentUser: User? = null
+
     init {
         loadData()
     }
 
     fun updateNickname(newNickname: String) {
-        val currentUser = uiState.value.user ?: return
+        val user = currentUser ?: return
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
-            val result = updateNicknameUseCase(currentUser, newNickname)
+            val result = updateNicknameUseCase(user, newNickname)
 
             if (result is DataResourceResult.Failure) {
                 _uiState.value = _uiState.value.copy(
@@ -45,11 +48,12 @@ class MyPageViewModel @Inject constructor(
                     userMessage = UiMessage.LoadDataFailed
                 )
             } else {
-                val updatedUser = currentUser.copy(nickName = newNickname)
+                val updatedUser = user.copy(nickName = newNickname)
+                currentUser = updatedUser
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    user = updatedUser
+                    user = updatedUser.toMyPageUiModel()
                 )
             }
         }
@@ -59,15 +63,26 @@ class MyPageViewModel @Inject constructor(
         viewModelScope.launch {
             observeMyPageDataUseCase().collectLatest { result ->
                 val currentState = _uiState.value
-                val user = if (result is DataResourceResult.Success) result.resultData.user else currentState.user
-                val consults = if (result is DataResourceResult.Success) result.resultData.consults else currentState.myConsults
+                if (result is DataResourceResult.Success) {
+                    currentUser = result.resultData.user
+                }
+                val user = if (result is DataResourceResult.Success) {
+                    result.resultData.user.toMyPageUiModel()
+                } else {
+                    currentState.user
+                }
+                val consults = if (result is DataResourceResult.Success) {
+                    result.resultData.consults.map { it.toMyPageUiModel() }
+                } else {
+                    currentState.myConsults
+                }
                 val isLoading = result is DataResourceResult.Loading
                 val errorMsg: UiMessage? = if (result is DataResourceResult.Failure) UiMessage.LoadDataFailed else null
-                val isPharmacist = user?.userType == UserType.PHARMACIST
+                val isPharmacist = user?.isPharmacist == true
                 val totalCount = consults.size
 
                 val countText = if (isPharmacist) {
-                    val completedCount = consults.count { it.status == ConsultStatus.COMPLETED }
+                    val completedCount = consults.count { it.status == MyPageConsultStatusUiModel.Completed }
                     if (totalCount > 0) "$completedCount/$totalCount" else null
                 } else {
                     if (totalCount > 0) "$totalCount" else null

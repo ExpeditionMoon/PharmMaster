@@ -3,6 +3,8 @@ package com.moon.pharm.consult.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.consult.mapper.toDomainModel
+import com.moon.pharm.consult.mapper.toUiModel
 import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
@@ -33,8 +35,8 @@ class ConsultDetailViewModel @Inject constructor(
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
                         is DataResourceResult.Success -> state.copy(
                             isLoading = false,
-                            selectedItem = result.resultData.consult,
-                            answerPharmacist = result.resultData.pharmacist,
+                            selectedItem = result.resultData.consult.toUiModel(),
+                            answerPharmacist = result.resultData.pharmacist?.toUiModel(),
                             canAnswer = result.resultData.isMyConsultToAnswer,
                             currentUserId = result.resultData.currentUserId
                         )
@@ -72,14 +74,14 @@ class ConsultDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            consultUseCases.registerAnswer(consultId, content, pharmacist).collectLatest { result ->
+            consultUseCases.registerAnswer(consultId, content, pharmacist.toDomainModel()).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Loading -> { _uiState.update { it.copy(isLoading = true) } }
                     is DataResourceResult.Success -> {
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                selectedItem = result.resultData,
+                                selectedItem = result.resultData.toUiModel(),
                                 canAnswer = false,
                                 isEditingAnswer = false,
                                 userMessage = ConsultUiMessage.AnswerRegisterSuccess
