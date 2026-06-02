@@ -10,16 +10,13 @@ import com.moon.pharm.consult.mapper.ConsultUiMapper
 import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.domain.model.consult.ConsultItem
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
-import com.moon.pharm.domain.repository.ConsultRepository
-import com.moon.pharm.domain.repository.PharmacyRepository
-import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
 import com.moon.pharm.domain.usecase.consult.UploadConsultImagesUseCase
 import com.moon.pharm.domain.usecase.consult.ValidateConsultFormUseCase
 import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocationUseCase
+import com.moon.pharm.domain.usecase.pharmacy.SearchNearbyPharmaciesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,10 +35,8 @@ import javax.inject.Inject
 class ConsultWriteViewModel @Inject constructor(
     private val consultUseCases: ConsultUseCases,
     private val getLocationUseCase: GetNearbyPharmaciesCurrentLocationUseCase,
+    private val searchNearbyPharmaciesUseCase: SearchNearbyPharmaciesUseCase,
     private val uploadImagesUseCase: UploadConsultImagesUseCase,
-    private val consultRepository: ConsultRepository,
-    private val pharmacyRepository: PharmacyRepository,
-    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private var editingConsultId: String? = null
@@ -77,7 +72,7 @@ class ConsultWriteViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            consultRepository.getConsultDetail(consultId).collectLatest { result ->
+            consultUseCases.getConsultForEdit(consultId).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Loading -> _uiState.update { it.copy(isLoading = true) }
                     is DataResourceResult.Success -> {
@@ -154,7 +149,7 @@ class ConsultWriteViewModel @Inject constructor(
 
     fun fetchNearbyPharmacies(lat: Double, lng: Double) {
         viewModelScope.launch {
-            pharmacyRepository.searchNearbyPharmacies(lat, lng).collectLatest { result ->
+            searchNearbyPharmaciesUseCase(lat, lng).collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
@@ -228,7 +223,7 @@ class ConsultWriteViewModel @Inject constructor(
         if (editId != null) {
             viewModelScope.launch {
                 _uiState.update { it.copy(isLoading = true) }
-                consultRepository.updateConsult(
+                consultUseCases.updateConsult(
                     consultId = editId,
                     title = state.title,
                     content = state.content,
@@ -250,21 +245,26 @@ class ConsultWriteViewModel @Inject constructor(
         }
 
         // Create
-        val userId = validateAndGetUserId(state) ?: return
+        if (!validateWriteForm(state)) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                val userResult = userRepository.getUserOnce(userId)
-                val nickname = if (userResult is DataResourceResult.Success) userResult.resultData.nickName else ""
+                val profileResult = consultUseCases.getCurrentUserConsultProfile()
+                if (profileResult !is DataResourceResult.Success) {
+                    _uiState.update { it.copy(isLoading = false, userMessage = UiMessage.LoginRequired) }
+                    return@launch
+                }
+
+                val profile = profileResult.resultData
                 val uploadedUrls = if (state.images.isNotEmpty()) {
-                    uploadImagesUseCase(state.images, userId)
+                    uploadImagesUseCase(state.images, profile.userId)
                 } else emptyList()
 
                 val newItem = ConsultUiMapper.toDomainModel(
                     writeState = state,
-                    currentUserId = userId,
-                    currentUserNickname = nickname,
+                    currentUserId = profile.userId,
+                    currentUserNickname = profile.nickname,
                     selectedPharmacistId = state.selectedPharmacistId!!,
                     uploadedImageUrls = uploadedUrls
                 )
@@ -277,17 +277,9 @@ class ConsultWriteViewModel @Inject constructor(
     }
 
     private fun sendNotificationToPharmacist(pharmacistId: String, consultId: String) {
-        CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+        viewModelScope.launch {
             try {
-                val pharmacistResult = userRepository.getUserOnce(pharmacistId)
-
-                if (pharmacistResult is DataResourceResult.Success) {
-                    val user = pharmacistResult.resultData
-                    val token = user.fcmToken
-                    if (!token.isNullOrEmpty()) {
-                        consultRepository.sendNewConsultNotification(token, consultId)
-                    }
-                }
+                consultUseCases.sendNewConsultNotification(pharmacistId, consultId)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -302,7 +294,7 @@ class ConsultWriteViewModel @Inject constructor(
     // region Private Helpers
     private fun fetchPharmacistsInPharmacy(pharmacy: Pharmacy) {
         viewModelScope.launch {
-            consultUseCases.pharmacistRepository.getPharmacistsByPlaceId(pharmacy.placeId).collectLatest { result ->
+            consultUseCases.searchPharmacistsByPlaceId(pharmacy.placeId).collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
@@ -324,7 +316,7 @@ class ConsultWriteViewModel @Inject constructor(
 
     private fun createConsult(consultInfo: ConsultItem) {
         viewModelScope.launch {
-            consultRepository.createConsult(consultInfo).collectLatest { result ->
+            consultUseCases.createConsult(consultInfo).collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
                         is DataResourceResult.Loading -> state.copy(isLoading = true)
@@ -342,7 +334,7 @@ class ConsultWriteViewModel @Inject constructor(
         }
     }
 
-    private fun validateAndGetUserId(state: ConsultWriteUiState): String? {
+    private fun validateWriteForm(state: ConsultWriteUiState): Boolean {
         val validationResult = consultUseCases.validateConsultForm(state.title, state.content)
         if (validationResult is ValidateConsultFormUseCase.Result.Invalid) {
             val error = when (validationResult.error) {
@@ -350,18 +342,13 @@ class ConsultWriteViewModel @Inject constructor(
                 ValidateConsultFormUseCase.ErrorType.TITLE_TOO_SHORT -> ConsultUiMessage.TitleTooShort
             }
             _uiState.update { it.copy(userMessage = error) }
-            return null
+            return false
         }
         if (state.selectedPharmacistId == null) {
             _uiState.update { it.copy(userMessage = ConsultUiMessage.PharmacistRequired) }
-            return null
+            return false
         }
-        val userId = consultUseCases.authRepository.getCurrentUserId()
-        if (userId == null) {
-            _uiState.update { it.copy(userMessage = UiMessage.LoginRequired) }
-            return null
-        }
-        return userId
+        return true
     }
     // endregion
 }

@@ -5,28 +5,23 @@ import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.domain.model.consult.ConsultStatus
-import com.moon.pharm.domain.repository.AuthRepository
-import com.moon.pharm.domain.repository.ConsultRepository
-import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
+import com.moon.pharm.domain.usecase.auth.LogoutUseCase
+import com.moon.pharm.domain.usecase.user.ObserveMyPageDataUseCase
 import com.moon.pharm.domain.usecase.user.UpdateNicknameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val consultRepository: ConsultRepository,
-    private val userRepository: UserRepository,
-    private val updateNicknameUseCase: UpdateNicknameUseCase
+    private val observeMyPageDataUseCase: ObserveMyPageDataUseCase,
+    private val updateNicknameUseCase: UpdateNicknameUseCase,
+    private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MyPageUiState())
@@ -60,43 +55,14 @@ class MyPageViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun loadData() {
-        val userId = authRepository.getCurrentUserId() ?: return
-
         viewModelScope.launch {
-            userRepository.getUser(userId).flatMapLatest { userResult ->
-                if (userResult !is DataResourceResult.Success) {
-                    return@flatMapLatest kotlinx.coroutines.flow.flowOf(
-                        Pair(userResult, DataResourceResult.Loading)
-                    )
-                }
-
-                val user = userResult.resultData
-                val isPharmacist = user.userType == UserType.PHARMACIST
-
-                val consultFlow = if (isPharmacist) {
-                    consultRepository.getMyAnsweredConsultList(userId)
-                } else {
-                    consultRepository.getMyConsult(userId)
-                }
-
-                consultFlow.map { consultResult ->
-                    Pair(userResult, consultResult)
-                }
-            }.collectLatest { (userResult, consultResult) ->
-                val user = if (userResult is DataResourceResult.Success) userResult.resultData else _uiState.value.user
-                val consults = if (consultResult is DataResourceResult.Success) {
-                    consultResult.resultData
-                } else {
-                    _uiState.value.myConsults
-                }
-                val isLoading = userResult is DataResourceResult.Loading || consultResult is DataResourceResult.Loading
-                val errorMsg: UiMessage? = when {
-                    userResult is DataResourceResult.Failure -> UiMessage.LoadDataFailed
-                    consultResult is DataResourceResult.Failure -> UiMessage.LoadDataFailed
-                    else -> null
-                }
+            observeMyPageDataUseCase().collectLatest { result ->
+                val currentState = _uiState.value
+                val user = if (result is DataResourceResult.Success) result.resultData.user else currentState.user
+                val consults = if (result is DataResourceResult.Success) result.resultData.consults else currentState.myConsults
+                val isLoading = result is DataResourceResult.Loading
+                val errorMsg: UiMessage? = if (result is DataResourceResult.Failure) UiMessage.LoadDataFailed else null
                 val isPharmacist = user?.userType == UserType.PHARMACIST
                 val totalCount = consults.size
 
@@ -120,7 +86,7 @@ class MyPageViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch {
-            authRepository.logout()
+            logoutUseCase()
         }
     }
 }

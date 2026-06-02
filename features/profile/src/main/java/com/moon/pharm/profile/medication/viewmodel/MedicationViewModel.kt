@@ -9,11 +9,12 @@ import com.moon.pharm.component_ui.model.ScannedMedication
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.model.medication.MedicationProgress
-import com.moon.pharm.domain.repository.AuthRepository
-import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
+import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
+import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.GetDailyIntakeRecordsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
+import com.moon.pharm.domain.usecase.medication.SaveMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
 import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
@@ -44,10 +45,11 @@ import kotlin.reflect.typeOf
 class MedicationViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getMedicationsUseCase: GetMedicationsUseCase,
-    private val medicationRepository: MedicationRepository,
+    private val saveMedicationUseCase: SaveMedicationUseCase,
+    private val deleteMedicationUseCase: DeleteMedicationUseCase,
     private val getDailyIntakeRecordsUseCase: GetDailyIntakeRecordsUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
-    private val authRepository: AuthRepository,
+    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     private val validateMedicationEntryUseCase: ValidateMedicationEntryUseCase,
     private val alarmScheduler: AlarmScheduler,
 ) : ViewModel() {
@@ -237,7 +239,7 @@ class MedicationViewModel @Inject constructor(
     }
 
     private fun fetchMedicationList() {
-        val userId = authRepository.getCurrentUserId() ?: return
+        val userId = getCurrentUserIdUseCase() ?: return
         val today = LocalDate.now()
         val todayDate = today.toString()
 
@@ -328,7 +330,7 @@ class MedicationViewModel @Inject constructor(
             return
         }
 
-        val userId = authRepository.getCurrentUserId()
+        val userId = getCurrentUserIdUseCase()
         if (userId == null) {
             _uiState.update { it.copy(userMessage = MedicationUiMessage.NotLoggedIn) }
             return
@@ -342,7 +344,7 @@ class MedicationViewModel @Inject constructor(
             forms.forEach { form ->
                 val newItem = MedicationUiMapper.toDomain(form, userId)
 
-                val result = medicationRepository.saveMedication(newItem)
+                val result = saveMedicationUseCase(newItem)
                     .filter { it !is DataResourceResult.Loading }
                     .first()
 
@@ -371,7 +373,7 @@ class MedicationViewModel @Inject constructor(
     }
 
     fun toggleMedicationTaken(medicationId: String, scheduleId: String) {
-        val userId = authRepository.getCurrentUserId() ?: return
+        val userId = getCurrentUserIdUseCase() ?: return
 
         val currentList = _uiState.value.medicationList
         val targetItem = currentList.find {
@@ -407,7 +409,7 @@ class MedicationViewModel @Inject constructor(
 
     private fun deleteMedication(medicationId: String) {
         viewModelScope.launch {
-            medicationRepository.deleteMedication(medicationId).collectLatest { result ->
+            deleteMedicationUseCase(medicationId).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Failure -> {
                         result.exception.printStackTrace()

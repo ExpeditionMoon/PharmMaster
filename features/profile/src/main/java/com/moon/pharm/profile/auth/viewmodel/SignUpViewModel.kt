@@ -8,13 +8,13 @@ import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.domain.model.pharmacy.Pharmacy
-import com.moon.pharm.domain.repository.PharmacyRepository
-import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.SignUpUseCase
 import com.moon.pharm.domain.usecase.auth.ValidateSignUpFormUseCase
 import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocationUseCase
+import com.moon.pharm.domain.usecase.pharmacy.SearchNearbyPharmaciesUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SearchPharmacyUseCase
+import com.moon.pharm.domain.usecase.user.CheckEmailDuplicatedUseCase
 import com.moon.pharm.profile.auth.mapper.SignUpUiMapper
 import com.moon.pharm.profile.auth.model.SignUpStep
 import com.moon.pharm.profile.auth.model.SignUpUiMessage
@@ -37,9 +37,9 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase,
-    private val userRepository: UserRepository,
+    private val checkEmailDuplicatedUseCase: CheckEmailDuplicatedUseCase,
     private val searchPharmacyUseCase: SearchPharmacyUseCase,
-    private val pharmacyRepository: PharmacyRepository,
+    private val searchNearbyPharmaciesUseCase: SearchNearbyPharmaciesUseCase,
     private val getNearbyPharmaciesUseCase: GetNearbyPharmaciesCurrentLocationUseCase,
     private val validateSignUpFormUseCase: ValidateSignUpFormUseCase
 ) : ViewModel() {
@@ -93,7 +93,7 @@ class SignUpViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isEmailChecking = true) }
-            val isDuplicated = userRepository.isEmailDuplicated(email)
+            val isDuplicated = checkEmailDuplicatedUseCase(email)
             _uiState.update {
                 it.copy(
                     isEmailAvailable = !isDuplicated,
@@ -182,7 +182,7 @@ class SignUpViewModel @Inject constructor(
     // region 4. Map & Search Actions
     fun fetchNearbyPharmacies(lat: Double, lng: Double) {
         viewModelScope.launch {
-            pharmacyRepository.searchNearbyPharmacies(lat, lng).collectLatest { result ->
+            searchNearbyPharmaciesUseCase(lat, lng).collectLatest { result ->
                 _uiState.update { state ->
                     when (result) {
                         is DataResourceResult.Loading -> state.copy(isLoading = true)

@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.util.toQueryString
 import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.model.medication.Medication
-import com.moon.pharm.domain.repository.AuthRepository
-import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
+import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
+import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMonthlyIntakeRecordsUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
@@ -27,9 +27,9 @@ import javax.inject.Inject
 class MedicationHistoryViewModel @Inject constructor(
     private val getMonthlyIntakeRecordsUseCase: GetMonthlyIntakeRecordsUseCase,
     private val getMedicationsUseCase: GetMedicationsUseCase,
-    private val medicationRepository: MedicationRepository,
+    private val deleteMedicationUseCase: DeleteMedicationUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
-    private val authRepository: AuthRepository
+    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -47,7 +47,7 @@ class MedicationHistoryViewModel @Inject constructor(
     }
 
     fun fetchMonthlyRecords(yearMonth: YearMonth) {
-        val userId = authRepository.getCurrentUserId() ?: return
+        val userId = getCurrentUserIdUseCase() ?: return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, selectedMonth = yearMonth) }
@@ -127,7 +127,7 @@ class MedicationHistoryViewModel @Inject constructor(
     }
 
     fun toggleRecord(medicationId: String, scheduleId: String, isNowTaken: Boolean, date: LocalDate) {
-        val userId = authRepository.getCurrentUserId() ?: return
+        val userId = getCurrentUserIdUseCase() ?: return
         val dateString = date.toQueryString()
 
         viewModelScope.launch {
@@ -150,7 +150,7 @@ class MedicationHistoryViewModel @Inject constructor(
 
     fun deleteMedication(medicationId: String) {
         viewModelScope.launch {
-            medicationRepository.deleteMedication(medicationId).collectLatest { result ->
+            deleteMedicationUseCase(medicationId).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Failure -> {
                         result.exception.printStackTrace()

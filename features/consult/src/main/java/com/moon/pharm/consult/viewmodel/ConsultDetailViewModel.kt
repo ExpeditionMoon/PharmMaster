@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.model.ConsultUiMessage
-import com.moon.pharm.domain.repository.ConsultRepository
-import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,9 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ConsultDetailViewModel @Inject constructor(
-    private val consultUseCases: ConsultUseCases,
-    private val userRepository: UserRepository,
-    private val consultRepository: ConsultRepository
+    private val consultUseCases: ConsultUseCases
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ConsultDetailUiState())
@@ -104,7 +100,7 @@ class ConsultDetailViewModel @Inject constructor(
     fun deleteConsult(consultId: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            consultRepository.deleteConsult(consultId).collectLatest { result ->
+            consultUseCases.deleteConsult(consultId).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Success -> {
                         _uiState.update { it.copy(isLoading = false, userMessage = ConsultUiMessage.ConsultDeleteSuccess) }
@@ -121,7 +117,7 @@ class ConsultDetailViewModel @Inject constructor(
     fun deleteAnswer(consultId: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            consultRepository.deleteConsultAnswer(consultId).collectLatest { result ->
+            consultUseCases.deleteConsultAnswer(consultId).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Success -> {
                         _uiState.update { it.copy(isLoading = false, canAnswer = true, userMessage = ConsultUiMessage.ConsultDeleteSuccess) }
@@ -138,14 +134,7 @@ class ConsultDetailViewModel @Inject constructor(
 
     private fun sendNotificationToUser(userId: String, consultId: String) {
         viewModelScope.launch {
-            val userResult = userRepository.getUserOnce(userId)
-
-            if (userResult is DataResourceResult.Success) {
-                val token = userResult.resultData.fcmToken
-                if (!token.isNullOrEmpty()) {
-                    consultRepository.sendAnswerNotification(token, consultId)
-                }
-            }
+            consultUseCases.sendAnswerNotification(userId, consultId)
         }
     }
 

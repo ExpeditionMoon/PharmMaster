@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.model.ConsultPrimaryTab
-import com.moon.pharm.domain.model.auth.UserType
-import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,8 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ConsultListViewModel @Inject constructor(
-    private val consultUseCases: ConsultUseCases,
-    private val userRepository: UserRepository
+    private val consultUseCases: ConsultUseCases
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ConsultListUiState())
     val uiState = _uiState.asStateFlow()
@@ -38,14 +35,12 @@ class ConsultListViewModel @Inject constructor(
 
     fun fetchConsultList() {
         viewModelScope.launch {
-            val userId = consultUseCases.authRepository.getCurrentUserId()
-            var isPharmacist = false
-
-            if (userId != null) {
-                val userResult = userRepository.getUserOnce(userId)
-                if (userResult is DataResourceResult.Success) {
-                    isPharmacist = userResult.resultData.userType == UserType.PHARMACIST
-                }
+            val profileResult = consultUseCases.getCurrentUserConsultProfile()
+            val userId = if (profileResult is DataResourceResult.Success) profileResult.resultData.userId else null
+            val isPharmacist = if (profileResult is DataResourceResult.Success) {
+                profileResult.resultData.isPharmacist
+            } else {
+                false
             }
 
             _uiState.update {
