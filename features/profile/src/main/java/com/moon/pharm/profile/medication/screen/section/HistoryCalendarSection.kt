@@ -172,8 +172,8 @@ private fun DayCell(
 ) {
     val dotColor = when {
         dailyRecords.isEmpty() -> Color.Transparent
-        dailyRecords.all { it.record.isTaken } -> PharmTheme.colors.success
-        dailyRecords.any { !it.record.isTaken } -> PharmTheme.colors.warning
+        dailyRecords.all { it.isTaken } -> PharmTheme.colors.success
+        dailyRecords.any { !it.isTaken } -> PharmTheme.colors.warning
         else -> Color.Transparent
     }
 

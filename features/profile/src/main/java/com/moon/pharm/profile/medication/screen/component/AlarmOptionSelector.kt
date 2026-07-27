@@ -7,24 +7,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.moon.pharm.component_ui.component.button.SelectButton
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.medication.RepeatType
+import com.moon.pharm.profile.medication.model.RepeatTypeUiModel
 
 @Composable
 fun AlarmOptionSelector(
-    selectedOption: RepeatType,
-    onOptionSelected: (RepeatType) -> Unit
+    selectedOption: RepeatTypeUiModel,
+    onOptionSelected: (RepeatTypeUiModel) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        RepeatType.entries.forEach { type ->
+        RepeatTypeUiModel.entries.forEach { type ->
             SelectButton(
-                text = type.label,
+                text = stringResource(type.labelRes),
                 isSelected = selectedOption == type,
                 modifier = Modifier.weight(1f),
                 onClick = { onOptionSelected(type) }
@@ -39,7 +40,7 @@ private fun AlarmOptionSelectorPreview() {
     PharmMasterTheme {
         Box(modifier = Modifier.padding(16.dp)) {
             AlarmOptionSelector(
-                selectedOption = RepeatType.DAILY,
+                selectedOption = RepeatTypeUiModel.Daily,
                 onOptionSelected = {}
             )
         }

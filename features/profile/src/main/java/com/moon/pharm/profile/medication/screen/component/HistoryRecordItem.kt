@@ -28,7 +28,6 @@ import com.moon.pharm.component_ui.component.item.PharmListItem
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.model.HistoryRecordUiModel
 
@@ -39,9 +38,12 @@ fun HistoryRecordItem(
     onDeleteClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val record = uiModel.record
-    val borderColor = if (record.isTaken) PharmTheme.colors.success else PharmTheme.colors.warning
-    val backgroundColor = if (record.isTaken) PharmTheme.colors.successContainer else PharmTheme.colors.warningContainer
+    val borderColor = if (uiModel.isTaken) PharmTheme.colors.success else PharmTheme.colors.warning
+    val backgroundColor = if (uiModel.isTaken) {
+        PharmTheme.colors.successContainer
+    } else {
+        PharmTheme.colors.warningContainer
+    }
 
     var showMenu by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -53,12 +55,15 @@ fun HistoryRecordItem(
         borderColor = borderColor,
         contentPadding = 10.dp,
         headline = uiModel.medicationName,
-        subhead = if (record.isTaken) stringResource(R.string.medication_take_on)
-        else stringResource(R.string.medication_take_off),
+        subhead = if (uiModel.isTaken) {
+            stringResource(R.string.medication_take_on)
+        } else {
+            stringResource(R.string.medication_take_off)
+        },
         trailing = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = if (record.isTaken) Icons.Default.CheckCircle else Icons.Default.Close,
+                    imageVector = if (uiModel.isTaken) Icons.Default.CheckCircle else Icons.Default.Close,
                     contentDescription = null,
                     tint = borderColor,
                     modifier = Modifier.size(24.dp)
@@ -77,7 +82,12 @@ fun HistoryRecordItem(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text(stringResource(R.string.medication_delete), color = MaterialTheme.colorScheme.error) },
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.medication_delete),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            },
                             onClick = {
                                 showMenu = false
                                 showDeleteDialog = true
@@ -88,13 +98,14 @@ fun HistoryRecordItem(
             }
         }
     )
+
     if (showDeleteDialog) {
         PharmConfirmDialog(
             title = stringResource(R.string.medication_delete_dialog_title),
             content = stringResource(R.string.medication_delete_dialog_content),
             confirmText = stringResource(R.string.medication_delete_desc),
             confirmTextColor = MaterialTheme.colorScheme.error,
-            onConfirm = { onDeleteClick(uiModel.record.medicationId) },
+            onConfirm = { onDeleteClick(uiModel.medicationId) },
             onDismiss = { showDeleteDialog = false }
         )
     }
@@ -107,16 +118,13 @@ private fun HistoryRecordItemPreview() {
         Box(modifier = Modifier.padding(16.dp)) {
             HistoryRecordItem(
                 uiModel = HistoryRecordUiModel(
-                    medicationName = "감기약 (아침)",
-                    time = "오전 08:00",
-                    record = IntakeRecord(
-                        id = "record_1",
-                        userId = "user_1",
-                        medicationId = "m1",
-                        scheduleId = "s1",
-                        recordDate = "2026-03-08",
-                        isTaken = true
-                    )
+                    recordId = "record_1",
+                    medicationId = "m1",
+                    scheduleId = "s1",
+                    recordDate = "2026-03-08",
+                    isTaken = true,
+                    medicationName = "Cold medicine",
+                    time = "08:00"
                 ),
                 onRecordClick = {},
                 onDeleteClick = {}

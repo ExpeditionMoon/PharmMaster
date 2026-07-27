@@ -6,7 +6,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.moon.pharm.component_ui.model.ScannedMedication
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.consult.screen.my.MyConsultListRoute
 import com.moon.pharm.profile.auth.screen.LoginScreen
 import com.moon.pharm.profile.auth.screen.SignUpScreen
 import com.moon.pharm.profile.auth.viewmodel.LoginViewModel
@@ -61,18 +60,17 @@ fun NavGraphBuilder.profileNavGraph(navController: NavController, onLogout: () -
             }
         )
     }
-    composable<ContentNavigationRoute.MyConsultList> {
-        MyConsultListRoute(
-            onNavigateUp = { navController.popBackStack() },
-            onNavigateToDetail = { consultId ->
-                navController.navigate(ContentNavigationRoute.ConsultTabDetailScreen(id = consultId))
-            }
-        )
-    }
-
     composable<ContentNavigationRoute.MedicationTab>{
         val viewModel: MedicationViewModel = hiltViewModel()
-        MedicationScreen(navController = navController, viewModel)
+        MedicationScreen(
+            viewModel = viewModel,
+            onNavigateToHistory = {
+                navController.navigate(ContentNavigationRoute.MedicationTabHistoryScreen)
+            },
+            onNavigateToCreate = {
+                navController.navigate(ContentNavigationRoute.MedicationTabCreateScreen())
+            }
+        )
     }
     composable<ContentNavigationRoute.MedicationTabCreateScreen>(
         typeMap = mapOf(
@@ -80,7 +78,16 @@ fun NavGraphBuilder.profileNavGraph(navController: NavController, onLogout: () -
         )
     ){
         val viewModel: MedicationViewModel = hiltViewModel()
-        MedicationCreateScreen(navController = navController, viewModel)
+        MedicationCreateScreen(
+            viewModel = viewModel,
+            onNavigateUp = { navController.popBackStack() },
+            onMedicationCreated = {
+                navController.navigate(ContentNavigationRoute.MedicationTab) {
+                    popUpTo(ContentNavigationRoute.MedicationTab) { inclusive = false }
+                    launchSingleTop = true
+                }
+            }
+        )
     }
     composable<ContentNavigationRoute.MedicationTabHistoryScreen>{
         MedicationHistoryScreen(onBackClick = { navController.popBackStack() })

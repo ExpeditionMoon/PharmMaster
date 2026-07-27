@@ -11,16 +11,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.moon.pharm.component_ui.model.PharmacyUiModel
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.pharmacy.Pharmacy
 
 @Composable
 fun PharmacyListItem(
-    pharmacy: Pharmacy,
-    onClick: (Pharmacy) -> Unit,
+    pharmacy: PharmacyUiModel,
+    onClick: (PharmacyUiModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
     PharmListItem(
@@ -42,7 +42,7 @@ fun PharmacyListItem(
 @ThemePreviews
 @Composable
 private fun PharmacyListItemPreview(
-    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<Pharmacy>
+    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<PharmacyUiModel>
 ) {
     PharmMasterTheme {
         Box(

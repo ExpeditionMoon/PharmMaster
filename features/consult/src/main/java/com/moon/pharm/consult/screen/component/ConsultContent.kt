@@ -10,16 +10,16 @@ import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.model.ConsultPrimaryTab
-import com.moon.pharm.domain.model.consult.ConsultItem
+import com.moon.pharm.consult.model.ConsultUiModel
 
 @Composable
 fun ConsultContent(
     selectedTab: ConsultPrimaryTab,
-    currentList: List<ConsultItem>,
+    currentList: List<ConsultUiModel>,
     currentUserId: String?,
     isPharmacist: Boolean,
     onTabSelected: (ConsultPrimaryTab) -> Unit,
-    onItemClick: (ConsultItem) -> Unit
+    onItemClick: (ConsultUiModel) -> Unit
 ) {
     val tabTitles = ConsultPrimaryTab.entries.map { it.title }
 

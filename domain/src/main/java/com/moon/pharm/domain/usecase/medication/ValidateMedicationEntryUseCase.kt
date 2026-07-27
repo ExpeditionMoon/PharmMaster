@@ -1,8 +1,7 @@
 package com.moon.pharm.domain.usecase.medication
 
-import javax.inject.Inject
 
-class ValidateMedicationEntryUseCase @Inject constructor() {
+class ValidateMedicationEntryUseCase() {
 
     sealed interface Result {
         object Success : Result

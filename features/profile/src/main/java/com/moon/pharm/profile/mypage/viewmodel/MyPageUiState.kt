@@ -2,14 +2,14 @@ package com.moon.pharm.profile.mypage.viewmodel
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.domain.model.auth.User
-import com.moon.pharm.domain.model.consult.ConsultItem
+import com.moon.pharm.profile.mypage.model.MyPageConsultUiModel
+import com.moon.pharm.profile.mypage.model.MyPageUserUiModel
 
 data class MyPageUiState(
     val isLoading: Boolean = true,
     val userMessage: UiMessage? = null,
-    val user: User? = null,
-    val myConsults: List<ConsultItem> = emptyList(),
+    val user: MyPageUserUiModel? = null,
+    val myConsults: List<MyPageConsultUiModel> = emptyList(),
     val consultHistoryText: String? = null,
 
     val menuItems: List<MyPageMenuState> = emptyList(),

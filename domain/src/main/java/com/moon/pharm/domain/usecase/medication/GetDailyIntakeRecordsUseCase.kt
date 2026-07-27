@@ -6,9 +6,8 @@ import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.result.mapResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-class GetDailyIntakeRecordsUseCase @Inject constructor(
+class GetDailyIntakeRecordsUseCase(
     private val repository: MedicationRepository
 ) {
     operator fun invoke(userId: String, date: String): Flow<DataResourceResult<List<IntakeRecord>>> {

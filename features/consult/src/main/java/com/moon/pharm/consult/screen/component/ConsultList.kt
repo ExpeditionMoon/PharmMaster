@@ -22,14 +22,14 @@ import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
-import com.moon.pharm.domain.model.consult.ConsultItem
+import com.moon.pharm.consult.model.ConsultUiModel
 
 @Composable
 fun ConsultList(
-    currentList: List<ConsultItem>,
+    currentList: List<ConsultUiModel>,
     currentUserId: String?,
     isPharmacist: Boolean,
-    onItemClick: (ConsultItem) -> Unit,
+    onItemClick: (ConsultUiModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (currentList.isEmpty()) {

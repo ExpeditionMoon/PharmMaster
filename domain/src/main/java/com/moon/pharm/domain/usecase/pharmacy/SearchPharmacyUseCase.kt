@@ -6,9 +6,8 @@ import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.result.mapResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-class SearchPharmacyUseCase @Inject constructor(
+class SearchPharmacyUseCase(
     private val repository: PharmacyRepository
 ) {
     operator fun invoke(query: String): Flow<DataResourceResult<List<Pharmacy>>> {

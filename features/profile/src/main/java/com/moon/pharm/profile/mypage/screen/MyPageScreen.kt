@@ -32,10 +32,9 @@ import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.auth.User
-import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.profile.BuildConfig
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.mypage.model.MyPageUserUiModel
 import com.moon.pharm.profile.mypage.screen.component.EditNicknameDialog
 import com.moon.pharm.profile.mypage.screen.component.MyPageFooterSection
 import com.moon.pharm.profile.mypage.screen.component.MyPageMenuItemData
@@ -43,7 +42,6 @@ import com.moon.pharm.profile.mypage.screen.component.MyPageMenuSection
 import com.moon.pharm.profile.mypage.screen.component.MyPageProfileCard
 import com.moon.pharm.profile.mypage.viewmodel.MyPageUiState
 import com.moon.pharm.profile.mypage.viewmodel.MyPageViewModel
-import com.moon.pharm.profile.util.myPageConsultMenuTitleRes
 import com.moon.pharm.component_ui.R as UiR
 
 @Composable
@@ -124,7 +122,9 @@ fun MyPageScreen(
                         onEditProfileClick = { showEditDialog = true }
                     )
 
-                    val baseTitle = stringResource(user.userType.myPageConsultMenuTitleRes)
+                    val baseTitle = stringResource(
+                        if (user.isPharmacist) UiR.string.my_answer_title else UiR.string.my_consult_title
+                    )
 
                     val formattedCount = uiState.consultHistoryText?.let {
                         stringResource(R.string.mypage_consult_history_format, it)
@@ -214,14 +214,11 @@ private fun MyPageScreenPreview() {
         MyPageScreen(
             uiState = MyPageUiState(
                 isLoading = false,
-                user = User(
+                user = MyPageUserUiModel(
                     id = "test_user_id",
-                    email = "test@moonpharm.com",
                     nickName = "달토끼",
-                    userType = UserType.GENERAL,
                     profileImageUrl = null,
-                    createdAt = System.currentTimeMillis(),
-                    fcmToken = null
+                    isPharmacist = false
                 ),
                 myConsults = emptyList()
             ),

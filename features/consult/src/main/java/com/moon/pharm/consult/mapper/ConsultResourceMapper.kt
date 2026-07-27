@@ -3,16 +3,16 @@ package com.moon.pharm.consult.mapper
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.domain.model.consult.ConsultStatus
+import com.moon.pharm.consult.model.ConsultStatusUiModel
 
 @Composable
-fun ConsultStatus.toBackgroundColor(): Color = when(this) {
-    ConsultStatus.WAITING -> PharmTheme.colors.secondary
-    ConsultStatus.COMPLETED -> PharmTheme.colors.primary
+fun ConsultStatusUiModel.toBackgroundColor(): Color = when(this) {
+    ConsultStatusUiModel.Waiting -> PharmTheme.colors.secondary
+    ConsultStatusUiModel.Completed -> PharmTheme.colors.primary
 }
 
 @Composable
-fun ConsultStatus.toTextColor(): Color = when(this) {
-    ConsultStatus.WAITING -> PharmTheme.colors.onSecondary
-    ConsultStatus.COMPLETED -> PharmTheme.colors.onPrimary
+fun ConsultStatusUiModel.toTextColor(): Color = when(this) {
+    ConsultStatusUiModel.Waiting -> PharmTheme.colors.onSecondary
+    ConsultStatusUiModel.Completed -> PharmTheme.colors.onPrimary
 }

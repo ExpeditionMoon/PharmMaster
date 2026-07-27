@@ -19,11 +19,11 @@ import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.R
-import com.moon.pharm.domain.model.consult.ConsultAnswer
+import com.moon.pharm.consult.model.ConsultAnswerUiModel
 
 @Composable
 fun AnswerContentCard(
-    answer: ConsultAnswer
+    answer: ConsultAnswerUiModel
 ) {
     Surface(
         shape = RoundedCornerShape(10.dp),
@@ -58,7 +58,7 @@ private fun AnswerContentCardPreview() {
     PharmMasterTheme {
         Box(modifier = Modifier.padding(16.dp)) {
             AnswerContentCard(
-                answer = ConsultAnswer(
+                answer = ConsultAnswerUiModel(
                     answerId = "a1",
                     pharmacistId = "p1",
                     pharmacistName = "김약사",

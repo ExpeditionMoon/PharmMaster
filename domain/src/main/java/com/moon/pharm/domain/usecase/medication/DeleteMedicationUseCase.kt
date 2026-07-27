@@ -1,0 +1,13 @@
+package com.moon.pharm.domain.usecase.medication
+
+import com.moon.pharm.domain.repository.MedicationRepository
+import com.moon.pharm.domain.result.DataResourceResult
+import kotlinx.coroutines.flow.Flow
+
+class DeleteMedicationUseCase(
+    private val medicationRepository: MedicationRepository
+) {
+    operator fun invoke(medicationId: String): Flow<DataResourceResult<Unit>> {
+        return medicationRepository.deleteMedication(medicationId)
+    }
+}

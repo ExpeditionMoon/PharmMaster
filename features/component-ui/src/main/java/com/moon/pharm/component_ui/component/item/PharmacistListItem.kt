@@ -25,15 +25,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.R
+import com.moon.pharm.component_ui.model.PharmacistUiModel
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.auth.Pharmacist
 
 @Composable
 fun PharmacistListItem(
-    pharmacist: Pharmacist,
-    onSelect: (Pharmacist) -> Unit,
+    pharmacist: PharmacistUiModel,
+    onSelect: (PharmacistUiModel) -> Unit,
     modifier: Modifier = Modifier,
     btnText: String? = null
 ) {
@@ -90,7 +90,7 @@ private fun PharmacistListItemPreview() {
                 .padding(16.dp)
         ) {
             PharmacistListItem(
-                pharmacist = Pharmacist(
+                pharmacist = PharmacistUiModel(
                     userId = "user_12345",
                     name = "김약사",
                     bio = "복약 지도를 꼼꼼하게 해드립니다.",

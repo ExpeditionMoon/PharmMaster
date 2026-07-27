@@ -129,12 +129,12 @@ fun MedicationHistoryContent(
                         uiModel = uiModel,
                         onRecordClick = {
                             onToggleRecord(
-                                uiModel.record.medicationId,
-                                uiModel.record.scheduleId,
-                                !uiModel.record.isTaken
+                                uiModel.medicationId,
+                                uiModel.scheduleId,
+                                !uiModel.isTaken
                             )
                         },
-                        onDeleteClick = { onDeleteClick(uiModel.record.medicationId) }
+                        onDeleteClick = { onDeleteClick(uiModel.medicationId) }
                     )
                 }
             }

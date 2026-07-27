@@ -3,30 +3,25 @@ package com.moon.pharm.profile.mypage.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.domain.model.auth.UserType
-import com.moon.pharm.domain.model.consult.ConsultStatus
-import com.moon.pharm.domain.repository.AuthRepository
-import com.moon.pharm.domain.repository.ConsultRepository
-import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
+import com.moon.pharm.domain.usecase.auth.LogoutUseCase
+import com.moon.pharm.domain.usecase.user.ObserveMyPageDataUseCase
 import com.moon.pharm.domain.usecase.user.UpdateNicknameUseCase
+import com.moon.pharm.profile.mypage.mapper.toMyPageUiModel
+import com.moon.pharm.profile.mypage.model.MyPageConsultStatusUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val consultRepository: ConsultRepository,
-    private val userRepository: UserRepository,
-    private val updateNicknameUseCase: UpdateNicknameUseCase
+    private val observeMyPageDataUseCase: ObserveMyPageDataUseCase,
+    private val updateNicknameUseCase: UpdateNicknameUseCase,
+    private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MyPageUiState())
@@ -37,12 +32,10 @@ class MyPageViewModel @Inject constructor(
     }
 
     fun updateNickname(newNickname: String) {
-        val currentUser = uiState.value.user ?: return
-
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
-            val result = updateNicknameUseCase(currentUser, newNickname)
+            val result = updateNicknameUseCase(newNickname)
 
             if (result is DataResourceResult.Failure) {
                 _uiState.value = _uiState.value.copy(
@@ -50,58 +43,35 @@ class MyPageViewModel @Inject constructor(
                     userMessage = UiMessage.LoadDataFailed
                 )
             } else {
-                val updatedUser = currentUser.copy(nickName = newNickname)
-
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    user = updatedUser
+                    user = _uiState.value.user?.copy(nickName = newNickname)
                 )
             }
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun loadData() {
-        val userId = authRepository.getCurrentUserId() ?: return
-
         viewModelScope.launch {
-            userRepository.getUser(userId).flatMapLatest { userResult ->
-                if (userResult !is DataResourceResult.Success) {
-                    return@flatMapLatest kotlinx.coroutines.flow.flowOf(
-                        Pair(userResult, DataResourceResult.Loading)
-                    )
-                }
-
-                val user = userResult.resultData
-                val isPharmacist = user.userType == UserType.PHARMACIST
-
-                val consultFlow = if (isPharmacist) {
-                    consultRepository.getMyAnsweredConsultList(userId)
+            observeMyPageDataUseCase().collectLatest { result ->
+                val currentState = _uiState.value
+                val user = if (result is DataResourceResult.Success) {
+                    result.resultData.user.toMyPageUiModel()
                 } else {
-                    consultRepository.getMyConsult(userId)
+                    currentState.user
                 }
-
-                consultFlow.map { consultResult ->
-                    Pair(userResult, consultResult)
-                }
-            }.collectLatest { (userResult, consultResult) ->
-                val user = if (userResult is DataResourceResult.Success) userResult.resultData else _uiState.value.user
-                val consults = if (consultResult is DataResourceResult.Success) {
-                    consultResult.resultData
+                val consults = if (result is DataResourceResult.Success) {
+                    result.resultData.consults.map { it.toMyPageUiModel() }
                 } else {
-                    _uiState.value.myConsults
+                    currentState.myConsults
                 }
-                val isLoading = userResult is DataResourceResult.Loading || consultResult is DataResourceResult.Loading
-                val errorMsg: UiMessage? = when {
-                    userResult is DataResourceResult.Failure -> UiMessage.LoadDataFailed
-                    consultResult is DataResourceResult.Failure -> UiMessage.LoadDataFailed
-                    else -> null
-                }
-                val isPharmacist = user?.userType == UserType.PHARMACIST
+                val isLoading = result is DataResourceResult.Loading
+                val errorMsg: UiMessage? = if (result is DataResourceResult.Failure) UiMessage.LoadDataFailed else null
+                val isPharmacist = user?.isPharmacist == true
                 val totalCount = consults.size
 
                 val countText = if (isPharmacist) {
-                    val completedCount = consults.count { it.status == ConsultStatus.COMPLETED }
+                    val completedCount = consults.count { it.status == MyPageConsultStatusUiModel.Completed }
                     if (totalCount > 0) "$completedCount/$totalCount" else null
                 } else {
                     if (totalCount > 0) "$totalCount" else null
@@ -120,7 +90,7 @@ class MyPageViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch {
-            authRepository.logout()
+            logoutUseCase()
         }
     }
 }

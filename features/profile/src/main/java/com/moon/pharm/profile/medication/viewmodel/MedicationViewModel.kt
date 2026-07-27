@@ -7,20 +7,20 @@ import androidx.navigation.toRoute
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.component_ui.model.ScannedMedication
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.domain.alarm.AlarmScheduler
-import com.moon.pharm.domain.model.medication.MedicationProgress
-import com.moon.pharm.domain.model.medication.MedicationTimeGroup
-import com.moon.pharm.domain.repository.AuthRepository
-import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.medication.GetDailyIntakeRecordsUseCase
-import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
+import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
+import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
+import com.moon.pharm.domain.usecase.medication.ObserveTodayMedicationItemsUseCase
+import com.moon.pharm.domain.usecase.medication.SaveMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
 import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
 import com.moon.pharm.profile.medication.mapper.toUiMessage
+import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
+import com.moon.pharm.profile.medication.model.MedicationProgressUiModel
 import com.moon.pharm.profile.medication.model.MedicationUiMessage
+import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 import com.moon.pharm.profile.navigation.ScannedMedicationListNavType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -42,13 +41,12 @@ import kotlin.reflect.typeOf
 @HiltViewModel
 class MedicationViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val getMedicationsUseCase: GetMedicationsUseCase,
-    private val medicationRepository: MedicationRepository,
-    private val getDailyIntakeRecordsUseCase: GetDailyIntakeRecordsUseCase,
+    private val observeTodayMedicationItemsUseCase: ObserveTodayMedicationItemsUseCase,
+    private val saveMedicationUseCase: SaveMedicationUseCase,
+    private val deleteMedicationUseCase: DeleteMedicationUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
-    private val authRepository: AuthRepository,
+    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     private val validateMedicationEntryUseCase: ValidateMedicationEntryUseCase,
-    private val alarmScheduler: AlarmScheduler,
 ) : ViewModel() {
 
     // region 1. State & Derived State
@@ -57,18 +55,18 @@ class MedicationViewModel @Inject constructor(
 
     private var isSaving = false
 
-    val groupedMedications: StateFlow<List<MedicationTimeGroup>> = uiState
+    val groupedMedications: StateFlow<List<MedicationTimeGroupUiModel>> = uiState
         .map { state ->
             state.medicationList
                 .groupBy { it.time }
-                .map { (time, items) -> MedicationTimeGroup(time = time, items = items) }
+                .map { (time, items) -> MedicationTimeGroupUiModel(time = time, items = items) }
                 .sortedBy { it.time }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val progress: StateFlow<MedicationProgress> = uiState
+    val progress: StateFlow<MedicationProgressUiModel> = uiState
         .map { calculateProgress(it.medicationList) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MedicationProgress(0f, 0, 0))
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MedicationProgressUiModel(0f, 0, 0))
     // endregion
 
     init {
@@ -220,52 +218,12 @@ class MedicationViewModel @Inject constructor(
     // endregion
 
     // region 3. Actions
-    private fun isActiveDate(medication: com.moon.pharm.domain.model.medication.Medication, date: LocalDate): Boolean {
-        val startDate = java.time.Instant.ofEpochMilli(medication.startDate ?: 0)
-            .atZone(java.time.ZoneId.systemDefault())
-            .toLocalDate()
-        if (date.isBefore(startDate)) return false
-
-        if (medication.endDate != null) {
-            val endDate = java.time.Instant.ofEpochMilli(medication.endDate!!)
-                .atZone(java.time.ZoneId.systemDefault())
-                .toLocalDate()
-            if (date.isAfter(endDate)) return false
-        }
-        return true
-    }
-
     private fun fetchMedicationList() {
-        val userId = authRepository.getCurrentUserId() ?: return
+        val userId = getCurrentUserIdUseCase() ?: return
         val today = LocalDate.now()
-        val todayDate = today.toString()
 
         viewModelScope.launch {
-            combine(
-                getMedicationsUseCase(userId),
-                getDailyIntakeRecordsUseCase(userId, todayDate)
-            ) { medsResult, recordsResult ->
-
-                when {
-                    medsResult is DataResourceResult.Success && recordsResult is DataResourceResult.Success -> {
-                        val activeMedications = medsResult.resultData.filter { isActiveDate(it, today) }
-                        val todayRecords = recordsResult.resultData
-
-                        val finalUiModels = MedicationUiMapper.toUiModelList(activeMedications).map { uiModel ->
-                            val isTakenToday = todayRecords.any { record ->
-                                record.medicationId == uiModel.medicationId &&
-                                        record.scheduleId == uiModel.scheduleId &&
-                                        record.isTaken
-                            }
-                            uiModel.copy(isTaken = isTakenToday)
-                        }
-                        DataResourceResult.Success(finalUiModels)
-                    }
-                    medsResult is DataResourceResult.Failure -> { DataResourceResult.Failure(medsResult.exception) }
-                    recordsResult is DataResourceResult.Failure -> { DataResourceResult.Failure(recordsResult.exception) }
-                    else -> { DataResourceResult.Loading }
-                }
-            }.collectLatest { result ->
+            observeTodayMedicationItemsUseCase(userId, today).collectLatest { result ->
                 if (isSaving) return@collectLatest
 
                 _uiState.update { currentState ->
@@ -277,7 +235,7 @@ class MedicationViewModel @Inject constructor(
                         is DataResourceResult.Success -> {
                             currentState.copy(
                                 isLoading = if (isSaving) true else false,
-                                medicationList = result.resultData
+                                medicationList = MedicationUiMapper.toUiModelList(result.resultData)
                             )
                         }
                         is DataResourceResult.Failure -> {
@@ -327,7 +285,7 @@ class MedicationViewModel @Inject constructor(
             return
         }
 
-        val userId = authRepository.getCurrentUserId()
+        val userId = getCurrentUserIdUseCase()
         if (userId == null) {
             _uiState.update { it.copy(userMessage = MedicationUiMessage.NotLoggedIn) }
             return
@@ -339,14 +297,13 @@ class MedicationViewModel @Inject constructor(
             var isAllSuccess = true
 
             forms.forEach { form ->
-                val newItem = MedicationUiMapper.toDomain(form, userId)
+                val command = MedicationUiMapper.toSaveCommand(form, userId)
 
-                val result = medicationRepository.saveMedication(newItem)
+                val result = saveMedicationUseCase(command)
                     .filter { it !is DataResourceResult.Loading }
                     .first()
 
                 if (result is DataResourceResult.Success) {
-                    alarmScheduler.schedule(newItem)
                 } else {
                     isAllSuccess = false
                 }
@@ -370,7 +327,7 @@ class MedicationViewModel @Inject constructor(
     }
 
     fun toggleMedicationTaken(medicationId: String, scheduleId: String) {
-        val userId = authRepository.getCurrentUserId() ?: return
+        val userId = getCurrentUserIdUseCase() ?: return
 
         val currentList = _uiState.value.medicationList
         val targetItem = currentList.find {
@@ -390,13 +347,13 @@ class MedicationViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val itemToSave = targetItem.copy(isTaken = newIsTaken)
-            val record = MedicationUiMapper.toIntakeRecord(itemToSave, userId)
-
-            toggleIntakeCheckUseCase(
-                record = record,
+            val command = MedicationUiMapper.toToggleCommand(
+                uiModel = targetItem,
+                userId = userId,
                 isTaken = newIsTaken
-            ).collectLatest { result ->
+            )
+
+            toggleIntakeCheckUseCase(command).collectLatest { result ->
                 if (result is DataResourceResult.Failure) {
                     result.exception.printStackTrace()
                 }
@@ -406,7 +363,7 @@ class MedicationViewModel @Inject constructor(
 
     private fun deleteMedication(medicationId: String) {
         viewModelScope.launch {
-            medicationRepository.deleteMedication(medicationId).collectLatest { result ->
+            deleteMedicationUseCase(medicationId).collectLatest { result ->
                 when (result) {
                     is DataResourceResult.Failure -> {
                         result.exception.printStackTrace()
@@ -429,11 +386,11 @@ class MedicationViewModel @Inject constructor(
         }
     }
 
-    private fun calculateProgress(list: List<com.moon.pharm.domain.model.medication.TodayMedicationUiModel>): MedicationProgress {
+    private fun calculateProgress(list: List<TodayMedicationUiModel>): MedicationProgressUiModel {
         val total = list.size
         val completed = list.count { it.isTaken }
-        if (total == 0) return MedicationProgress(0f, 0, 0)
-        return MedicationProgress(
+        if (total == 0) return MedicationProgressUiModel(0f, 0, 0)
+        return MedicationProgressUiModel(
             ratio = completed.toFloat() / total,
             completed = completed,
             total = total

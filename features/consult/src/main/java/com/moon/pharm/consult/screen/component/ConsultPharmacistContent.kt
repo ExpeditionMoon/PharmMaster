@@ -7,8 +7,9 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.moon.pharm.component_ui.component.map.PharmacySelector
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.auth.Pharmacist
-import com.moon.pharm.domain.model.pharmacy.Pharmacy
+import com.moon.pharm.consult.mapper.toComponentUiModel
+import com.moon.pharm.consult.model.PharmacistUiModel
+import com.moon.pharm.consult.model.PharmacyUiModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -16,24 +17,26 @@ import kotlinx.coroutines.flow.SharedFlow
 fun ConsultPharmacistContent(
     isMapView: Boolean,
     searchQuery: String,
-    searchResults: List<Pharmacy>,
-    selectedPharmacy: Pharmacy?,
-    availablePharmacists: List<Pharmacist>,
+    searchResults: List<PharmacyUiModel>,
+    selectedPharmacy: PharmacyUiModel?,
+    availablePharmacists: List<PharmacistUiModel>,
     cameraPositionState: CameraPositionState,
     cameraMoveEvent: SharedFlow<LatLng>,
 
     onSearchQueryChange: (String) -> Unit,
     onSearchArea: (Double, Double) -> Unit,
-    onPharmacySelect: (Pharmacy) -> Unit,
+    onPharmacySelect: (PharmacyUiModel) -> Unit,
     onPharmacistSelect: (String) -> Unit,
     onMapModeChange: (Boolean) -> Unit,
     onBackFromMap: () -> Unit
 ) {
     if (isMapView) {
         PharmacySelector(
-            pharmacies = searchResults,
-            selectedPharmacy = selectedPharmacy,
-            onPharmacyClick = onPharmacySelect,
+            pharmacies = searchResults.map { it.toComponentUiModel() },
+            selectedPharmacy = selectedPharmacy?.toComponentUiModel(),
+            onPharmacyClick = { selected ->
+                searchResults.find { it.placeId == selected.placeId }?.let(onPharmacySelect)
+            },
             onSearch = onSearchQueryChange,
             onSearchArea = onSearchArea,
             onBackClick = onBackFromMap,

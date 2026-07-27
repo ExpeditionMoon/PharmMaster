@@ -9,6 +9,13 @@ import com.moon.pharm.home.screen.HomeMainScreen
 fun NavGraphBuilder.homeNavGraph(navController: NavController) {
 
     composable<ContentNavigationRoute.HomeTab>{
-        HomeMainScreen(navController = navController)
+        HomeMainScreen(
+            onNavigateToSearch = {
+                navController.navigate(ContentNavigationRoute.Search)
+            },
+            onNavigateToPrescriptionCapture = {
+                navController.navigate(ContentNavigationRoute.PrescriptionCapture)
+            }
+        )
     }
 }

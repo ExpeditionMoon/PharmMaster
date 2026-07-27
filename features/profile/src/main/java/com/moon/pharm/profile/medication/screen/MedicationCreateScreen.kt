@@ -9,27 +9,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.model.TopBarData
 import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.screen.component.MedicationCreateContent
 import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 
 @Composable
 fun MedicationCreateScreen(
-    navController: NavController? = null, viewModel: MedicationViewModel
+    viewModel: MedicationViewModel,
+    onNavigateUp: () -> Unit,
+    onMedicationCreated: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.isMedicationCreated) {
         if (uiState.isMedicationCreated) {
-            navController?.navigate(ContentNavigationRoute.MedicationTab) {
-                popUpTo(ContentNavigationRoute.MedicationTab) { inclusive = false }
-                launchSingleTop = true
-            }
+            onMedicationCreated()
         }
     }
 
@@ -39,7 +36,8 @@ fun MedicationCreateScreen(
                 data = TopBarData(
                     title = stringResource(R.string.medication_create_title),
                     navigationType = TopBarNavigationType.Close,
-                    onNavigationClick = { navController?.popBackStack() })
+                    onNavigationClick = onNavigateUp
+                )
             )
         }
     ) { innerPadding ->

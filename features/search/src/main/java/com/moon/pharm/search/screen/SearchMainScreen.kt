@@ -25,7 +25,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.moon.pharm.component_ui.component.bar.PharmTopBar
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
 import com.moon.pharm.component_ui.model.TopBarData
@@ -33,15 +32,15 @@ import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.drug.Drug
 import com.moon.pharm.search.mapper.asString
+import com.moon.pharm.search.model.DrugUiModel
 import com.moon.pharm.search.screen.component.DrugListItem
 import com.moon.pharm.search.viewmodel.SearchMainViewModel
 import com.moon.pharm.search.viewmodel.SearchUiState
 
 @Composable
 fun SearchMainScreen(
-    navController: NavController,
+    onNavigateUp: () -> Unit,
     viewModel: SearchMainViewModel = hiltViewModel()
 ) {
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
@@ -62,7 +61,7 @@ fun SearchMainScreen(
                 data = TopBarData(
                     title = "의약품 검색",
                     navigationType = TopBarNavigationType.Back,
-                    onNavigationClick = { navController.popBackStack() },
+                    onNavigationClick = onNavigateUp,
                     actions = emptyList()
                 )
             )
@@ -86,7 +85,7 @@ fun SearchMainContent(
     searchQuery: String,
     uiState: SearchUiState,
     onSearchQueryChange: (String) -> Unit,
-    onItemClick: (Drug) -> Unit
+    onItemClick: (DrugUiModel) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -146,7 +145,7 @@ fun SearchMainContent(
 @Composable
 private fun SearchMainContentPreview_Success() {
     val dummyDrugs = listOf(
-        Drug(
+        DrugUiModel(
             itemSeq = "199303108",
             itemName = "타이레놀정500밀리그람",
             companyName = "(주)한국얀센",
@@ -154,7 +153,7 @@ private fun SearchMainContentPreview_Success() {
             interaction = "매일 세 잔 이상 정기적으로 술을 마시는 사람이 이 약을 복용하면 간손상이 유발될 수 있습니다.",
             imageUrl = ""
         ),
-        Drug(
+        DrugUiModel(
             itemSeq = "200609341",
             itemName = "어린이타이레놀현탁액",
             companyName = "(주)한국얀센",

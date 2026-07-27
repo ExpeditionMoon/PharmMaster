@@ -3,7 +3,7 @@ package com.moon.pharm.ui.screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.domain.repository.AuthRepository
+import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.user.SyncFcmTokenUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val syncFcmTokenUseCase: SyncFcmTokenUseCase,
-    private val authRepository: AuthRepository
+    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase
 ) : ViewModel() {
 
     private val _isSplashLoading = MutableStateFlow(true)
@@ -36,7 +36,7 @@ class MainViewModel @Inject constructor(
 
     private fun checkLoginStatus() {
         viewModelScope.launch {
-            val userId = authRepository.getCurrentUserId()
+            val userId = getCurrentUserIdUseCase()
 
             if (userId != null) {
                 _startDestination.value = ContentNavigationRoute.MainBase

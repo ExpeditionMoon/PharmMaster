@@ -33,16 +33,15 @@ import com.moon.pharm.component_ui.component.button.PharmOutlinedButton
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.auth.User
-import com.moon.pharm.domain.model.auth.UserType
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.mypage.model.MyPageUserUiModel
 
 @Composable
 fun MyPageProfileCard(
-    user: User,
+    user: MyPageUserUiModel,
     onEditProfileClick: () -> Unit = {}
 ) {
-    val userTypeLabel = if (user.userType == UserType.PHARMACIST)
+    val userTypeLabel = if (user.isPharmacist)
         stringResource(R.string.mypage_pharmacist_member)
     else
         stringResource(R.string.mypage_general_member)
@@ -108,14 +107,11 @@ private fun MyPageProfileCardPreview() {
     PharmMasterTheme {
         Box(modifier = Modifier.padding(16.dp)) {
             MyPageProfileCard(
-                user = User(
+                user = MyPageUserUiModel(
                     id = "test_id",
-                    email = "test@email.com",
                     nickName = "보름달",
-                    userType = UserType.PHARMACIST,
                     profileImageUrl = null,
-                    createdAt = 0L,
-                    fcmToken = null
+                    isPharmacist = true
                 ),
                 onEditProfileClick = {}
             )
