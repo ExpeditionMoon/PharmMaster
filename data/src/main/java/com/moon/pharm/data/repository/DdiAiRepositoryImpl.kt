@@ -26,7 +26,7 @@ class DdiAiRepositoryImpl @Inject constructor(
             } else {
                 DataResourceResult.Failure(DdiException.AnalysisFailed())
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             DataResourceResult.Failure(DdiException.Network())
         }
     }
@@ -43,7 +43,7 @@ class DdiAiRepositoryImpl @Inject constructor(
             } else {
                 DataResourceResult.Success(resultList)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             DataResourceResult.Failure(DdiException.Network())
         }
     }

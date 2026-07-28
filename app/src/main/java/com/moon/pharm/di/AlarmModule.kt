@@ -1,6 +1,6 @@
-package com.moon.pharm.data.di
+package com.moon.pharm.di
 
-import com.moon.pharm.data.alarm.AndroidAlarmScheduler
+import com.moon.pharm.alarm.AndroidAlarmScheduler
 import com.moon.pharm.domain.alarm.AlarmScheduler
 import dagger.Binds
 import dagger.Module
@@ -10,6 +10,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
+@Suppress("unused")
 abstract class AlarmModule {
 
     @Binds

@@ -2,9 +2,9 @@ package com.moon.pharm.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.moon.pharm.data.datasource.UserDataSource
-import com.moon.pharm.data.datasource.remote.dto.toDomain
-import com.moon.pharm.data.datasource.remote.dto.toDto
 import com.moon.pharm.data.di.IoDispatcher
+import com.moon.pharm.data.mapper.toDomain
+import com.moon.pharm.data.mapper.toDto
 import com.moon.pharm.domain.model.auth.User
 import com.moon.pharm.domain.model.auth.UserException
 import com.moon.pharm.domain.model.auth.UserLifeStyle
@@ -23,13 +23,15 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val dataSource: UserDataSource,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : UserRepository {
 
-    private fun Throwable.toUserException(): UserException = when {
-        this is FirebaseFirestoreException && this.code == FirebaseFirestoreException.Code.NOT_FOUND -> UserException.NotFound()
-        this is FirebaseFirestoreException -> UserException.NetworkError()
-        else -> UserException.Unknown(this.message)
+    private fun Throwable.toUserException(): UserException = when (this) {
+        is FirebaseFirestoreException -> when (code) {
+            FirebaseFirestoreException.Code.NOT_FOUND -> UserException.NotFound()
+            else -> UserException.NetworkError()
+        }
+        else -> UserException.Unknown(message)
     }
 
     private suspend fun <T> wrapUserOperation(
