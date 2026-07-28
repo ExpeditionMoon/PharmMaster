@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.firebase.messaging.FirebaseMessaging
 import com.moon.pharm.alarm.AlarmConstants
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
 import com.moon.pharm.ui.screen.EntryPointScreen
 import com.moon.pharm.ui.screen.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint

@@ -4,11 +4,11 @@ import androidx.compose.runtime.Composable
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.mapper.toMapPlace
 import com.moon.pharm.consult.model.PharmacistUiModel
 import com.moon.pharm.consult.model.PharmacyUiModel
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.maps.component.PharmacySelector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

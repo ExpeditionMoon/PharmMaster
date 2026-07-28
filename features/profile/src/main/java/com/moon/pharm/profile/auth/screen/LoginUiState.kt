@@ -1,6 +1,6 @@
 package com.moon.pharm.profile.auth.screen
 
-import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.designsystem.common.UiMessage
 
 data class LoginUiState(
     val email: String = "",

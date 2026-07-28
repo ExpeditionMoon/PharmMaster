@@ -3,9 +3,9 @@ package com.moon.pharm.ddi.mapper
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.ddi.R
 import com.moon.pharm.ddi.model.RiskLevelUi
+import com.moon.pharm.designsystem.theme.PharmTheme
 
 @Composable
 fun RiskLevelUi.toContainerColor(): Color = when (this) {

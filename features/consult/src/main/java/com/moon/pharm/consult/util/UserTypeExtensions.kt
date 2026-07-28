@@ -1,7 +1,7 @@
 package com.moon.pharm.consult.util
 
 import com.moon.pharm.consult.R
-import com.moon.pharm.component_ui.R as UiR
+import com.moon.pharm.designsystem.R as UiR
 
 val Boolean.myConsultListTitleRes: Int
     get() = when (this) {

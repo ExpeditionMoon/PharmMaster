@@ -2,7 +2,7 @@ package com.moon.pharm.profile.mypage.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.designsystem.common.UiMessage
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.LogoutUseCase
 import com.moon.pharm.domain.usecase.user.ObserveMyPageDataUseCase

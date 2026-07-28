@@ -39,12 +39,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.moon.pharm.component_ui.component.bar.PharmTopBar
-import com.moon.pharm.component_ui.model.TopBarData
-import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.ddi.R
 import com.moon.pharm.ddi.mapper.asString
 import com.moon.pharm.ddi.mapper.toContainerColor
@@ -53,6 +47,12 @@ import com.moon.pharm.ddi.model.DdiResultUiModel
 import com.moon.pharm.ddi.model.RiskLevelUi
 import com.moon.pharm.ddi.viewmodel.DdiSharedViewModel
 import com.moon.pharm.ddi.viewmodel.DdiUiState
+import com.moon.pharm.designsystem.component.bar.PharmTopBar
+import com.moon.pharm.designsystem.model.TopBarData
+import com.moon.pharm.designsystem.model.TopBarNavigationType
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 
 @Composable
 fun DdiResultRoute(

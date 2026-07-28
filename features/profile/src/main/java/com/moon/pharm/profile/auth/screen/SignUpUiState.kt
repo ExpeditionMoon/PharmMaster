@@ -1,6 +1,6 @@
 package com.moon.pharm.profile.auth.screen
 
-import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.designsystem.common.UiMessage
 import com.moon.pharm.profile.auth.model.SignUpPharmacyUiModel
 import com.moon.pharm.profile.auth.model.SignUpStep
 import com.moon.pharm.profile.auth.model.UserTypeUiModel

@@ -21,13 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.component.card.DateSettingCard
-import com.moon.pharm.component_ui.component.dialog.DatePickerModal
-import com.moon.pharm.component_ui.component.toggle.CustomSwitch
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.component_ui.util.toDisplayDateString
+import com.moon.pharm.designsystem.component.card.DateSettingCard
+import com.moon.pharm.designsystem.component.dialog.DatePickerModal
+import com.moon.pharm.designsystem.component.toggle.CustomSwitch
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.designsystem.util.toDisplayDateString
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 

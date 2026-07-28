@@ -3,7 +3,7 @@ package com.moon.pharm.profile.auth.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
-import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.designsystem.common.UiMessage
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.SignUpUseCase
 import com.moon.pharm.domain.usecase.auth.ValidateSignUpFormUseCase

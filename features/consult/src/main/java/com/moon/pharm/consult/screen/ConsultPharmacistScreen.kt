@@ -26,12 +26,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.moon.pharm.component_ui.component.bar.PharmTopBar
-import com.moon.pharm.component_ui.model.TopBarData
-import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.screen.component.ConsultPharmacistContent
 import com.moon.pharm.consult.viewmodel.ConsultWriteViewModel
+import com.moon.pharm.designsystem.component.bar.PharmTopBar
+import com.moon.pharm.designsystem.model.TopBarData
+import com.moon.pharm.designsystem.model.TopBarNavigationType
 import com.moon.pharm.maps.DEFAULT_SEOUL_LATITUDE
 import com.moon.pharm.maps.DEFAULT_SEOUL_LONGITUDE
 import kotlinx.coroutines.launch

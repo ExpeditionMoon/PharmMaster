@@ -2,8 +2,8 @@ package com.moon.pharm.consult.mapper
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.consult.model.ConsultStatusUiModel
+import com.moon.pharm.designsystem.theme.PharmTheme
 
 @Composable
 fun ConsultStatusUiModel.toBackgroundColor(): Color = when(this) {

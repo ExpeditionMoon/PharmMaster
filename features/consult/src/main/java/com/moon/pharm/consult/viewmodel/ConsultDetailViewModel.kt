@@ -2,10 +2,10 @@ package com.moon.pharm.consult.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.mapper.toDomainModel
 import com.moon.pharm.consult.mapper.toUiModel
 import com.moon.pharm.consult.model.ConsultUiMessage
+import com.moon.pharm.designsystem.common.UiMessage
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel

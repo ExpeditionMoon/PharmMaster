@@ -23,17 +23,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.component.StatusBadge
-import com.moon.pharm.component_ui.component.button.PharmIconButton
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.model.ConsultStatusUiModel
 import com.moon.pharm.consult.model.ConsultUiModel
 import com.moon.pharm.consult.screen.component.ConsultImageItem
 import com.moon.pharm.consult.screen.component.ConsultPreviewData
+import com.moon.pharm.designsystem.component.StatusBadge
+import com.moon.pharm.designsystem.component.button.PharmIconButton
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.designsystem.util.toDisplayDateTimeString
 
 @Composable
 fun QuestionSection(

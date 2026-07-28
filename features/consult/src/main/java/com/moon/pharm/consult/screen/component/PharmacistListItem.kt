@@ -24,12 +24,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.R
-import com.moon.pharm.component_ui.component.item.PharmListItem
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.model.PharmacistUiModel
+import com.moon.pharm.designsystem.R
+import com.moon.pharm.designsystem.component.item.PharmListItem
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 
 @Composable
 fun PharmacistListItem(

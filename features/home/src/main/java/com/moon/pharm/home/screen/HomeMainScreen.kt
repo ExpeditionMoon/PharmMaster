@@ -33,17 +33,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.moon.pharm.component_ui.R
-import com.moon.pharm.component_ui.component.SectionHeader
-import com.moon.pharm.component_ui.component.bar.PharmTopBar
-import com.moon.pharm.component_ui.component.card.HealthInfoCard
-import com.moon.pharm.component_ui.component.fab.PharmPrescriptionFAB
-import com.moon.pharm.component_ui.model.TopBarAction
-import com.moon.pharm.component_ui.model.TopBarData
-import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
+import com.moon.pharm.designsystem.R
+import com.moon.pharm.designsystem.component.SectionHeader
+import com.moon.pharm.designsystem.component.bar.PharmTopBar
+import com.moon.pharm.designsystem.component.card.HealthInfoCard
+import com.moon.pharm.designsystem.component.fab.PharmPrescriptionFAB
+import com.moon.pharm.designsystem.model.TopBarAction
+import com.moon.pharm.designsystem.model.TopBarData
+import com.moon.pharm.designsystem.model.TopBarNavigationType
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.home.viewmodel.HomeViewModel
 
 @Composable

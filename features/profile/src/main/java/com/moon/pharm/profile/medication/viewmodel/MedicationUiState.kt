@@ -1,6 +1,6 @@
 package com.moon.pharm.profile.medication.viewmodel
 
-import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.designsystem.common.UiMessage
 import com.moon.pharm.profile.medication.model.MealTimingUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 import com.moon.pharm.profile.medication.model.MedicationTypeUiModel

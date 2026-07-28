@@ -17,14 +17,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.component.chip.FilterChip
-import com.moon.pharm.component_ui.component.input.SearchBar
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.mapper.toMapPlace
 import com.moon.pharm.consult.model.PharmacyUiModel
+import com.moon.pharm.designsystem.component.chip.FilterChip
+import com.moon.pharm.designsystem.component.input.SearchBar
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.maps.component.PharmacyListItem
 
 @Composable

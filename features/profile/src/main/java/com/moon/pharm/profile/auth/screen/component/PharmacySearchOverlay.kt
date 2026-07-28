@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
+import com.moon.pharm.designsystem.component.button.PharmPrimaryButton
 import com.moon.pharm.maps.DEFAULT_SEOUL_LATITUDE
 import com.moon.pharm.maps.DEFAULT_SEOUL_LONGITUDE
 import com.moon.pharm.maps.component.PharmacySelector

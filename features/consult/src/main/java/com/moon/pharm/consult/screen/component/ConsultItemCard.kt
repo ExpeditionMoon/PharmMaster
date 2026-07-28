@@ -13,17 +13,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.moon.pharm.component_ui.component.StatusBadge
-import com.moon.pharm.component_ui.component.item.PharmListItem
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.mapper.toBackgroundColor
 import com.moon.pharm.consult.mapper.toTextColor
 import com.moon.pharm.consult.model.ConsultStatusUiModel
 import com.moon.pharm.consult.model.ConsultUiModel
+import com.moon.pharm.designsystem.component.StatusBadge
+import com.moon.pharm.designsystem.component.item.PharmListItem
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.designsystem.util.toDisplayDateTimeString
 
 @Composable
 fun ConsultItemCard(

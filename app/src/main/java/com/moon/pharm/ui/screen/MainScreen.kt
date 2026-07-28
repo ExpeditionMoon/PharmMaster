@@ -18,8 +18,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.moon.pharm.component_ui.component.bar.PharmBottomBar
-import com.moon.pharm.component_ui.model.BottomBarUiModel
+import com.moon.pharm.designsystem.component.bar.PharmBottomBar
+import com.moon.pharm.designsystem.model.BottomBarUiModel
 import com.moon.pharm.consult.navigation.MyConsultListRoute
 import com.moon.pharm.consult.navigation.consultNavGraph
 import com.moon.pharm.home.navigation.HomeRoute

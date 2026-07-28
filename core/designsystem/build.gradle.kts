@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.moon.pharm.component_ui"
+    namespace = "com.moon.pharm.designsystem"
     compileSdk {
         version = release(36)
     }
