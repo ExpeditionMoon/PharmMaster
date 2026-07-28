@@ -1,0 +1,88 @@
+package com.moon.pharm.maps.component
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import com.moon.pharm.designsystem.R
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.maps.model.MapPlace
+import com.moon.pharm.maps.util.MapPlacePreviewProvider
+
+@Composable
+fun PharmacyListPanel(
+    pharmacies: List<MapPlace>,
+    onPharmacyClick: (MapPlace) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val focusManager = LocalFocusManager.current
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(max = 400.dp)
+            .padding(horizontal = 16.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.search_result_count_format, pharmacies.size),
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(vertical = 12.dp)
+        )
+
+        if (pharmacies.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = stringResource(R.string.search_result_empty), color = PharmTheme.colors.placeholder)
+            }
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(bottom = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(pharmacies) { pharmacy ->
+                    PharmacyListItem(
+                        pharmacy = pharmacy,
+                        onClick = {
+                            onPharmacyClick(pharmacy)
+                            focusManager.clearFocus()
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacyListPanelPreview(
+    @PreviewParameter(MapPlacePreviewProvider::class) pharmacies: List<MapPlace>
+) {
+    PharmMasterTheme {
+        Box(modifier = Modifier.background(PharmTheme.colors.background)) {
+            PharmacyListPanel(pharmacies = pharmacies, onPharmacyClick = {})
+        }
+    }
+}

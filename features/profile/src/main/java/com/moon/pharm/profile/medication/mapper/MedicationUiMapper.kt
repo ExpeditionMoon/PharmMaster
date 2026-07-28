@@ -1,6 +1,6 @@
 package com.moon.pharm.profile.medication.mapper
 
-import com.moon.pharm.component_ui.util.toScheduleTimeString
+import com.moon.pharm.designsystem.util.toScheduleTimeString
 import com.moon.pharm.domain.usecase.medication.MealTimingInput
 import com.moon.pharm.domain.usecase.medication.MedicationHistoryItem
 import com.moon.pharm.domain.usecase.medication.MedicationScheduleCommand

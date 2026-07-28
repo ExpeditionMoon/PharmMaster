@@ -3,9 +3,7 @@ package com.moon.pharm.profile.auth.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
-import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
-import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
-import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.designsystem.common.UiMessage
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.SignUpUseCase
 import com.moon.pharm.domain.usecase.auth.ValidateSignUpFormUseCase
@@ -13,6 +11,8 @@ import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocation
 import com.moon.pharm.domain.usecase.pharmacy.SearchNearbyPharmaciesUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SearchPharmacyUseCase
 import com.moon.pharm.domain.usecase.user.CheckEmailDuplicatedUseCase
+import com.moon.pharm.maps.DEFAULT_SEOUL_LATITUDE
+import com.moon.pharm.maps.DEFAULT_SEOUL_LONGITUDE
 import com.moon.pharm.profile.auth.mapper.SignUpUiMapper
 import com.moon.pharm.profile.auth.mapper.toSignUpUiModel
 import com.moon.pharm.profile.auth.model.SignUpPharmacyUiModel
@@ -217,7 +217,7 @@ class SignUpViewModel @Inject constructor(
                     is DataResourceResult.Failure -> {
                         result.exception.printStackTrace()
                         _uiState.update { it.copy(userMessage = UiMessage.LoadDataFailed) }
-                        fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
+                        fetchNearbyPharmacies(DEFAULT_SEOUL_LATITUDE, DEFAULT_SEOUL_LONGITUDE)
                     }
                 }
             }

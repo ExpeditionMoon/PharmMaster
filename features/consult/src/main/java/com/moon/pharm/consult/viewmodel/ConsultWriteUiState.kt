@@ -1,8 +1,8 @@
 package com.moon.pharm.consult.viewmodel
 
-import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.model.PharmacistUiModel
 import com.moon.pharm.consult.model.PharmacyUiModel
+import com.moon.pharm.designsystem.common.UiMessage
 
 data class ConsultWriteUiState(
     val isLoading: Boolean = false,

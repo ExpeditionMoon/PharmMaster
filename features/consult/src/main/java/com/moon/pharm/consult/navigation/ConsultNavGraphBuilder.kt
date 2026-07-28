@@ -12,7 +12,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.consult.screen.ConsultConfirmScreen
 import com.moon.pharm.consult.screen.ConsultDetailScreen
 import com.moon.pharm.consult.screen.ConsultPharmacistScreen
@@ -27,19 +26,19 @@ fun NavGraphBuilder.consultNavGraph(
     navController: NavController,
     onMapModeChanged: (Boolean) -> Unit
 ) {
-    composable<ContentNavigationRoute.MyConsultList> {
+    composable<MyConsultListRoute> {
         MyConsultListRoute(
             onNavigateUp = { navController.popBackStack() },
             onNavigateToDetail = { consultId ->
-                navController.navigate(ContentNavigationRoute.ConsultTabDetailScreen(id = consultId))
+                navController.navigate(ConsultDetailRoute(id = consultId))
             }
         )
     }
 
-    navigation<ContentNavigationRoute.ConsultGraph>(
-        startDestination = ContentNavigationRoute.ConsultTab
+    navigation<ConsultGraphRoute>(
+        startDestination = ConsultRoute
     ) {
-        composable<ContentNavigationRoute.ConsultTab> {
+        composable<ConsultRoute> {
             val viewModel: ConsultListViewModel = hiltViewModel()
             val refreshFlow = navController.currentBackStackEntry
                 ?.savedStateHandle
@@ -56,69 +55,69 @@ fun NavGraphBuilder.consultNavGraph(
                         ?.set(ConsultNavKeys.REFRESH_CONSULT_LIST, false)
                 },
                 onNavigateToWrite = {
-                    navController.navigate(ContentNavigationRoute.ConsultTabWriteScreen)
+                    navController.navigate(ConsultWriteRoute)
                 },
                 onNavigateToDetail = { consultId ->
-                    navController.navigate(ContentNavigationRoute.ConsultTabDetailScreen(id = consultId))
+                    navController.navigate(ConsultDetailRoute(id = consultId))
                 }
             )
         }
 
-        composable<ContentNavigationRoute.ConsultTabDetailScreen> { backStackEntry ->
-            val detail = backStackEntry.toRoute<ContentNavigationRoute.ConsultTabDetailScreen>()
+        composable<ConsultDetailRoute> { backStackEntry ->
+            val detail = backStackEntry.toRoute<ConsultDetailRoute>()
             val viewModel: ConsultDetailViewModel = hiltViewModel()
             ConsultDetailScreen(
                 consultId = detail.id,
                 viewModel = viewModel,
                 onNavigateUp = { navController.popBackStack() },
                 onNavigateToEditQuestion = { consultId ->
-                    navController.navigate(ContentNavigationRoute.ConsultWriteGraph(consultId = consultId))
+                    navController.navigate(ConsultWriteGraphRoute(consultId = consultId))
                 }
             )
         }
 
-        navigation<ContentNavigationRoute.ConsultWriteGraph>(
-            startDestination = ContentNavigationRoute.ConsultTabWriteScreen
+        navigation<ConsultWriteGraphRoute>(
+            startDestination = ConsultWriteRoute
         ) {
-            consultWriteComposable<ContentNavigationRoute.ConsultTabWriteScreen>(navController) { viewModel ->
+            consultWriteComposable<ConsultWriteRoute>(navController) { viewModel ->
                 ConsultWriteScreen(
                     viewModel = viewModel,
                     onNavigateUp = { navController.popBackStack() },
                     onNavigateToPharmacist = {
-                        navController.navigate(ContentNavigationRoute.ConsultTabPharmacistScreen)
+                        navController.navigate(ConsultPharmacistRoute)
                     }
                 )
             }
-            consultWriteComposable<ContentNavigationRoute.ConsultTabPharmacistScreen>(navController) { viewModel ->
+            consultWriteComposable<ConsultPharmacistRoute>(navController) { viewModel ->
                 ConsultPharmacistScreen(
                     viewModel = viewModel,
                     onMapModeChanged = onMapModeChanged,
                     onNavigateUp = { navController.popBackStack() },
                     onNavigateToConfirm = {
-                        navController.navigate(ContentNavigationRoute.ConsultTabConfirmScreen)
+                        navController.navigate(ConsultConfirmRoute)
                     }
                 )
             }
-            consultWriteComposable<ContentNavigationRoute.ConsultTabConfirmScreen>(navController) { viewModel ->
+            consultWriteComposable<ConsultConfirmRoute>(navController) { viewModel ->
                 ConsultConfirmScreen(
                     viewModel = viewModel,
                     onNavigateUp = { navController.popBackStack() },
                     onConsultCreated = {
                         runCatching {
-                            navController.getBackStackEntry(ContentNavigationRoute.ConsultTab)
+                            navController.getBackStackEntry<ConsultRoute>()
                                 .savedStateHandle[ConsultNavKeys.REFRESH_CONSULT_LIST] = true
                         }
-                        navController.navigate(ContentNavigationRoute.ConsultTab) {
-                            popUpTo(ContentNavigationRoute.ConsultTab) { inclusive = false }
+                        navController.navigate(ConsultRoute) {
+                            popUpTo(ConsultRoute) { inclusive = false }
                             launchSingleTop = true
                         }
                     },
                     onEditTitleOrContent = {
-                        navController.popBackStack(ContentNavigationRoute.ConsultTabWriteScreen, false)
+                        navController.popBackStack(ConsultWriteRoute, false)
                     },
                     onEditPharmacist = {
                         navController.popBackStack(
-                            ContentNavigationRoute.ConsultTabPharmacistScreen,
+                            ConsultPharmacistRoute,
                             false
                         )
                     }
@@ -128,17 +127,17 @@ fun NavGraphBuilder.consultNavGraph(
     }
 }
 
-private inline fun <reified T : ContentNavigationRoute> NavGraphBuilder.consultWriteComposable(
+private inline fun <reified T : Any> NavGraphBuilder.consultWriteComposable(
     navController: NavController,
     crossinline content: @Composable (ConsultWriteViewModel) -> Unit
 ) {
     composable<T> { backStackEntry ->
         val parentEntry = remember(backStackEntry) {
-            navController.getBackStackEntry<ContentNavigationRoute.ConsultWriteGraph>()
+            navController.getBackStackEntry<ConsultWriteGraphRoute>()
         }
         val sharedViewModel: ConsultWriteViewModel = hiltViewModel(parentEntry)
 
-        val routeParams = parentEntry.toRoute<ContentNavigationRoute.ConsultWriteGraph>()
+        val routeParams = parentEntry.toRoute<ConsultWriteGraphRoute>()
         val editConsultId = routeParams.consultId
 
         LaunchedEffect(editConsultId) {

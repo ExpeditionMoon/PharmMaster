@@ -1,7 +1,7 @@
 package com.moon.pharm.profile.mypage.viewmodel
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.designsystem.common.UiMessage
 import com.moon.pharm.profile.mypage.model.MyPageConsultUiModel
 import com.moon.pharm.profile.mypage.model.MyPageUserUiModel
 

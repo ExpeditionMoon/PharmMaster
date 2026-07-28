@@ -20,9 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.component.button.PharmIconButton
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.model.ConsultAnswerUiModel
 import com.moon.pharm.consult.model.ConsultUiModel
@@ -30,6 +27,9 @@ import com.moon.pharm.consult.model.PharmacistUiModel
 import com.moon.pharm.consult.screen.component.AnswerContentCard
 import com.moon.pharm.consult.screen.component.ConsultPreviewData
 import com.moon.pharm.consult.screen.component.PharmacistProfileCard
+import com.moon.pharm.designsystem.component.button.PharmIconButton
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 
 @Composable
 fun AnswerSection(

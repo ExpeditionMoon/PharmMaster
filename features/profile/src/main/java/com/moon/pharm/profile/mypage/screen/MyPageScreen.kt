@@ -26,12 +26,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.moon.pharm.component_ui.component.bar.PharmTopBar
-import com.moon.pharm.component_ui.model.TopBarAction
-import com.moon.pharm.component_ui.model.TopBarData
-import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
+import com.moon.pharm.designsystem.component.bar.PharmTopBar
+import com.moon.pharm.designsystem.model.TopBarAction
+import com.moon.pharm.designsystem.model.TopBarData
+import com.moon.pharm.designsystem.model.TopBarNavigationType
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.profile.BuildConfig
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.mypage.model.MyPageUserUiModel
@@ -42,7 +42,7 @@ import com.moon.pharm.profile.mypage.screen.component.MyPageMenuSection
 import com.moon.pharm.profile.mypage.screen.component.MyPageProfileCard
 import com.moon.pharm.profile.mypage.viewmodel.MyPageUiState
 import com.moon.pharm.profile.mypage.viewmodel.MyPageViewModel
-import com.moon.pharm.component_ui.R as UiR
+import com.moon.pharm.designsystem.R as UiR
 
 @Composable
 fun MyPageRoute(

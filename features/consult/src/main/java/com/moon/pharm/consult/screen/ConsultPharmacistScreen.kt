@@ -26,14 +26,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
-import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
-import com.moon.pharm.component_ui.component.bar.PharmTopBar
-import com.moon.pharm.component_ui.model.TopBarData
-import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.screen.component.ConsultPharmacistContent
 import com.moon.pharm.consult.viewmodel.ConsultWriteViewModel
+import com.moon.pharm.designsystem.component.bar.PharmTopBar
+import com.moon.pharm.designsystem.model.TopBarData
+import com.moon.pharm.designsystem.model.TopBarNavigationType
+import com.moon.pharm.maps.DEFAULT_SEOUL_LATITUDE
+import com.moon.pharm.maps.DEFAULT_SEOUL_LONGITUDE
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,7 +52,7 @@ fun ConsultPharmacistScreen(
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
-            LatLng(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL),
+            LatLng(DEFAULT_SEOUL_LATITUDE, DEFAULT_SEOUL_LONGITUDE),
             15f
         )
     }
@@ -64,7 +64,7 @@ fun ConsultPharmacistScreen(
         if (isGranted) {
             viewModel.fetchCurrentLocationAndPharmacies()
         } else {
-            viewModel.fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
+            viewModel.fetchNearbyPharmacies(DEFAULT_SEOUL_LATITUDE, DEFAULT_SEOUL_LONGITUDE)
         }
     }
 

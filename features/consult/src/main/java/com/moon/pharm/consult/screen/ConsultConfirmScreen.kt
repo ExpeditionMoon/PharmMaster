@@ -14,16 +14,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.moon.pharm.component_ui.component.bar.PharmTopBar
-import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
-import com.moon.pharm.component_ui.component.snackbar.SnackbarType
-import com.moon.pharm.component_ui.model.TopBarData
-import com.moon.pharm.component_ui.model.TopBarNavigationType
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.mapper.asString
 import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.consult.screen.component.ConsultConfirmContent
 import com.moon.pharm.consult.viewmodel.ConsultWriteViewModel
+import com.moon.pharm.designsystem.component.bar.PharmTopBar
+import com.moon.pharm.designsystem.component.snackbar.CustomSnackbar
+import com.moon.pharm.designsystem.component.snackbar.SnackbarType
+import com.moon.pharm.designsystem.model.TopBarData
+import com.moon.pharm.designsystem.model.TopBarNavigationType
 
 @Composable
 fun ConsultConfirmScreen(

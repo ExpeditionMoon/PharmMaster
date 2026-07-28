@@ -42,7 +42,7 @@ kotlin{
 }
 
 dependencies {
-    implementation(project(":features:component-ui"))
+    implementation(project(":core:designsystem"))
     implementation(project(":domain"))
 
     implementation(libs.androidx.core.ktx)

@@ -18,13 +18,18 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.moon.pharm.component_ui.component.bar.PharmBottomBar
-import com.moon.pharm.component_ui.model.BottomBarUiModel
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
+import com.moon.pharm.designsystem.component.bar.PharmBottomBar
+import com.moon.pharm.designsystem.model.BottomBarUiModel
+import com.moon.pharm.consult.navigation.MyConsultListRoute
 import com.moon.pharm.consult.navigation.consultNavGraph
+import com.moon.pharm.home.navigation.HomeRoute
 import com.moon.pharm.home.navigation.homeNavGraph
+import com.moon.pharm.prescription.navigation.PrescriptionCaptureRoute
 import com.moon.pharm.prescription.navigation.prescriptionNavGraph
+import com.moon.pharm.profile.navigation.MedicationCreateRoute
+import com.moon.pharm.profile.navigation.MedicationRoute
 import com.moon.pharm.profile.navigation.profileNavGraph
+import com.moon.pharm.search.navigation.SearchRoute
 import com.moon.pharm.search.navigation.searchNavGraph
 import com.moon.pharm.ui.navigation.BottomAppBarItem
 import kotlinx.coroutines.flow.collectLatest
@@ -37,10 +42,10 @@ fun MainScreen(
     val mainNavController = rememberNavController()
 
     LaunchedEffect(Unit) {
-        viewModel.navigationEvent.collectLatest { route ->
-            if (route is ContentNavigationRoute.MedicationTab) {
-                mainNavController.navigate(ContentNavigationRoute.MedicationTab) {
-                    popUpTo(ContentNavigationRoute.HomeTab) {
+        viewModel.navigationEvent.collectLatest { event ->
+            if (event is MainNavigationEvent.NavigateToMedication) {
+                mainNavController.navigate(MedicationRoute) {
+                    popUpTo(HomeRoute) {
                         saveState = true
                     }
                     launchSingleTop = true
@@ -70,7 +75,7 @@ fun MainScreen(
                         tabName = navItem.tabName,
                         icon = navItem.icon,
                         onClick = {
-                            val isHome = navItem.destination is ContentNavigationRoute.HomeTab
+                            val isHome = navItem.destination == HomeRoute
 
                             mainNavController.navigate(navItem.destination) {
                                 popUpTo(mainNavController.graph.findStartDestination().id) {
@@ -96,13 +101,24 @@ fun MainScreen(
         ) {
             NavHost(
                 navController = mainNavController,
-                startDestination = ContentNavigationRoute.HomeTab,
+                startDestination = HomeRoute,
                 modifier = Modifier.fillMaxSize()
             ) {
-                homeNavGraph(mainNavController)
+                homeNavGraph(
+                    onNavigateToSearch = { mainNavController.navigate(SearchRoute) },
+                    onNavigateToPrescriptionCapture = { mainNavController.navigate(PrescriptionCaptureRoute) }
+                )
                 consultNavGraph(mainNavController, onMapModeChanged = { isMapVisible -> isMapMode = isMapVisible })
-                profileNavGraph(mainNavController, onLogout = onLogout)
-                prescriptionNavGraph(mainNavController)
+                profileNavGraph(
+                    navController = mainNavController,
+                    onLogout = onLogout,
+                    onNavigateToMyConsultation = { mainNavController.navigate(MyConsultListRoute) }
+                )
+                prescriptionNavGraph { scannedMedicationNames ->
+                    mainNavController.navigate(MedicationCreateRoute(scannedMedicationNames)) {
+                        popUpTo(PrescriptionCaptureRoute) { inclusive = false }
+                    }
+                }
                 searchNavGraph(mainNavController)
             }
         }

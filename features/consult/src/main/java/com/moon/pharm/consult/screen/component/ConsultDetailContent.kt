@@ -14,10 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.component.progress.CircularProgressBar
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.model.ConsultStatusUiModel
 import com.moon.pharm.consult.model.ConsultUiModel
@@ -25,6 +21,10 @@ import com.moon.pharm.consult.model.PharmacistUiModel
 import com.moon.pharm.consult.screen.section.AnswerSection
 import com.moon.pharm.consult.screen.section.PharmacistAnswerInputSection
 import com.moon.pharm.consult.screen.section.QuestionSection
+import com.moon.pharm.designsystem.component.progress.CircularProgressBar
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 
 @Composable
 fun ConsultDetailContent(

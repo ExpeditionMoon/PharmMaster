@@ -63,8 +63,8 @@ dependencies {
     // Firebase Vertex AI
     implementation(libs.firebase.vertexai)
 
-    // Map
-    implementation(libs.bundles.google.maps.libs)
+    // Location
+    implementation(libs.play.services.location)
 
     //REST
     implementation(libs.bundles.rest.libraries)

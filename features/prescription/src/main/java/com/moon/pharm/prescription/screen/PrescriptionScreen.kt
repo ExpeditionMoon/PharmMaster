@@ -34,14 +34,13 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
-import com.moon.pharm.component_ui.component.card.InfoCardType
-import com.moon.pharm.component_ui.component.card.PharmInfoCard
-import com.moon.pharm.component_ui.component.progress.CircularProgressBar
-import com.moon.pharm.component_ui.model.ScannedMedication
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
+import com.moon.pharm.designsystem.component.button.PharmPrimaryButton
+import com.moon.pharm.designsystem.component.card.InfoCardType
+import com.moon.pharm.designsystem.component.card.PharmInfoCard
+import com.moon.pharm.designsystem.component.progress.CircularProgressBar
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.prescription.R
 import com.moon.pharm.prescription.viewmodel.PrescriptionUiEvent
 import com.moon.pharm.prescription.viewmodel.PrescriptionViewModel
@@ -50,7 +49,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun PrescriptionScreen(
     viewModel: PrescriptionViewModel = hiltViewModel(),
-    onNavigateToMedicationCreate: (List<ScannedMedication>) -> Unit
+    onNavigateToMedicationCreate: (List<String>) -> Unit
 ) {
     val context = LocalContext.current
     var showCamera by remember { mutableStateOf(false) }
@@ -61,7 +60,7 @@ fun PrescriptionScreen(
         viewModel.uiEvent.collectLatest { event ->
             when (event) {
                 is PrescriptionUiEvent.NavigateToCreate -> {
-                    onNavigateToMedicationCreate(event.scannedList)
+                    onNavigateToMedicationCreate(event.scannedMedicationNames)
                 }
             }
         }
