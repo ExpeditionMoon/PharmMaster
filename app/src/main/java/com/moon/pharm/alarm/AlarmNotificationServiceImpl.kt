@@ -8,8 +8,6 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.moon.pharm.MainActivity
 import com.moon.pharm.R
-import com.moon.pharm.data.common.NOTIFICATION_CHANNEL_ID
-import com.moon.pharm.data.common.NOTIFICATION_CHANNEL_NAME
 import com.moon.pharm.domain.alarm.AlarmNotificationService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -45,7 +43,7 @@ class AlarmNotificationServiceImpl @Inject constructor(
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+        val builder = NotificationCompat.Builder(context, AlarmConstants.NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_pill)
             .setContentTitle(title)
             .setContentText(content)
@@ -55,7 +53,7 @@ class AlarmNotificationServiceImpl @Inject constructor(
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setGroup(groupKey)
 
-        val summaryNotification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+        val summaryNotification = NotificationCompat.Builder(context, AlarmConstants.NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_pill)
             .setContentTitle(time)
             .setContentText(context.getString(R.string.notification_title))
@@ -72,10 +70,10 @@ class AlarmNotificationServiceImpl @Inject constructor(
     }
 
     private fun createNotificationChannel(manager: NotificationManager) {
-        if (manager.getNotificationChannel(NOTIFICATION_CHANNEL_ID) == null) {
+        if (manager.getNotificationChannel(AlarmConstants.NOTIFICATION_CHANNEL_ID) == null) {
             val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_CHANNEL_NAME,
+                AlarmConstants.NOTIFICATION_CHANNEL_ID,
+                AlarmConstants.NOTIFICATION_CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = context.getString(R.string.notification_channel_description)

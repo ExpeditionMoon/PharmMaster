@@ -1,4 +1,4 @@
-package com.moon.pharm.data.di
+package com.moon.pharm.di
 
 import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.repository.AuthRepository
@@ -62,7 +62,8 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DomainUseCaseModule {
+@Suppress("unused")
+object UseCaseModule {
 
     @Provides
     fun provideGetCurrentUserIdUseCase(authRepository: AuthRepository): GetCurrentUserIdUseCase {

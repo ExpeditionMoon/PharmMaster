@@ -1,16 +1,7 @@
 package com.moon.pharm.data.common
 
-object NotificationConstants {
-    // 채널 정보
-    const val CHANNEL_ID_CONSULT = "pharm_consult_channel"
-    const val CHANNEL_NAME_CONSULT = "상담 알림"
-
-    // 인텐트 및 데이터 키 (FCM Payload Key)
-    const val KEY_CONSULT_ID = "consultId"
-    const val KEY_TITLE = "title"
-    const val KEY_BODY = "body"
-
-    // 서버 전송용 메시지 (Repository에서 사용)
+object FcmNotificationMessage {
+    // 서버 전송용 메시지
     const val MSG_ANSWER_TITLE = "약사님 답변 도착! 💊"
     const val MSG_ANSWER_BODY = "회원님의 상담 질문에 답변이 등록되었습니다."
 

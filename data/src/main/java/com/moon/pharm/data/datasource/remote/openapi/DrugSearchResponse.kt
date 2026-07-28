@@ -1,48 +1,35 @@
 package com.moon.pharm.data.datasource.remote.openapi
 
-import com.moon.pharm.domain.model.drug.Drug
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class DrugSearchResponse(
-    @Json(name = "header") val header: DrugSearchHeader?,
-    @Json(name = "body") val body: DrugSearchBody?
+    @param:Json(name = "header") val header: DrugSearchHeader?,
+    @param:Json(name = "body") val body: DrugSearchBody?
 )
 
 @JsonClass(generateAdapter = true)
 data class DrugSearchHeader(
-    @Json(name = "resultCode") val resultCode: String?,
-    @Json(name = "resultMsg") val resultMsg: String?
+    @param:Json(name = "resultCode") val resultCode: String?,
+    @param:Json(name = "resultMsg") val resultMsg: String?
 )
 
 @JsonClass(generateAdapter = true)
 data class DrugSearchBody(
-    @Json(name = "pageNo") val pageNo: Int?,
-    @Json(name = "totalCount") val totalCount: Int?,
-    @Json(name = "numOfRows") val numOfRows: Int?,
-    @Json(name = "items") val items: List<DrugSearchItem>?
+    @param:Json(name = "pageNo") val pageNo: Int?,
+    @param:Json(name = "totalCount") val totalCount: Int?,
+    @param:Json(name = "numOfRows") val numOfRows: Int?,
+    @param:Json(name = "items") val items: List<DrugSearchItem>?
 )
 
 @JsonClass(generateAdapter = true)
 data class DrugSearchItem(
-    @Json(name = "itemSeq") val itemSeq: String?,
-    @Json(name = "itemName") val itemName: String?,
-    @Json(name = "entpName") val entpName: String?,
-    @Json(name = "efcyQesitm") val efcyQesitm: String?,
-    @Json(name = "useMethodQesitm") val useMethodQesitm: String?,
-    @Json(name = "intrcQesitm") val intrcQesitm: String?,
-    @Json(name = "itemImage") val itemImage: String?
+    @param:Json(name = "itemSeq") val itemSeq: String?,
+    @param:Json(name = "itemName") val itemName: String?,
+    @param:Json(name = "entpName") val entpName: String?,
+    @param:Json(name = "efcyQesitm") val efcyQesitm: String?,
+    @param:Json(name = "useMethodQesitm") val useMethodQesitm: String?,
+    @param:Json(name = "intrcQesitm") val intrcQesitm: String?,
+    @param:Json(name = "itemImage") val itemImage: String?
 )
-
-// 매퍼
-fun DrugSearchItem.toDomain(): Drug {
-    return Drug(
-        itemSeq = this.itemSeq ?: "",
-        itemName = this.itemName ?: OpenApiConst.DEFAULT_ITEM_NAME,
-        companyName = this.entpName ?: OpenApiConst.DEFAULT_COMPANY_NAME,
-        efficacy = this.efcyQesitm?.removeHtmlTags() ?: OpenApiConst.DEFAULT_EFFICACY,
-        interaction = this.intrcQesitm?.removeHtmlTags() ?: OpenApiConst.DEFAULT_INTERACTION,
-        imageUrl = this.itemImage ?: ""
-    )
-}

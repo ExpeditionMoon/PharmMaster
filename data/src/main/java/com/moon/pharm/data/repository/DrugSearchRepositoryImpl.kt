@@ -2,7 +2,7 @@ package com.moon.pharm.data.repository
 
 import com.moon.pharm.data.datasource.DrugSearchDataSource
 import com.moon.pharm.data.datasource.remote.openapi.OpenApiConst
-import com.moon.pharm.data.datasource.remote.openapi.toDomain
+import com.moon.pharm.data.mapper.toDomain
 import com.moon.pharm.domain.model.drug.Drug
 import com.moon.pharm.domain.repository.DrugSearchRepository
 import javax.inject.Inject

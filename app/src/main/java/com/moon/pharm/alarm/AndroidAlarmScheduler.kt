@@ -1,17 +1,10 @@
-package com.moon.pharm.data.alarm
+package com.moon.pharm.alarm
 
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.moon.pharm.data.common.ALARM_NEXT_DAY_OFFSET
-import com.moon.pharm.data.common.KEY_ALARM_TIME
-import com.moon.pharm.data.common.KEY_DOSAGE
-import com.moon.pharm.data.common.KEY_IS_GROUPED
-import com.moon.pharm.data.common.KEY_MEDICATION_NAME
-import com.moon.pharm.data.common.TIME_DELIMITER
-import com.moon.pharm.data.common.TIME_PARTS_SIZE
 import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.model.medication.Medication
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,15 +14,15 @@ import java.time.ZoneId
 import javax.inject.Inject
 
 class AndroidAlarmScheduler @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : AlarmScheduler {
 
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     override fun schedule(medication: Medication) {
         medication.schedules.forEach { schedule ->
-            val timeParts = schedule.time.split(TIME_DELIMITER)
-            if (timeParts.size != TIME_PARTS_SIZE) return@forEach
+            val timeParts = schedule.time.split(AlarmConstants.TIME_DELIMITER)
+            if (timeParts.size != AlarmConstants.TIME_PARTS_SIZE) return@forEach
 
             val hour = timeParts[0].toInt()
             val minute = timeParts[1].toInt()
@@ -37,10 +30,11 @@ class AndroidAlarmScheduler @Inject constructor(
             val alarmId = (medication.id + schedule.id).hashCode()
 
             val intent = Intent(context, AlarmReceiver::class.java).apply {
-                putExtra(KEY_MEDICATION_NAME, medication.name)
-                putExtra(KEY_DOSAGE, schedule.dosage)
-                putExtra(KEY_ALARM_TIME, schedule.time)
-                putExtra(KEY_IS_GROUPED, medication.isGrouped)
+                action = AlarmConstants.ACTION_MEDICATION_ALARM
+                putExtra(AlarmConstants.EXTRA_MEDICATION_NAME, medication.name)
+                putExtra(AlarmConstants.EXTRA_DOSAGE, schedule.dosage)
+                putExtra(AlarmConstants.EXTRA_ALARM_TIME, schedule.time)
+                putExtra(AlarmConstants.EXTRA_IS_GROUPED, medication.isGrouped)
             }
 
             val pendingIntent = PendingIntent.getBroadcast(
@@ -54,7 +48,7 @@ class AndroidAlarmScheduler @Inject constructor(
             var alarmDateTime = LocalDateTime.of(now.toLocalDate(), localTime)
 
             if (alarmDateTime.isBefore(now)) {
-                alarmDateTime = alarmDateTime.plusDays(ALARM_NEXT_DAY_OFFSET)
+                alarmDateTime = alarmDateTime.plusDays(AlarmConstants.NEXT_DAY_OFFSET)
             }
 
             val triggerAtMillis = alarmDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -75,8 +69,8 @@ class AndroidAlarmScheduler @Inject constructor(
                         pendingIntent
                     )
                 }
-            } catch (e: SecurityException) {
-                e.printStackTrace()
+            } catch (_: SecurityException) {
+                return@forEach
             }
         }
     }
@@ -85,7 +79,9 @@ class AndroidAlarmScheduler @Inject constructor(
         medication.schedules.forEach { schedule ->
             val alarmId = (medication.id + schedule.id).hashCode()
 
-            val intent = Intent(context, AlarmReceiver::class.java)
+            val intent = Intent(context, AlarmReceiver::class.java).apply {
+                action = AlarmConstants.ACTION_MEDICATION_ALARM
+            }
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
                 alarmId,
