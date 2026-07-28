@@ -19,12 +19,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.component.item.PharmacistListItem
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
-import com.moon.pharm.consult.mapper.toComponentUiModel
 import com.moon.pharm.consult.model.PharmacistUiModel
 
 @Composable
@@ -67,7 +65,7 @@ fun PharmacistListPanel(
             ) {
                 items(pharmacists) { pharmacist ->
                     PharmacistListItem(
-                        pharmacist = pharmacist.toComponentUiModel(),
+                        pharmacist = pharmacist,
                         onSelect = { onPharmacistSelect(pharmacist) }
                     )
                 }

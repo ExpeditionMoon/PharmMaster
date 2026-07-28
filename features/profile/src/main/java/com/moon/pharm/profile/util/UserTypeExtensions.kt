@@ -1,7 +1,7 @@
 package com.moon.pharm.profile.util
 
-import com.moon.pharm.profile.auth.model.UserTypeUiModel
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.auth.model.UserTypeUiModel
 
 val UserTypeUiModel.labelRes: Int
     get() = when (this) {

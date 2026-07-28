@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase.MedicationValidatorError
 import com.moon.pharm.profile.R
-import com.moon.pharm.component_ui.R as UiR
 import com.moon.pharm.profile.medication.model.MedicationUiMessage
+import com.moon.pharm.component_ui.R as UiR
 
 @Composable
 fun MedicationUiMessage.asString(): String {

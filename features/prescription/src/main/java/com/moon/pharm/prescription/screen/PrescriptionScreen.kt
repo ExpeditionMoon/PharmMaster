@@ -38,7 +38,6 @@ import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
 import com.moon.pharm.component_ui.component.card.InfoCardType
 import com.moon.pharm.component_ui.component.card.PharmInfoCard
 import com.moon.pharm.component_ui.component.progress.CircularProgressBar
-import com.moon.pharm.component_ui.model.ScannedMedication
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
@@ -50,7 +49,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun PrescriptionScreen(
     viewModel: PrescriptionViewModel = hiltViewModel(),
-    onNavigateToMedicationCreate: (List<ScannedMedication>) -> Unit
+    onNavigateToMedicationCreate: (List<String>) -> Unit
 ) {
     val context = LocalContext.current
     var showCamera by remember { mutableStateOf(false) }
@@ -61,7 +60,7 @@ fun PrescriptionScreen(
         viewModel.uiEvent.collectLatest { event ->
             when (event) {
                 is PrescriptionUiEvent.NavigateToCreate -> {
-                    onNavigateToMedicationCreate(event.scannedList)
+                    onNavigateToMedicationCreate(event.scannedMedicationNames)
                 }
             }
         }

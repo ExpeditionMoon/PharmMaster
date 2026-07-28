@@ -1,16 +1,15 @@
 package com.moon.pharm.ui.screen
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
+import com.moon.pharm.profile.navigation.LoginRoute
 import com.moon.pharm.profile.navigation.authNavGraph
-import kotlinx.coroutines.flow.collectLatest
+import com.moon.pharm.ui.navigation.MainRoute
 
 @Composable
 fun EntryPointScreen(
@@ -19,25 +18,24 @@ fun EntryPointScreen(
     val rootNavController = rememberNavController()
     val startDestination by viewModel.startDestination.collectAsStateWithLifecycle()
 
-    LaunchedEffect(true) {
-        viewModel.navigationEvent.collectLatest { route ->
-            rootNavController.navigate(route) {
-                launchSingleTop = true
-            }
-        }
-    }
-
-    if (startDestination != null) {
+    startDestination?.let { destination ->
         NavHost(
             navController = rootNavController,
-            startDestination = startDestination!!
+            startDestination = when (destination) {
+                AppStartDestination.Main -> MainRoute
+                AppStartDestination.Login -> LoginRoute
+            }
         ) {
-            authNavGraph(rootNavController)
-            composable<ContentNavigationRoute.MainBase> {
+            authNavGraph(rootNavController) {
+                rootNavController.navigate(MainRoute) {
+                    popUpTo(LoginRoute) { inclusive = true }
+                }
+            }
+            composable<MainRoute> {
                 MainScreen(
                     viewModel = viewModel,
                     onLogout = {
-                        rootNavController.navigate(ContentNavigationRoute.LoginScreen) {
+                        rootNavController.navigate(LoginRoute) {
                             popUpTo(0) { inclusive = true }
                             launchSingleTop = true
                         }

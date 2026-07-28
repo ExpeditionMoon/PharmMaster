@@ -3,21 +3,20 @@ package com.moon.pharm.consult.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
-import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
-import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
 import com.moon.pharm.component_ui.common.UiMessage
 import com.moon.pharm.consult.mapper.ConsultUiMapper
-import com.moon.pharm.consult.mapper.toDomainModel
 import com.moon.pharm.consult.mapper.toUiModel
 import com.moon.pharm.consult.model.ConsultUiMessage
 import com.moon.pharm.consult.model.PharmacyUiModel
 import com.moon.pharm.domain.result.DataResourceResult
-import com.moon.pharm.domain.usecase.consult.CreateConsultCommand
 import com.moon.pharm.domain.usecase.consult.ConsultUseCases
+import com.moon.pharm.domain.usecase.consult.CreateConsultCommand
 import com.moon.pharm.domain.usecase.consult.UploadConsultImagesUseCase
 import com.moon.pharm.domain.usecase.consult.ValidateConsultFormUseCase
 import com.moon.pharm.domain.usecase.pharmacy.GetNearbyPharmaciesCurrentLocationUseCase
 import com.moon.pharm.domain.usecase.pharmacy.SearchNearbyPharmaciesUseCase
+import com.moon.pharm.maps.DEFAULT_SEOUL_LATITUDE
+import com.moon.pharm.maps.DEFAULT_SEOUL_LONGITUDE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -128,7 +127,7 @@ class ConsultWriteViewModel @Inject constructor(
                     }
                     is DataResourceResult.Failure -> {
                         _uiState.update { it.copy(isLoading = false, userMessage = UiMessage.LoadDataFailed) }
-                        fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
+                        fetchNearbyPharmacies(DEFAULT_SEOUL_LATITUDE, DEFAULT_SEOUL_LONGITUDE)
                     }
                 }
             }

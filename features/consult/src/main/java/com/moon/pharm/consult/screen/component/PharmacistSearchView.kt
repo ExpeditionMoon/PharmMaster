@@ -19,13 +19,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.component_ui.component.chip.FilterChip
 import com.moon.pharm.component_ui.component.input.SearchBar
-import com.moon.pharm.component_ui.component.item.PharmacyListItem
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.theme.PharmTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
-import com.moon.pharm.consult.mapper.toComponentUiModel
+import com.moon.pharm.consult.mapper.toMapPlace
 import com.moon.pharm.consult.model.PharmacyUiModel
+import com.moon.pharm.maps.component.PharmacyListItem
 
 @Composable
 fun PharmacistSearchView(
@@ -70,7 +70,7 @@ fun PharmacistSearchView(
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items (pharmacies){ pharmacy ->
                     PharmacyListItem(
-                        pharmacy = pharmacy.toComponentUiModel(),
+                        pharmacy = pharmacy.toMapPlace(),
                         onClick = { onPharmacySelect(pharmacy) }
                     )
                 }

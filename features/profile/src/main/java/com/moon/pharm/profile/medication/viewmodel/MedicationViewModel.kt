@@ -5,8 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.component_ui.model.ScannedMedication
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
@@ -16,12 +14,12 @@ import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
 import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
 import com.moon.pharm.profile.medication.mapper.toUiMessage
-import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 import com.moon.pharm.profile.medication.model.MedicationProgressUiModel
+import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
 import com.moon.pharm.profile.medication.model.MedicationUiMessage
 import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
-import com.moon.pharm.profile.navigation.ScannedMedicationListNavType
+import com.moon.pharm.profile.navigation.MedicationCreateRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,7 +34,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
-import kotlin.reflect.typeOf
 
 @HiltViewModel
 class MedicationViewModel @Inject constructor(
@@ -252,18 +249,14 @@ class MedicationViewModel @Inject constructor(
 
     private fun initializeFormFromArgs() {
         val newForms = runCatching {
-            savedStateHandle.toRoute<ContentNavigationRoute.MedicationTabCreateScreen>(
-                typeMap = mapOf(
-                    typeOf<List<ScannedMedication>>() to ScannedMedicationListNavType
-                )
-            )
+            savedStateHandle.toRoute<MedicationCreateRoute>()
         }.getOrNull()
-            ?.scannedList
+            ?.scannedMedicationNames
             ?.takeIf { it.isNotEmpty() }
             ?.map {
                 MedicationFormState(
-                    medicationName = it.name,
-                    dailyCount = it.dailyCount
+                    medicationName = it,
+                    dailyCount = 1
                 )
             }
             ?: listOf(MedicationFormState())

@@ -3,7 +3,6 @@ package com.moon.pharm.prescription.viewmodel
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moon.pharm.component_ui.model.ScannedMedication
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.prescription.ExtractDrugNamesFromOcrUseCase
 import com.moon.pharm.prescription.ocr.TextRecognitionHelper
@@ -62,8 +61,7 @@ class PrescriptionViewModel @Inject constructor(
     private suspend fun processTextWithAi(rawText: String) {
         when(val result = extractDrugNamesUseCase(rawText)) {
             is DataResourceResult.Success -> {
-                val scannedList = result.resultData.map { ScannedMedication(name = it, dailyCount = 1) }
-                _uiEvent.emit(PrescriptionUiEvent.NavigateToCreate(scannedList))
+                _uiEvent.emit(PrescriptionUiEvent.NavigateToCreate(result.resultData))
             }
             is DataResourceResult.Failure -> {
                 result.exception.printStackTrace()

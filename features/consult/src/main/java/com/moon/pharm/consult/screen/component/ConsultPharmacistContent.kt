@@ -4,12 +4,12 @@ import androidx.compose.runtime.Composable
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.moon.pharm.component_ui.component.map.PharmacySelector
 import com.moon.pharm.component_ui.theme.PharmMasterTheme
 import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.consult.mapper.toComponentUiModel
+import com.moon.pharm.consult.mapper.toMapPlace
 import com.moon.pharm.consult.model.PharmacistUiModel
 import com.moon.pharm.consult.model.PharmacyUiModel
+import com.moon.pharm.maps.component.PharmacySelector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -32,8 +32,8 @@ fun ConsultPharmacistContent(
 ) {
     if (isMapView) {
         PharmacySelector(
-            pharmacies = searchResults.map { it.toComponentUiModel() },
-            selectedPharmacy = selectedPharmacy?.toComponentUiModel(),
+            pharmacies = searchResults.map { it.toMapPlace() },
+            selectedPharmacy = selectedPharmacy?.toMapPlace(),
             onPharmacyClick = { selected ->
                 searchResults.find { it.placeId == selected.placeId }?.let(onPharmacySelect)
             },
