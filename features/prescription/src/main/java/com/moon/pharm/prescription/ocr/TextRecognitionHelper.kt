@@ -12,21 +12,19 @@ import javax.inject.Inject
 
 class TextRecognitionHelper @Inject constructor(
     @param:ApplicationContext private val context: Context
-) {
+) : OcrTextExtractor {
     private val recognizer = TextRecognition.getClient(KoreanTextRecognizerOptions.Builder().build())
 
-    suspend fun extractTextFromUri(imageUri: Uri): Result<String> {
+    override suspend fun extractTextFromUri(imageUri: Uri): Result<String> {
         return try {
             val image = InputImage.fromFilePath(context, imageUri)
             val result = recognizer.process(image).await()
 
             Result.success(result.text)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Result.failure(e)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.failure(e)
+        } catch (exception: IOException) {
+            Result.failure(exception)
+        } catch (exception: Exception) {
+            Result.failure(exception)
         }
     }
 }

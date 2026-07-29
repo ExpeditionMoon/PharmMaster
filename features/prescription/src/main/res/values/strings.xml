@@ -1,13 +1,24 @@
 <resources>
     <string name="toast_camera_permission_required">카메라 권한이 필요합니다.</string>
 
-    <string name="camera_preview_guide_title">약 봉투나 처방전을 비춰주세요</string>
-    <string name="camera_preview_security_notice">🔒 개인정보는 서버로 전송되지 않고\n처방전 정보만 안전하게 분석됩니다.</string>
+    <string name="camera_preview_guide_title">처방전 또는 약 봉투를 비춰주세요</string>
+    <string name="camera_preview_security_notice">개인정보는 서버로 전송되지 않고\n처방전의 약 정보만 안전하게 분석합니다.</string>
+    <string name="camera_preview_captured_image_description">촬영한 처방전 미리보기</string>
+    <string name="camera_preview_btn_capture">촬영하기</string>
+    <string name="camera_preview_btn_retake">다시 촬영</string>
+    <string name="camera_preview_btn_analyze">인식한 내용으로 분석하기</string>
+    <string name="camera_preview_ocr_loading">촬영한 처방전을 인식하고 있어요.</string>
+    <string name="camera_preview_ocr_failed">처방전의 글자를 찾지 못했어요. 글자가 선명하게 보이도록 다시 촬영해 주세요.</string>
+    <string name="camera_preview_guide_analyze">촬영한 사진을 확인한 뒤 분석을 진행해 주세요.</string>
 
     <string name="prescription_select_method_title">처방전을 어떻게 등록할까요?</string>
-    <string name="prescription_btn_camera">📸 카메라로 촬영</string>
-    <string name="prescription_btn_gallery">🖼️ 앨범에서 선택</string>
+    <string name="prescription_btn_camera">카메라로 촬영</string>
+    <string name="prescription_btn_gallery">앨범에서 선택</string>
+    <string name="prescription_btn_retry">다시 시도</string>
 
-    <string name="prescription_security_notice">개인정보는 서버로 전송되지 않고 처방전 정보만 안전하게 분석됩니다.</string>
-    <string name="prescription_analyzing_loading">✨ 처방전을 분석하고 있어요...</string>
+    <string name="prescription_security_notice">개인정보는 서버로 전송되지 않고 처방전의 약 정보만 안전하게 분석합니다.</string>
+    <string name="prescription_analyzing_loading">처방전을 분석하고 있어요…</string>
+    <string name="prescription_error_gemini">약 이름 분석 서비스를 사용할 수 없어요. 잠시 후 다시 시도해 주세요.</string>
+    <string name="prescription_error_network">네트워크 연결을 확인한 뒤 다시 시도해 주세요.</string>
+    <string name="prescription_error_ocr">처방전에서 읽을 수 있는 글자를 찾지 못했어요. 사진을 다시 선택하거나 글자가 잘 보이게 촬영해 주세요.</string>
 </resources>

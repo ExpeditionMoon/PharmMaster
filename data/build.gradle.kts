@@ -60,8 +60,8 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.data)
     implementation(libs.firebase.messaging)
-    // Firebase Vertex AI
-    implementation(libs.firebase.vertexai)
+    // Firebase AI Logic
+    implementation(libs.firebase.ai)
 
     // Location
     implementation(libs.play.services.location)
@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.mockwebserver)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
