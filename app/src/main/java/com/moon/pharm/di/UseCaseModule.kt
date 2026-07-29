@@ -51,7 +51,7 @@ import com.moon.pharm.domain.usecase.user.CheckEmailDuplicatedUseCase
 import com.moon.pharm.domain.usecase.user.GetUserOnceUseCase
 import com.moon.pharm.domain.usecase.user.ObserveCurrentUserNicknameUseCase
 import com.moon.pharm.domain.usecase.user.ObserveCurrentUserUseCase
-import com.moon.pharm.domain.usecase.user.ObserveMyPageDataUseCase
+import com.moon.pharm.domain.usecase.user.ObserveMyPageConsultsUseCase
 import com.moon.pharm.domain.usecase.user.SaveUserUseCase
 import com.moon.pharm.domain.usecase.user.SyncFcmTokenUseCase
 import com.moon.pharm.domain.usecase.user.UpdateNicknameUseCase
@@ -216,12 +216,10 @@ object UseCaseModule {
     }
 
     @Provides
-    fun provideObserveMyPageDataUseCase(
-        authRepository: AuthRepository,
-        userRepository: UserRepository,
+    fun provideObserveMyPageConsultsUseCase(
         consultRepository: ConsultRepository
-    ): ObserveMyPageDataUseCase {
-        return ObserveMyPageDataUseCase(authRepository, userRepository, consultRepository)
+    ): ObserveMyPageConsultsUseCase {
+        return ObserveMyPageConsultsUseCase(consultRepository)
     }
 
     @Provides
