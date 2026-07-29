@@ -7,6 +7,7 @@ import com.moon.pharm.designsystem.common.UiMessage
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.consult.GetMyConsultListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +23,7 @@ class MyConsultListViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(MyConsultListUiState(isLoading = true))
     val uiState: StateFlow<MyConsultListUiState> = _uiState.asStateFlow()
+    private var fetchJob: Job? = null
 
     init {
         fetchMyConsultList()
@@ -31,40 +33,42 @@ class MyConsultListViewModel @Inject constructor(
         _uiState.update { it.copy(userMessage = null) }
     }
 
+    fun retry() {
+        fetchMyConsultList()
+    }
+
     private fun fetchMyConsultList() {
-        viewModelScope.launch {
-            getMyConsultListUseCase().collectLatest { profileResult ->
-                if (profileResult !is DataResourceResult.Success) return@collectLatest
-
-                val profile = profileResult.resultData
-                _uiState.update {
-                    it.copy(currentUserId = profile.userId, isPharmacist = profile.isPharmacist)
-                }
-
-                profile.consultsFlow.collectLatest { result ->
-                    _uiState.update { state ->
-                        when (result) {
-                            is DataResourceResult.Loading -> state.copy(isLoading = true)
-                            is DataResourceResult.Success -> {
-                                val displayedConsults =
-                                    if (!profile.isPharmacist && profile.nickname.isNotEmpty()) {
-                                        result.resultData.map { item ->
-                                            item.copy(nickName = profile.nickname)
-                                        }
-                                    } else {
-                                        result.resultData
-                                    }
-                                state.copy(
-                                    isLoading = false,
-                                    myConsults = displayedConsults.map { it.toUiModel() },
-                                    userMessage = null
-                                )
-                            }
-                            is DataResourceResult.Failure -> state.copy(
+        fetchJob?.cancel()
+        fetchJob = viewModelScope.launch {
+            getMyConsultListUseCase().collectLatest { result ->
+                _uiState.update { state ->
+                    when (result) {
+                        DataResourceResult.Loading -> state.copy(
+                            isLoading = true,
+                            hasLoadError = false
+                        )
+                        is DataResourceResult.Success -> {
+                            val profile = result.resultData
+                            val displayedConsults =
+                                if (!profile.isPharmacist && profile.nickname.isNotEmpty()) {
+                                    profile.consults.map { item -> item.copy(nickName = profile.nickname) }
+                                } else {
+                                    profile.consults
+                                }
+                            state.copy(
                                 isLoading = false,
-                                userMessage = if (state.myConsults.isEmpty()) UiMessage.LoadDataFailed else null
+                                hasLoadError = false,
+                                myConsults = displayedConsults.map { it.toUiModel() },
+                                currentUserId = profile.userId,
+                                isPharmacist = profile.isPharmacist,
+                                userMessage = null
                             )
                         }
+                        is DataResourceResult.Failure -> state.copy(
+                            isLoading = false,
+                            hasLoadError = true,
+                            userMessage = UiMessage.LoadDataFailed
+                        )
                     }
                 }
             }

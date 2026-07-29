@@ -54,6 +54,7 @@ fun EditNicknameDialog(
                 onClick = {
                     if (text.isNotBlank() && text != currentNickname) {
                         onConfirm(text)
+                        onDismiss()
                     } else {
                         onDismiss()
                     }

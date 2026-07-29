@@ -7,6 +7,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moon.pharm.consult.R
 import com.moon.pharm.consult.screen.component.MyConsultEmptyView
 import com.moon.pharm.consult.screen.component.MyConsultListContent
 import com.moon.pharm.consult.util.myConsultListEmptyTextRes
@@ -55,7 +58,8 @@ fun MyConsultListRoute(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onNavigateUp = onNavigateUp,
-        onItemClick = onNavigateToDetail
+        onItemClick = onNavigateToDetail,
+        onRetry = viewModel::retry
     )
 }
 
@@ -65,7 +69,8 @@ fun MyConsultListScreen(
     uiState: MyConsultListUiState,
     snackbarHostState: SnackbarHostState,
     onNavigateUp: () -> Unit,
-    onItemClick: (String) -> Unit
+    onItemClick: (String) -> Unit,
+    onRetry: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -92,6 +97,12 @@ fun MyConsultListScreen(
                 uiState.isLoading -> {
                     CircularProgressBar(modifier = Modifier.align(Alignment.Center))
                 }
+                uiState.hasLoadError -> {
+                    MyConsultLoadErrorView(
+                        onRetry = onRetry,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
                 uiState.myConsults.isEmpty() -> {
                     MyConsultEmptyView(
                         text = stringResource(uiState.isPharmacist.myConsultListEmptyTextRes),
@@ -111,6 +122,22 @@ fun MyConsultListScreen(
     }
 }
 
+@Composable
+private fun MyConsultLoadErrorView(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    androidx.compose.foundation.layout.Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = stringResource(R.string.my_consult_load_error))
+        TextButton(onClick = onRetry) {
+            Text(text = stringResource(R.string.my_consult_retry))
+        }
+    }
+}
+
 @ThemePreviews
 @Composable
 private fun MyConsultListScreenPreview() {
@@ -124,7 +151,8 @@ private fun MyConsultListScreenPreview() {
             ),
             snackbarHostState = SnackbarHostState(),
             onNavigateUp = {},
-            onItemClick = {}
+            onItemClick = {},
+            onRetry = {}
         )
     }
 }
