@@ -1,7 +1,7 @@
 package com.moon.pharm.data.datasource.remote.ai
 
 object DdiAiConst {
-    const val MODEL_NAME = "gemini-1.5-flash"
+    const val MODEL_NAME = "gemini-3.6-flash"
 
     fun buildAnalyzeDdiPrompt(drugListText: String): String = """
         환자가 다음 약물들을 함께 복용하려고 합니다: [$drugListText]

@@ -1,14 +1,17 @@
 package com.moon.pharm.data.datasource.remote.ai
 
 import com.google.firebase.Firebase
-import com.google.firebase.vertexai.type.generationConfig
-import com.google.firebase.vertexai.vertexAI
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.type.generationConfig
 import com.moon.pharm.data.datasource.AiDataSource
 import javax.inject.Inject
 
 class FirebaseAiDataSourceImpl @Inject constructor() : AiDataSource {
 
-    private val generativeModel = Firebase.vertexAI.generativeModel(
+    private val generativeModel = Firebase.ai(
+        backend = GenerativeBackend.googleAI()
+    ).generativeModel(
         modelName = DdiAiConst.MODEL_NAME,
         generationConfig = generationConfig {
             responseMimeType = "application/json"
@@ -31,6 +34,6 @@ class FirebaseAiDataSourceImpl @Inject constructor() : AiDataSource {
     }
 
     companion object {
-        private const val ERROR_NO_RESPONSE = "Gemini API 응답 없음"
+        private const val ERROR_NO_RESPONSE = "Gemini API response is empty."
     }
 }
