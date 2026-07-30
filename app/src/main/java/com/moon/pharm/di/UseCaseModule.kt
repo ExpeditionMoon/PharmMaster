@@ -40,6 +40,7 @@ import com.moon.pharm.domain.usecase.medication.GetMedicationHistoryItemsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMonthlyIntakeRecordsUseCase
 import com.moon.pharm.domain.usecase.medication.ObserveTodayMedicationItemsUseCase
+import com.moon.pharm.domain.usecase.medication.RestoreMedicationAlarmsUseCase
 import com.moon.pharm.domain.usecase.medication.SaveMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
@@ -111,8 +112,11 @@ object UseCaseModule {
     }
 
     @Provides
-    fun provideDeleteMedicationUseCase(medicationRepository: MedicationRepository): DeleteMedicationUseCase {
-        return DeleteMedicationUseCase(medicationRepository)
+    fun provideDeleteMedicationUseCase(
+        medicationRepository: MedicationRepository,
+        alarmScheduler: AlarmScheduler
+    ): DeleteMedicationUseCase {
+        return DeleteMedicationUseCase(medicationRepository, alarmScheduler)
     }
 
     @Provides
@@ -154,6 +158,14 @@ object UseCaseModule {
         alarmScheduler: AlarmScheduler
     ): SaveMedicationUseCase {
         return SaveMedicationUseCase(medicationRepository, alarmScheduler)
+    }
+
+    @Provides
+    fun provideRestoreMedicationAlarmsUseCase(
+        medicationRepository: MedicationRepository,
+        alarmScheduler: AlarmScheduler
+    ): RestoreMedicationAlarmsUseCase {
+        return RestoreMedicationAlarmsUseCase(medicationRepository, alarmScheduler)
     }
 
     @Provides

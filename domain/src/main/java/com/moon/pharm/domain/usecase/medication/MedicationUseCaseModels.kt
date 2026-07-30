@@ -26,14 +26,17 @@ data class MedicationScheduleCommand(
 )
 
 data class SaveMedicationCommand(
+    val medicationId: String? = null,
     val userId: String,
     val name: String,
     val type: MedicationTypeInput,
     val startDate: Long,
     val endDate: Long?,
     val repeatType: RepeatTypeInput,
+    val weeklyDays: Set<Int> = emptySet(),
     val schedules: List<MedicationScheduleCommand>,
-    val isGrouped: Boolean
+    val isGrouped: Boolean,
+    val isAlarmEnabled: Boolean = true
 )
 
 data class ToggleIntakeCommand(

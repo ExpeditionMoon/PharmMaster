@@ -60,6 +60,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.data)
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.installations)
     // Firebase AI Logic
     implementation(libs.firebase.ai)
 

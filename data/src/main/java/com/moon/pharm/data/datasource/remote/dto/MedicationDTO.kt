@@ -16,6 +16,8 @@ data class MedicationDTO(
     val startDate: Timestamp? = null,
     val endDate: Timestamp? = null,
     val repeatType: String = EMPTY_STRING,
+    val weeklyDays: List<Int> = emptyList(),
+    val isAlarmEnabled: Boolean = true,
     val memo: String? = null,
 
     val schedules: List<MedicationScheduleDTO> = emptyList(),

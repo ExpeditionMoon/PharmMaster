@@ -1,6 +1,7 @@
 package com.moon.pharm.domain.usecase.medication
 
 import com.moon.pharm.domain.alarm.AlarmScheduler
+import com.moon.pharm.domain.alarm.MedicationAlarm
 import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.repository.MedicationRepository
@@ -53,7 +54,9 @@ class SaveMedicationUseCaseTest {
             scheduledMedication = medication
         }
 
-        override fun cancel(medication: Medication) = Unit
+        override fun cancel(medicationId: String) = Unit
+
+        override fun reschedule(alarm: MedicationAlarm) = Unit
     }
 
     private class RecordingMedicationRepository : MedicationRepository {

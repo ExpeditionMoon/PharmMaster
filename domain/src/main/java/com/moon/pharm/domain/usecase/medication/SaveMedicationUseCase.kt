@@ -28,15 +28,17 @@ class SaveMedicationUseCase(
 
     private fun SaveMedicationCommand.toMedication(): Medication {
         return Medication(
-            id = "",
+            id = medicationId ?: UUID.randomUUID().toString(),
             userId = userId,
             name = name,
             type = type.toMedicationType(),
             startDate = startDate,
             endDate = endDate,
             repeatType = repeatType.toRepeatType(),
+            weeklyDays = weeklyDays,
             schedules = schedules.map { it.toMedicationSchedule() },
-            isGrouped = isGrouped
+            isGrouped = isGrouped,
+            isAlarmEnabled = isAlarmEnabled
         )
     }
 

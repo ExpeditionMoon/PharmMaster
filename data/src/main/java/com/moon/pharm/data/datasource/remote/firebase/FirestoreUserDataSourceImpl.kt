@@ -1,6 +1,7 @@
 package com.moon.pharm.data.datasource.remote.firebase
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.messaging.FirebaseMessaging
 import com.moon.pharm.data.common.DOCUMENT_LIFESTYLE
 import com.moon.pharm.data.common.FIELD_FCM_TOKEN
@@ -59,7 +60,8 @@ class FirestoreUserDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getFcmToken(): String {
-        return FirebaseMessaging.getInstance().token.await()
+        FirebaseMessaging.getInstance().register().await()
+        return FirebaseInstallations.getInstance().id.await()
     }
 
     override suspend fun updateFcmToken(userId: String, token: String) {

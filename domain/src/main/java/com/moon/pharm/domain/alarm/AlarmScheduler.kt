@@ -4,5 +4,6 @@ import com.moon.pharm.domain.model.medication.Medication
 
 interface AlarmScheduler {
     fun schedule(medication: Medication)
-    fun cancel(medication: Medication)
+    fun cancel(medicationId: String)
+    fun reschedule(alarm: MedicationAlarm)
 }

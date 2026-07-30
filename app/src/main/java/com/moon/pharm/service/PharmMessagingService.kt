@@ -1,5 +1,6 @@
 package com.moon.pharm.service
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
+@SuppressLint("MissingFirebaseInstanceTokenRefresh")
 class PharmMessagingService : FirebaseMessagingService() {
 
     @Inject
@@ -37,12 +39,10 @@ class PharmMessagingService : FirebaseMessagingService() {
         showNotification(title, body, consultId)
     }
 
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
-
+    override fun onRegistered(installationId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                syncFcmTokenUseCase()
+                syncFcmTokenUseCase(installationId)
             } catch (_: Exception) {
                 return@launch
             }
