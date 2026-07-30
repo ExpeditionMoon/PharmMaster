@@ -2,6 +2,7 @@ package com.moon.pharm.domain.alarm
 
 import com.moon.pharm.domain.model.medication.RepeatType
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Test
 import java.time.LocalDateTime
@@ -36,6 +37,16 @@ class MedicationAlarmNextTriggerCalculatorTest {
         )
 
         assertNull(next)
+    }
+
+    @Test
+    fun `expired period alarm is not active on a later date`() {
+        val isActive = MedicationAlarmNextTriggerCalculator.isActiveOn(
+            alarm = alarm(repeatType = RepeatType.PERIOD, endDate = 0L),
+            date = LocalDateTime.of(2026, 7, 30, 9, 0).toLocalDate()
+        )
+
+        assertFalse(isActive)
     }
 
     private fun alarm(

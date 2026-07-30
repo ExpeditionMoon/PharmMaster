@@ -25,10 +25,11 @@ class AlarmRestoreReceiver : BroadcastReceiver() {
 
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
-            runCatching {
+            try {
                 getCurrentUserId()?.let { userId -> restoreMedicationAlarms(userId) }
+            } finally {
+                pendingResult.finish()
             }
-            pendingResult.finish()
         }
     }
 

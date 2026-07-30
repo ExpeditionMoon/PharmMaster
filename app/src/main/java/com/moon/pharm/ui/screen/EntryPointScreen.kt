@@ -27,6 +27,7 @@ fun EntryPointScreen(
             }
         ) {
             authNavGraph(rootNavController) {
+                viewModel.restoreMedicationAlarms()
                 rootNavController.navigate(MainRoute) {
                     popUpTo(LoginRoute) { inclusive = true }
                 }

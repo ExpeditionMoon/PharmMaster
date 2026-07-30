@@ -6,8 +6,10 @@ import android.content.Intent
 import com.moon.pharm.domain.alarm.AlarmNotificationService
 import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.alarm.MedicationAlarm
+import com.moon.pharm.domain.alarm.MedicationAlarmNextTriggerCalculator
 import com.moon.pharm.domain.model.medication.RepeatType
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -27,7 +29,10 @@ class AlarmReceiver : BroadcastReceiver() {
         val time = intent.getStringExtra(AlarmConstants.EXTRA_ALARM_TIME).orEmpty()
         val isGrouped = intent.getBooleanExtra(AlarmConstants.EXTRA_IS_GROUPED, false)
 
-        intent.toMedicationAlarmOrNull()?.let(alarmScheduler::reschedule)
+        val alarm = intent.toMedicationAlarmOrNull()
+        if (alarm != null && !MedicationAlarmNextTriggerCalculator.isActiveOn(alarm, LocalDate.now())) return
+
+        alarm?.let(alarmScheduler::reschedule)
         notificationService.showMedicationAlarm(name, dosage, time, isGrouped)
     }
 
