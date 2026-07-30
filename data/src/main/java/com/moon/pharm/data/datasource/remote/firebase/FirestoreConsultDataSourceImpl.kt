@@ -1,9 +1,11 @@
 package com.moon.pharm.data.datasource.remote.firebase
 
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.snapshots
 import com.moon.pharm.data.common.CONSULT_COLLECTION
 import com.moon.pharm.data.common.ERROR_MSG_CONSULT_NOT_FOUND
@@ -19,6 +21,8 @@ import com.moon.pharm.data.common.FIELD_USER_ID
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.remote.dto.ConsultAnswerDTO
 import com.moon.pharm.data.datasource.remote.dto.ConsultItemDTO
+import com.moon.pharm.data.mapper.hasLegacyConsultImageUrls
+import com.moon.pharm.data.mapper.toLegacyConsultItemDto
 import com.moon.pharm.domain.model.consult.ConsultStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -44,15 +48,14 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
         collection.orderBy(FIELD_CREATED_AT, Query.Direction.DESCENDING)
             .snapshots()
             .map { snapshot ->
-                snapshot.toObjects(ConsultItemDTO::class.java)
+                snapshot.toConsultItemDtos()
             }
 
     override fun getConsultDetail(id: String): Flow<ConsultItemDTO?> = flow {
         val snapshot = collection.document(id).get().await()
 
         if (snapshot.exists()) {
-            val dto = snapshot.toObject(ConsultItemDTO::class.java)
-            emit(dto)
+            emit(snapshot.toConsultItemDto())
         } else {
             emit(null)
         }
@@ -64,7 +67,7 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
             .orderBy(FIELD_CREATED_AT, Query.Direction.DESCENDING)
             .snapshots()
             .map { snapshot ->
-                snapshot.toObjects(ConsultItemDTO::class.java)
+                snapshot.toConsultItemDtos()
             }
     override suspend fun updateConsult(consultId: String, title: String, content: String, isPublic: Boolean) {
         collection.document(consultId).update(
@@ -87,14 +90,14 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
             .orderBy(FIELD_CREATED_AT, Query.Direction.DESCENDING)
             .snapshots()
             .map { snapshot ->
-                snapshot.toObjects(ConsultItemDTO::class.java)
+                snapshot.toConsultItemDtos()
             }
 
     override suspend fun updateConsultAnswer(consultId: String, answerDto: ConsultAnswerDTO): ConsultItemDTO {
         val consultRef = collection.document(consultId)
         return firestore.runTransaction { transaction ->
             val snapshot = transaction.get(consultRef)
-            val currentDto = snapshot.toObject(ConsultItemDTO::class.java)
+            val currentDto = snapshot.toConsultItemDto()
                 ?: throw FirebaseFirestoreException(
                     ERROR_MSG_CONSULT_NOT_FOUND,
                     FirebaseFirestoreException.Code.NOT_FOUND
@@ -129,5 +132,29 @@ class FirestoreConsultDataSourceImpl @Inject constructor(
             batch.update(doc.reference, FIELD_ANSWER_PHARMACIST_NAME, newNickname)
         }
         batch.commit().await()
+    }
+
+    private fun QuerySnapshot.toConsultItemDtos(): List<ConsultItemDTO> {
+        if (documents.none { it.hasLegacyConsultImageUrls() }) {
+            return toObjects(ConsultItemDTO::class.java)
+        }
+
+        return documents.map { document ->
+            requireNotNull(document.toConsultItemDto()) {
+                "Consult document data is missing. documentId=${document.id}"
+            }
+        }
+    }
+
+    private fun DocumentSnapshot.toConsultItemDto(): ConsultItemDTO? {
+        return if (hasLegacyConsultImageUrls()) {
+            data?.toLegacyConsultItemDto(id)
+        } else {
+            toObject(ConsultItemDTO::class.java)
+        }
+    }
+
+    private fun DocumentSnapshot.hasLegacyConsultImageUrls(): Boolean {
+        return data?.hasLegacyConsultImageUrls() == true
     }
 }
