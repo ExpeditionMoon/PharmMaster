@@ -27,9 +27,11 @@ import com.moon.pharm.designsystem.theme.PharmTheme
 import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.designsystem.util.toMinuteTimeUiString
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.medication.model.RepeatTypeUiModel
 import com.moon.pharm.profile.medication.screen.component.AlarmOptionSelector
 import com.moon.pharm.profile.medication.screen.component.MealTimeChips
 import com.moon.pharm.profile.medication.screen.component.MedicationAlarmOptionsCard
+import com.moon.pharm.profile.medication.screen.component.WeeklyDaySelector
 import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
 import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 
@@ -90,6 +92,16 @@ fun MedicationAlarmSection(
             selectedOption = form.selectedRepeatType,
             onOptionSelected = { onEvent(MedicationUiEvent.UpdateRepeatType(index = medicationIndex, type = it)) }
         )
+
+        if (form.selectedRepeatType == RepeatTypeUiModel.Weekly) {
+            Spacer(modifier = Modifier.height(12.dp))
+            WeeklyDaySelector(
+                selectedDays = form.selectedWeeklyDays,
+                onDayToggle = { day ->
+                    onEvent(MedicationUiEvent.ToggleWeeklyDay(medicationIndex, day))
+                }
+            )
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 

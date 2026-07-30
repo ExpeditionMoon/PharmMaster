@@ -57,10 +57,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun refreshFcmToken() {
-        syncToken()
-    }
-
     fun moveToMedicationTab() {
         viewModelScope.launch {
             _navigationEvent.send(MainNavigationEvent.NavigateToMedication)

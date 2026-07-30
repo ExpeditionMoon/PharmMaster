@@ -15,10 +15,8 @@ import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
 import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
 import com.moon.pharm.profile.medication.mapper.toUiMessage
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
-import com.moon.pharm.profile.medication.model.MedicationProgressUiModel
 import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
 import com.moon.pharm.profile.medication.model.MedicationUiMessage
-import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 import com.moon.pharm.profile.navigation.MedicationCreateRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,9 +59,6 @@ class MedicationViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val progress: StateFlow<MedicationProgressUiModel> = uiState
-        .map { calculateProgress(it.medicationList) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MedicationProgressUiModel(0f, 0, 0))
     // endregion
 
     init {
@@ -185,6 +180,24 @@ class MedicationViewModel @Inject constructor(
                     updateForm(event.index) { it.copy(isGrouped = event.enabled) }
                 }
             }
+            is MedicationUiEvent.ToggleWeeklyDay -> updateForm(event.index) { form ->
+                form.copy(
+                    selectedWeeklyDays = form.selectedWeeklyDays.toMutableSet().apply {
+                        if (!add(event.day)) remove(event.day)
+                    }
+                )
+            }
+            is MedicationUiEvent.UpdateAlarmEnabled -> {
+                if (event.index == -1) {
+                    _uiState.update { state ->
+                        state.copy(medicationForms = state.medicationForms.map {
+                            it.copy(isAlarmEnabled = event.enabled)
+                        })
+                    }
+                } else {
+                    updateForm(event.index) { it.copy(isAlarmEnabled = event.enabled) }
+                }
+            }
             is MedicationUiEvent.RemoveMedication -> {
                 _uiState.update { state ->
                     val newForms = state.medicationForms.toMutableList().apply {
@@ -231,7 +244,7 @@ class MedicationViewModel @Inject constructor(
                         )
                         is DataResourceResult.Success -> {
                             currentState.copy(
-                                isLoading = if (isSaving) true else false,
+                                isLoading = false,
                                 medicationList = MedicationUiMapper.toUiModelList(result.resultData)
                             )
                         }
@@ -296,8 +309,7 @@ class MedicationViewModel @Inject constructor(
                     .filter { it !is DataResourceResult.Loading }
                     .first()
 
-                if (result is DataResourceResult.Success) {
-                } else {
+                if (result !is DataResourceResult.Success) {
                     isAllSuccess = false
                 }
             }
@@ -379,15 +391,5 @@ class MedicationViewModel @Inject constructor(
         }
     }
 
-    private fun calculateProgress(list: List<TodayMedicationUiModel>): MedicationProgressUiModel {
-        val total = list.size
-        val completed = list.count { it.isTaken }
-        if (total == 0) return MedicationProgressUiModel(0f, 0, 0)
-        return MedicationProgressUiModel(
-            ratio = completed.toFloat() / total,
-            completed = completed,
-            total = total
-        )
-    }
     // endregion
 }

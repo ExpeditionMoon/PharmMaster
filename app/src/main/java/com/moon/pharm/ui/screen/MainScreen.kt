@@ -12,16 +12,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.moon.pharm.designsystem.component.bar.PharmBottomBar
-import com.moon.pharm.designsystem.model.BottomBarUiModel
 import com.moon.pharm.consult.navigation.MyConsultListRoute
 import com.moon.pharm.consult.navigation.consultNavGraph
+import com.moon.pharm.designsystem.component.bar.PharmBottomBar
+import com.moon.pharm.designsystem.model.BottomBarUiModel
 import com.moon.pharm.home.navigation.HomeRoute
 import com.moon.pharm.home.navigation.homeNavGraph
 import com.moon.pharm.prescription.navigation.PrescriptionCaptureRoute
@@ -62,8 +61,8 @@ fun MainScreen(
     val isFullScreen = currentRoute?.contains("PrescriptionCapture") == true ||
             currentRoute?.contains("Search") == true
 
-    var isMapMode by remember { mutableStateOf(false) }
-    val shouldShowBars = !isFullScreen && !isMapMode
+    val isMapMode = remember { mutableStateOf(false) }
+    val shouldShowBars = !isFullScreen && !isMapMode.value
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -108,7 +107,10 @@ fun MainScreen(
                     onNavigateToSearch = { mainNavController.navigate(SearchRoute) },
                     onNavigateToPrescriptionCapture = { mainNavController.navigate(PrescriptionCaptureRoute) }
                 )
-                consultNavGraph(mainNavController, onMapModeChanged = { isMapVisible -> isMapMode = isMapVisible })
+                consultNavGraph(
+                    navController = mainNavController,
+                    onMapModeChanged = { isMapMode.value = it }
+                )
                 profileNavGraph(
                     navController = mainNavController,
                     onLogout = onLogout,

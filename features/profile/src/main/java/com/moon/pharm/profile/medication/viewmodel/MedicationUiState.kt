@@ -28,5 +28,7 @@ data class MedicationFormState(
     val selectedMealTiming: MealTimingUiModel = MealTimingUiModel.BeforeMeal,
     val selectedTime: Long? = null,
     val selectedRepeatType: RepeatTypeUiModel = RepeatTypeUiModel.Daily,
-    val isGrouped: Boolean = false
+    val selectedWeeklyDays: Set<Int> = emptySet(),
+    val isGrouped: Boolean = false,
+    val isAlarmEnabled: Boolean = true
 )

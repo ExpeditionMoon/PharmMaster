@@ -26,6 +26,7 @@ object MedicationUiMapper {
             startDate = form.startDate ?: System.currentTimeMillis(),
             endDate = if (form.noEndDate) null else form.endDate,
             repeatType = form.selectedRepeatType.toInput(),
+            weeklyDays = form.selectedWeeklyDays,
             schedules = listOf(
                 MedicationScheduleCommand(
                     time = form.selectedTime.toScheduleTimeString(),
@@ -33,7 +34,8 @@ object MedicationUiMapper {
                     mealTiming = form.selectedMealTiming.toInput()
                 )
             ),
-            isGrouped = form.isGrouped
+            isGrouped = form.isGrouped,
+            isAlarmEnabled = form.isAlarmEnabled
         )
     }
 
