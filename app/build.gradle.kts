@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.kotlin.android.ksp)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.secrets.gradle.plugin)
 }
 
@@ -54,7 +55,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":data"))
     implementation(project(":features:home"))
-    implementation(project(":features:component-ui"))
+    implementation(project(":core:designsystem"))
     implementation(project(":features:consult"))
     implementation(project(":features:profile"))
     implementation(project(":features:prescription"))
@@ -76,6 +77,8 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+
+    implementation(libs.play.services.maps)
 
     // Hilt Core
     implementation(libs.hilt.android)

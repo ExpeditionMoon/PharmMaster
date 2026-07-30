@@ -16,8 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.profile.R
 
 @Composable

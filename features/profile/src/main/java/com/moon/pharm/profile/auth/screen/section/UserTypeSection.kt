@@ -20,30 +20,30 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.profile.auth.model.UserTypeUiModel
 import com.moon.pharm.profile.util.labelRes
 
 @Composable
 fun UserTypeSection(
-    selectedType: UserType?,
-    onSelect: (UserType) -> Unit
+    selectedType: UserTypeUiModel?,
+    onSelect: (UserTypeUiModel) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        UserType.entries.forEachIndexed { index, type ->
+        UserTypeUiModel.entries.forEachIndexed { index, type ->
             UserTypeRow(
                 label = stringResource(id = type.labelRes),
                 isSelected = selectedType == type,
                 onSelect = { onSelect(type) }
             )
 
-            if (index < UserType.entries.lastIndex) {
+            if (index < UserTypeUiModel.entries.lastIndex) {
                 Spacer(modifier = Modifier.height(10.dp))
             }
         }
@@ -88,7 +88,7 @@ private fun UserTypeSectionPreview() {
     PharmMasterTheme {
         Box(modifier = Modifier.padding(24.dp)) {
             UserTypeSection(
-                selectedType = UserType.GENERAL,
+                selectedType = UserTypeUiModel.General,
                 onSelect = {}
             )
         }

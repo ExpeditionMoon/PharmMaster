@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     // Hilt Core
     implementation(libs.hilt.android)
@@ -59,23 +60,19 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase.data)
     implementation(libs.firebase.messaging)
-    // Firebase Vertex AI
-    implementation(libs.firebase.vertexai)
+    implementation(libs.firebase.installations)
+    // Firebase AI Logic
+    implementation(libs.firebase.ai)
 
-    // Map
-    implementation(libs.bundles.google.maps.libs)
+    // Location
+    implementation(libs.play.services.location)
 
     //REST
     implementation(libs.bundles.rest.libraries)
     implementation(libs.mockwebserver)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    compilerOptions {
-        freeCompilerArgs.add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
-    }
 }

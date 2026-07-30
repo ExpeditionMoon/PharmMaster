@@ -18,19 +18,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.component_ui.util.toDisplayTimeString
-import com.moon.pharm.domain.model.medication.MealTiming
-import com.moon.pharm.domain.model.medication.MedicationTimeGroup
-import com.moon.pharm.domain.model.medication.MedicationType
-import com.moon.pharm.domain.model.medication.RepeatType
-import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.designsystem.util.toDisplayTimeString
+import com.moon.pharm.profile.medication.model.MealTimingUiModel
+import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
+import com.moon.pharm.profile.medication.model.MedicationTypeUiModel
+import com.moon.pharm.profile.medication.model.RepeatTypeUiModel
+import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 
 @Composable
 fun MedicationGroupItem(
-    group: MedicationTimeGroup,
+    group: MedicationTimeGroupUiModel,
     onTakeClick: (TodayMedicationUiModel) -> Unit,
     onDeleteClick: (String) -> Unit
 ) {
@@ -49,18 +49,20 @@ fun MedicationGroupItem(
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = displayTime ?: "",
+                text = displayTime.orEmpty(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = PharmTheme.colors.secondFont
             )
         }
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             group.items.forEach { item ->
-                MedicationItemCard(item = item, onTakeClick = onTakeClick, onDeleteClick = onDeleteClick)
+                MedicationItemCard(
+                    item = item,
+                    onTakeClick = onTakeClick,
+                    onDeleteClick = onDeleteClick
+                )
             }
         }
     }
@@ -72,20 +74,20 @@ private fun MedicationGroupItemPreview() {
     PharmMasterTheme {
         Box(modifier = Modifier.padding(16.dp)) {
             MedicationGroupItem(
-                group = MedicationTimeGroup(
+                group = MedicationTimeGroupUiModel(
                     time = "08:00",
                     items = listOf(
                         TodayMedicationUiModel(
                             medicationId = "m1",
                             scheduleId = "s1",
-                            name = "혈압약",
-                            type = MedicationType.OTC,
-                            repeatType = RepeatType.DAILY,
-                            time = "오전 08:00",
-                            dosage = "1알",
-                            mealTiming = MealTiming.AFTER_MEAL,
+                            name = "Tylenol",
+                            type = MedicationTypeUiModel.Otc,
+                            repeatType = RepeatTypeUiModel.Daily,
+                            time = "08:00",
+                            dosage = "1 tablet",
+                            mealTiming = MealTimingUiModel.AfterMeal,
                             isTaken = false
-                        ),
+                        )
                     )
                 ),
                 onTakeClick = {},

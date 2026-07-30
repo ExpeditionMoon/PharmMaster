@@ -1,19 +1,19 @@
 package com.moon.pharm.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestoreException
-import com.moon.pharm.data.common.NotificationConstants.ERR_FCM_FAILED
-import com.moon.pharm.data.common.NotificationConstants.ERR_UNKNOWN_SERVER
-import com.moon.pharm.data.common.NotificationConstants.MSG_ANSWER_BODY
-import com.moon.pharm.data.common.NotificationConstants.MSG_ANSWER_TITLE
-import com.moon.pharm.data.common.NotificationConstants.MSG_NEW_CONSULT_BODY
-import com.moon.pharm.data.common.NotificationConstants.MSG_NEW_CONSULT_TITLE
+import com.moon.pharm.data.common.FcmNotificationMessage.ERR_FCM_FAILED
+import com.moon.pharm.data.common.FcmNotificationMessage.ERR_UNKNOWN_SERVER
+import com.moon.pharm.data.common.FcmNotificationMessage.MSG_ANSWER_BODY
+import com.moon.pharm.data.common.FcmNotificationMessage.MSG_ANSWER_TITLE
+import com.moon.pharm.data.common.FcmNotificationMessage.MSG_NEW_CONSULT_BODY
+import com.moon.pharm.data.common.FcmNotificationMessage.MSG_NEW_CONSULT_TITLE
 import com.moon.pharm.data.datasource.ConsultDataSource
 import com.moon.pharm.data.datasource.ImageDataSource
-import com.moon.pharm.data.datasource.remote.dto.toDomain
-import com.moon.pharm.data.datasource.remote.dto.toDto
 import com.moon.pharm.data.datasource.remote.fcm.FcmApi
 import com.moon.pharm.data.datasource.remote.fcm.FcmSendRequest
 import com.moon.pharm.data.di.IoDispatcher
+import com.moon.pharm.data.mapper.toDomain
+import com.moon.pharm.data.mapper.toDto
 import com.moon.pharm.domain.model.consult.ConsultAnswer
 import com.moon.pharm.domain.model.consult.ConsultException
 import com.moon.pharm.domain.model.consult.ConsultItem
@@ -34,13 +34,15 @@ class ConsultRepositoryImpl @Inject constructor(
     private val fcmApi: FcmApi,
     private val dataSource: ConsultDataSource,
     private val imageDataSource: ImageDataSource,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ConsultRepository {
 
-    private fun Throwable.toConsultException(): ConsultException = when {
-        this is FirebaseFirestoreException && this.code == FirebaseFirestoreException.Code.NOT_FOUND -> ConsultException.NotFound()
-        this is FirebaseFirestoreException -> ConsultException.Network()
-        else -> ConsultException.Unknown(this.message)
+    private fun Throwable.toConsultException(): ConsultException = when (this) {
+        is FirebaseFirestoreException -> when (code) {
+            FirebaseFirestoreException.Code.NOT_FOUND -> ConsultException.NotFound()
+            else -> ConsultException.Network()
+        }
+        else -> ConsultException.Unknown(message)
     }
 
     private fun <T> wrapOperation(

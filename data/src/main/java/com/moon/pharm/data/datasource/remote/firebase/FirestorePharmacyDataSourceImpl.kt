@@ -14,7 +14,7 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FirestorePharmacyDataSourceImpl @Inject constructor(
-    private val firestore: FirebaseFirestore, @ApplicationContext private val context: Context
+    private val firestore: FirebaseFirestore, @param:ApplicationContext private val context: Context
 ) : PharmacyStorageDataSource {
 
     private val pharmacyCollection = firestore.collection(PHARMACY_COLLECTION)

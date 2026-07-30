@@ -51,6 +51,8 @@
     <string name="mypage_title">마이페이지</string>
     <string name="mypage_nickname_update">닉네임 수정</string>
     <string name="mypage_consult_history_format">(%s)</string>
+    <string name="mypage_consult_load_error">상담 목록을 불러오지 못했습니다.</string>
+    <string name="mypage_consult_retry">다시 시도</string>
     <string name="mypage_menu_medication_record">나의 약 기록</string>
     <string name="mypage_menu_intake_history">나의 복약 기록</string>
     <string name="mypage_menu_core_feature">핵심 기능</string>
@@ -76,6 +78,13 @@
     <string name="medication_category_prescription">처방약</string>
     <string name="medication_category_general">일반약</string>
     <string name="medication_category_supplements">비타민/영양제</string>
+    <string name="medication_meal_before">식전</string>
+    <string name="medication_meal_during">식사 중</string>
+    <string name="medication_meal_after">식후</string>
+    <string name="medication_meal_none">상관없음</string>
+    <string name="medication_repeat_daily">매일</string>
+    <string name="medication_repeat_weekly">매주</string>
+    <string name="medication_repeat_period">특정 기간</string>
 
     <string name="medication_board_title">복약 관리</string>
     <string name="medication_create_title">복약 알림 설정</string>
@@ -116,4 +125,20 @@
     <string name="medication_delete_dialog_content">이 약을 삭제하시겠습니까?\n 묶음 설정된 모든 시간대의 스케줄이 함께 삭제됩니다.</string>
     <string name="medication_option_menu_desc">옵션 메뉴</string>
     <string name="medication_delete_desc">삭제</string>
+    <string name="medication_weekday_mon">월</string>
+    <string name="medication_weekday_tue">화</string>
+    <string name="medication_weekday_wed">수</string>
+    <string name="medication_weekday_thu">목</string>
+    <string name="medication_weekday_fri">금</string>
+    <string name="medication_weekday_sat">토</string>
+    <string name="medication_weekday_sun">일</string>
+    <string name="medication_alarm_enabled_title">복약 알림</string>
+    <string name="medication_alarm_enabled_desc">설정한 시간에 복약 알림을 받습니다</string>
+    <string name="medication_alarm_notification_permission_title">앱 알림 권한 필요</string>
+    <string name="medication_alarm_notification_permission_desc">앱 알림 권한이 없어 복약 데이터는 저장되지만 알림은 표시되지 않습니다.</string>
+    <string name="medication_alarm_notification_permission_action">앱 알림 권한 허용</string>
+    <string name="medication_alarm_notification_settings_action">앱 알림 설정 열기</string>
+    <string name="medication_alarm_exact_permission_title">정확한 알람</string>
+    <string name="medication_alarm_exact_permission_desc">정확한 알람 권한이 없으면 알림이 다소 지연될 수 있습니다.</string>
+    <string name="medication_alarm_exact_permission_action">정확한 알람 권한 설정</string>
 </resources>

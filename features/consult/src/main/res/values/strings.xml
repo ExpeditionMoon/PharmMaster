@@ -29,6 +29,8 @@
 
     <string name="my_consult_empty">작성한 상담 내역이 없습니다.</string>
     <string name="my_answer_empty">작성한 답변 내역이 없습니다.</string>
+    <string name="my_consult_load_error">상담 목록을 불러오지 못했습니다.</string>
+    <string name="my_consult_retry">다시 시도</string>
 
     <string name="consult_secret_icon_desc">비공개</string>
     <string name="consult_secret_hidden_title">비공개 상담입니다.</string>

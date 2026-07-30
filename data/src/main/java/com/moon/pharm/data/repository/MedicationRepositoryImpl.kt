@@ -2,9 +2,9 @@ package com.moon.pharm.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.moon.pharm.data.datasource.MedicationDataSource
-import com.moon.pharm.data.datasource.remote.dto.toDomain
-import com.moon.pharm.data.datasource.remote.dto.toDto
 import com.moon.pharm.data.di.IoDispatcher
+import com.moon.pharm.data.mapper.toDomain
+import com.moon.pharm.data.mapper.toDto
 import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.model.medication.MedicationException
@@ -22,13 +22,15 @@ import javax.inject.Inject
 
 class MedicationRepositoryImpl @Inject constructor(
     private val dataSource: MedicationDataSource,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MedicationRepository {
 
-    private fun Throwable.toMedicationException(): MedicationException = when {
-        this is FirebaseFirestoreException && this.code == FirebaseFirestoreException.Code.NOT_FOUND -> MedicationException.NotFound()
-        this is FirebaseFirestoreException -> MedicationException.NetworkError()
-        else -> MedicationException.Unknown(this.message)
+    private fun Throwable.toMedicationException(): MedicationException = when (this) {
+        is FirebaseFirestoreException -> when (code) {
+            FirebaseFirestoreException.Code.NOT_FOUND -> MedicationException.NotFound()
+            else -> MedicationException.NetworkError()
+        }
+        else -> MedicationException.Unknown(message)
     }
 
     private fun wrapCUDOperation(

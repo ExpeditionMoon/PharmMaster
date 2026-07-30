@@ -2,125 +2,154 @@ package com.moon.pharm.profile.mypage.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.designsystem.common.UiMessage
 import com.moon.pharm.domain.model.auth.UserType
-import com.moon.pharm.domain.model.consult.ConsultStatus
-import com.moon.pharm.domain.repository.AuthRepository
-import com.moon.pharm.domain.repository.ConsultRepository
-import com.moon.pharm.domain.repository.UserRepository
 import com.moon.pharm.domain.result.DataResourceResult
+import com.moon.pharm.domain.usecase.auth.LogoutUseCase
+import com.moon.pharm.domain.usecase.user.ObserveCurrentUserUseCase
+import com.moon.pharm.domain.usecase.user.ObserveMyPageConsultsUseCase
 import com.moon.pharm.domain.usecase.user.UpdateNicknameUseCase
+import com.moon.pharm.profile.mypage.mapper.toMyPageUiModel
+import com.moon.pharm.profile.mypage.model.MyPageConsultStatusUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val consultRepository: ConsultRepository,
-    private val userRepository: UserRepository,
-    private val updateNicknameUseCase: UpdateNicknameUseCase
+    private val observeCurrentUserUseCase: ObserveCurrentUserUseCase,
+    private val observeMyPageConsultsUseCase: ObserveMyPageConsultsUseCase,
+    private val updateNicknameUseCase: UpdateNicknameUseCase,
+    private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MyPageUiState())
     val uiState: StateFlow<MyPageUiState> = _uiState.asStateFlow()
+    private var consultJob: Job? = null
+    private var consultOwner: Pair<String, UserType>? = null
 
     init {
-        loadData()
+        observeProfile()
     }
 
     fun updateNickname(newNickname: String) {
-        val currentUser = uiState.value.user ?: return
-
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
+            _uiState.update { it.copy(isNicknameUpdating = true) }
 
-            val result = updateNicknameUseCase(currentUser, newNickname)
+            val result = updateNicknameUseCase(newNickname)
 
-            if (result is DataResourceResult.Failure) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    userMessage = UiMessage.LoadDataFailed
-                )
-            } else {
-                val updatedUser = currentUser.copy(nickName = newNickname)
-
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    user = updatedUser
-                )
+            _uiState.update { state ->
+                when (result) {
+                    is DataResourceResult.Success -> state.copy(
+                        isNicknameUpdating = false,
+                        user = state.user?.copy(nickName = newNickname)
+                    )
+                    is DataResourceResult.Failure -> state.copy(
+                        isNicknameUpdating = false,
+                        userMessage = result.exception.toUiMessage("닉네임 변경에 실패했습니다.")
+                    )
+                    DataResourceResult.Loading -> state.copy(isNicknameUpdating = false)
+                }
             }
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun loadData() {
-        val userId = authRepository.getCurrentUserId() ?: return
-
+    private fun observeProfile() {
         viewModelScope.launch {
-            userRepository.getUser(userId).flatMapLatest { userResult ->
-                if (userResult !is DataResourceResult.Success) {
-                    return@flatMapLatest kotlinx.coroutines.flow.flowOf(
-                        Pair(userResult, DataResourceResult.Loading)
-                    )
+            observeCurrentUserUseCase().collectLatest { result ->
+                when (result) {
+                    DataResourceResult.Loading -> _uiState.update { state ->
+                        state.copy(isProfileLoading = state.user == null)
+                    }
+                    is DataResourceResult.Failure -> _uiState.update {
+                        it.copy(
+                            isProfileLoading = false,
+                            userMessage = UiMessage.LoadDataFailed
+                        )
+                    }
+                    is DataResourceResult.Success -> {
+                        val user = result.resultData
+                        _uiState.update {
+                            it.copy(
+                                isProfileLoading = false,
+                                user = user.toMyPageUiModel()
+                            )
+                        }
+                        if (consultOwner != (user.id to user.userType)) {
+                            loadConsults(user.id, user.userType)
+                        }
+                    }
                 }
+            }
+        }
+    }
 
-                val user = userResult.resultData
-                val isPharmacist = user.userType == UserType.PHARMACIST
+    fun retryConsults() {
+        val user = _uiState.value.user ?: return
+        loadConsults(
+            userId = user.id,
+            userType = if (user.isPharmacist) UserType.PHARMACIST else UserType.GENERAL
+        )
+    }
 
-                val consultFlow = if (isPharmacist) {
-                    consultRepository.getMyAnsweredConsultList(userId)
-                } else {
-                    consultRepository.getMyConsult(userId)
+    private fun loadConsults(userId: String, userType: UserType) {
+        consultOwner = userId to userType
+        consultJob?.cancel()
+        consultJob = viewModelScope.launch {
+            observeMyPageConsultsUseCase(userId, userType).collectLatest { result ->
+                _uiState.update { state ->
+                    when (result) {
+                        DataResourceResult.Loading -> state.copy(consultState = MyPageConsultState.Loading)
+                        is DataResourceResult.Failure -> state.copy(consultState = MyPageConsultState.Error)
+                        is DataResourceResult.Success -> {
+                            val consults = result.resultData.map { it.toMyPageUiModel() }
+                            state.copy(
+                                consultState = MyPageConsultState.Content(
+                                    consults = consults,
+                                    historyText = consults.toHistoryText(state.user?.isPharmacist == true)
+                                )
+                            )
+                        }
+                    }
                 }
-
-                consultFlow.map { consultResult ->
-                    Pair(userResult, consultResult)
-                }
-            }.collectLatest { (userResult, consultResult) ->
-                val user = if (userResult is DataResourceResult.Success) userResult.resultData else _uiState.value.user
-                val consults = if (consultResult is DataResourceResult.Success) {
-                    consultResult.resultData
-                } else {
-                    _uiState.value.myConsults
-                }
-                val isLoading = userResult is DataResourceResult.Loading || consultResult is DataResourceResult.Loading
-                val errorMsg: UiMessage? = when {
-                    userResult is DataResourceResult.Failure -> UiMessage.LoadDataFailed
-                    consultResult is DataResourceResult.Failure -> UiMessage.LoadDataFailed
-                    else -> null
-                }
-                val isPharmacist = user?.userType == UserType.PHARMACIST
-                val totalCount = consults.size
-
-                val countText = if (isPharmacist) {
-                    val completedCount = consults.count { it.status == ConsultStatus.COMPLETED }
-                    if (totalCount > 0) "$completedCount/$totalCount" else null
-                } else {
-                    if (totalCount > 0) "$totalCount" else null
-                }
-
-                _uiState.value = MyPageUiState(
-                    isLoading = isLoading,
-                    user = user,
-                    myConsults = consults,
-                    userMessage = errorMsg,
-                    consultHistoryText = countText
-                )
             }
         }
     }
 
     fun logout() {
         viewModelScope.launch {
-            authRepository.logout()
+            when (val result = logoutUseCase()) {
+                is DataResourceResult.Success -> _uiState.update { it.copy(isLogoutSuccess = true) }
+                is DataResourceResult.Failure -> _uiState.update {
+                    it.copy(userMessage = result.exception.toUiMessage("로그아웃에 실패했습니다."))
+                }
+                DataResourceResult.Loading -> Unit
+            }
         }
+    }
+
+    fun userMessageShown() {
+        _uiState.update { it.copy(userMessage = null) }
+    }
+
+    private fun List<com.moon.pharm.profile.mypage.model.MyPageConsultUiModel>.toHistoryText(
+        isPharmacist: Boolean
+    ): String? {
+        if (isEmpty()) return null
+        return if (isPharmacist) {
+            "${count { it.status == MyPageConsultStatusUiModel.Completed }}/$size"
+        } else {
+            size.toString()
+        }
+    }
+
+    private fun Throwable.toUiMessage(defaultMessage: String): UiMessage {
+        return UiMessage.Error(message?.takeIf(String::isNotBlank) ?: defaultMessage)
     }
 }

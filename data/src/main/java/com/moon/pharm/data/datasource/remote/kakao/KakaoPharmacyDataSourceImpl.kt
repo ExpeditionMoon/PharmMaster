@@ -3,6 +3,7 @@ package com.moon.pharm.data.datasource.remote.kakao
 import com.moon.pharm.data.BuildConfig
 import com.moon.pharm.data.datasource.PharmacySearchDataSource
 import com.moon.pharm.data.datasource.remote.dto.PharmacyDTO
+import com.moon.pharm.data.mapper.toDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -11,11 +12,11 @@ class KakaoPharmacyDataSourceImpl @Inject constructor(
     private val kakaoApi: KakaoApiService
 ) : PharmacySearchDataSource {
 
-    private val AUTHORIZATION = "${KakaoApiConst.AUTH_PREFIX} ${BuildConfig.KAKAO_REST_API_KEY}"
+    private val authorization = "${KakaoApiConst.AUTH_PREFIX} ${BuildConfig.KAKAO_REST_API_KEY}"
 
     override fun searchExternalPharmacies(query: String): Flow<List<PharmacyDTO>> = flow {
         val response = kakaoApi.searchPharmaciesByKeyword(
-            apiKey = AUTHORIZATION,
+            apiKey = authorization,
             query = query
         )
         val dtos = response.documents.map { it.toDto() }
@@ -24,7 +25,7 @@ class KakaoPharmacyDataSourceImpl @Inject constructor(
 
     override fun searchNearbyPharmacies(lat: Double, lng: Double): Flow<List<PharmacyDTO>> = flow {
         val response = kakaoApi.searchPharmacies(
-            apiKey = AUTHORIZATION,
+            apiKey = authorization,
             longitude = lng.toString(),
             latitude = lat.toString()
         )

@@ -12,18 +12,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.moon.pharm.component_ui.component.bar.PharmPrimaryTabRow
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.medication.MedicationTimeGroup
-import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
+import com.moon.pharm.designsystem.component.bar.PharmPrimaryTabRow
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
+import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
+import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 
 @Composable
 fun MedicationHomeContent(
     selectedTab: MedicationPrimaryTab,
-    currentList: List<MedicationTimeGroup>,
+    currentList: List<MedicationTimeGroupUiModel>,
     totalCount: Int,
     completedCount: Int,
     onTabSelected: (MedicationPrimaryTab) -> Unit,

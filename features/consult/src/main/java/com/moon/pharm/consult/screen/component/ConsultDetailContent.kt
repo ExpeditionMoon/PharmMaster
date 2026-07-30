@@ -14,23 +14,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.component.progress.CircularProgressBar
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
+import com.moon.pharm.consult.model.ConsultStatusUiModel
+import com.moon.pharm.consult.model.ConsultUiModel
+import com.moon.pharm.consult.model.PharmacistUiModel
 import com.moon.pharm.consult.screen.section.AnswerSection
 import com.moon.pharm.consult.screen.section.PharmacistAnswerInputSection
 import com.moon.pharm.consult.screen.section.QuestionSection
-import com.moon.pharm.domain.model.auth.Pharmacist
-import com.moon.pharm.domain.model.consult.ConsultItem
-import com.moon.pharm.domain.model.consult.ConsultStatus
+import com.moon.pharm.designsystem.component.progress.CircularProgressBar
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 
 @Composable
 fun ConsultDetailContent(
     isLoading: Boolean,
-    item: ConsultItem?,
-    pharmacist: Pharmacist?,
+    item: ConsultUiModel?,
+    pharmacist: PharmacistUiModel?,
     pharmacistImageUrl: String?,
 
     isPharmacistMode: Boolean = false,
@@ -66,7 +66,7 @@ fun ConsultDetailContent(
                     Spacer(modifier = Modifier.height(24.dp))
                 }
                 item {
-                    if (item.status == ConsultStatus.COMPLETED && item.answer != null) {
+                    if (item.status == ConsultStatusUiModel.Completed && item.answer != null) {
                         if (isEditingAnswer) {
                             Spacer(modifier = Modifier.height(20.dp))
                             PharmacistAnswerInputSection(
@@ -85,7 +85,7 @@ fun ConsultDetailContent(
                                 onDeleteClick = onDeleteAnswer
                             )
                         }
-                    } else if (item.status == ConsultStatus.WAITING) {
+                    } else if (item.status == ConsultStatusUiModel.Waiting) {
                         Spacer(modifier = Modifier.height(20.dp))
                         if (isPharmacistMode) {
                             PharmacistAnswerInputSection(
@@ -126,7 +126,7 @@ private fun ConsultDetailContentPreview() {
     PharmMasterTheme {
         ConsultDetailContent(
             isLoading = false,
-            item = ConsultItem(
+            item = ConsultUiModel(
                 id = "1",
                 userId = "u1",
                 pharmacistId = "p1",
@@ -134,7 +134,7 @@ private fun ConsultDetailContentPreview() {
                 title = "두통약 문의",
                 content = "어떻게 먹나요?",
                 isPublic = true,
-                status = ConsultStatus.WAITING,
+                status = ConsultStatusUiModel.Waiting,
                 createdAt = System.currentTimeMillis()
             ),
             pharmacist = null,

@@ -2,9 +2,9 @@ package com.moon.pharm.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.moon.pharm.data.datasource.UserLifeStyleDataSource
-import com.moon.pharm.data.datasource.remote.dto.toDomain
-import com.moon.pharm.data.datasource.remote.dto.toDto
 import com.moon.pharm.data.di.IoDispatcher
+import com.moon.pharm.data.mapper.toDomain
+import com.moon.pharm.data.mapper.toDto
 import com.moon.pharm.domain.model.auth.UserException
 import com.moon.pharm.domain.model.auth.UserLifeStyle
 import com.moon.pharm.domain.repository.UserLifeStyleRepository
@@ -21,13 +21,15 @@ import javax.inject.Inject
 
 class UserLifeStyleRepositoryImpl @Inject constructor(
     private val dataSource: UserLifeStyleDataSource,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : UserLifeStyleRepository {
 
-    private fun Throwable.toUserException(): UserException = when {
-        this is FirebaseFirestoreException && this.code == FirebaseFirestoreException.Code.NOT_FOUND -> UserException.NotFound()
-        this is FirebaseFirestoreException -> UserException.NetworkError()
-        else -> UserException.Unknown(this.message)
+    private fun Throwable.toUserException(): UserException = when (this) {
+        is FirebaseFirestoreException -> when (code) {
+            FirebaseFirestoreException.Code.NOT_FOUND -> UserException.NotFound()
+            else -> UserException.NetworkError()
+        }
+        else -> UserException.Unknown(message)
     }
 
     private fun wrapCUDOperation(
@@ -41,7 +43,7 @@ class UserLifeStyleRepositoryImpl @Inject constructor(
             }
         }.fold(
             onSuccess = { DataResourceResult.Success(Unit) },
-            onFailure = { e -> DataResourceResult.Failure(e.toUserException()) } // ⚠️ 여기는 toUserException 입니다!
+            onFailure = { e -> DataResourceResult.Failure(e.toUserException()) }
         )
         emit(result)
     }.flowOn(ioDispatcher)

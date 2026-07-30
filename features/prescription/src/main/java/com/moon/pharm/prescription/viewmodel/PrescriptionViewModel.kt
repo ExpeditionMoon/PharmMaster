@@ -3,12 +3,11 @@ package com.moon.pharm.prescription.viewmodel
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moon.pharm.component_ui.model.ScannedMedication
+import com.moon.pharm.domain.model.prescription.PrescriptionException
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.prescription.ExtractDrugNamesFromOcrUseCase
-import com.moon.pharm.prescription.ocr.TextRecognitionHelper
+import com.moon.pharm.prescription.ocr.OcrTextExtractor
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -18,59 +17,72 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PrescriptionViewModel @Inject constructor(
-    private val ocrHelper: TextRecognitionHelper,
+    private val ocrTextExtractor: OcrTextExtractor,
     private val extractDrugNamesUseCase: ExtractDrugNamesFromOcrUseCase
 ) : ViewModel() {
 
     private val _uiEvent = MutableSharedFlow<PrescriptionUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
+    private val _uiState = MutableStateFlow<PrescriptionUiState>(PrescriptionUiState.Idle)
+    val uiState = _uiState.asStateFlow()
 
-    private var isProcessing = false
+    private var latestImageUri: Uri? = null
+    private var latestOcrText: String? = null
 
     fun onTextRecognized(text: String) {
-        if (isProcessing) return
-        if (text.length > 10 && (text.contains("정") || text.contains("회") || text.contains("캡슐"))) {
-            isProcessing = true
-            viewModelScope.launch {
-                _isLoading.value = true
-                delay(500)
-                processTextWithAi(text)
-            }
-        }
+        latestImageUri = null
+        submitOcrText(text)
     }
 
     fun analyzeImageFromUri(uri: Uri) {
-        if (isProcessing) return
-        isProcessing = true
+        if (_uiState.value is PrescriptionUiState.Loading) return
+        latestImageUri = uri
+        latestOcrText = null
         viewModelScope.launch {
-            _isLoading.value = true
-            ocrHelper.extractTextFromUri(uri)
+            _uiState.value = PrescriptionUiState.Loading
+            ocrTextExtractor.extractTextFromUri(uri)
                 .onSuccess { rawText ->
                     processTextWithAi(rawText)
                 }
-                .onFailure { exception ->
-                    exception.printStackTrace()
-                    _isLoading.value = false
-                    isProcessing = false
+                .onFailure {
+                    _uiState.value = PrescriptionUiState.Error(PrescriptionException.OcrFailed.toPrescriptionError())
                 }
+        }
+    }
+
+    fun retry() {
+        latestOcrText?.let(::submitOcrText)
+            ?: latestImageUri?.let(::analyzeImageFromUri)
+    }
+
+    private fun submitOcrText(rawText: String) {
+        if (_uiState.value is PrescriptionUiState.Loading) return
+        latestOcrText = rawText
+        viewModelScope.launch {
+            _uiState.value = PrescriptionUiState.Loading
+            processTextWithAi(rawText)
         }
     }
 
     private suspend fun processTextWithAi(rawText: String) {
-        when(val result = extractDrugNamesUseCase(rawText)) {
+        when (val result = extractDrugNamesUseCase(rawText)) {
             is DataResourceResult.Success -> {
-                val scannedList = result.resultData.map { ScannedMedication(name = it, dailyCount = 1) }
-                _uiEvent.emit(PrescriptionUiEvent.NavigateToCreate(scannedList))
+                _uiEvent.emit(PrescriptionUiEvent.NavigateToCreate(result.resultData))
+                _uiState.value = PrescriptionUiState.Idle
             }
             is DataResourceResult.Failure -> {
-                result.exception.printStackTrace()
+                _uiState.value = PrescriptionUiState.Error(result.exception.toPrescriptionError())
             }
-            is DataResourceResult.Loading -> { }
+            DataResourceResult.Loading -> Unit
         }
-        _isLoading.value = false
-        isProcessing = false
+    }
+
+    private fun Throwable.toPrescriptionError(): PrescriptionError = when (this) {
+        PrescriptionException.Network -> PrescriptionError.NETWORK
+        PrescriptionException.OcrNoText,
+        PrescriptionException.DrugNameNotFound,
+        PrescriptionException.OcrFailed -> PrescriptionError.OCR
+        else -> PrescriptionError.GEMINI
     }
 }

@@ -21,14 +21,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.moon.pharm.component_ui.component.bar.PharmTopBar
-import com.moon.pharm.component_ui.model.TopBarData
-import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.component_ui.util.toDisplayString
-import com.moon.pharm.component_ui.util.toQueryString
+import com.moon.pharm.designsystem.component.bar.PharmTopBar
+import com.moon.pharm.designsystem.model.TopBarData
+import com.moon.pharm.designsystem.model.TopBarNavigationType
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.designsystem.util.toDisplayString
+import com.moon.pharm.designsystem.util.toQueryString
 import com.moon.pharm.profile.R
 import com.moon.pharm.profile.medication.screen.component.HistoryRecordItem
 import com.moon.pharm.profile.medication.screen.section.HistoryCalendarSection
@@ -129,12 +129,12 @@ fun MedicationHistoryContent(
                         uiModel = uiModel,
                         onRecordClick = {
                             onToggleRecord(
-                                uiModel.record.medicationId,
-                                uiModel.record.scheduleId,
-                                !uiModel.record.isTaken
+                                uiModel.medicationId,
+                                uiModel.scheduleId,
+                                !uiModel.isTaken
                             )
                         },
-                        onDeleteClick = { onDeleteClick(uiModel.record.medicationId) }
+                        onDeleteClick = { onDeleteClick(uiModel.medicationId) }
                     )
                 }
             }

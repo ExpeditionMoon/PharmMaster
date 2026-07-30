@@ -5,21 +5,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.moon.pharm.component_ui.component.bar.PharmPrimaryTabRow
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.model.ConsultPrimaryTab
-import com.moon.pharm.domain.model.consult.ConsultItem
+import com.moon.pharm.consult.model.ConsultUiModel
+import com.moon.pharm.designsystem.component.bar.PharmPrimaryTabRow
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 
 @Composable
 fun ConsultContent(
     selectedTab: ConsultPrimaryTab,
-    currentList: List<ConsultItem>,
+    currentList: List<ConsultUiModel>,
     currentUserId: String?,
     isPharmacist: Boolean,
     onTabSelected: (ConsultPrimaryTab) -> Unit,
-    onItemClick: (ConsultItem) -> Unit
+    onItemClick: (ConsultUiModel) -> Unit
 ) {
     val tabTitles = ConsultPrimaryTab.entries.map { it.title }
 

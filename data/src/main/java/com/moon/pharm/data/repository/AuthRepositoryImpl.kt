@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val dataSource: AuthDataSource,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : AuthRepository {
 
     private suspend fun <T> wrapAuthOperation(

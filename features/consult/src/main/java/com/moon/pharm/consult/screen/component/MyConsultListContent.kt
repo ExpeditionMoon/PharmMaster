@@ -8,14 +8,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.consult.ConsultItem
-import com.moon.pharm.domain.model.consult.ConsultStatus
+import com.moon.pharm.consult.model.ConsultStatusUiModel
+import com.moon.pharm.consult.model.ConsultUiModel
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 
 @Composable
 fun MyConsultListContent(
-    items: List<ConsultItem>,
+    items: List<ConsultUiModel>,
     currentUserId: String?,
     isPharmacist: Boolean,
     onItemClick: (String) -> Unit
@@ -42,7 +42,7 @@ private fun MyConsultListContentPreview() {
     PharmMasterTheme {
         MyConsultListContent(
             items = listOf(
-                ConsultItem(
+                ConsultUiModel(
                     id = "1",
                     userId = "u1",
                     pharmacistId = "p1",
@@ -50,7 +50,7 @@ private fun MyConsultListContentPreview() {
                     title = "타이레놀 복용 문의",
                     content = "...",
                     isPublic = true,
-                    status = ConsultStatus.WAITING,
+                    status = ConsultStatusUiModel.Waiting,
                     createdAt = System.currentTimeMillis()
                 )
             ),

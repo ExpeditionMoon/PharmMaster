@@ -8,6 +8,8 @@ data class Medication(
     val startDate: Long?,
     val endDate: Long?,
     val repeatType: RepeatType,
+    val weeklyDays: Set<Int> = emptySet(),
+    val isAlarmEnabled: Boolean = true,
     val memo: String? = null,
     val schedules: List<MedicationSchedule>,
 

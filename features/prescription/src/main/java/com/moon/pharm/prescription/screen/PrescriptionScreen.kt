@@ -34,41 +34,36 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
-import com.moon.pharm.component_ui.component.card.InfoCardType
-import com.moon.pharm.component_ui.component.card.PharmInfoCard
-import com.moon.pharm.component_ui.component.progress.CircularProgressBar
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
+import com.moon.pharm.designsystem.component.button.PharmPrimaryButton
+import com.moon.pharm.designsystem.component.card.InfoCardType
+import com.moon.pharm.designsystem.component.card.PharmInfoCard
+import com.moon.pharm.designsystem.component.progress.CircularProgressBar
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.prescription.R
+import com.moon.pharm.prescription.viewmodel.PrescriptionError
 import com.moon.pharm.prescription.viewmodel.PrescriptionUiEvent
+import com.moon.pharm.prescription.viewmodel.PrescriptionUiState
 import com.moon.pharm.prescription.viewmodel.PrescriptionViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun PrescriptionScreen(
-    navController: NavController,
-    viewModel: PrescriptionViewModel = hiltViewModel()
+    viewModel: PrescriptionViewModel = hiltViewModel(),
+    onNavigateToMedicationCreate: (List<String>) -> Unit
 ) {
     val context = LocalContext.current
     var showCamera by remember { mutableStateOf(false) }
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLoading = uiState is PrescriptionUiState.Loading
     val permissionRequiredMessage = stringResource(id = R.string.toast_camera_permission_required)
 
-    LaunchedEffect(true) {
+    LaunchedEffect(Unit) {
         viewModel.uiEvent.collectLatest { event ->
             when (event) {
                 is PrescriptionUiEvent.NavigateToCreate -> {
-                    navController.navigate(
-                        ContentNavigationRoute.MedicationTabCreateScreen(
-                            scannedList = event.scannedList
-                        )
-                    ) {
-                        popUpTo(ContentNavigationRoute.PrescriptionCapture) { inclusive = false }
-                    }
+                    onNavigateToMedicationCreate(event.scannedMedicationNames)
                 }
             }
         }
@@ -142,6 +137,20 @@ fun PrescriptionScreen(
                 message = stringResource(id = R.string.prescription_security_notice),
                 type = InfoCardType.NOTICE
             )
+
+            if (uiState is PrescriptionUiState.Error) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(id = (uiState as PrescriptionUiState.Error).type.messageResId()),
+                    color = PharmTheme.colors.error,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                PharmPrimaryButton(
+                    text = stringResource(id = R.string.prescription_btn_retry),
+                    onClick = viewModel::retry
+                )
+            }
         }
     }
 
@@ -168,6 +177,12 @@ fun PrescriptionScreen(
             }
         }
     }
+}
+
+private fun PrescriptionError.messageResId(): Int = when (this) {
+    PrescriptionError.GEMINI -> R.string.prescription_error_gemini
+    PrescriptionError.NETWORK -> R.string.prescription_error_network
+    PrescriptionError.OCR -> R.string.prescription_error_ocr
 }
 
 @ThemePreviews

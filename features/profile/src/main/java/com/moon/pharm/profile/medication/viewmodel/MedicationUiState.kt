@@ -1,11 +1,11 @@
 package com.moon.pharm.profile.medication.viewmodel
 
-import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.domain.model.medication.MealTiming
-import com.moon.pharm.domain.model.medication.MedicationType
-import com.moon.pharm.domain.model.medication.RepeatType
-import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
+import com.moon.pharm.designsystem.common.UiMessage
+import com.moon.pharm.profile.medication.model.MealTimingUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
+import com.moon.pharm.profile.medication.model.MedicationTypeUiModel
+import com.moon.pharm.profile.medication.model.RepeatTypeUiModel
+import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 
 data class MedicationUiState(
     val isLoading: Boolean = false,
@@ -21,12 +21,14 @@ data class MedicationFormState(
     val medicationName: String = "",
     val dailyCount: Int = 0,
     val medicationDosage: String? = "",
-    val selectedType: MedicationType = MedicationType.PRESCRIPTION,
+    val selectedType: MedicationTypeUiModel = MedicationTypeUiModel.Prescription,
     val startDate: Long? = null,
     val endDate: Long? = null,
     val noEndDate: Boolean = false,
-    val selectedMealTiming: MealTiming = MealTiming.BEFORE_MEAL,
+    val selectedMealTiming: MealTimingUiModel = MealTimingUiModel.BeforeMeal,
     val selectedTime: Long? = null,
-    val selectedRepeatType: RepeatType = RepeatType.DAILY,
-    val isGrouped: Boolean = false
+    val selectedRepeatType: RepeatTypeUiModel = RepeatTypeUiModel.Daily,
+    val selectedWeeklyDays: Set<Int> = emptySet(),
+    val isGrouped: Boolean = false,
+    val isAlarmEnabled: Boolean = true
 )

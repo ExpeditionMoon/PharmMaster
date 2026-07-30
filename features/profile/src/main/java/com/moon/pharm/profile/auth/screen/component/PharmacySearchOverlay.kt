@@ -18,12 +18,13 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
-import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
-import com.moon.pharm.component_ui.component.button.PharmPrimaryButton
-import com.moon.pharm.component_ui.component.map.PharmacySelector
-import com.moon.pharm.domain.model.pharmacy.Pharmacy
+import com.moon.pharm.designsystem.component.button.PharmPrimaryButton
+import com.moon.pharm.maps.DEFAULT_SEOUL_LATITUDE
+import com.moon.pharm.maps.DEFAULT_SEOUL_LONGITUDE
+import com.moon.pharm.maps.component.PharmacySelector
+import com.moon.pharm.maps.model.MapPlace
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.auth.model.SignUpPharmacyUiModel
 import com.moon.pharm.profile.auth.screen.SignUpUiState
 import com.moon.pharm.profile.auth.viewmodel.SignUpViewModel
 
@@ -33,11 +34,11 @@ fun PharmacySearchOverlay(
     viewModel: SignUpViewModel,
     onClose: () -> Unit
 ) {
-    var tempSelectedPharmacy by remember { mutableStateOf<Pharmacy?>(null) }
+    var tempSelectedPharmacy by remember { mutableStateOf<SignUpPharmacyUiModel?>(null) }
     var isLocationGranted by remember { mutableStateOf(false) }
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL), 15f)
+        position = CameraPosition.fromLatLngZoom(LatLng(DEFAULT_SEOUL_LATITUDE, DEFAULT_SEOUL_LONGITUDE), 15f)
     }
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -46,7 +47,7 @@ fun PharmacySearchOverlay(
         val isGranted = permissions.values.all { it }
         isLocationGranted = isGranted
         if (isGranted) viewModel.fetchCurrentLocationAndSearch()
-        else viewModel.fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
+        else viewModel.fetchNearbyPharmacies(DEFAULT_SEOUL_LATITUDE, DEFAULT_SEOUL_LONGITUDE)
     }
 
     LaunchedEffect(Unit) {
@@ -56,10 +57,12 @@ fun PharmacySearchOverlay(
     }
 
     PharmacySelector(
-        pharmacies = uiState.pharmacySearchResults,
-        selectedPharmacy = tempSelectedPharmacy,
+        pharmacies = uiState.pharmacySearchResults.map { it.toMapPlace() },
+        selectedPharmacy = tempSelectedPharmacy?.toMapPlace(),
         isLocationEnabled = isLocationGranted,
-        onPharmacyClick = { tempSelectedPharmacy = it },
+        onPharmacyClick = { selected ->
+            tempSelectedPharmacy = uiState.pharmacySearchResults.find { it.placeId == selected.placeId }
+        },
         cameraPositionState = cameraPositionState,
         cameraMoveEvent = viewModel.moveCameraEvent,
         onSearch = { query -> viewModel.searchPharmacies(query) },
@@ -87,4 +90,16 @@ fun PharmacySearchOverlay(
         viewModel.clearSearchResults()
         onClose()
     }
+}
+
+private fun SignUpPharmacyUiModel.toMapPlace(): MapPlace {
+    return MapPlace(
+        id = id,
+        placeId = placeId,
+        name = name,
+        address = address,
+        tel = tel,
+        latitude = latitude,
+        longitude = longitude
+    )
 }

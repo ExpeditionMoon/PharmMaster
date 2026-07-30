@@ -10,49 +10,38 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import com.moon.pharm.component_ui.component.bar.PharmTopBar
-import com.moon.pharm.component_ui.component.progress.CircularProgressBar
-import com.moon.pharm.component_ui.model.TopBarAction
-import com.moon.pharm.component_ui.model.TopBarData
-import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.component_ui.util.MultipleEventsCutter
 import com.moon.pharm.consult.R
-import com.moon.pharm.consult.navigation.ConsultNavKeys.REFRESH_CONSULT_LIST
 import com.moon.pharm.consult.screen.component.ConsultContent
 import com.moon.pharm.consult.viewmodel.ConsultListViewModel
+import com.moon.pharm.designsystem.component.bar.PharmTopBar
+import com.moon.pharm.designsystem.component.progress.CircularProgressBar
+import com.moon.pharm.designsystem.model.TopBarAction
+import com.moon.pharm.designsystem.model.TopBarData
+import com.moon.pharm.designsystem.model.TopBarNavigationType
+import com.moon.pharm.designsystem.util.MultipleEventsCutter
 
 @Composable
 fun ConsultScreen(
-    navController: NavController? = null,
-    viewModel: ConsultListViewModel
+    viewModel: ConsultListViewModel,
+    shouldRefresh: Boolean,
+    onRefreshHandled: () -> Unit,
+    onNavigateToWrite: () -> Unit,
+    onNavigateToDetail: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val multipleEventsCutter = remember { MultipleEventsCutter.get() }
 
-    if (navController != null) {
-        val refreshFlow = navController.currentBackStackEntry
-                ?.savedStateHandle
-            ?.getStateFlow(REFRESH_CONSULT_LIST, false)
-
-        val shouldRefresh by refreshFlow?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
-
-        LaunchedEffect(shouldRefresh) {
-            if (shouldRefresh) {
-                viewModel.fetchConsultList()
-                navController.currentBackStackEntry
-                    ?.savedStateHandle
-                    ?.set(REFRESH_CONSULT_LIST, false)
-            }
+    LaunchedEffect(shouldRefresh) {
+        if (shouldRefresh) {
+            viewModel.fetchConsultList()
+            onRefreshHandled()
         }
     }
 
@@ -62,13 +51,12 @@ fun ConsultScreen(
                 data = TopBarData(
                     title = stringResource(R.string.consult_board_title),
                     navigationType = TopBarNavigationType.None,
-                    onNavigationClick = { navController?.popBackStack() },
                     actions = listOf(
                         TopBarAction(
                             icon = Icons.Filled.Add,
                             onClick = {
                                 multipleEventsCutter.processEvent {
-                                    navController?.navigate(ContentNavigationRoute.ConsultTabWriteScreen)
+                                    onNavigateToWrite()
                                 }
                             }
                         )
@@ -94,9 +82,7 @@ fun ConsultScreen(
                     val hasPermission = consultItem.isPublic || isOwner || isPharmacist
 
                     if (hasPermission) {
-                        navController?.navigate(
-                            ContentNavigationRoute.ConsultTabDetailScreen(id = consultItem.id)
-                        )
+                        onNavigateToDetail(consultItem.id)
                     } else {
                         Toast.makeText(context, "작성자만 확인할 수 있습니다.", Toast.LENGTH_SHORT).show()
                     }

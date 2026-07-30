@@ -23,27 +23,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.moon.pharm.component_ui.common.DEFAULT_LAT_SEOUL
-import com.moon.pharm.component_ui.common.DEFAULT_LNG_SEOUL
-import com.moon.pharm.component_ui.component.bar.PharmTopBar
-import com.moon.pharm.component_ui.model.TopBarData
-import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
 import com.moon.pharm.consult.R
 import com.moon.pharm.consult.screen.component.ConsultPharmacistContent
 import com.moon.pharm.consult.viewmodel.ConsultWriteViewModel
+import com.moon.pharm.designsystem.component.bar.PharmTopBar
+import com.moon.pharm.designsystem.model.TopBarData
+import com.moon.pharm.designsystem.model.TopBarNavigationType
+import com.moon.pharm.maps.DEFAULT_SEOUL_LATITUDE
+import com.moon.pharm.maps.DEFAULT_SEOUL_LONGITUDE
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConsultPharmacistScreen(
-    navController: NavController,
     viewModel: ConsultWriteViewModel,
-    onMapModeChanged: (Boolean) -> Unit
+    onMapModeChanged: (Boolean) -> Unit,
+    onNavigateUp: () -> Unit,
+    onNavigateToConfirm: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -53,7 +52,7 @@ fun ConsultPharmacistScreen(
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
-            LatLng(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL),
+            LatLng(DEFAULT_SEOUL_LATITUDE, DEFAULT_SEOUL_LONGITUDE),
             15f
         )
     }
@@ -65,7 +64,7 @@ fun ConsultPharmacistScreen(
         if (isGranted) {
             viewModel.fetchCurrentLocationAndPharmacies()
         } else {
-            viewModel.fetchNearbyPharmacies(DEFAULT_LAT_SEOUL, DEFAULT_LNG_SEOUL)
+            viewModel.fetchNearbyPharmacies(DEFAULT_SEOUL_LATITUDE, DEFAULT_SEOUL_LONGITUDE)
         }
     }
 
@@ -87,7 +86,7 @@ fun ConsultPharmacistScreen(
         } else if (isMapView) {
             isMapView = false
         } else {
-            navController.popBackStack()
+            onNavigateUp()
         }
     }
 
@@ -122,7 +121,7 @@ fun ConsultPharmacistScreen(
                 onPharmacistSelect = { pharmacistId ->
                     viewModel.selectPharmacist(pharmacistId)
                     isMapView = false
-                    navController.navigate(ContentNavigationRoute.ConsultTabConfirmScreen)
+                    onNavigateToConfirm()
                 },
                 onMapModeChange = { isMap -> isMapView = isMap },
                 onBackFromMap = {

@@ -15,26 +15,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.component.chip.FilterChip
-import com.moon.pharm.component_ui.component.input.SearchBar
-import com.moon.pharm.component_ui.component.item.PharmacyListItem
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.PharmacyListPreviewProvider
-import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
-import com.moon.pharm.domain.model.pharmacy.Pharmacy
+import com.moon.pharm.consult.mapper.toMapPlace
+import com.moon.pharm.consult.model.PharmacyUiModel
+import com.moon.pharm.designsystem.component.chip.FilterChip
+import com.moon.pharm.designsystem.component.input.SearchBar
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.maps.component.PharmacyListItem
 
 @Composable
 fun PharmacistSearchView(
     searchText: String,
-    pharmacies: List<Pharmacy>,
+    pharmacies: List<PharmacyUiModel>,
     onSearchChange: (String) -> Unit,
     onNavigateToMap: () -> Unit,
-    onPharmacySelect: (Pharmacy) -> Unit
+    onPharmacySelect: (PharmacyUiModel) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -71,8 +70,8 @@ fun PharmacistSearchView(
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items (pharmacies){ pharmacy ->
                     PharmacyListItem(
-                        pharmacy = pharmacy,
-                        onClick = onPharmacySelect
+                        pharmacy = pharmacy.toMapPlace(),
+                        onClick = { onPharmacySelect(pharmacy) }
                     )
                 }
             }
@@ -84,13 +83,21 @@ fun PharmacistSearchView(
 
 @ThemePreviews
 @Composable
-private fun PharmacistSearchViewPreview(
-    @PreviewParameter(PharmacyListPreviewProvider::class) pharmacies: List<Pharmacy>
-) {
+private fun PharmacistSearchViewPreview() {
     PharmMasterTheme {
         PharmacistSearchView(
             searchText = "달빛",
-            pharmacies = pharmacies,
+            pharmacies = listOf(
+                PharmacyUiModel(
+                    id = "pharmacy-1",
+                    placeId = "place-1",
+                    name = "Moon Pharmacy",
+                    address = "Seoul",
+                    tel = "02-0000-0000",
+                    latitude = 37.5665,
+                    longitude = 126.9780
+                )
+            ),
             onSearchChange = {},
             onNavigateToMap = {},
             onPharmacySelect = {}

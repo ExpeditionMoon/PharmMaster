@@ -2,7 +2,8 @@ package com.moon.pharm.search.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moon.pharm.domain.repository.DrugSearchRepository
+import com.moon.pharm.domain.usecase.drug.SearchDrugUseCase
+import com.moon.pharm.search.mapper.toUiModel
 import com.moon.pharm.search.model.SearchUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
@@ -18,7 +19,7 @@ import javax.inject.Inject
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class SearchMainViewModel @Inject constructor(
-    private val drugSearchRepository: DrugSearchRepository
+    private val searchDrugUseCase: SearchDrugUseCase
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -58,12 +59,14 @@ class SearchMainViewModel @Inject constructor(
     private suspend fun searchDrugs(query: String) {
         _uiState.update { it.copy(isLoading = true, userMessage = null) }
 
-        val result = drugSearchRepository.searchDrugByName(itemName = query)
+        val result = searchDrugUseCase(query)
 
         result.onSuccess { drugs ->
             _uiState.update {
                 it.copy(
-                    isLoading = false, drugs = drugs, isSearchExecuted = true
+                    isLoading = false,
+                    drugs = drugs.map { drug -> drug.toUiModel() },
+                    isSearchExecuted = true
                 )
             }
         }.onFailure { error ->

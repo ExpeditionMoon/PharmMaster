@@ -1,6 +1,6 @@
 package com.moon.pharm.profile.auth.model
 
-import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.designsystem.common.UiMessage
 
 sealed interface SignUpUiMessage : UiMessage {
     // 공통

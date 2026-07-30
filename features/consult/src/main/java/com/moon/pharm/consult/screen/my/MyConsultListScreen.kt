@@ -7,6 +7,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,22 +18,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.moon.pharm.component_ui.common.asString
-import com.moon.pharm.component_ui.component.bar.PharmTopBar
-import com.moon.pharm.component_ui.component.progress.CircularProgressBar
-import com.moon.pharm.component_ui.component.snackbar.CustomSnackbar
-import com.moon.pharm.component_ui.component.snackbar.SnackbarType
-import com.moon.pharm.component_ui.model.TopBarData
-import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
+import com.moon.pharm.consult.R
 import com.moon.pharm.consult.screen.component.MyConsultEmptyView
 import com.moon.pharm.consult.screen.component.MyConsultListContent
 import com.moon.pharm.consult.util.myConsultListEmptyTextRes
 import com.moon.pharm.consult.util.myConsultListTitleRes
 import com.moon.pharm.consult.viewmodel.MyConsultListUiState
 import com.moon.pharm.consult.viewmodel.MyConsultListViewModel
-import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.designsystem.common.asString
+import com.moon.pharm.designsystem.component.bar.PharmTopBar
+import com.moon.pharm.designsystem.component.progress.CircularProgressBar
+import com.moon.pharm.designsystem.component.snackbar.CustomSnackbar
+import com.moon.pharm.designsystem.component.snackbar.SnackbarType
+import com.moon.pharm.designsystem.model.TopBarData
+import com.moon.pharm.designsystem.model.TopBarNavigationType
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 
 @Composable
 fun MyConsultListRoute(
@@ -56,7 +58,8 @@ fun MyConsultListRoute(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onNavigateUp = onNavigateUp,
-        onItemClick = onNavigateToDetail
+        onItemClick = onNavigateToDetail,
+        onRetry = viewModel::retry
     )
 }
 
@@ -66,15 +69,14 @@ fun MyConsultListScreen(
     uiState: MyConsultListUiState,
     snackbarHostState: SnackbarHostState,
     onNavigateUp: () -> Unit,
-    onItemClick: (String) -> Unit
+    onItemClick: (String) -> Unit,
+    onRetry: () -> Unit
 ) {
-    val userType = if (uiState.isPharmacist) UserType.PHARMACIST else UserType.GENERAL
-
     Scaffold(
         topBar = {
             PharmTopBar(
                 data = TopBarData(
-                    title = stringResource(userType.myConsultListTitleRes),
+                    title = stringResource(uiState.isPharmacist.myConsultListTitleRes),
                     navigationType = TopBarNavigationType.Back,
                     onNavigationClick = onNavigateUp
                 )
@@ -95,9 +97,15 @@ fun MyConsultListScreen(
                 uiState.isLoading -> {
                     CircularProgressBar(modifier = Modifier.align(Alignment.Center))
                 }
+                uiState.hasLoadError -> {
+                    MyConsultLoadErrorView(
+                        onRetry = onRetry,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
                 uiState.myConsults.isEmpty() -> {
                     MyConsultEmptyView(
-                        text = stringResource(userType.myConsultListEmptyTextRes),
+                        text = stringResource(uiState.isPharmacist.myConsultListEmptyTextRes),
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -110,6 +118,22 @@ fun MyConsultListScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun MyConsultLoadErrorView(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    androidx.compose.foundation.layout.Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = stringResource(R.string.my_consult_load_error))
+        TextButton(onClick = onRetry) {
+            Text(text = stringResource(R.string.my_consult_retry))
         }
     }
 }
@@ -127,7 +151,8 @@ private fun MyConsultListScreenPreview() {
             ),
             snackbarHostState = SnackbarHostState(),
             onNavigateUp = {},
-            onItemClick = {}
+            onItemClick = {},
+            onRetry = {}
         )
     }
 }

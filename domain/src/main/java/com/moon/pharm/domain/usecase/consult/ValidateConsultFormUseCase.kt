@@ -1,8 +1,7 @@
 package com.moon.pharm.domain.usecase.consult
 
-import javax.inject.Inject
 
-class ValidateConsultFormUseCase @Inject constructor() {
+class ValidateConsultFormUseCase() {
     enum class ErrorType {
         EMPTY_INPUT, TITLE_TOO_SHORT
     }

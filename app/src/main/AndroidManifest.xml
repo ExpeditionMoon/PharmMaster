@@ -9,8 +9,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera.any" android:required="true" />
@@ -19,9 +19,9 @@
         android:name=".PharmMasterApplication"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/launcher_logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/launcher_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.PharmMaster"
         android:usesCleartextTraffic="true"
@@ -32,6 +32,9 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="pharm_consult_channel" />
+        <meta-data
+            android:name="firebase_messaging_installation_id_enabled"
+            android:value="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -53,11 +56,16 @@
             </intent-filter>
         </service>
         <receiver
-            android:name="com.moon.pharm.data.alarm.AlarmReceiver"
+            android:name=".alarm.AlarmReceiver"
+            android:enabled="true"
+            android:exported="false" />
+        <receiver
+            android:name=".alarm.AlarmRestoreReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
     </application>

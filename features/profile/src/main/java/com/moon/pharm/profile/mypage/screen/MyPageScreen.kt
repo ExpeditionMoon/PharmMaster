@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -14,37 +15,43 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.moon.pharm.component_ui.component.bar.PharmTopBar
-import com.moon.pharm.component_ui.model.TopBarAction
-import com.moon.pharm.component_ui.model.TopBarData
-import com.moon.pharm.component_ui.model.TopBarNavigationType
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.auth.User
-import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.designsystem.common.asString
+import com.moon.pharm.designsystem.component.bar.PharmTopBar
+import com.moon.pharm.designsystem.component.snackbar.CustomSnackbar
+import com.moon.pharm.designsystem.component.snackbar.SnackbarType
+import com.moon.pharm.designsystem.model.TopBarAction
+import com.moon.pharm.designsystem.model.TopBarData
+import com.moon.pharm.designsystem.model.TopBarNavigationType
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.profile.BuildConfig
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.mypage.model.MyPageUserUiModel
 import com.moon.pharm.profile.mypage.screen.component.EditNicknameDialog
 import com.moon.pharm.profile.mypage.screen.component.MyPageFooterSection
 import com.moon.pharm.profile.mypage.screen.component.MyPageMenuItemData
 import com.moon.pharm.profile.mypage.screen.component.MyPageMenuSection
 import com.moon.pharm.profile.mypage.screen.component.MyPageProfileCard
+import com.moon.pharm.profile.mypage.viewmodel.MyPageConsultState
 import com.moon.pharm.profile.mypage.viewmodel.MyPageUiState
 import com.moon.pharm.profile.mypage.viewmodel.MyPageViewModel
-import com.moon.pharm.profile.util.myPageConsultMenuTitleRes
-import com.moon.pharm.component_ui.R as UiR
+import com.moon.pharm.designsystem.R as UiR
 
 @Composable
 fun MyPageRoute(
@@ -54,38 +61,52 @@ fun MyPageRoute(
     viewModel: MyPageViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val userMessage = uiState.userMessage
+    val messageText = userMessage?.asString()
+
+    LaunchedEffect(uiState.isLogoutSuccess) {
+        if (uiState.isLogoutSuccess) {
+            onNavigateToLogin()
+        }
+    }
+
+    LaunchedEffect(userMessage) {
+        if (userMessage != null && messageText != null) {
+            snackbarHostState.showSnackbar(messageText)
+            viewModel.userMessageShown()
+        }
+    }
 
     MyPageScreen(
         uiState = uiState,
+        snackbarHostState = snackbarHostState,
         onNavigateToMyConsultation = onNavigateToMyConsultation,
         onNavigateToMedicationHistory = onNavigateToMedicationHistory,
-        onLogout = {
-            viewModel.logout()
-            onNavigateToLogin()
-        },
-        onUpdateNickname = viewModel::updateNickname
+        onLogout = viewModel::logout,
+        onUpdateNickname = viewModel::updateNickname,
+        onRetryConsults = viewModel::retryConsults
     )
 }
 
 @Composable
 fun MyPageScreen(
     uiState: MyPageUiState,
+    snackbarHostState: SnackbarHostState,
     onNavigateToMyConsultation: () -> Unit,
     onNavigateToMedicationHistory: () -> Unit,
     onLogout: () -> Unit,
-    onUpdateNickname: (String) -> Unit
+    onUpdateNickname: (String) -> Unit,
+    onRetryConsults: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-    var showEditDialog by remember { mutableStateOf(false) }
+    val showEditDialog: MutableState<Boolean> = remember { mutableStateOf(false) }
 
-    if (showEditDialog && uiState.user != null) {
+    if (showEditDialog.value && uiState.user != null) {
         EditNicknameDialog(
             currentNickname = uiState.user.nickName,
-            onDismiss = { showEditDialog = false },
-            onConfirm = { newNickname ->
-                onUpdateNickname(newNickname)
-                showEditDialog = false
-            }
+            onDismiss = { showEditDialog.value = false },
+            onConfirm = onUpdateNickname
         )
     }
 
@@ -104,8 +125,13 @@ fun MyPageScreen(
                 )
             )
         },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                CustomSnackbar(snackbarData = data, type = SnackbarType.ERROR)
+            }
+        }
     ) { paddingValues ->
-        if (uiState.isLoading && uiState.user == null) {
+        if (uiState.isProfileLoading && uiState.user == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
@@ -121,12 +147,14 @@ fun MyPageScreen(
                 ) {
                     MyPageProfileCard(
                         user = user,
-                        onEditProfileClick = { showEditDialog = true }
+                        onEditProfileClick = { showEditDialog.value = true }
                     )
 
-                    val baseTitle = stringResource(user.userType.myPageConsultMenuTitleRes)
+                    val baseTitle = stringResource(
+                        if (user.isPharmacist) UiR.string.my_answer_title else UiR.string.my_consult_title
+                    )
 
-                    val formattedCount = uiState.consultHistoryText?.let {
+                    val formattedCount = (uiState.consultState as? MyPageConsultState.Content)?.historyText?.let {
                         stringResource(R.string.mypage_consult_history_format, it)
                     }
 
@@ -138,6 +166,11 @@ fun MyPageScreen(
                             onConsultClick = onNavigateToMyConsultation,
                             onMedicationHistoryClick = onNavigateToMedicationHistory
                         )
+                    )
+
+                    MyPageConsultStateContent(
+                        consultState = uiState.consultState,
+                        onRetry = onRetryConsults
                     )
 
                     MyPageMenuSection(
@@ -156,6 +189,34 @@ fun MyPageScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun MyPageConsultStateContent(
+    consultState: MyPageConsultState,
+    onRetry: () -> Unit
+) {
+    when (consultState) {
+        MyPageConsultState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        MyPageConsultState.Error -> {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = stringResource(R.string.mypage_consult_load_error))
+                TextButton(onClick = onRetry) {
+                    Text(text = stringResource(R.string.mypage_consult_retry))
+                }
+            }
+        }
+        is MyPageConsultState.Content -> Unit
     }
 }
 
@@ -213,22 +274,20 @@ private fun MyPageScreenPreview() {
     PharmMasterTheme {
         MyPageScreen(
             uiState = MyPageUiState(
-                isLoading = false,
-                user = User(
+                isProfileLoading = false,
+                user = MyPageUserUiModel(
                     id = "test_user_id",
-                    email = "test@moonpharm.com",
                     nickName = "달토끼",
-                    userType = UserType.GENERAL,
                     profileImageUrl = null,
-                    createdAt = System.currentTimeMillis(),
-                    fcmToken = null
-                ),
-                myConsults = emptyList()
+                    isPharmacist = false
+                )
             ),
+            snackbarHostState = SnackbarHostState(),
             onNavigateToMyConsultation = {},
             onNavigateToMedicationHistory = {},
             onLogout = {},
-            onUpdateNickname = {}
+            onUpdateNickname = {},
+            onRetryConsults = {}
         )
     }
 }

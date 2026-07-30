@@ -8,9 +8,8 @@ import com.moon.pharm.domain.repository.ConsultRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
-class RegisterAnswerUseCase @Inject constructor(
+class RegisterAnswerUseCase(
     private val repository: ConsultRepository,
     private val authRepository: AuthRepository
 ) {

@@ -2,9 +2,9 @@ package com.moon.pharm.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.moon.pharm.data.datasource.PharmacistDataSource
-import com.moon.pharm.data.datasource.remote.dto.toDomain
-import com.moon.pharm.data.datasource.remote.dto.toDto
 import com.moon.pharm.data.di.IoDispatcher
+import com.moon.pharm.data.mapper.toDomain
+import com.moon.pharm.data.mapper.toDto
 import com.moon.pharm.domain.model.auth.Pharmacist
 import com.moon.pharm.domain.model.auth.PharmacistException
 import com.moon.pharm.domain.repository.PharmacistRepository
@@ -21,13 +21,15 @@ import javax.inject.Inject
 
 class PharmacistRepositoryImpl @Inject constructor(
     private val dataSource: PharmacistDataSource,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : PharmacistRepository {
 
-    private fun Throwable.toPharmacistException(): PharmacistException = when {
-        this is FirebaseFirestoreException && this.code == FirebaseFirestoreException.Code.NOT_FOUND -> PharmacistException.NotFound()
-        this is FirebaseFirestoreException -> PharmacistException.NetworkError()
-        else -> PharmacistException.Unknown(this.message)
+    private fun Throwable.toPharmacistException(): PharmacistException = when (this) {
+        is FirebaseFirestoreException -> when (code) {
+            FirebaseFirestoreException.Code.NOT_FOUND -> PharmacistException.NotFound()
+            else -> PharmacistException.NetworkError()
+        }
+        else -> PharmacistException.Unknown(message)
     }
 
     private suspend fun <T> wrapPharmacistOperation(

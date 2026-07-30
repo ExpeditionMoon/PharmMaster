@@ -21,12 +21,13 @@ dependencyResolutionManagement {
 
 rootProject.name = "PharmMaster"
 include(":app")
-include(":features")
+include(":core:designsystem")
+include(":core:maps")
 include(":features:home")
-include(":features:component-ui")
 include(":features:consult")
 include(":features:profile")
 include(":features:prescription")
 include(":domain")
 include(":data")
 include(":features:search")
+include(":features:ddi")

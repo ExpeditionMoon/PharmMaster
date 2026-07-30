@@ -30,15 +30,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.component.dialog.PharmConfirmDialog
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.medication.MealTiming
-import com.moon.pharm.domain.model.medication.MedicationType
-import com.moon.pharm.domain.model.medication.RepeatType
-import com.moon.pharm.domain.model.medication.TodayMedicationUiModel
+import com.moon.pharm.designsystem.component.dialog.PharmConfirmDialog
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.medication.model.MealTimingUiModel
+import com.moon.pharm.profile.medication.model.MedicationTypeUiModel
+import com.moon.pharm.profile.medication.model.RepeatTypeUiModel
+import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 
 @Composable
 fun MedicationItemCard(
@@ -75,14 +75,14 @@ fun MedicationItemCard(
                         color = PharmTheme.colors.onSurface
                     )
                     Text(
-                        text = " · ${item.type.label}",
+                        text = " · ${stringResource(item.type.labelRes)}",
                         fontSize = 13.sp,
                         color = PharmTheme.colors.secondFont
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${item.mealTiming.label} · ${item.repeatType.label}",
+                    text = "${stringResource(item.mealTiming.labelRes)} · ${stringResource(item.repeatType.labelRes)}",
                     fontSize = 13.sp,
                     color = PharmTheme.colors.secondFont
                 )
@@ -109,7 +109,7 @@ fun MedicationItemCard(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    stringResource(R.string.medication_delete),
+                                    text = stringResource(R.string.medication_delete),
                                     color = MaterialTheme.colorScheme.error
                                 )
                             },
@@ -123,18 +123,15 @@ fun MedicationItemCard(
             }
         }
     }
+
     if (showDeleteDialog) {
         PharmConfirmDialog(
             title = stringResource(R.string.medication_delete_dialog_title),
             content = stringResource(R.string.medication_delete_dialog_content),
             confirmText = stringResource(R.string.medication_delete_desc),
             confirmTextColor = MaterialTheme.colorScheme.error,
-            onConfirm = {
-                onDeleteClick(item.medicationId)
-            },
-            onDismiss = {
-                showDeleteDialog = false
-            }
+            onConfirm = { onDeleteClick(item.medicationId) },
+            onDismiss = { showDeleteDialog = false }
         )
     }
 }
@@ -148,12 +145,12 @@ private fun MedicationItemCardPreview() {
                 item = TodayMedicationUiModel(
                     medicationId = "m1",
                     scheduleId = "s1",
-                    name = "혈압약",
-                    type = MedicationType.OTC,
-                    repeatType = RepeatType.DAILY,
-                    time = "오전 08:00",
-                    dosage = "1알",
-                    mealTiming = MealTiming.AFTER_MEAL,
+                    name = "Tylenol",
+                    type = MedicationTypeUiModel.Otc,
+                    repeatType = RepeatTypeUiModel.Daily,
+                    time = "08:00",
+                    dosage = "1 tablet",
+                    mealTiming = MealTimingUiModel.AfterMeal,
                     isTaken = false
                 ),
                 onTakeClick = {},

@@ -1,0 +1,92 @@
+package com.moon.pharm.designsystem.component
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+
+@Composable
+fun StatusBadge(
+    text: String,
+    statusColor: Color,
+    modifier: Modifier = Modifier,
+    contentColor: Color = PharmTheme.colors.onPrimary,
+    useBorderedStyle: Boolean = false,
+    leadingIcon: @Composable (() -> Unit)? = null
+) {
+    val badgeShape = RoundedCornerShape(4.dp)
+
+    val rowModifier = if (useBorderedStyle) {
+        modifier
+            .border(1.dp, statusColor, shape = badgeShape)
+            .background(color = statusColor.copy(alpha = 0.1f), shape = badgeShape)
+    } else {
+        modifier
+            .background(color = statusColor, shape = badgeShape)
+    }.padding(horizontal = 8.dp, vertical = 4.dp)
+
+    Row(
+        modifier = rowModifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (leadingIcon != null) {
+            leadingIcon()
+            Spacer(modifier = Modifier.width(4.dp))
+        }
+
+        val textColor = when {
+            useBorderedStyle -> statusColor
+            contentColor != PharmTheme.colors.onPrimary -> contentColor
+            else -> PharmTheme.colors.surface
+        }
+
+        Text(
+            text = text,
+            color = textColor,
+            fontSize = if (useBorderedStyle) 12.sp else 11.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun StatusBadgePreview() {
+    PharmMasterTheme {
+        Row(
+            modifier = Modifier
+                .background(PharmTheme.colors.background)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            StatusBadge(
+                text = "답변 완료",
+                statusColor = PharmTheme.colors.primary
+            )
+            StatusBadge(
+                text = "답변 대기",
+                statusColor = PharmTheme.colors.secondary
+            )
+            StatusBadge(
+                text = "테두리",
+                statusColor = PharmTheme.colors.primary,
+                useBorderedStyle = true
+            )
+        }
+    }
+}

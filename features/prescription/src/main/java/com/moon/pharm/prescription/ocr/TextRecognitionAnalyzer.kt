@@ -9,7 +9,9 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions
 
 class TextRecognitionAnalyzer(
-    private val onTextFound: (String) -> Unit
+    private val onTextFound: (String) -> Unit,
+    private val onFailure: () -> Unit,
+    private val onComplete: () -> Unit = {}
 ) : ImageAnalysis.Analyzer {
 
     private val recognizer = TextRecognition.getClient(KoreanTextRecognizerOptions.Builder().build())
@@ -22,12 +24,17 @@ class TextRecognitionAnalyzer(
 
             recognizer.process(image)
                 .addOnSuccessListener { visionText ->
-                    if (visionText.text.isNotBlank()) { onTextFound(visionText.text) }
+                    onTextFound(visionText.text)
                 }
-                .addOnFailureListener { e -> e.printStackTrace() }
-                .addOnCompleteListener { imageProxy.close() }
+                .addOnFailureListener { onFailure() }
+                .addOnCompleteListener {
+                    imageProxy.close()
+                    onComplete()
+                }
         } else {
             imageProxy.close()
+            onFailure()
+            onComplete()
         }
     }
 }

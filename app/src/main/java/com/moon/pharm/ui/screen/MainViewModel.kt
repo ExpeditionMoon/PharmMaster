@@ -2,10 +2,11 @@ package com.moon.pharm.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.domain.repository.AuthRepository
+import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
+import com.moon.pharm.domain.usecase.medication.RestoreMedicationAlarmsUseCase
 import com.moon.pharm.domain.usecase.user.SyncFcmTokenUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,17 +18,20 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val syncFcmTokenUseCase: SyncFcmTokenUseCase,
-    private val authRepository: AuthRepository
+    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
+    private val restoreMedicationAlarmsUseCase: RestoreMedicationAlarmsUseCase
 ) : ViewModel() {
 
     private val _isSplashLoading = MutableStateFlow(true)
     val isSplashLoading = _isSplashLoading.asStateFlow()
 
-    private val _startDestination = MutableStateFlow<ContentNavigationRoute?>(null)
+    private val _startDestination = MutableStateFlow<AppStartDestination?>(null)
     val startDestination = _startDestination.asStateFlow()
 
-    private val _navigationEvent = Channel<ContentNavigationRoute>(Channel.BUFFERED)
+    private val _navigationEvent = Channel<MainNavigationEvent>(Channel.BUFFERED)
     val navigationEvent = _navigationEvent.receiveAsFlow()
+
+    private var restoreAlarmsJob: Job? = null
 
     init {
         checkLoginStatus()
@@ -36,12 +40,12 @@ class MainViewModel @Inject constructor(
 
     private fun checkLoginStatus() {
         viewModelScope.launch {
-            val userId = authRepository.getCurrentUserId()
+            val userId = getCurrentUserIdUseCase()
 
             if (userId != null) {
-                _startDestination.value = ContentNavigationRoute.MainBase
+                _startDestination.value = AppStartDestination.Main
             } else {
-                _startDestination.value = ContentNavigationRoute.LoginScreen
+                _startDestination.value = AppStartDestination.Login
             }
             delay(500)
             _isSplashLoading.value = false
@@ -58,13 +62,23 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun refreshFcmToken() {
-        syncToken()
-    }
-
     fun moveToMedicationTab() {
         viewModelScope.launch {
-            _navigationEvent.send(ContentNavigationRoute.MedicationTab)
+            _navigationEvent.send(MainNavigationEvent.NavigateToMedication)
         }
     }
+
+    fun restoreMedicationAlarms() {
+        val userId = getCurrentUserIdUseCase() ?: return
+        restoreAlarmsJob?.cancel()
+        restoreAlarmsJob = viewModelScope.launch {
+            restoreMedicationAlarmsUseCase(userId)
+        }
+    }
+}
+
+enum class AppStartDestination { Main, Login }
+
+sealed interface MainNavigationEvent {
+    data object NavigateToMedication : MainNavigationEvent
 }

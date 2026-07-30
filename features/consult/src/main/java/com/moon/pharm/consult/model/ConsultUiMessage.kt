@@ -1,6 +1,6 @@
 package com.moon.pharm.consult.model
 
-import com.moon.pharm.component_ui.common.UiMessage
+import com.moon.pharm.designsystem.common.UiMessage
 
 sealed interface ConsultUiMessage : UiMessage {
     data object InputRequired : ConsultUiMessage

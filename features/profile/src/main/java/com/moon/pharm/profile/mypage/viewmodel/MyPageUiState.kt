@@ -1,20 +1,30 @@
 package com.moon.pharm.profile.mypage.viewmodel
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.moon.pharm.component_ui.common.UiMessage
-import com.moon.pharm.domain.model.auth.User
-import com.moon.pharm.domain.model.consult.ConsultItem
+import com.moon.pharm.designsystem.common.UiMessage
+import com.moon.pharm.profile.mypage.model.MyPageConsultUiModel
+import com.moon.pharm.profile.mypage.model.MyPageUserUiModel
 
 data class MyPageUiState(
-    val isLoading: Boolean = true,
+    val isProfileLoading: Boolean = true,
+    val isNicknameUpdating: Boolean = false,
+    val isLogoutSuccess: Boolean = false,
     val userMessage: UiMessage? = null,
-    val user: User? = null,
-    val myConsults: List<ConsultItem> = emptyList(),
-    val consultHistoryText: String? = null,
+    val user: MyPageUserUiModel? = null,
+    val consultState: MyPageConsultState = MyPageConsultState.Loading,
 
     val menuItems: List<MyPageMenuState> = emptyList(),
     val supportItems: List<MyPageMenuState> = emptyList()
 )
+
+sealed interface MyPageConsultState {
+    data object Loading : MyPageConsultState
+    data object Error : MyPageConsultState
+    data class Content(
+        val consults: List<MyPageConsultUiModel>,
+        val historyText: String?
+    ) : MyPageConsultState
+}
 
 data class MyPageMenuState(
     val icon: ImageVector,

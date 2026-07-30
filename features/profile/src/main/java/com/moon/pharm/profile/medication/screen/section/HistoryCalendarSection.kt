@@ -30,11 +30,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.component_ui.util.toDisplayString
-import com.moon.pharm.component_ui.util.toQueryString
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.designsystem.util.toDisplayString
+import com.moon.pharm.designsystem.util.toQueryString
 import com.moon.pharm.profile.medication.model.HistoryRecordUiModel
 import java.time.LocalDate
 import java.time.YearMonth
@@ -172,8 +172,8 @@ private fun DayCell(
 ) {
     val dotColor = when {
         dailyRecords.isEmpty() -> Color.Transparent
-        dailyRecords.all { it.record.isTaken } -> PharmTheme.colors.success
-        dailyRecords.any { !it.record.isTaken } -> PharmTheme.colors.warning
+        dailyRecords.all { it.isTaken } -> PharmTheme.colors.success
+        dailyRecords.any { !it.isTaken } -> PharmTheme.colors.warning
         else -> Color.Transparent
     }
 

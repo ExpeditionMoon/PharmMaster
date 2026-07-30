@@ -19,18 +19,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.component.item.PharmacistListItem
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
 import com.moon.pharm.consult.R
-import com.moon.pharm.domain.model.auth.Pharmacist
+import com.moon.pharm.consult.model.PharmacistUiModel
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 
 @Composable
 fun PharmacistListPanel(
     pharmacyName: String,
-    pharmacists: List<Pharmacist>,
-    onPharmacistSelect: (Pharmacist) -> Unit
+    pharmacists: List<PharmacistUiModel>,
+    onPharmacistSelect: (PharmacistUiModel) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -67,7 +66,7 @@ fun PharmacistListPanel(
                 items(pharmacists) { pharmacist ->
                     PharmacistListItem(
                         pharmacist = pharmacist,
-                        onSelect = onPharmacistSelect
+                        onSelect = { onPharmacistSelect(pharmacist) }
                     )
                 }
             }
@@ -82,7 +81,7 @@ private fun PharmacistListPanelPreview() {
         PharmacistListPanel(
             pharmacyName = "달빛약국",
             pharmacists = listOf(
-                Pharmacist(userId = "p1", name = "김약사", bio = "친절하게 상담해 드립니다.", placeId = "1", pharmacyName = "달빛약국")
+                PharmacistUiModel(userId = "p1", name = "김약사", bio = "친절하게 상담해 드립니다.", placeId = "1", pharmacyName = "달빛약국")
             ),
             onPharmacistSelect = {}
         )

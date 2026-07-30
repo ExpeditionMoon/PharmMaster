@@ -11,9 +11,8 @@ import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.user.SaveUserUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
-class SignUpUseCase @Inject constructor(
+class SignUpUseCase(
     private val authRepository: AuthRepository,
     private val saveUserUseCase: SaveUserUseCase,
     private val pharmacyRepository: PharmacyRepository,
@@ -36,7 +35,7 @@ class SignUpUseCase @Inject constructor(
         }
 
         if (result !is DataResourceResult.Success) {
-            emit(DataResourceResult.Failure(Exception("알 수 없는 오류 발생")))
+            emit(DataResourceResult.Failure(Exception("?????�는 ?�류 발생")))
             return@flow
         }
 
@@ -54,7 +53,7 @@ class SignUpUseCase @Inject constructor(
                 if (pharmacy != null) {
                     val savePharmacyResult = pharmacyRepository.savePharmacy(pharmacy)
                     if (savePharmacyResult is DataResourceResult.Failure) {
-                        throw Exception("약국 저장 실패: ${savePharmacyResult.exception.message}")
+                        throw Exception("?�국 ?�???�패: ${savePharmacyResult.exception.message}")
                     }
                 }
                 val pharmacistWithId = pharmacist.copy(userId = uid)

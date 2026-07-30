@@ -20,16 +20,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.component.card.TimeSettingCard
-import com.moon.pharm.component_ui.component.dialog.TimePickerDialog
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.component_ui.util.toMinuteTimeUiString
+import com.moon.pharm.designsystem.component.card.TimeSettingCard
+import com.moon.pharm.designsystem.component.dialog.TimePickerDialog
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.designsystem.util.toMinuteTimeUiString
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.medication.model.RepeatTypeUiModel
 import com.moon.pharm.profile.medication.screen.component.AlarmOptionSelector
 import com.moon.pharm.profile.medication.screen.component.MealTimeChips
 import com.moon.pharm.profile.medication.screen.component.MedicationAlarmOptionsCard
+import com.moon.pharm.profile.medication.screen.component.WeeklyDaySelector
 import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
 import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 
@@ -90,6 +92,16 @@ fun MedicationAlarmSection(
             selectedOption = form.selectedRepeatType,
             onOptionSelected = { onEvent(MedicationUiEvent.UpdateRepeatType(index = medicationIndex, type = it)) }
         )
+
+        if (form.selectedRepeatType == RepeatTypeUiModel.Weekly) {
+            Spacer(modifier = Modifier.height(12.dp))
+            WeeklyDaySelector(
+                selectedDays = form.selectedWeeklyDays,
+                onDayToggle = { day ->
+                    onEvent(MedicationUiEvent.ToggleWeeklyDay(medicationIndex, day))
+                }
+            )
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 

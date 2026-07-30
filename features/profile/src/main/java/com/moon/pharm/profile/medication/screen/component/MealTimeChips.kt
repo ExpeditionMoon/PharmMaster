@@ -7,23 +7,24 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.moon.pharm.component_ui.component.chip.FilterChip
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.medication.MealTiming
+import com.moon.pharm.designsystem.component.chip.FilterChip
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.profile.medication.model.MealTimingUiModel
 
 @Composable
 fun MealTimeChips(
-    selectedTimes: MealTiming,
-    onTimeClick: (MealTiming) -> Unit
+    selectedTimes: MealTimingUiModel,
+    onTimeClick: (MealTimingUiModel) -> Unit
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(MealTiming.entries.toTypedArray()) { timing ->
+        items(MealTimingUiModel.entries.toTypedArray()) { timing ->
             FilterChip(
-                text = timing.label,
+                text = stringResource(timing.labelRes),
                 isSelected = selectedTimes == timing,
                 onClick = { onTimeClick(timing) }
             )
@@ -37,7 +38,7 @@ private fun MealTimeChipsPreview() {
     PharmMasterTheme {
         Box(modifier = Modifier.padding(16.dp)) {
             MealTimeChips(
-                selectedTimes = MealTiming.AFTER_MEAL,
+                selectedTimes = MealTimingUiModel.AfterMeal,
                 onTimeClick = {}
             )
         }

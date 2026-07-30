@@ -1,0 +1,110 @@
+package com.moon.pharm.maps.component
+
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.moon.pharm.designsystem.R
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.maps.model.MapPlace
+import com.moon.pharm.maps.util.MapPlacePreviewProvider
+
+@SuppressLint("UnrememberedMutableState")
+@Composable
+fun PharmacyMap(
+    pharmacies: List<MapPlace>,
+    onPharmacyClick: (MapPlace) -> Unit,
+    onBackClick: () -> Unit,
+    cameraPositionState: CameraPositionState,
+    modifier: Modifier = Modifier,
+    showBackButton: Boolean = true,
+    isLocationEnabled: Boolean = false
+) {
+    Box(modifier = modifier.fillMaxSize()) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(isMyLocationEnabled = isLocationEnabled),
+            uiSettings = MapUiSettings(
+                zoomControlsEnabled = false,
+                myLocationButtonEnabled = true,
+                mapToolbarEnabled = false
+            )
+        ) {
+            pharmacies.forEach { pharmacy ->
+                key(pharmacy.placeId) {
+                    Marker(
+                        state = MarkerState(position = LatLng(pharmacy.latitude, pharmacy.longitude)),
+                        title = pharmacy.name,
+                        snippet = pharmacy.address,
+                        onClick = {
+                            onPharmacyClick(pharmacy)
+                            true
+                        }
+                    )
+                }
+            }
+        }
+
+        if (showBackButton) {
+            Button(
+                onClick = onBackClick,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .statusBarsPadding()
+                    .align(Alignment.TopStart),
+                colors = ButtonDefaults.buttonColors(containerColor = PharmTheme.colors.surface),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                contentPadding = PaddingValues(0.dp),
+                shape = CircleShape
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.desc_back_button),
+                    tint = PharmTheme.colors.onSurface
+                )
+            }
+        }
+    }
+}
+
+@ThemePreviews
+@Composable
+private fun PharmacyMapPreview(
+    @PreviewParameter(MapPlacePreviewProvider::class) pharmacies: List<MapPlace>
+) {
+    PharmMasterTheme {
+        val cameraPositionState = rememberCameraPositionState()
+        PharmacyMap(
+            pharmacies = pharmacies,
+            onPharmacyClick = {},
+            onBackClick = {},
+            cameraPositionState = cameraPositionState
+        )
+    }
+}

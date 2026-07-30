@@ -1,5 +1,6 @@
 package com.moon.pharm.service
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -9,11 +10,6 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.moon.pharm.MainActivity
 import com.moon.pharm.R
-import com.moon.pharm.data.common.NotificationConstants.CHANNEL_ID_CONSULT
-import com.moon.pharm.data.common.NotificationConstants.CHANNEL_NAME_CONSULT
-import com.moon.pharm.data.common.NotificationConstants.KEY_BODY
-import com.moon.pharm.data.common.NotificationConstants.KEY_CONSULT_ID
-import com.moon.pharm.data.common.NotificationConstants.KEY_TITLE
 import com.moon.pharm.domain.usecase.user.SyncFcmTokenUseCase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -22,6 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
+@SuppressLint("MissingFirebaseInstanceTokenRefresh")
 class PharmMessagingService : FirebaseMessagingService() {
 
     @Inject
@@ -31,37 +28,35 @@ class PharmMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
 
         val title = remoteMessage.notification?.title
-            ?: remoteMessage.data[KEY_TITLE]
+            ?: remoteMessage.data[ConsultNotificationConstants.PAYLOAD_TITLE]
             ?: getString(R.string.noti_default_title)
 
         val body = remoteMessage.notification?.body
-            ?: remoteMessage.data[KEY_BODY]
+            ?: remoteMessage.data[ConsultNotificationConstants.PAYLOAD_BODY]
             ?: getString(R.string.noti_default_body)
-        val consultId = remoteMessage.data[KEY_CONSULT_ID]
+        val consultId = remoteMessage.data[ConsultNotificationConstants.EXTRA_CONSULT_ID]
 
         showNotification(title, body, consultId)
     }
 
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
-
+    override fun onRegistered(installationId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                syncFcmTokenUseCase()
-            } catch (e: Exception) {
-                e.printStackTrace()
+                syncFcmTokenUseCase(installationId)
+            } catch (_: Exception) {
+                return@launch
             }
         }
     }
 
     private fun showNotification(title: String, messageBody: String, consultId: String?) {
-        val channelId = CHANNEL_ID_CONSULT
-        val channelName = CHANNEL_NAME_CONSULT
+        val channelId = ConsultNotificationConstants.CHANNEL_ID
+        val channelName = ConsultNotificationConstants.CHANNEL_NAME
 
         val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             if (consultId != null) {
-                putExtra(KEY_CONSULT_ID, consultId)
+                putExtra(ConsultNotificationConstants.EXTRA_CONSULT_ID, consultId)
             }
         }
 

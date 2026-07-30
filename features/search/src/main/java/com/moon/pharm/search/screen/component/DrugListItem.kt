@@ -20,16 +20,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.moon.pharm.component_ui.component.item.PharmListItem
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.drug.Drug
+import com.moon.pharm.designsystem.component.item.PharmListItem
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.search.model.DrugUiModel
 
 @Composable
 fun DrugListItem(
-    drug: Drug,
-    onClick: (Drug) -> Unit
+    drug: DrugUiModel,
+    onClick: (DrugUiModel) -> Unit
 ) {
     PharmListItem(
         onClick = { onClick(drug) },
@@ -74,7 +74,7 @@ private fun DrugListItemPreview() {
         ) {
             Text("1. 이미지가 있는 경우", color = PharmTheme.colors.secondFont, fontSize = 12.sp)
             DrugListItem(
-                drug = Drug(
+                drug = DrugUiModel(
                     itemSeq = "1",
                     itemName = "타이레놀",
                     companyName = "한국얀센",
@@ -87,7 +87,7 @@ private fun DrugListItemPreview() {
 
             Text("2. 이미지가 없는 경우", color = PharmTheme.colors.secondFont, fontSize = 12.sp)
             DrugListItem(
-                drug = Drug(
+                drug = DrugUiModel(
                     itemSeq = "2",
                     itemName = "이미지 없는 약",
                     companyName = "제약회사",

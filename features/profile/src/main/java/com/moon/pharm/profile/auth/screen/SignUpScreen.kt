@@ -23,13 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.domain.model.auth.UserType
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.profile.auth.mapper.asString
 import com.moon.pharm.profile.auth.model.SignUpStep
 import com.moon.pharm.profile.auth.model.SignUpUiMessage
+import com.moon.pharm.profile.auth.model.UserTypeUiModel
 import com.moon.pharm.profile.auth.screen.component.PharmacySearchOverlay
 import com.moon.pharm.profile.auth.screen.component.SignUpHeader
 import com.moon.pharm.profile.auth.screen.section.EmailPasswordSection
@@ -102,7 +102,7 @@ fun SignUpScreen(
 fun SignUpScreenContent(
     uiState: SignUpUiState,
     snackbarHostState: SnackbarHostState,
-    onUpdateUserType: (UserType) -> Unit,
+    onUpdateUserType: (UserTypeUiModel) -> Unit,
     onUpdateEmail: (String) -> Unit,
     onCheckEmail: () -> Unit,
     onUpdatePassword: (String) -> Unit,
@@ -177,7 +177,7 @@ private fun SignUpScreenContentPreview() {
         SignUpScreenContent(
             uiState = SignUpUiState(
                 currentStep = SignUpStep.TYPE,
-                userType = UserType.GENERAL,
+                userType = UserTypeUiModel.General,
                 email = "",
                 password = "",
                 isEmailAvailable = false,

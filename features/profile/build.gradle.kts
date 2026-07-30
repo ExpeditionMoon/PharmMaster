@@ -47,8 +47,8 @@ kotlin{
 
 dependencies {
     implementation(project(":domain"))
-    implementation(project(":features:component-ui"))
-    implementation(project(":features:consult"))
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:maps"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -4,9 +4,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.moon.pharm.component_ui.model.ScannedMedication
-import com.moon.pharm.component_ui.navigation.ContentNavigationRoute
-import com.moon.pharm.consult.screen.my.MyConsultListRoute
 import com.moon.pharm.profile.auth.screen.LoginScreen
 import com.moon.pharm.profile.auth.screen.SignUpScreen
 import com.moon.pharm.profile.auth.viewmodel.LoginViewModel
@@ -16,73 +13,74 @@ import com.moon.pharm.profile.medication.screen.MedicationHistoryScreen
 import com.moon.pharm.profile.medication.screen.MedicationScreen
 import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 import com.moon.pharm.profile.mypage.screen.MyPageRoute
-import kotlin.reflect.typeOf
 
-fun NavGraphBuilder.authNavGraph(rootNavController: NavController) {
-    composable<ContentNavigationRoute.LoginScreen> {
+fun NavGraphBuilder.authNavGraph(rootNavController: NavController, onAuthenticated: () -> Unit) {
+    composable<LoginRoute> {
         val viewModel: LoginViewModel = hiltViewModel()
         LoginScreen(
             viewModel = viewModel,
             onNavigateToSignUp = {
-                rootNavController.navigate(ContentNavigationRoute.SignUpScreen)
+                rootNavController.navigate(SignUpRoute)
             },
             onNavigateToHome = {
-                rootNavController.navigate(ContentNavigationRoute.MainBase) {
-                    popUpTo(ContentNavigationRoute.LoginScreen) { inclusive = true }
-                }
+                onAuthenticated()
             }
         )
     }
 
-    composable<ContentNavigationRoute.SignUpScreen> {
+    composable<SignUpRoute> {
         val viewModel: SignUpViewModel = hiltViewModel()
         SignUpScreen(
             viewModel = viewModel,
             onNavigateToHome = {
-                rootNavController.navigate(ContentNavigationRoute.MainBase) {
-                    popUpTo(ContentNavigationRoute.SignUpScreen) { inclusive = true }
-                }
+                onAuthenticated()
             }
         )
     }
 }
 
-fun NavGraphBuilder.profileNavGraph(navController: NavController, onLogout: () -> Unit) {
-    composable<ContentNavigationRoute.ProfileTab> {
+fun NavGraphBuilder.profileNavGraph(
+    navController: NavController,
+    onLogout: () -> Unit,
+    onNavigateToMyConsultation: () -> Unit
+) {
+    composable<ProfileRoute> {
         MyPageRoute(
-            onNavigateToMyConsultation = {
-                navController.navigate(ContentNavigationRoute.MyConsultList)
-            },
+            onNavigateToMyConsultation = onNavigateToMyConsultation,
             onNavigateToMedicationHistory = {
-                navController.navigate(ContentNavigationRoute.MedicationTabHistoryScreen)
+                navController.navigate(MedicationHistoryRoute)
             },
             onNavigateToLogin = {
                 onLogout()
             }
         )
     }
-    composable<ContentNavigationRoute.MyConsultList> {
-        MyConsultListRoute(
-            onNavigateUp = { navController.popBackStack() },
-            onNavigateToDetail = { consultId ->
-                navController.navigate(ContentNavigationRoute.ConsultTabDetailScreen(id = consultId))
+    composable<MedicationRoute> {
+        val viewModel: MedicationViewModel = hiltViewModel()
+        MedicationScreen(
+            viewModel = viewModel,
+            onNavigateToHistory = {
+                navController.navigate(MedicationHistoryRoute)
+            },
+            onNavigateToCreate = {
+                navController.navigate(MedicationCreateRoute())
             }
         )
     }
-
-    composable<ContentNavigationRoute.MedicationTab>{
+    composable<MedicationCreateRoute> {
         val viewModel: MedicationViewModel = hiltViewModel()
-        MedicationScreen(navController = navController, viewModel)
-    }
-    composable<ContentNavigationRoute.MedicationTabCreateScreen>(
-        typeMap = mapOf(
-            typeOf<List<ScannedMedication>>() to ScannedMedicationListNavType
+        MedicationCreateScreen(
+            viewModel = viewModel,
+            onNavigateUp = { navController.popBackStack() },
+            onMedicationCreated = {
+                navController.navigate(MedicationRoute) {
+                    popUpTo(MedicationRoute) { inclusive = false }
+                    launchSingleTop = true
+                }
+            }
         )
-    ){
-        val viewModel: MedicationViewModel = hiltViewModel()
-        MedicationCreateScreen(navController = navController, viewModel)
     }
-    composable<ContentNavigationRoute.MedicationTabHistoryScreen>{
+    composable<MedicationHistoryRoute> {
         MedicationHistoryScreen(onBackClick = { navController.popBackStack() })
     }
 }

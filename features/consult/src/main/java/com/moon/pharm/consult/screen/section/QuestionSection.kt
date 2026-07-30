@@ -23,21 +23,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.component.StatusBadge
-import com.moon.pharm.component_ui.component.button.PharmIconButton
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.component_ui.util.toDisplayDateTimeString
 import com.moon.pharm.consult.R
+import com.moon.pharm.consult.model.ConsultStatusUiModel
+import com.moon.pharm.consult.model.ConsultUiModel
 import com.moon.pharm.consult.screen.component.ConsultImageItem
 import com.moon.pharm.consult.screen.component.ConsultPreviewData
-import com.moon.pharm.domain.model.consult.ConsultItem
-import com.moon.pharm.domain.model.consult.ConsultStatus
+import com.moon.pharm.designsystem.component.StatusBadge
+import com.moon.pharm.designsystem.component.button.PharmIconButton
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.designsystem.util.toDisplayDateTimeString
 
 @Composable
 fun QuestionSection(
-    item: ConsultItem,
+    item: ConsultUiModel,
     currentUserId: String?,
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {}
@@ -60,7 +60,7 @@ fun QuestionSection(
             )
             StatusBadge(
                 text = item.status.label,
-                statusColor = if (item.status == ConsultStatus.WAITING) PharmTheme.colors.secondary else PharmTheme.colors.primary,
+                statusColor = if (item.status == ConsultStatusUiModel.Waiting) PharmTheme.colors.secondary else PharmTheme.colors.primary,
                 contentColor = PharmTheme.colors.surface
             )
         }

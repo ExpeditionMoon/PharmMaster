@@ -12,7 +12,7 @@ data class FcmSendRequest(
 
 @JsonClass(generateAdapter = true)
 data class FcmSendResponse(
-    @Json(name = "success") val success: Boolean,
-    @Json(name = "messageId") val messageId: String? = null,
-    @Json(name = "error") val error: String? = null
+    @param:Json(name = "success") val success: Boolean,
+    @param:Json(name = "messageId") val messageId: String? = null,
+    @param:Json(name = "error") val error: String? = null
 )

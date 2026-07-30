@@ -12,19 +12,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.moon.pharm.component_ui.theme.PharmMasterTheme
-import com.moon.pharm.component_ui.theme.PharmTheme
-import com.moon.pharm.component_ui.util.ThemePreviews
-import com.moon.pharm.component_ui.util.clickableSingle
-import com.moon.pharm.domain.model.medication.MedicationType
+import com.moon.pharm.designsystem.theme.PharmMasterTheme
+import com.moon.pharm.designsystem.theme.PharmTheme
+import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.designsystem.util.clickableSingle
+import com.moon.pharm.profile.medication.model.MedicationTypeUiModel
 
 @Composable
 fun MedicationTypeSelector(
-    selectedType: MedicationType,
-    onTypeSelected: (MedicationType) -> Unit
+    selectedType: MedicationTypeUiModel,
+    onTypeSelected: (MedicationTypeUiModel) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -32,7 +33,7 @@ fun MedicationTypeSelector(
             .padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        MedicationType.entries.forEach { type ->
+        MedicationTypeUiModel.entries.forEach { type ->
             val isSelected = selectedType == type
             Box(
                 modifier = Modifier
@@ -46,7 +47,7 @@ fun MedicationTypeSelector(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = type.label,
+                    text = stringResource(type.labelRes),
                     fontSize = 13.sp,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                     color = if (isSelected) PharmTheme.colors.surface else PharmTheme.colors.secondFont
@@ -62,7 +63,7 @@ private fun MedicationTypeSelectorPreview() {
     PharmMasterTheme {
         Box(modifier = Modifier.padding(16.dp)) {
             MedicationTypeSelector(
-                selectedType = MedicationType.OTC,
+                selectedType = MedicationTypeUiModel.Otc,
                 onTypeSelected = {}
             )
         }

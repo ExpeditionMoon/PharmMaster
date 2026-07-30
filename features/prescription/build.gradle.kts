@@ -42,7 +42,7 @@ kotlin{
 }
 
 dependencies {
-    implementation(project(":features:component-ui"))
+    implementation(project(":core:designsystem"))
     implementation(project(":domain"))
 
     implementation(libs.androidx.core.ktx)
@@ -73,6 +73,8 @@ dependencies {
     implementation(libs.accompanist.permissions)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
