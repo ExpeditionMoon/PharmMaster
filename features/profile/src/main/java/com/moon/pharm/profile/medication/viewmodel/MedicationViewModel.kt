@@ -4,19 +4,29 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.moon.pharm.designsystem.common.UiMessage
+import com.moon.pharm.domain.model.medication.MealTiming
+import com.moon.pharm.domain.model.medication.Medication
+import com.moon.pharm.domain.model.medication.MedicationType
+import com.moon.pharm.domain.model.medication.RepeatType
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
-import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
+import com.moon.pharm.domain.usecase.medication.ChangeMedicationStatusCommand
+import com.moon.pharm.domain.usecase.medication.ChangeMedicationStatusUseCase
+import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
+import com.moon.pharm.domain.usecase.medication.MedicationStatusInput
 import com.moon.pharm.domain.usecase.medication.ObserveTodayMedicationItemsUseCase
 import com.moon.pharm.domain.usecase.medication.SaveMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
 import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
 import com.moon.pharm.profile.medication.mapper.toUiMessage
+import com.moon.pharm.profile.medication.model.MealTimingUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
+import com.moon.pharm.profile.medication.model.MedicationTypeUiModel
 import com.moon.pharm.profile.medication.model.MedicationUiMessage
+import com.moon.pharm.profile.medication.model.RepeatTypeUiModel
+import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 import com.moon.pharm.profile.navigation.MedicationCreateRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +48,8 @@ class MedicationViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val observeTodayMedicationItemsUseCase: ObserveTodayMedicationItemsUseCase,
     private val saveMedicationUseCase: SaveMedicationUseCase,
-    private val deleteMedicationUseCase: DeleteMedicationUseCase,
+    private val changeMedicationStatusUseCase: ChangeMedicationStatusUseCase,
+    private val getMedicationsUseCase: GetMedicationsUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     private val validateMedicationEntryUseCase: ValidateMedicationEntryUseCase,
@@ -210,7 +221,18 @@ class MedicationViewModel @Inject constructor(
 
             // 2. 주요 비즈니스 로직
             MedicationUiEvent.SaveAllMedications -> saveAllMedications()
-            is MedicationUiEvent.DeleteMedication -> deleteMedication(event.medicationId)
+            is MedicationUiEvent.PauseMedication -> changeMedicationStatus(
+                medicationId = event.medicationId,
+                status = MedicationStatusInput.PAUSED
+            )
+            is MedicationUiEvent.ResumeMedication -> changeMedicationStatus(
+                medicationId = event.medicationId,
+                status = MedicationStatusInput.ACTIVE
+            )
+            is MedicationUiEvent.EndMedication -> changeMedicationStatus(
+                medicationId = event.medicationId,
+                status = MedicationStatusInput.ENDED
+            )
             is MedicationUiEvent.ToggleTaken -> toggleMedicationTaken(
                 medicationId = event.medicationId,
                 scheduleId = event.scheduleId
@@ -251,7 +273,7 @@ class MedicationViewModel @Inject constructor(
                         is DataResourceResult.Failure -> {
                             currentState.copy(
                                 isLoading = false,
-                                userMessage = UiMessage.LoadDataFailed
+                                userMessage = MedicationUiMessage.LoadFailed
                             )
                         }
                     }
@@ -261,9 +283,17 @@ class MedicationViewModel @Inject constructor(
     }
 
     private fun initializeFormFromArgs() {
-        val newForms = runCatching {
+        val route = runCatching {
             savedStateHandle.toRoute<MedicationCreateRoute>()
         }.getOrNull()
+
+        val medicationId = route?.medicationId
+        if (medicationId != null) {
+            loadMedicationForEdit(medicationId)
+            return
+        }
+
+        val newForms = route
             ?.scannedMedicationNames
             ?.takeIf { it.isNotEmpty() }
             ?.map {
@@ -275,6 +305,40 @@ class MedicationViewModel @Inject constructor(
             ?: listOf(MedicationFormState())
 
         _uiState.update { it.copy(medicationForms = newForms) }
+    }
+
+    private fun loadMedicationForEdit(medicationId: String) {
+        val userId = getCurrentUserIdUseCase()
+        if (userId == null) {
+            _uiState.update { it.copy(userMessage = MedicationUiMessage.NotLoggedIn) }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            when (val result = getMedicationsUseCase(userId)
+                .filter { it !is DataResourceResult.Loading }
+                .first()) {
+                is DataResourceResult.Success -> {
+                    val medication = result.resultData.find { it.id == medicationId }
+                    _uiState.update {
+                        if (medication == null) {
+                            it.copy(isLoading = false, userMessage = MedicationUiMessage.MedicationNotFound)
+                        } else {
+                            it.copy(
+                                isLoading = false,
+                                isEditing = true,
+                                medicationForms = listOf(medication.toFormState())
+                            )
+                        }
+                    }
+                }
+                is DataResourceResult.Failure -> {
+                    _uiState.update { it.copy(isLoading = false, userMessage = MedicationUiMessage.LoadFailed) }
+                }
+                DataResourceResult.Loading -> Unit
+            }
+        }
     }
 
     private fun saveAllMedications() {
@@ -324,7 +388,11 @@ class MedicationViewModel @Inject constructor(
                 } else {
                     currentState.copy(
                         isLoading = false,
-                        userMessage = MedicationUiMessage.CreateFailed
+                        userMessage = if (currentState.isEditing) {
+                            MedicationUiMessage.UpdateFailed
+                        } else {
+                            MedicationUiMessage.CreateFailed
+                        }
                     )
                 }
             }
@@ -338,6 +406,11 @@ class MedicationViewModel @Inject constructor(
         val targetItem = currentList.find {
             it.medicationId == medicationId && it.scheduleId == scheduleId
         } ?: return
+
+        if (targetItem.isPaused) {
+            _uiState.update { it.copy(userMessage = MedicationUiMessage.MedicationPaused) }
+            return
+        }
 
         val newIsTaken = !targetItem.isTaken
         _uiState.update { state ->
@@ -360,21 +433,54 @@ class MedicationViewModel @Inject constructor(
 
             toggleIntakeCheckUseCase(command).collectLatest { result ->
                 if (result is DataResourceResult.Failure) {
-                    result.exception.printStackTrace()
+                    _uiState.update { state ->
+                        state.copy(
+                            medicationList = state.medicationList.map { item ->
+                                if (item.medicationId == medicationId && item.scheduleId == scheduleId) {
+                                    item.copy(isTaken = targetItem.isTaken)
+                                } else {
+                                    item
+                                }
+                            },
+                            userMessage = MedicationUiMessage.IntakeUpdateFailed
+                        )
+                    }
                 }
             }
         }
     }
 
-    private fun deleteMedication(medicationId: String) {
+    private fun changeMedicationStatus(medicationId: String, status: MedicationStatusInput) {
+        val userId = getCurrentUserIdUseCase()
+        if (userId == null) {
+            _uiState.update { it.copy(userMessage = MedicationUiMessage.NotLoggedIn) }
+            return
+        }
+
         viewModelScope.launch {
-            deleteMedicationUseCase(medicationId).collectLatest { result ->
-                when (result) {
-                    is DataResourceResult.Failure -> {
-                        result.exception.printStackTrace()
-                    }
-                    else -> { }
-                }
+            isSaving = true
+            _uiState.update { it.copy(isLoading = true) }
+            val result = changeMedicationStatusUseCase(
+                ChangeMedicationStatusCommand(
+                    userId = userId,
+                    medicationId = medicationId,
+                    status = status,
+                    changedAt = System.currentTimeMillis()
+                )
+            ).filter { it !is DataResourceResult.Loading }.first()
+
+            isSaving = false
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    medicationList = if (result is DataResourceResult.Success) {
+                        it.medicationList.updateMedicationStatus(medicationId, status)
+                    } else {
+                        it.medicationList
+                    },
+                    userMessage = (result as? DataResourceResult.Failure)
+                        ?.let { MedicationUiMessage.StatusUpdateFailed }
+                )
             }
         }
     }
@@ -388,6 +494,67 @@ class MedicationViewModel @Inject constructor(
                 updatedForms[index] = block(updatedForms[index])
             }
             state.copy(medicationForms = updatedForms)
+        }
+    }
+
+    private fun Medication.toFormState(): MedicationFormState {
+        val schedule = schedules.firstOrNull()
+        return MedicationFormState(
+            medicationId = id,
+            scheduleId = schedule?.id,
+            medicationName = name,
+            medicationDosage = schedule?.dosage.orEmpty(),
+            selectedType = type.toUiModel(),
+            startDate = startDate,
+            endDate = endDate,
+            noEndDate = endDate == null,
+            selectedMealTiming = schedule?.mealTiming?.toUiModel() ?: MealTimingUiModel.BeforeMeal,
+            selectedTime = schedule?.time?.toMinuteOfDay(),
+            selectedRepeatType = repeatType.toUiModel(),
+            selectedWeeklyDays = weeklyDays,
+            isGrouped = isGrouped,
+            isAlarmEnabled = isAlarmEnabled
+        )
+    }
+
+    private fun MedicationType.toUiModel(): MedicationTypeUiModel = when (this) {
+        MedicationType.PRESCRIPTION -> MedicationTypeUiModel.Prescription
+        MedicationType.OTC -> MedicationTypeUiModel.Otc
+        MedicationType.SUPPLEMENT -> MedicationTypeUiModel.Supplement
+    }
+
+    private fun MealTiming.toUiModel(): MealTimingUiModel = when (this) {
+        MealTiming.BEFORE_MEAL -> MealTimingUiModel.BeforeMeal
+        MealTiming.DURING_MEAL -> MealTimingUiModel.DuringMeal
+        MealTiming.AFTER_MEAL -> MealTimingUiModel.AfterMeal
+        MealTiming.NONE -> MealTimingUiModel.None
+    }
+
+    private fun RepeatType.toUiModel(): RepeatTypeUiModel = when (this) {
+        RepeatType.DAILY -> RepeatTypeUiModel.Daily
+        RepeatType.WEEKLY -> RepeatTypeUiModel.Weekly
+        RepeatType.PERIOD -> RepeatTypeUiModel.Period
+    }
+
+    private fun String.toMinuteOfDay(): Long? {
+        val (hour, minute) = split(":").mapNotNull(String::toLongOrNull)
+            .takeIf { it.size == 2 }
+            ?: return null
+        return (hour * 60 + minute).takeIf { it in 0 until 24 * 60 }
+    }
+
+    private fun List<TodayMedicationUiModel>.updateMedicationStatus(
+        medicationId: String,
+        status: MedicationStatusInput
+    ) = when (status) {
+        MedicationStatusInput.ENDED -> filterNot { it.medicationId == medicationId }
+        MedicationStatusInput.PAUSED,
+        MedicationStatusInput.ACTIVE -> map { item ->
+            if (item.medicationId == medicationId) {
+                item.copy(isPaused = status == MedicationStatusInput.PAUSED)
+            } else {
+                item
+            }
         }
     }
 

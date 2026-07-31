@@ -28,6 +28,7 @@ import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 fun MedicationCreateContent(
     forms: List<MedicationFormState>,
     isLoading: Boolean,
+    isEditing: Boolean,
     onEvent: (MedicationUiEvent) -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -75,7 +76,8 @@ fun MedicationCreateContent(
 
         PharmPrimaryButton(
             text =
-                if (!isSingleMode) stringResource(R.string.medication_add_all_format, forms.size)
+                if (isEditing) stringResource(R.string.medication_save)
+                else if (!isSingleMode) stringResource(R.string.medication_add_all_format, forms.size)
                 else stringResource(R.string.medication_add),
             onClick = { onEvent(MedicationUiEvent.SaveAllMedications) },
             enabled = forms.all { it.medicationName.isNotEmpty() } && !isLoading,
@@ -97,6 +99,7 @@ private fun MedicationCreateContentPreview() {
                 )
             ),
             isLoading = false,
+            isEditing = false,
             onEvent = {}
         )
     }

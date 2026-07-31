@@ -28,7 +28,10 @@ fun MedicationHomeContent(
     completedCount: Int,
     onTabSelected: (MedicationPrimaryTab) -> Unit,
     onTakeClick: (TodayMedicationUiModel) -> Unit,
-    onDeleteClick: (String) -> Unit
+    onEditClick: (String) -> Unit,
+    onPauseClick: (String) -> Unit,
+    onResumeClick: (String) -> Unit,
+    onEndClick: (String) -> Unit
 ) {
     val tabTitles = MedicationPrimaryTab.entries.map { it.title }
 
@@ -53,7 +56,14 @@ fun MedicationHomeContent(
             }
 
             items(items = currentList, key = { it.time ?: "no-time" }) { group ->
-                MedicationGroupItem(group = group, onTakeClick = onTakeClick, onDeleteClick = onDeleteClick)
+                MedicationGroupItem(
+                    group = group,
+                    onTakeClick = onTakeClick,
+                    onEditClick = onEditClick,
+                    onPauseClick = onPauseClick,
+                    onResumeClick = onResumeClick,
+                    onEndClick = onEndClick
+                )
             }
 
             item { Spacer(modifier = Modifier.height(50.dp)) }
@@ -72,7 +82,10 @@ private fun MedicationHomeContentPreview() {
             completedCount = 1,
             onTabSelected = {},
             onTakeClick = {},
-            onDeleteClick = {}
+            onEditClick = {},
+            onPauseClick = {},
+            onResumeClick = {},
+            onEndClick = {}
         )
     }
 }

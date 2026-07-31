@@ -32,7 +32,10 @@ import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 fun MedicationGroupItem(
     group: MedicationTimeGroupUiModel,
     onTakeClick: (TodayMedicationUiModel) -> Unit,
-    onDeleteClick: (String) -> Unit
+    onEditClick: (String) -> Unit,
+    onPauseClick: (String) -> Unit,
+    onResumeClick: (String) -> Unit,
+    onEndClick: (String) -> Unit
 ) {
     val displayTime = group.time?.toLongOrNull()?.toDisplayTimeString() ?: group.time
 
@@ -61,7 +64,10 @@ fun MedicationGroupItem(
                 MedicationItemCard(
                     item = item,
                     onTakeClick = onTakeClick,
-                    onDeleteClick = onDeleteClick
+                    onEditClick = onEditClick,
+                    onPauseClick = onPauseClick,
+                    onResumeClick = onResumeClick,
+                    onEndClick = onEndClick
                 )
             }
         }
@@ -86,12 +92,16 @@ private fun MedicationGroupItemPreview() {
                             time = "08:00",
                             dosage = "1 tablet",
                             mealTiming = MealTimingUiModel.AfterMeal,
+                            isPaused = false,
                             isTaken = false
                         )
                     )
                 ),
                 onTakeClick = {},
-                onDeleteClick = {}
+                onEditClick = {},
+                onPauseClick = {},
+                onResumeClick = {},
+                onEndClick = {}
             )
         }
     }

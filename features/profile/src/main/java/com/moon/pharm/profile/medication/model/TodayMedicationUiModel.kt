@@ -9,5 +9,6 @@ data class TodayMedicationUiModel(
     val time: String,
     val dosage: String,
     val mealTiming: MealTimingUiModel,
+    val isPaused: Boolean,
     val isTaken: Boolean
 )

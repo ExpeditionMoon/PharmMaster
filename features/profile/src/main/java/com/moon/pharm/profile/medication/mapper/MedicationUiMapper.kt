@@ -20,6 +20,7 @@ import java.time.LocalDate
 object MedicationUiMapper {
     fun toSaveCommand(form: MedicationFormState, userId: String): SaveMedicationCommand {
         return SaveMedicationCommand(
+            medicationId = form.medicationId,
             userId = userId,
             name = form.medicationName,
             type = form.selectedType.toInput(),
@@ -29,6 +30,7 @@ object MedicationUiMapper {
             weeklyDays = form.selectedWeeklyDays,
             schedules = listOf(
                 MedicationScheduleCommand(
+                    scheduleId = form.scheduleId,
                     time = form.selectedTime.toScheduleTimeString(),
                     dosage = form.medicationDosage.orEmpty(),
                     mealTiming = form.selectedMealTiming.toInput()
@@ -94,6 +96,7 @@ object MedicationUiMapper {
             time = time,
             dosage = dosage,
             mealTiming = mealTiming.toUiModel(),
+            isPaused = isPaused,
             isTaken = isTaken
         )
     }

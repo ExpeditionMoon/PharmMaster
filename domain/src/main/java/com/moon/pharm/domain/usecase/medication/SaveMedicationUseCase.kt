@@ -44,7 +44,7 @@ class SaveMedicationUseCase(
 
     private fun MedicationScheduleCommand.toMedicationSchedule(): MedicationSchedule {
         return MedicationSchedule(
-            id = UUID.randomUUID().toString(),
+            id = scheduleId ?: UUID.randomUUID().toString(),
             time = time,
             dosage = dosage,
             mealTiming = mealTiming.toMealTiming()

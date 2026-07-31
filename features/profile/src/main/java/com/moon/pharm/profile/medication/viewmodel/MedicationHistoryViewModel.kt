@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
-import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationHistoryItemsUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
@@ -21,7 +20,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MedicationHistoryViewModel @Inject constructor(
     private val getMedicationHistoryItemsUseCase: GetMedicationHistoryItemsUseCase,
-    private val deleteMedicationUseCase: DeleteMedicationUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase
 ) : ViewModel() {
@@ -73,16 +71,6 @@ class MedicationHistoryViewModel @Inject constructor(
             )
 
             toggleIntakeCheckUseCase(command).collectLatest { }
-        }
-    }
-
-    fun deleteMedication(medicationId: String) {
-        viewModelScope.launch {
-            deleteMedicationUseCase(medicationId).collectLatest { result ->
-                if (result is DataResourceResult.Failure) {
-                    result.exception.printStackTrace()
-                }
-            }
         }
     }
 

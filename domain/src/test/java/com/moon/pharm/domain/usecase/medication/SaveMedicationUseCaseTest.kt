@@ -30,6 +30,29 @@ class SaveMedicationUseCaseTest {
         assertEquals(repository.savedMedication, scheduledMedication)
     }
 
+    @Test
+    fun `keeps medication and schedule identifiers when medication is edited`() = runBlocking {
+        val repository = RecordingMedicationRepository()
+        val alarmScheduler = RecordingAlarmScheduler()
+        val useCase = SaveMedicationUseCase(repository, alarmScheduler)
+        val command = saveMedicationCommand().copy(
+            medicationId = "medication-id",
+            schedules = listOf(
+                MedicationScheduleCommand(
+                    scheduleId = "schedule-id",
+                    time = "10:00",
+                    dosage = "2정",
+                    mealTiming = MealTimingInput.AFTER_MEAL
+                )
+            )
+        )
+
+        useCase(command).toList()
+
+        assertEquals("medication-id", repository.savedMedication?.id)
+        assertEquals("schedule-id", repository.savedMedication?.schedules?.single()?.id)
+    }
+
     private fun saveMedicationCommand() = SaveMedicationCommand(
         userId = "user-id",
         name = "약 이름",

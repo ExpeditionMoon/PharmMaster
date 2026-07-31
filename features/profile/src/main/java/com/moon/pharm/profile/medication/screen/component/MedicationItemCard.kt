@@ -44,11 +44,14 @@ import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
 fun MedicationItemCard(
     item: TodayMedicationUiModel,
     onTakeClick: (TodayMedicationUiModel) -> Unit,
-    onDeleteClick: (String) -> Unit,
+    onEditClick: (String) -> Unit,
+    onPauseClick: (String) -> Unit,
+    onResumeClick: (String) -> Unit,
+    onEndClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showEndDialog by remember { mutableStateOf(false) }
 
     Card(
         colors = CardDefaults.cardColors(
@@ -79,6 +82,13 @@ fun MedicationItemCard(
                         fontSize = 13.sp,
                         color = PharmTheme.colors.secondFont
                     )
+                    if (item.isPaused) {
+                        Text(
+                            text = " · ${stringResource(R.string.medication_paused_badge)}",
+                            fontSize = 13.sp,
+                            color = PharmTheme.colors.warning
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
@@ -91,6 +101,7 @@ fun MedicationItemCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 MedicationCheckButton(
                     isTaken = item.isTaken,
+                    enabled = !item.isPaused,
                     onClick = { onTakeClick(item) }
                 )
 
@@ -107,15 +118,36 @@ fun MedicationItemCard(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
+                            text = { Text(stringResource(R.string.medication_edit)) },
+                            onClick = {
+                                showMenu = false
+                                onEditClick(item.medicationId)
+                            }
+                        )
+                        DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = stringResource(R.string.medication_delete),
+                                    stringResource(
+                                        if (item.isPaused) R.string.medication_resume else R.string.medication_pause
+                                    )
+                                )
+                            },
+                            onClick = {
+                                showMenu = false
+                                if (item.isPaused) onResumeClick(item.medicationId)
+                                else onPauseClick(item.medicationId)
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.medication_end),
                                     color = MaterialTheme.colorScheme.error
                                 )
                             },
                             onClick = {
                                 showMenu = false
-                                showDeleteDialog = true
+                                showEndDialog = true
                             }
                         )
                     }
@@ -124,14 +156,14 @@ fun MedicationItemCard(
         }
     }
 
-    if (showDeleteDialog) {
+    if (showEndDialog) {
         PharmConfirmDialog(
-            title = stringResource(R.string.medication_delete_dialog_title),
-            content = stringResource(R.string.medication_delete_dialog_content),
-            confirmText = stringResource(R.string.medication_delete_desc),
+            title = stringResource(R.string.medication_end_dialog_title),
+            content = stringResource(R.string.medication_end_dialog_content),
+            confirmText = stringResource(R.string.medication_end_desc),
             confirmTextColor = MaterialTheme.colorScheme.error,
-            onConfirm = { onDeleteClick(item.medicationId) },
-            onDismiss = { showDeleteDialog = false }
+            onConfirm = { onEndClick(item.medicationId) },
+            onDismiss = { showEndDialog = false }
         )
     }
 }
@@ -151,10 +183,14 @@ private fun MedicationItemCardPreview() {
                     time = "08:00",
                     dosage = "1 tablet",
                     mealTiming = MealTimingUiModel.AfterMeal,
+                    isPaused = false,
                     isTaken = false
                 ),
                 onTakeClick = {},
-                onDeleteClick = {}
+                onEditClick = {},
+                onPauseClick = {},
+                onResumeClick = {},
+                onEndClick = {}
             )
         }
     }

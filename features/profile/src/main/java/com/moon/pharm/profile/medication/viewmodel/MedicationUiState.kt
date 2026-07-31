@@ -11,6 +11,7 @@ data class MedicationUiState(
     val isLoading: Boolean = false,
     val userMessage: UiMessage? = null,
     val isMedicationCreated: Boolean = false,
+    val isEditing: Boolean = false,
 
     val medicationList: List<TodayMedicationUiModel> = emptyList(),
     val selectedTab: MedicationPrimaryTab = MedicationPrimaryTab.ALL,
@@ -18,6 +19,8 @@ data class MedicationUiState(
 )
 
 data class MedicationFormState(
+    val medicationId: String? = null,
+    val scheduleId: String? = null,
     val medicationName: String = "",
     val dailyCount: Int = 0,
     val medicationDosage: String? = "",

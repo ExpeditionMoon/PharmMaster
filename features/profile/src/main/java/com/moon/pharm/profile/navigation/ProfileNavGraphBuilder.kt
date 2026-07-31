@@ -64,6 +64,9 @@ fun NavGraphBuilder.profileNavGraph(
             },
             onNavigateToCreate = {
                 navController.navigate(MedicationCreateRoute())
+            },
+            onNavigateToEdit = { medicationId ->
+                navController.navigate(MedicationCreateRoute(medicationId = medicationId))
             }
         )
     }

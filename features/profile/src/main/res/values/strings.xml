@@ -73,6 +73,12 @@
     <!--  복약 관리(medication)  -->
     <string name="error_empty_medication_name">약 이름을 입력해주세요.</string>
     <string name="error_create_medication">복용 알림 등록 실패</string>
+    <string name="error_update_medication">복약 정보 저장에 실패했습니다. 다시 시도해 주세요.</string>
+    <string name="error_update_medication_status">복약 상태 변경에 실패했습니다. 다시 시도해 주세요.</string>
+    <string name="error_load_medication">복약 정보를 불러오지 못했습니다. 다시 시도해 주세요.</string>
+    <string name="error_medication_not_found">수정할 복약 정보를 찾을 수 없습니다.</string>
+    <string name="error_medication_paused">일시 중지된 복약은 복용 처리할 수 없습니다.</string>
+    <string name="error_update_medication_intake">복약 처리에 실패했습니다. 다시 시도해 주세요.</string>
 
     <string name="medication_category_all">전체</string>
     <string name="medication_category_prescription">처방약</string>
@@ -125,6 +131,16 @@
     <string name="medication_delete_dialog_content">이 약을 삭제하시겠습니까?\n 묶음 설정된 모든 시간대의 스케줄이 함께 삭제됩니다.</string>
     <string name="medication_option_menu_desc">옵션 메뉴</string>
     <string name="medication_delete_desc">삭제</string>
+    <string name="medication_edit">수정하기</string>
+    <string name="medication_pause">일시 중지</string>
+    <string name="medication_resume">복약 재개</string>
+    <string name="medication_end">복약 종료</string>
+    <string name="medication_end_dialog_title">복약 종료</string>
+    <string name="medication_end_dialog_content">복약을 종료하면 예정된 알림이 취소되고 기존 복약 이력은 유지됩니다.</string>
+    <string name="medication_end_desc">종료</string>
+    <string name="medication_paused_badge">일시 중지됨</string>
+    <string name="medication_edit_title">복약 정보 수정</string>
+    <string name="medication_save">저장하기</string>
     <string name="medication_weekday_mon">월</string>
     <string name="medication_weekday_tue">화</string>
     <string name="medication_weekday_wed">수</string>

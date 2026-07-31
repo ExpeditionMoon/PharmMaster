@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -44,10 +43,6 @@ fun MedicationHistoryScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchMonthlyRecords(uiState.selectedMonth)
-    }
-
     MedicationHistoryContent(
         uiState = uiState,
         onBackClick = onBackClick,
@@ -55,9 +50,6 @@ fun MedicationHistoryScreen(
         onDateClick = { viewModel.onDateSelected(it) },
         onToggleRecord = { medId, schId, isTaken ->
             viewModel.toggleRecord(medId, schId, isTaken, uiState.selectedDate)
-        },
-        onDeleteClick = { medicationId ->
-            viewModel.deleteMedication(medicationId)
         }
     )
 }
@@ -68,8 +60,7 @@ fun MedicationHistoryContent(
     onBackClick: () -> Unit,
     onMonthChanged: (YearMonth) -> Unit,
     onDateClick: (LocalDate) -> Unit,
-    onToggleRecord: (String, String, Boolean) -> Unit,
-    onDeleteClick: (String) -> Unit
+    onToggleRecord: (String, String, Boolean) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -133,8 +124,7 @@ fun MedicationHistoryContent(
                                 uiModel.scheduleId,
                                 !uiModel.isTaken
                             )
-                        },
-                        onDeleteClick = { onDeleteClick(uiModel.medicationId) }
+                        }
                     )
                 }
             }
@@ -155,8 +145,7 @@ private fun MedicationHistoryContentPreview() {
             onBackClick = {},
             onMonthChanged = {},
             onDateClick = {},
-            onToggleRecord = { _, _, _ -> },
-            onDeleteClick = {}
+            onToggleRecord = { _, _, _ -> }
         )
     }
 }

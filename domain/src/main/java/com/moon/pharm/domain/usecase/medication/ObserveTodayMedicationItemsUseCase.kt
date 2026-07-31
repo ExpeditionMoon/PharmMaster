@@ -3,6 +3,7 @@ package com.moon.pharm.domain.usecase.medication
 import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.model.medication.MealTiming
 import com.moon.pharm.domain.model.medication.Medication
+import com.moon.pharm.domain.model.medication.MedicationStatus
 import com.moon.pharm.domain.model.medication.MedicationType
 import com.moon.pharm.domain.model.medication.RepeatType
 import com.moon.pharm.domain.repository.MedicationRepository
@@ -26,7 +27,7 @@ class ObserveTodayMedicationItemsUseCase(
                 medicationsResult is DataResourceResult.Success && recordsResult is DataResourceResult.Success -> {
                     DataResourceResult.Success(
                         medicationsResult.resultData
-                            .filter { it.isActiveOn(date) }
+                            .filter { it.isVisibleOn(date) }
                             .toMedicationScheduleItems(recordsResult.resultData)
                     )
                 }
@@ -49,6 +50,7 @@ class ObserveTodayMedicationItemsUseCase(
                     time = schedule.time,
                     dosage = schedule.dosage,
                     mealTiming = schedule.mealTiming.toInput(),
+                    isPaused = medication.status == MedicationStatus.PAUSED,
                     isTaken = records.any { record ->
                         record.medicationId == medication.id &&
                                 record.scheduleId == schedule.id &&
@@ -59,7 +61,8 @@ class ObserveTodayMedicationItemsUseCase(
         }.sortedBy { it.time }
     }
 
-    private fun Medication.isActiveOn(date: LocalDate): Boolean {
+    private fun Medication.isVisibleOn(date: LocalDate): Boolean {
+        if (status == MedicationStatus.ENDED) return false
         val start = startDate?.toLocalDate() ?: LocalDate.MIN
         if (date.isBefore(start)) return false
 
