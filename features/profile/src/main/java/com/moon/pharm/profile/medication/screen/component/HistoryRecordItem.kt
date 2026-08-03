@@ -35,7 +35,7 @@ import com.moon.pharm.profile.medication.model.HistoryRecordUiModel
 fun HistoryRecordItem(
     uiModel: HistoryRecordUiModel,
     onRecordClick: () -> Unit,
-    onDeleteClick: (String) -> Unit,
+    onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val borderColor = if (uiModel.isTaken) PharmTheme.colors.success else PharmTheme.colors.warning
@@ -44,7 +44,6 @@ fun HistoryRecordItem(
     } else {
         PharmTheme.colors.warningContainer
     }
-
     var showMenu by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
@@ -56,9 +55,9 @@ fun HistoryRecordItem(
         contentPadding = 10.dp,
         headline = uiModel.medicationName,
         subhead = if (uiModel.isTaken) {
-            stringResource(R.string.medication_take_on)
+            androidx.compose.ui.res.stringResource(R.string.medication_take_on)
         } else {
-            stringResource(R.string.medication_take_off)
+            androidx.compose.ui.res.stringResource(R.string.medication_take_off)
         },
         trailing = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -68,7 +67,6 @@ fun HistoryRecordItem(
                     tint = borderColor,
                     modifier = Modifier.size(24.dp)
                 )
-
                 Box {
                     IconButton(onClick = { showMenu = true }) {
                         Icon(
@@ -84,7 +82,7 @@ fun HistoryRecordItem(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = stringResource(R.string.medication_delete),
+                                    text = stringResource(R.string.medication_delete_with_history),
                                     color = MaterialTheme.colorScheme.error
                                 )
                             },
@@ -101,11 +99,11 @@ fun HistoryRecordItem(
 
     if (showDeleteDialog) {
         PharmConfirmDialog(
-            title = stringResource(R.string.medication_delete_dialog_title),
-            content = stringResource(R.string.medication_delete_dialog_content),
-            confirmText = stringResource(R.string.medication_delete_desc),
+            title = stringResource(R.string.medication_delete_with_history_dialog_title),
+            content = stringResource(R.string.medication_delete_with_history_dialog_content),
+            confirmText = stringResource(R.string.medication_delete_with_history_desc),
             confirmTextColor = MaterialTheme.colorScheme.error,
-            onConfirm = { onDeleteClick(uiModel.medicationId) },
+            onConfirm = onDeleteClick,
             onDismiss = { showDeleteDialog = false }
         )
     }

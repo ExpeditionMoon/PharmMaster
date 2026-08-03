@@ -10,6 +10,7 @@ import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.alarm.MedicationAlarm
 import com.moon.pharm.domain.alarm.MedicationAlarmNextTriggerCalculator
 import com.moon.pharm.domain.model.medication.Medication
+import com.moon.pharm.domain.model.medication.MedicationStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -24,7 +25,7 @@ class AndroidAlarmScheduler @Inject constructor(
 
     override fun schedule(medication: Medication) {
         cancel(medication.id)
-        if (!medication.isAlarmEnabled) return
+        if (!medication.isAlarmEnabled || medication.status != MedicationStatus.ACTIVE) return
 
         medication.schedules.forEach { schedule ->
             val alarm = MedicationAlarm(

@@ -24,6 +24,9 @@ sealed interface MedicationUiEvent {
     // 2. 주요 비즈니스 로직 (Business Logic)
     object SaveAllMedications : MedicationUiEvent
     data class ToggleTaken(val medicationId: String, val scheduleId: String) : MedicationUiEvent
+    data class PauseMedication(val medicationId: String) : MedicationUiEvent
+    data class ResumeMedication(val medicationId: String) : MedicationUiEvent
+    data class EndMedication(val medicationId: String) : MedicationUiEvent
     data class DeleteMedication(val medicationId: String) : MedicationUiEvent
 
     // 3. UI 상태 및 시스템 이벤트 (UI State & System)

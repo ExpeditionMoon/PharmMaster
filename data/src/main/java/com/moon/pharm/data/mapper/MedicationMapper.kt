@@ -6,6 +6,7 @@ import com.moon.pharm.data.datasource.remote.dto.MedicationScheduleDTO
 import com.moon.pharm.domain.model.medication.MealTiming
 import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.model.medication.MedicationSchedule
+import com.moon.pharm.domain.model.medication.MedicationStatus
 import com.moon.pharm.domain.model.medication.MedicationType
 import com.moon.pharm.domain.model.medication.RepeatType
 
@@ -33,6 +34,7 @@ fun MedicationDTO.toDomain(): Medication = Medication(
     repeatType = RepeatType.from(repeatType),
     weeklyDays = weeklyDays.toSet(),
     isAlarmEnabled = isAlarmEnabled,
+    status = MedicationStatus.from(status),
     memo = memo,
     schedules = schedules.map { it.toDomain() },
     prescriptionImageUrl = prescriptionImageUrl,
@@ -49,6 +51,7 @@ fun Medication.toDto(): MedicationDTO = MedicationDTO(
     repeatType = repeatType.name,
     weeklyDays = weeklyDays.sorted(),
     isAlarmEnabled = isAlarmEnabled,
+    status = status.name,
     memo = memo,
     schedules = schedules.map { it.toDto() },
     prescriptionImageUrl = prescriptionImageUrl,

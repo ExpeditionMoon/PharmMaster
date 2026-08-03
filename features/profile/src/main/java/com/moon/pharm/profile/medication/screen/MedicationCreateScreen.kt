@@ -34,7 +34,9 @@ fun MedicationCreateScreen(
         topBar = {
             PharmTopBar(
                 data = TopBarData(
-                    title = stringResource(R.string.medication_create_title),
+                    title = stringResource(
+                        if (uiState.isEditing) R.string.medication_edit_title else R.string.medication_create_title
+                    ),
                     navigationType = TopBarNavigationType.Close,
                     onNavigationClick = onNavigateUp
                 )
@@ -45,6 +47,7 @@ fun MedicationCreateScreen(
             MedicationCreateContent(
                 forms = uiState.medicationForms,
                 isLoading = uiState.isLoading,
+                isEditing = uiState.isEditing,
                 onEvent = { intent -> viewModel.onEvent(intent) }
             )
         }

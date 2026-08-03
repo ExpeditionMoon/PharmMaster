@@ -1,6 +1,7 @@
 package com.moon.pharm.profile.medication.viewmodel
 
 import com.moon.pharm.designsystem.common.UiMessage
+import com.moon.pharm.domain.usecase.medication.MedicationStatusInput
 import com.moon.pharm.profile.medication.model.MealTimingUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 import com.moon.pharm.profile.medication.model.MedicationTypeUiModel
@@ -11,13 +12,18 @@ data class MedicationUiState(
     val isLoading: Boolean = false,
     val userMessage: UiMessage? = null,
     val isMedicationCreated: Boolean = false,
+    val isEditing: Boolean = false,
 
     val medicationList: List<TodayMedicationUiModel> = emptyList(),
+    val weeklyTotalCount: Int = 0,
+    val weeklyCompletedCount: Int = 0,
     val selectedTab: MedicationPrimaryTab = MedicationPrimaryTab.ALL,
     val medicationForms: List<MedicationFormState> = listOf(MedicationFormState())
 )
 
 data class MedicationFormState(
+    val medicationId: String? = null,
+    val scheduleId: String? = null,
     val medicationName: String = "",
     val dailyCount: Int = 0,
     val medicationDosage: String? = "",
@@ -30,5 +36,6 @@ data class MedicationFormState(
     val selectedRepeatType: RepeatTypeUiModel = RepeatTypeUiModel.Daily,
     val selectedWeeklyDays: Set<Int> = emptySet(),
     val isGrouped: Boolean = false,
-    val isAlarmEnabled: Boolean = true
+    val isAlarmEnabled: Boolean = true,
+    val status: MedicationStatusInput = MedicationStatusInput.ACTIVE
 )

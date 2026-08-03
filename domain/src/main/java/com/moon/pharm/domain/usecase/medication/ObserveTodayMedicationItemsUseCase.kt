@@ -3,6 +3,7 @@ package com.moon.pharm.domain.usecase.medication
 import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.model.medication.MealTiming
 import com.moon.pharm.domain.model.medication.Medication
+import com.moon.pharm.domain.model.medication.MedicationStatus
 import com.moon.pharm.domain.model.medication.MedicationType
 import com.moon.pharm.domain.model.medication.RepeatType
 import com.moon.pharm.domain.repository.MedicationRepository
@@ -26,7 +27,7 @@ class ObserveTodayMedicationItemsUseCase(
                 medicationsResult is DataResourceResult.Success && recordsResult is DataResourceResult.Success -> {
                     DataResourceResult.Success(
                         medicationsResult.resultData
-                            .filter { it.isActiveOn(date) }
+                            .filter { it.isVisibleOn(date) }
                             .toMedicationScheduleItems(recordsResult.resultData)
                     )
                 }
@@ -39,7 +40,11 @@ class ObserveTodayMedicationItemsUseCase(
 
     private fun List<Medication>.toMedicationScheduleItems(records: List<IntakeRecord>): List<MedicationScheduleItem> {
         return flatMap { medication ->
-            medication.schedules.map { schedule ->
+            medication.schedules.mapNotNull { schedule ->
+                val record = records.find {
+                    it.medicationId == medication.id && it.scheduleId == schedule.id
+                }
+
                 MedicationScheduleItem(
                     medicationId = medication.id,
                     scheduleId = schedule.id,
@@ -49,17 +54,16 @@ class ObserveTodayMedicationItemsUseCase(
                     time = schedule.time,
                     dosage = schedule.dosage,
                     mealTiming = schedule.mealTiming.toInput(),
-                    isTaken = records.any { record ->
-                        record.medicationId == medication.id &&
-                                record.scheduleId == schedule.id &&
-                                record.isTaken
-                    }
+                    isPaused = medication.status == MedicationStatus.PAUSED,
+                    isTaken = record?.isTaken == true
                 )
             }
         }.sortedBy { it.time }
     }
 
-    private fun Medication.isActiveOn(date: LocalDate): Boolean {
+    private fun Medication.isVisibleOn(date: LocalDate): Boolean {
+        if (status == MedicationStatus.ENDED && endDate == null) return false
+
         val start = startDate?.toLocalDate() ?: LocalDate.MIN
         if (date.isBefore(start)) return false
 

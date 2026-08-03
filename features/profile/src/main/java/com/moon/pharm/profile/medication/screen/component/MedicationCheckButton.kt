@@ -34,10 +34,12 @@ import com.moon.pharm.profile.R
 @Composable
 fun MedicationCheckButton(
     isTaken: Boolean,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     OutlinedButton(
         onClick = onClick,
+        enabled = enabled,
         shape = RoundedCornerShape(10.dp),
         border = if (isTaken) null else BorderStroke(1.dp, PharmTheme.colors.primary),
         colors = ButtonDefaults.outlinedButtonColors(

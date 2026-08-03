@@ -18,6 +18,7 @@ data class MedicationDTO(
     val repeatType: String = EMPTY_STRING,
     val weeklyDays: List<Int> = emptyList(),
     val isAlarmEnabled: Boolean = true,
+    val status: String = "ACTIVE",
     val memo: String? = null,
 
     val schedules: List<MedicationScheduleDTO> = emptyList(),

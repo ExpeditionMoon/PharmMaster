@@ -8,10 +8,13 @@ import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationHistoryItemsUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
+import com.moon.pharm.profile.medication.model.MedicationUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -77,13 +80,24 @@ class MedicationHistoryViewModel @Inject constructor(
     }
 
     fun deleteMedication(medicationId: String) {
+        if (getCurrentUserIdUseCase() == null) {
+            _uiState.update { it.copy(userMessage = MedicationUiMessage.NotLoggedIn) }
+            return
+        }
+
         viewModelScope.launch {
-            deleteMedicationUseCase(medicationId).collectLatest { result ->
-                if (result is DataResourceResult.Failure) {
-                    result.exception.printStackTrace()
-                }
+            val result = deleteMedicationUseCase(medicationId)
+                .filter { it !is DataResourceResult.Loading }
+                .first()
+
+            if (result is DataResourceResult.Failure) {
+                _uiState.update { it.copy(userMessage = MedicationUiMessage.DeleteFailed) }
             }
         }
+    }
+
+    fun userMessageShown() {
+        _uiState.update { it.copy(userMessage = null) }
     }
 
     fun onDateSelected(date: LocalDate) {

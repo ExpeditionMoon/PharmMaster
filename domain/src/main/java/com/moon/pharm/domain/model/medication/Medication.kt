@@ -10,6 +10,7 @@ data class Medication(
     val repeatType: RepeatType,
     val weeklyDays: Set<Int> = emptySet(),
     val isAlarmEnabled: Boolean = true,
+    val status: MedicationStatus = MedicationStatus.ACTIVE,
     val memo: String? = null,
     val schedules: List<MedicationSchedule>,
 
