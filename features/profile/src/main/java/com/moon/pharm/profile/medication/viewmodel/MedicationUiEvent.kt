@@ -27,6 +27,7 @@ sealed interface MedicationUiEvent {
     data class PauseMedication(val medicationId: String) : MedicationUiEvent
     data class ResumeMedication(val medicationId: String) : MedicationUiEvent
     data class EndMedication(val medicationId: String) : MedicationUiEvent
+    data class DeleteMedication(val medicationId: String) : MedicationUiEvent
 
     // 3. UI 상태 및 시스템 이벤트 (UI State & System)
     data class SelectTab(val tab: MedicationPrimaryTab) : MedicationUiEvent

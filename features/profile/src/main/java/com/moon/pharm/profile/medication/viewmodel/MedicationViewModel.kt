@@ -6,15 +6,18 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.moon.pharm.domain.model.medication.MealTiming
 import com.moon.pharm.domain.model.medication.Medication
+import com.moon.pharm.domain.model.medication.MedicationStatus
 import com.moon.pharm.domain.model.medication.MedicationType
 import com.moon.pharm.domain.model.medication.RepeatType
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.medication.ChangeMedicationStatusCommand
 import com.moon.pharm.domain.usecase.medication.ChangeMedicationStatusUseCase
+import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
 import com.moon.pharm.domain.usecase.medication.MedicationStatusInput
 import com.moon.pharm.domain.usecase.medication.ObserveTodayMedicationItemsUseCase
+import com.moon.pharm.domain.usecase.medication.ObserveWeeklyMedicationAdherenceUseCase
 import com.moon.pharm.domain.usecase.medication.SaveMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
@@ -47,8 +50,10 @@ import javax.inject.Inject
 class MedicationViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val observeTodayMedicationItemsUseCase: ObserveTodayMedicationItemsUseCase,
+    private val observeWeeklyMedicationAdherenceUseCase: ObserveWeeklyMedicationAdherenceUseCase,
     private val saveMedicationUseCase: SaveMedicationUseCase,
     private val changeMedicationStatusUseCase: ChangeMedicationStatusUseCase,
+    private val deleteMedicationUseCase: DeleteMedicationUseCase,
     private val getMedicationsUseCase: GetMedicationsUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
@@ -64,6 +69,7 @@ class MedicationViewModel @Inject constructor(
     val groupedMedications: StateFlow<List<MedicationTimeGroupUiModel>> = uiState
         .map { state ->
             state.medicationList
+                .filter { state.selectedTab.includes(it.type) }
                 .groupBy { it.time }
                 .map { (time, items) -> MedicationTimeGroupUiModel(time = time, items = items) }
                 .sortedBy { it.time }
@@ -233,6 +239,7 @@ class MedicationViewModel @Inject constructor(
                 medicationId = event.medicationId,
                 status = MedicationStatusInput.ENDED
             )
+            is MedicationUiEvent.DeleteMedication -> deleteMedication(event.medicationId)
             is MedicationUiEvent.ToggleTaken -> toggleMedicationTaken(
                 medicationId = event.medicationId,
                 scheduleId = event.scheduleId
@@ -280,6 +287,26 @@ class MedicationViewModel @Inject constructor(
                 }
             }
         }
+
+        observeWeeklyAdherence(userId, today)
+    }
+
+    private fun observeWeeklyAdherence(userId: String, today: LocalDate) {
+        viewModelScope.launch {
+            observeWeeklyMedicationAdherenceUseCase(userId, today).collectLatest { result ->
+                if (isSaving) return@collectLatest
+
+                if (result is DataResourceResult.Success) {
+                    _uiState.update {
+                        it.copy(
+                            weeklyTotalCount = result.resultData.totalCount,
+                            weeklyCompletedCount = result.resultData.completedCount
+                        )
+                    }
+                }
+            }
+        }
+
     }
 
     private fun initializeFormFromArgs() {
@@ -484,6 +511,31 @@ class MedicationViewModel @Inject constructor(
             }
         }
     }
+
+    private fun deleteMedication(medicationId: String) {
+        viewModelScope.launch {
+            isSaving = true
+            _uiState.update { it.copy(isLoading = true) }
+            val result = deleteMedicationUseCase(medicationId)
+                .filter { it !is DataResourceResult.Loading }
+                .first()
+
+            isSaving = false
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    medicationList = if (result is DataResourceResult.Success) {
+                        it.medicationList.filterNot { item -> item.medicationId == medicationId }
+                    } else {
+                        it.medicationList
+                    },
+                    userMessage = (result as? DataResourceResult.Failure)
+                        ?.let { MedicationUiMessage.DeleteFailed }
+                )
+            }
+        }
+
+    }
     // endregion
 
     // region 4. Helper Functions
@@ -513,7 +565,8 @@ class MedicationViewModel @Inject constructor(
             selectedRepeatType = repeatType.toUiModel(),
             selectedWeeklyDays = weeklyDays,
             isGrouped = isGrouped,
-            isAlarmEnabled = isAlarmEnabled
+            isAlarmEnabled = isAlarmEnabled,
+            status = status.toInput()
         )
     }
 
@@ -547,7 +600,7 @@ class MedicationViewModel @Inject constructor(
         medicationId: String,
         status: MedicationStatusInput
     ) = when (status) {
-        MedicationStatusInput.ENDED -> filterNot { it.medicationId == medicationId }
+        MedicationStatusInput.ENDED -> this
         MedicationStatusInput.PAUSED,
         MedicationStatusInput.ACTIVE -> map { item ->
             if (item.medicationId == medicationId) {
@@ -556,6 +609,19 @@ class MedicationViewModel @Inject constructor(
                 item
             }
         }
+    }
+
+    private fun MedicationStatus.toInput(): MedicationStatusInput = when (this) {
+        MedicationStatus.ACTIVE -> MedicationStatusInput.ACTIVE
+        MedicationStatus.PAUSED -> MedicationStatusInput.PAUSED
+        MedicationStatus.ENDED -> MedicationStatusInput.ENDED
+    }
+
+    private fun MedicationPrimaryTab.includes(type: MedicationTypeUiModel): Boolean = when (this) {
+        MedicationPrimaryTab.ALL -> true
+        MedicationPrimaryTab.PRESCRIPTION -> type == MedicationTypeUiModel.Prescription
+        MedicationPrimaryTab.GENERAL -> type == MedicationTypeUiModel.Otc
+        MedicationPrimaryTab.SUPPLEMENTS -> type == MedicationTypeUiModel.Supplement
     }
 
     // endregion

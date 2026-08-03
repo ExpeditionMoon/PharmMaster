@@ -89,6 +89,8 @@ fun MedicationScreen(
                 currentList = groupedList,
                 totalCount = totalCount,
                 completedCount = completedCount,
+                weeklyTotalCount = uiState.weeklyTotalCount,
+                weeklyCompletedCount = uiState.weeklyCompletedCount,
                 onTabSelected = { viewModel.onTabSelected(it) },
                 onTakeClick = { item ->
                     viewModel.onEvent(
@@ -107,6 +109,9 @@ fun MedicationScreen(
                 },
                 onEndClick = { medicationId ->
                     viewModel.onEvent(MedicationUiEvent.EndMedication(medicationId))
+                },
+                onDeleteClick = { medicationId ->
+                    viewModel.onEvent(MedicationUiEvent.DeleteMedication(medicationId))
                 }
             )
         }

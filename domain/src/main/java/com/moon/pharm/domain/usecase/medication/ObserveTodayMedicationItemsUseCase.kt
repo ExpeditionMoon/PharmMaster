@@ -40,7 +40,11 @@ class ObserveTodayMedicationItemsUseCase(
 
     private fun List<Medication>.toMedicationScheduleItems(records: List<IntakeRecord>): List<MedicationScheduleItem> {
         return flatMap { medication ->
-            medication.schedules.map { schedule ->
+            medication.schedules.mapNotNull { schedule ->
+                val record = records.find {
+                    it.medicationId == medication.id && it.scheduleId == schedule.id
+                }
+
                 MedicationScheduleItem(
                     medicationId = medication.id,
                     scheduleId = schedule.id,
@@ -51,18 +55,15 @@ class ObserveTodayMedicationItemsUseCase(
                     dosage = schedule.dosage,
                     mealTiming = schedule.mealTiming.toInput(),
                     isPaused = medication.status == MedicationStatus.PAUSED,
-                    isTaken = records.any { record ->
-                        record.medicationId == medication.id &&
-                                record.scheduleId == schedule.id &&
-                                record.isTaken
-                    }
+                    isTaken = record?.isTaken == true
                 )
             }
         }.sortedBy { it.time }
     }
 
     private fun Medication.isVisibleOn(date: LocalDate): Boolean {
-        if (status == MedicationStatus.ENDED) return false
+        if (status == MedicationStatus.ENDED && endDate == null) return false
+
         val start = startDate?.toLocalDate() ?: LocalDate.MIN
         if (date.isBefore(start)) return false
 

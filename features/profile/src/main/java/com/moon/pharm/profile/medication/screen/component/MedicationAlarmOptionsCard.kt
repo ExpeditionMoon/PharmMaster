@@ -73,7 +73,11 @@ fun MedicationAlarmOptionsCard(
     val context = LocalContext.current
     var permissionStateVersion by remember { mutableIntStateOf(0) }
     val shouldOpenNotificationSettings = remember(context, permissionStateVersion) {
-        context.shouldOpenNotificationSettings()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.shouldOpenNotificationSettings()
+        } else {
+            false
+        }
     }
     val lifecycleOwner = LocalLifecycleOwner.current
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
@@ -82,11 +86,11 @@ fun MedicationAlarmOptionsCard(
         permissionStateVersion++
     }
     val isNotificationPermissionGranted = remember(context, permissionStateVersion) {
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.isNotificationPermissionGranted()
+        } else {
+            true
+        }
     }
     val isExactAlarmPermissionGranted = remember(context, permissionStateVersion) {
         Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
@@ -181,6 +185,14 @@ private fun requestNotificationPermission(
     launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
 }
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+private fun Context.isNotificationPermissionGranted(): Boolean =
+    ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.POST_NOTIFICATIONS
+    ) == PackageManager.PERMISSION_GRANTED
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun Context.shouldOpenNotificationSettings(): Boolean {
     val hasRequestedPermission = getSharedPreferences(
         PERMISSION_PREFERENCES_NAME,

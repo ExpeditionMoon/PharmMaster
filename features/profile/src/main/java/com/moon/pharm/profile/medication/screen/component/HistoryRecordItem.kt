@@ -7,11 +7,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.moon.pharm.designsystem.component.dialog.PharmConfirmDialog
 import com.moon.pharm.designsystem.component.item.PharmListItem
 import com.moon.pharm.designsystem.theme.PharmMasterTheme
 import com.moon.pharm.designsystem.theme.PharmTheme
@@ -23,6 +35,7 @@ import com.moon.pharm.profile.medication.model.HistoryRecordUiModel
 fun HistoryRecordItem(
     uiModel: HistoryRecordUiModel,
     onRecordClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val borderColor = if (uiModel.isTaken) PharmTheme.colors.success else PharmTheme.colors.warning
@@ -31,6 +44,8 @@ fun HistoryRecordItem(
     } else {
         PharmTheme.colors.warningContainer
     }
+    var showMenu by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     PharmListItem(
         modifier = modifier,
@@ -52,9 +67,46 @@ fun HistoryRecordItem(
                     tint = borderColor,
                     modifier = Modifier.size(24.dp)
                 )
+                Box {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = stringResource(R.string.medication_option_menu_desc),
+                            tint = PharmTheme.colors.secondFont
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.medication_delete_with_history),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            },
+                            onClick = {
+                                showMenu = false
+                                showDeleteDialog = true
+                            }
+                        )
+                    }
+                }
             }
         }
     )
+
+    if (showDeleteDialog) {
+        PharmConfirmDialog(
+            title = stringResource(R.string.medication_delete_with_history_dialog_title),
+            content = stringResource(R.string.medication_delete_with_history_dialog_content),
+            confirmText = stringResource(R.string.medication_delete_with_history_desc),
+            confirmTextColor = MaterialTheme.colorScheme.error,
+            onConfirm = onDeleteClick,
+            onDismiss = { showDeleteDialog = false }
+        )
+    }
 }
 
 @ThemePreviews
@@ -72,7 +124,8 @@ private fun HistoryRecordItemPreview() {
                     medicationName = "Cold medicine",
                     time = "08:00"
                 ),
-                onRecordClick = {}
+                onRecordClick = {},
+                onDeleteClick = {}
             )
         }
     }

@@ -48,10 +48,12 @@ fun MedicationItemCard(
     onPauseClick: (String) -> Unit,
     onResumeClick: (String) -> Unit,
     onEndClick: (String) -> Unit,
+    onDeleteClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var showEndDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Card(
         colors = CardDefaults.cardColors(
@@ -127,6 +129,18 @@ fun MedicationItemCard(
                         DropdownMenuItem(
                             text = {
                                 Text(
+                                    text = stringResource(R.string.medication_delete_with_history),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            },
+                            onClick = {
+                                showMenu = false
+                                showDeleteDialog = true
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Text(
                                     stringResource(
                                         if (item.isPaused) R.string.medication_resume else R.string.medication_pause
                                     )
@@ -166,6 +180,17 @@ fun MedicationItemCard(
             onDismiss = { showEndDialog = false }
         )
     }
+
+    if (showDeleteDialog) {
+        PharmConfirmDialog(
+            title = stringResource(R.string.medication_delete_with_history_dialog_title),
+            content = stringResource(R.string.medication_delete_with_history_dialog_content),
+            confirmText = stringResource(R.string.medication_delete_with_history_desc),
+            confirmTextColor = MaterialTheme.colorScheme.error,
+            onConfirm = { onDeleteClick(item.medicationId) },
+            onDismiss = { showDeleteDialog = false }
+        )
+    }
 }
 
 @ThemePreviews
@@ -190,7 +215,8 @@ private fun MedicationItemCardPreview() {
                 onEditClick = {},
                 onPauseClick = {},
                 onResumeClick = {},
-                onEndClick = {}
+                onEndClick = {},
+                onDeleteClick = {}
             )
         }
     }

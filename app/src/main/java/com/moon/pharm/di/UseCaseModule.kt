@@ -34,13 +34,14 @@ import com.moon.pharm.domain.usecase.consult.UploadConsultImagesUseCase
 import com.moon.pharm.domain.usecase.consult.ValidateConsultFormUseCase
 import com.moon.pharm.domain.usecase.ddi.AnalyzeDdiUseCase
 import com.moon.pharm.domain.usecase.drug.SearchDrugUseCase
-import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.ChangeMedicationStatusUseCase
+import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.GetDailyIntakeRecordsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationHistoryItemsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMonthlyIntakeRecordsUseCase
 import com.moon.pharm.domain.usecase.medication.ObserveTodayMedicationItemsUseCase
+import com.moon.pharm.domain.usecase.medication.ObserveWeeklyMedicationAdherenceUseCase
 import com.moon.pharm.domain.usecase.medication.RestoreMedicationAlarmsUseCase
 import com.moon.pharm.domain.usecase.medication.SaveMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
@@ -145,6 +146,13 @@ object UseCaseModule {
         medicationRepository: MedicationRepository
     ): ObserveTodayMedicationItemsUseCase {
         return ObserveTodayMedicationItemsUseCase(medicationRepository)
+    }
+
+    @Provides
+    fun provideObserveWeeklyMedicationAdherenceUseCase(
+        medicationRepository: MedicationRepository
+    ): ObserveWeeklyMedicationAdherenceUseCase {
+        return ObserveWeeklyMedicationAdherenceUseCase(medicationRepository)
     }
 
     @Provides

@@ -37,7 +37,8 @@ data class SaveMedicationCommand(
     val weeklyDays: Set<Int> = emptySet(),
     val schedules: List<MedicationScheduleCommand>,
     val isGrouped: Boolean,
-    val isAlarmEnabled: Boolean = true
+    val isAlarmEnabled: Boolean = true,
+    val status: MedicationStatusInput = MedicationStatusInput.ACTIVE
 )
 
 enum class MedicationStatusInput {

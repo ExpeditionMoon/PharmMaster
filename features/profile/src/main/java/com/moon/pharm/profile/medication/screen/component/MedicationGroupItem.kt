@@ -35,7 +35,8 @@ fun MedicationGroupItem(
     onEditClick: (String) -> Unit,
     onPauseClick: (String) -> Unit,
     onResumeClick: (String) -> Unit,
-    onEndClick: (String) -> Unit
+    onEndClick: (String) -> Unit,
+    onDeleteClick: (String) -> Unit
 ) {
     val displayTime = group.time?.toLongOrNull()?.toDisplayTimeString() ?: group.time
 
@@ -67,7 +68,8 @@ fun MedicationGroupItem(
                     onEditClick = onEditClick,
                     onPauseClick = onPauseClick,
                     onResumeClick = onResumeClick,
-                    onEndClick = onEndClick
+                    onEndClick = onEndClick,
+                    onDeleteClick = onDeleteClick
                 )
             }
         }
@@ -101,7 +103,8 @@ private fun MedicationGroupItemPreview() {
                 onEditClick = {},
                 onPauseClick = {},
                 onResumeClick = {},
-                onEndClick = {}
+                onEndClick = {},
+                onDeleteClick = {}
             )
         }
     }

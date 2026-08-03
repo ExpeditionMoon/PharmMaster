@@ -4,6 +4,7 @@ import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.alarm.MedicationAlarm
 import com.moon.pharm.domain.model.medication.IntakeRecord
 import com.moon.pharm.domain.model.medication.Medication
+import com.moon.pharm.domain.model.medication.MedicationStatus
 import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.flow.Flow
@@ -51,6 +52,17 @@ class SaveMedicationUseCaseTest {
 
         assertEquals("medication-id", repository.savedMedication?.id)
         assertEquals("schedule-id", repository.savedMedication?.schedules?.single()?.id)
+    }
+
+    @Test
+    fun `keeps paused status when medication is edited`() = runBlocking {
+        val repository = RecordingMedicationRepository()
+        val alarmScheduler = RecordingAlarmScheduler()
+        val useCase = SaveMedicationUseCase(repository, alarmScheduler)
+
+        useCase(saveMedicationCommand().copy(status = MedicationStatusInput.PAUSED)).toList()
+
+        assertEquals(MedicationStatus.PAUSED, repository.savedMedication?.status)
     }
 
     private fun saveMedicationCommand() = SaveMedicationCommand(

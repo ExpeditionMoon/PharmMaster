@@ -11,5 +11,6 @@ sealed interface MedicationUiMessage : UiMessage {
     object MedicationNotFound : MedicationUiMessage
     object MedicationPaused : MedicationUiMessage
     object IntakeUpdateFailed : MedicationUiMessage
+    object DeleteFailed : MedicationUiMessage
     object NotLoggedIn : MedicationUiMessage
 }

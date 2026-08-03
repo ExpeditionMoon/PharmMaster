@@ -26,12 +26,15 @@ fun MedicationHomeContent(
     currentList: List<MedicationTimeGroupUiModel>,
     totalCount: Int,
     completedCount: Int,
+    weeklyTotalCount: Int,
+    weeklyCompletedCount: Int,
     onTabSelected: (MedicationPrimaryTab) -> Unit,
     onTakeClick: (TodayMedicationUiModel) -> Unit,
     onEditClick: (String) -> Unit,
     onPauseClick: (String) -> Unit,
     onResumeClick: (String) -> Unit,
-    onEndClick: (String) -> Unit
+    onEndClick: (String) -> Unit,
+    onDeleteClick: (String) -> Unit
 ) {
     val tabTitles = MedicationPrimaryTab.entries.map { it.title }
 
@@ -52,7 +55,12 @@ fun MedicationHomeContent(
             modifier = Modifier.fillMaxSize()
         ) {
             item {
-                MedicationProgressCard(total = totalCount, completed = completedCount)
+                MedicationProgressCard(
+                    total = totalCount,
+                    completed = completedCount,
+                    weeklyTotal = weeklyTotalCount,
+                    weeklyCompleted = weeklyCompletedCount
+                )
             }
 
             items(items = currentList, key = { it.time ?: "no-time" }) { group ->
@@ -62,7 +70,8 @@ fun MedicationHomeContent(
                     onEditClick = onEditClick,
                     onPauseClick = onPauseClick,
                     onResumeClick = onResumeClick,
-                    onEndClick = onEndClick
+                    onEndClick = onEndClick,
+                    onDeleteClick = onDeleteClick
                 )
             }
 
@@ -80,12 +89,15 @@ private fun MedicationHomeContentPreview() {
             currentList = emptyList(),
             totalCount = 3,
             completedCount = 1,
+            weeklyTotalCount = 8,
+            weeklyCompletedCount = 6,
             onTabSelected = {},
             onTakeClick = {},
             onEditClick = {},
             onPauseClick = {},
             onResumeClick = {},
-            onEndClick = {}
+            onEndClick = {},
+            onDeleteClick = {}
         )
     }
 }

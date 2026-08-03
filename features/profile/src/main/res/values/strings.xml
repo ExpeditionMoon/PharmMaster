@@ -79,6 +79,7 @@
     <string name="error_medication_not_found">수정할 복약 정보를 찾을 수 없습니다.</string>
     <string name="error_medication_paused">일시 중지된 복약은 복용 처리할 수 없습니다.</string>
     <string name="error_update_medication_intake">복약 처리에 실패했습니다. 다시 시도해 주세요.</string>
+    <string name="error_delete_medication">복약과 기록 삭제에 실패했습니다. 다시 시도해 주세요.</string>
 
     <string name="medication_category_all">전체</string>
     <string name="medication_category_prescription">처방약</string>
@@ -121,6 +122,7 @@
 
     <string name="medication_time_label">%1$s 복용</string>
     <string name="medication_progress_today">오늘 복용 %1$d/%2$d회 완료</string>
+    <string name="medication_progress_weekly">이번 주 복용 준수율 %1$d%%</string>
 
     <string name="medication_history_title">나의 복약 기록</string>
     <string name="medication_history_detail_title">%1$s 복약 상세</string>
@@ -138,6 +140,10 @@
     <string name="medication_end_dialog_title">복약 종료</string>
     <string name="medication_end_dialog_content">복약을 종료하면 예정된 알림이 취소되고 기존 복약 이력은 유지됩니다.</string>
     <string name="medication_end_desc">종료</string>
+    <string name="medication_delete_with_history">삭제하기</string>
+    <string name="medication_delete_with_history_dialog_title">복약과 기록 삭제</string>
+    <string name="medication_delete_with_history_dialog_content">이 약과 연결된 모든 복약 기록이 영구 삭제됩니다. 삭제한 데이터는 복구할 수 없습니다.</string>
+    <string name="medication_delete_with_history_desc">영구 삭제</string>
     <string name="medication_paused_badge">일시 중지됨</string>
     <string name="medication_edit_title">복약 정보 수정</string>
     <string name="medication_save">저장하기</string>

@@ -4,6 +4,7 @@ import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.model.medication.MealTiming
 import com.moon.pharm.domain.model.medication.Medication
 import com.moon.pharm.domain.model.medication.MedicationSchedule
+import com.moon.pharm.domain.model.medication.MedicationStatus
 import com.moon.pharm.domain.model.medication.MedicationType
 import com.moon.pharm.domain.model.medication.RepeatType
 import com.moon.pharm.domain.repository.MedicationRepository
@@ -38,7 +39,8 @@ class SaveMedicationUseCase(
             weeklyDays = weeklyDays,
             schedules = schedules.map { it.toMedicationSchedule() },
             isGrouped = isGrouped,
-            isAlarmEnabled = isAlarmEnabled
+            isAlarmEnabled = isAlarmEnabled,
+            status = status.toDomain()
         )
     }
 
@@ -74,5 +76,11 @@ class SaveMedicationUseCase(
             RepeatTypeInput.WEEKLY -> RepeatType.WEEKLY
             RepeatTypeInput.PERIOD -> RepeatType.PERIOD
         }
+    }
+
+    private fun MedicationStatusInput.toDomain(): MedicationStatus = when (this) {
+        MedicationStatusInput.ACTIVE -> MedicationStatus.ACTIVE
+        MedicationStatusInput.PAUSED -> MedicationStatus.PAUSED
+        MedicationStatusInput.ENDED -> MedicationStatus.ENDED
     }
 }

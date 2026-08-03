@@ -37,7 +37,8 @@ object MedicationUiMapper {
                 )
             ),
             isGrouped = form.isGrouped,
-            isAlarmEnabled = form.isAlarmEnabled
+            isAlarmEnabled = form.isAlarmEnabled,
+            status = form.status
         )
     }
 
