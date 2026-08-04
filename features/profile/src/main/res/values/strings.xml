@@ -107,6 +107,12 @@
 
     <string name="medication_name_hint">약물 이름 입력</string>
     <string name="medication_dosage_hint">복용 용량 입력(예: 2알, 1캡슐)</string>
+    <string name="medication_common_dosage_hint">모든 약에 적용할 복용 용량 입력(예: 1정)</string>
+    <string name="medication_detected_count">인식된 약품 %1$d개</string>
+    <string name="medication_common_setting_title">복용 설정 (전체 적용)</string>
+    <string name="medication_individual_dosage">약마다 복용량 수정하기</string>
+    <string name="medication_individual_dosage_hide">개별 복용량 수정 닫기</string>
+    <string name="medication_use_common_dosage">공통 용량 사용</string>
 
     <string name="medication_alarm_time_dialog_title">알람 시간 설정</string>
     <string name="medication_alarm_grouped_title">묶음 알림</string>
@@ -163,4 +169,7 @@
     <string name="medication_alarm_exact_permission_title">정확한 알람</string>
     <string name="medication_alarm_exact_permission_desc">정확한 알람 권한이 없으면 알림이 다소 지연될 수 있습니다.</string>
     <string name="medication_alarm_exact_permission_action">정확한 알람 권한 설정</string>
+    <string name="medication_review_title">처방전 인식 결과 검토</string>
+    <string name="medication_review_notice">인식한 약 정보가 일부 누락되거나 정확하지 않을 수 있어요. 약 이름, 용량, 복용 시간, 기간을 확인하고 필요한 약을 추가해 주세요.</string>
+    <string name="medication_add_another">약 추가하기</string>
 </resources>

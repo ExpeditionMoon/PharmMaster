@@ -10,6 +10,8 @@ sealed interface MedicationUiEvent {
     data class UpdateType(val index: Int = 0, val type: MedicationTypeUiModel) : MedicationUiEvent
     data class UpdateName(val index: Int = 0, val name: String) : MedicationUiEvent
     data class UpdateDosage(val index: Int = 0, val dosage: String) : MedicationUiEvent
+    data class ToggleIndividualDosage(val index: Int) : MedicationUiEvent
+    data object ToggleIndividualDosageEditor : MedicationUiEvent
     data class UpdateStartDate(val index: Int = 0, val millis: Long?) : MedicationUiEvent
     data class UpdateEndDate(val index: Int = 0, val millis: Long?) : MedicationUiEvent
     data class UpdatePeriod(val index: Int = 0, val start: Long?, val end: Long?, val noEnd: Boolean) : MedicationUiEvent
@@ -19,6 +21,7 @@ sealed interface MedicationUiEvent {
     data class ToggleWeeklyDay(val index: Int = 0, val day: Int) : MedicationUiEvent
     data class UpdateGroupedNotification(val index: Int = 0, val enabled: Boolean) : MedicationUiEvent
     data class UpdateAlarmEnabled(val index: Int = 0, val enabled: Boolean) : MedicationUiEvent
+    data object AddMedication : MedicationUiEvent
     data class RemoveMedication(val index: Int) : MedicationUiEvent
 
     // 2. 주요 비즈니스 로직 (Business Logic)

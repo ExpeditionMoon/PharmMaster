@@ -117,7 +117,12 @@ fun MainScreen(
                     onNavigateToMyConsultation = { mainNavController.navigate(MyConsultListRoute) }
                 )
                 prescriptionNavGraph { scannedMedicationNames ->
-                    mainNavController.navigate(MedicationCreateRoute(scannedMedicationNames)) {
+                    mainNavController.navigate(
+                        MedicationCreateRoute(
+                            scannedMedicationNames = scannedMedicationNames,
+                            isPrescriptionReview = true
+                        )
+                    ) {
                         popUpTo(PrescriptionCaptureRoute) { inclusive = false }
                     }
                 }
