@@ -56,6 +56,12 @@ class PrescriptionViewModel @Inject constructor(
             ?: latestImageUri?.let(::analyzeImageFromUri)
     }
 
+    fun openManualMedicationReview() {
+        viewModelScope.launch {
+            _uiEvent.emit(PrescriptionUiEvent.NavigateToMedicationReview(emptyList()))
+        }
+    }
+
     private fun submitOcrText(rawText: String) {
         if (_uiState.value is PrescriptionUiState.Loading) return
         latestOcrText = rawText
@@ -68,18 +74,42 @@ class PrescriptionViewModel @Inject constructor(
     private suspend fun processTextWithAi(rawText: String) {
         when (val result = extractDrugNamesUseCase(rawText)) {
             is DataResourceResult.Success -> {
-                _uiEvent.emit(PrescriptionUiEvent.NavigateToCreate(result.resultData))
-                _uiState.value = PrescriptionUiState.Idle
+                val medicationNames = result.resultData
+                    .map(String::trim)
+                    .filter(String::isNotEmpty)
+                    .distinct()
+
+                if (medicationNames.isEmpty()) {
+                    navigateToMedicationReview(isAiExtractionFailed = true)
+                } else {
+                    navigateToMedicationReview(medicationNames)
+                }
             }
             is DataResourceResult.Failure -> {
-                _uiState.value = PrescriptionUiState.Error(result.exception.toPrescriptionError())
+                if (result.exception == PrescriptionException.OcrNoText) {
+                    _uiState.value = PrescriptionUiState.Error(PrescriptionError.OCR)
+                } else {
+                    navigateToMedicationReview(isAiExtractionFailed = true)
+                }
             }
             DataResourceResult.Loading -> Unit
         }
     }
 
+    private suspend fun navigateToMedicationReview(
+        medicationNames: List<String> = emptyList(),
+        isAiExtractionFailed: Boolean = false
+    ) {
+        _uiEvent.emit(
+            PrescriptionUiEvent.NavigateToMedicationReview(
+                scannedMedicationNames = medicationNames,
+                isAiExtractionFailed = isAiExtractionFailed
+            )
+        )
+        _uiState.value = PrescriptionUiState.Idle
+    }
+
     private fun Throwable.toPrescriptionError(): PrescriptionError = when (this) {
-        PrescriptionException.Network -> PrescriptionError.NETWORK
         PrescriptionException.OcrNoText,
         PrescriptionException.DrugNameNotFound,
         PrescriptionException.OcrFailed -> PrescriptionError.OCR

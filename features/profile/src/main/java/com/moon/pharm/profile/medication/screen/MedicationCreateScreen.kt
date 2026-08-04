@@ -35,7 +35,11 @@ fun MedicationCreateScreen(
             PharmTopBar(
                 data = TopBarData(
                     title = stringResource(
-                        if (uiState.isEditing) R.string.medication_edit_title else R.string.medication_create_title
+                        when {
+                            uiState.isEditing -> R.string.medication_edit_title
+                            uiState.isPrescriptionReview -> R.string.medication_review_title
+                            else -> R.string.medication_create_title
+                        }
                     ),
                     navigationType = TopBarNavigationType.Close,
                     onNavigationClick = onNavigateUp
@@ -46,9 +50,13 @@ fun MedicationCreateScreen(
         Box(modifier = Modifier.padding(innerPadding)) {
             MedicationCreateContent(
                 forms = uiState.medicationForms,
+                sharedMedicationDosage = uiState.sharedMedicationDosage,
+                isIndividualDosageEditorVisible = uiState.isIndividualDosageEditorVisible,
                 isLoading = uiState.isLoading,
                 isEditing = uiState.isEditing,
-                onEvent = { intent -> viewModel.onEvent(intent) }
+                isPrescriptionReview = uiState.isPrescriptionReview,
+                isAiExtractionFailed = uiState.isAiExtractionFailed,
+                onEvent = viewModel::onEvent
             )
         }
     }

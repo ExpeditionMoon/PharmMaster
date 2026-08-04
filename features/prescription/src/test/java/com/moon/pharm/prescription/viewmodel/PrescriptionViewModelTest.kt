@@ -42,7 +42,7 @@ class PrescriptionViewModelTest {
     }
 
     @Test
-    fun `카메라 OCR 결과를 복약 등록 화면으로 전달한다`() = runTest(dispatcher) {
+    fun `AI가 추출한 약 이름을 검토 화면으로 전달한다`() = runTest(dispatcher) {
         ddiRepository.extractResult = DataResourceResult.Success(listOf("타이레놀", "아목시실린"))
         val viewModel = createViewModel()
         val event = async { viewModel.uiEvent.first() }
@@ -51,15 +51,15 @@ class PrescriptionViewModelTest {
         advanceUntilIdle()
 
         assertEquals(
-            PrescriptionUiEvent.NavigateToCreate(listOf("타이레놀", "아목시실린")),
+            PrescriptionUiEvent.NavigateToMedicationReview(listOf("타이레놀", "아목시실린")),
             event.await()
         )
     }
 
     @Test
-    fun `갤러리 OCR 성공 결과를 복약 등록 화면으로 전달한다`() = runTest(dispatcher) {
+    fun `갤러리 OCR 결과를 검토 화면으로 전달한다`() = runTest(dispatcher) {
         val imageUri: Uri = mock()
-        ocrTextExtractor.result = Result.success("처방 약 이름")
+        ocrTextExtractor.result = Result.success("처방전 약 이름")
         ddiRepository.extractResult = DataResourceResult.Success(listOf("타이레놀"))
         val viewModel = createViewModel()
         val event = async { viewModel.uiEvent.first() }
@@ -67,33 +67,32 @@ class PrescriptionViewModelTest {
         viewModel.analyzeImageFromUri(imageUri)
         advanceUntilIdle()
 
-        assertEquals(PrescriptionUiEvent.NavigateToCreate(listOf("타이레놀")), event.await())
+        assertEquals(PrescriptionUiEvent.NavigateToMedicationReview(listOf("타이레놀")), event.await())
         assertEquals(imageUri, ocrTextExtractor.lastUri)
     }
 
     @Test
-    fun `네트워크 오류는 재시도 가능한 네트워크 UI 상태로 표시한다`() = runTest(dispatcher) {
+    fun `AI 추출 네트워크 오류에도 직접 입력 가능한 검토 화면으로 이동한다`() = runTest(dispatcher) {
         ddiRepository.extractResult = DataResourceResult.Failure(PrescriptionException.Network)
         val viewModel = createViewModel()
+        val event = async { viewModel.uiEvent.first() }
 
-        viewModel.onTextRecognized("처방 약 이름")
+        viewModel.onTextRecognized("처방전 약 이름")
         advanceUntilIdle()
 
         assertEquals(
-            PrescriptionUiState.Error(PrescriptionError.NETWORK),
-            viewModel.uiState.value
+            PrescriptionUiEvent.NavigateToMedicationReview(
+                scannedMedicationNames = emptyList(),
+                isAiExtractionFailed = true
+            ),
+            event.await()
         )
-
-        ddiRepository.extractResult = DataResourceResult.Success(listOf("타이레놀"))
-        viewModel.retry()
-        advanceUntilIdle()
-
         assertEquals(PrescriptionUiState.Idle, viewModel.uiState.value)
-        assertEquals(2, ddiRepository.extractCalls)
+        assertEquals(1, ddiRepository.extractCalls)
     }
 
     @Test
-    fun `빈 OCR 결과는 OCR 오류 UI 상태로 표시한다`() = runTest(dispatcher) {
+    fun `빈 OCR 결과는 OCR 오류 UI 상태로 표시된다`() = runTest(dispatcher) {
         val viewModel = createViewModel()
 
         viewModel.onTextRecognized(" ")
@@ -101,6 +100,35 @@ class PrescriptionViewModelTest {
 
         assertEquals(PrescriptionUiState.Error(PrescriptionError.OCR), viewModel.uiState.value)
         assertEquals(0, ddiRepository.extractCalls)
+    }
+
+    @Test
+    fun `빈 AI 추출 결과는 직접 입력 가능한 검토 화면으로 이동한다`() = runTest(dispatcher) {
+        ddiRepository.extractResult = DataResourceResult.Success(listOf(" ", ""))
+        val viewModel = createViewModel()
+        val event = async { viewModel.uiEvent.first() }
+
+        viewModel.onTextRecognized("처방전 약 이름")
+        advanceUntilIdle()
+
+        assertEquals(
+            PrescriptionUiEvent.NavigateToMedicationReview(
+                scannedMedicationNames = emptyList(),
+                isAiExtractionFailed = true
+            ),
+            event.await()
+        )
+    }
+
+    @Test
+    fun `직접 입력을 선택하면 빈 검토 화면으로 이동한다`() = runTest(dispatcher) {
+        val viewModel = createViewModel()
+        val event = async { viewModel.uiEvent.first() }
+
+        viewModel.openManualMedicationReview()
+        advanceUntilIdle()
+
+        assertEquals(PrescriptionUiEvent.NavigateToMedicationReview(emptyList()), event.await())
     }
 
     private fun createViewModel(): PrescriptionViewModel = PrescriptionViewModel(

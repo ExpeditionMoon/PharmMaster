@@ -12,9 +12,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.moon.pharm.designsystem.component.button.PharmOutlinedButton
 import com.moon.pharm.designsystem.component.button.PharmPrimaryButton
+import com.moon.pharm.designsystem.component.card.InfoCardType
+import com.moon.pharm.designsystem.component.card.PharmInfoCard
 import com.moon.pharm.designsystem.theme.PharmMasterTheme
 import com.moon.pharm.designsystem.theme.PharmTheme
 import com.moon.pharm.designsystem.util.ThemePreviews
@@ -27,13 +29,17 @@ import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 @Composable
 fun MedicationCreateContent(
     forms: List<MedicationFormState>,
+    sharedMedicationDosage: String,
+    isIndividualDosageEditorVisible: Boolean,
     isLoading: Boolean,
     isEditing: Boolean,
+    isPrescriptionReview: Boolean,
+    isAiExtractionFailed: Boolean,
     onEvent: (MedicationUiEvent) -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val globalForm = forms.firstOrNull() ?: MedicationFormState()
-    val isSingleMode = forms.size == 1
+    val isSingleMedication = forms.size == 1
+    val sharedForm = forms.firstOrNull() ?: MedicationFormState()
 
     Column(
         modifier = Modifier
@@ -44,8 +50,23 @@ fun MedicationCreateContent(
     ) {
         Spacer(modifier = Modifier.height(10.dp))
 
+        if (isPrescriptionReview) {
+            PharmInfoCard(
+                message = stringResource(
+                    if (isAiExtractionFailed) {
+                        R.string.medication_review_ai_failure_notice
+                    } else {
+                        R.string.medication_review_notice
+                    }
+                ),
+                type = InfoCardType.NOTICE
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
         MedicationTypeSelector(
-            selectedType = globalForm.selectedType,
+            selectedType = forms.firstOrNull()?.selectedType ?: MedicationFormState().selectedType,
             onTypeSelected = { onEvent(MedicationUiEvent.UpdateType(index = -1, type = it)) }
         )
 
@@ -53,22 +74,31 @@ fun MedicationCreateContent(
 
         MedicationInfoSection(
             forms = forms,
+            sharedMedicationDosage = sharedMedicationDosage,
+            isIndividualDosageEditorVisible = isIndividualDosageEditorVisible,
             onEvent = onEvent
         )
 
+        if (!isEditing) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            PharmOutlinedButton(onClick = { onEvent(MedicationUiEvent.AddMedication) }) {
+                Text(text = stringResource(R.string.medication_add_another))
+            }
+        }
+
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(
-            text =
-                if (isSingleMode) stringResource(R.string.medication_setting_alarm)
-                else stringResource(R.string.medication_setting_alarm_total),
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp, start = 4.dp)
-        )
-
         MedicationAlarmSection(
-            medicationIndex = if (isSingleMode) 0 else -1,
-            form = globalForm,
+            medicationIndex = if (isSingleMedication) 0 else -1,
+            form = sharedForm,
+            title = stringResource(
+                if (isSingleMedication) {
+                    R.string.medication_setting_alarm
+                } else {
+                    R.string.medication_setting_alarm_total
+                }
+            ),
             onEvent = onEvent
         )
 
@@ -76,9 +106,12 @@ fun MedicationCreateContent(
 
         PharmPrimaryButton(
             text =
-                if (isEditing) stringResource(R.string.medication_save)
-                else if (!isSingleMode) stringResource(R.string.medication_add_all_format, forms.size)
-                else stringResource(R.string.medication_add),
+                when {
+                    isEditing -> stringResource(R.string.medication_save)
+                    isPrescriptionReview -> stringResource(R.string.medication_add)
+                    forms.size > 1 -> stringResource(R.string.medication_add_all_format, forms.size)
+                    else -> stringResource(R.string.medication_add)
+                },
             onClick = { onEvent(MedicationUiEvent.SaveAllMedications) },
             enabled = forms.all { it.medicationName.isNotEmpty() } && !isLoading,
         )
@@ -98,8 +131,12 @@ private fun MedicationCreateContentPreview() {
                     medicationDosage = "1알"
                 )
             ),
+            sharedMedicationDosage = "",
+            isIndividualDosageEditorVisible = false,
             isLoading = false,
             isEditing = false,
+            isPrescriptionReview = false,
+            isAiExtractionFailed = false,
             onEvent = {}
         )
     }

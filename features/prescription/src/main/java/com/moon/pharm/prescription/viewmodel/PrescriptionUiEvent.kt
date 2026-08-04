@@ -1,7 +1,8 @@
 package com.moon.pharm.prescription.viewmodel
 
 sealed interface PrescriptionUiEvent {
-    data class NavigateToCreate(
-        val scannedMedicationNames: List<String>
+    data class NavigateToMedicationReview(
+        val scannedMedicationNames: List<String>,
+        val isAiExtractionFailed: Boolean = false
     ) : PrescriptionUiEvent
 }

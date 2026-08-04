@@ -116,8 +116,14 @@ fun MainScreen(
                     onLogout = onLogout,
                     onNavigateToMyConsultation = { mainNavController.navigate(MyConsultListRoute) }
                 )
-                prescriptionNavGraph { scannedMedicationNames ->
-                    mainNavController.navigate(MedicationCreateRoute(scannedMedicationNames)) {
+                prescriptionNavGraph { scannedMedicationNames, isAiExtractionFailed ->
+                    mainNavController.navigate(
+                        MedicationCreateRoute(
+                            scannedMedicationNames = scannedMedicationNames,
+                            isPrescriptionReview = true,
+                            isAiExtractionFailed = isAiExtractionFailed
+                        )
+                    ) {
                         popUpTo(PrescriptionCaptureRoute) { inclusive = false }
                     }
                 }

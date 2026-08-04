@@ -13,11 +13,15 @@ data class MedicationUiState(
     val userMessage: UiMessage? = null,
     val isMedicationCreated: Boolean = false,
     val isEditing: Boolean = false,
+    val isPrescriptionReview: Boolean = false,
+    val isAiExtractionFailed: Boolean = false,
 
     val medicationList: List<TodayMedicationUiModel> = emptyList(),
     val weeklyTotalCount: Int = 0,
     val weeklyCompletedCount: Int = 0,
     val selectedTab: MedicationPrimaryTab = MedicationPrimaryTab.ALL,
+    val sharedMedicationDosage: String = "",
+    val isIndividualDosageEditorVisible: Boolean = false,
     val medicationForms: List<MedicationFormState> = listOf(MedicationFormState())
 )
 
@@ -27,6 +31,7 @@ data class MedicationFormState(
     val medicationName: String = "",
     val dailyCount: Int = 0,
     val medicationDosage: String? = "",
+    val usesIndividualDosage: Boolean = false,
     val selectedType: MedicationTypeUiModel = MedicationTypeUiModel.Prescription,
     val startDate: Long? = null,
     val endDate: Long? = null,

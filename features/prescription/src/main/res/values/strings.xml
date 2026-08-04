@@ -21,4 +21,5 @@
     <string name="prescription_error_gemini">약 이름 분석 서비스를 사용할 수 없어요. 잠시 후 다시 시도해 주세요.</string>
     <string name="prescription_error_network">네트워크 연결을 확인한 뒤 다시 시도해 주세요.</string>
     <string name="prescription_error_ocr">처방전에서 읽을 수 있는 글자를 찾지 못했어요. 사진을 다시 선택하거나 글자가 잘 보이게 촬영해 주세요.</string>
+    <string name="prescription_btn_manual_entry">직접 입력하기</string>
 </resources>

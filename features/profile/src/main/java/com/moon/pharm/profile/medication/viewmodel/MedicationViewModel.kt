@@ -103,12 +103,52 @@ class MedicationViewModel @Inject constructor(
                 if (event.index == -1) {
                     _uiState.update { state ->
                         val newForms = state.medicationForms.map {
-                            it.copy(medicationDosage = event.dosage)
+                            if (it.usesIndividualDosage) it else it.copy(medicationDosage = event.dosage)
                         }
-                        state.copy(medicationForms = newForms)
+                        state.copy(
+                            sharedMedicationDosage = event.dosage,
+                            medicationForms = newForms
+                        )
                     }
                 } else {
-                    updateForm(event.index) { it.copy(medicationDosage = event.dosage) }
+                    _uiState.update { state ->
+                        val isMultipleMedication = state.medicationForms.size > 1
+                        val updatedForms = state.medicationForms.mapIndexed { index, form ->
+                            if (index == event.index) {
+                                form.copy(
+                                    medicationDosage = event.dosage,
+                                    usesIndividualDosage = isMultipleMedication || form.usesIndividualDosage
+                                )
+                            } else {
+                                form
+                            }
+                        }
+                        state.copy(medicationForms = updatedForms)
+                    }
+                }
+            }
+            is MedicationUiEvent.ToggleIndividualDosage -> {
+                _uiState.update { state ->
+                    val updatedForms = state.medicationForms.mapIndexed { index, form ->
+                        if (index != event.index) {
+                            form
+                        } else if (form.usesIndividualDosage) {
+                            form.copy(
+                                medicationDosage = state.sharedMedicationDosage,
+                                usesIndividualDosage = false
+                            )
+                        } else {
+                            form.copy(usesIndividualDosage = true)
+                        }
+                    }
+                    state.copy(medicationForms = updatedForms)
+                }
+            }
+            MedicationUiEvent.ToggleIndividualDosageEditor -> {
+                _uiState.update { state ->
+                    state.copy(
+                        isIndividualDosageEditorVisible = !state.isIndividualDosageEditorVisible
+                    )
                 }
             }
             is MedicationUiEvent.UpdateStartDate -> {
@@ -213,6 +253,25 @@ class MedicationViewModel @Inject constructor(
                     }
                 } else {
                     updateForm(event.index) { it.copy(isAlarmEnabled = event.enabled) }
+                }
+            }
+            MedicationUiEvent.AddMedication -> {
+                _uiState.update { state ->
+                    val sharedForm = state.medicationForms.firstOrNull() ?: MedicationFormState()
+                    val sharedDosage = state.sharedMedicationDosage.ifBlank {
+                        sharedForm.medicationDosage.orEmpty()
+                    }
+                    val newForm = sharedForm.copy(
+                        medicationId = null,
+                        scheduleId = null,
+                        medicationName = "",
+                        medicationDosage = sharedDosage,
+                        usesIndividualDosage = false
+                    )
+                    state.copy(
+                        sharedMedicationDosage = sharedDosage,
+                        medicationForms = state.medicationForms + newForm
+                    )
                 }
             }
             is MedicationUiEvent.RemoveMedication -> {
@@ -331,7 +390,14 @@ class MedicationViewModel @Inject constructor(
             }
             ?: listOf(MedicationFormState())
 
-        _uiState.update { it.copy(medicationForms = newForms) }
+        _uiState.update {
+            it.copy(
+                medicationForms = newForms,
+                isPrescriptionReview = route?.isPrescriptionReview == true,
+                isAiExtractionFailed = route?.isAiExtractionFailed == true,
+                sharedMedicationDosage = newForms.firstOrNull()?.medicationDosage.orEmpty()
+            )
+        }
     }
 
     private fun loadMedicationForEdit(medicationId: String) {

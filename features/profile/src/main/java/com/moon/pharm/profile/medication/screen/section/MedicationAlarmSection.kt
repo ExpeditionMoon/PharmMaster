@@ -40,6 +40,7 @@ import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 fun MedicationAlarmSection(
     medicationIndex: Int,
     form: MedicationFormState,
+    title: String,
     onEvent: (MedicationUiEvent) -> Unit
 ) {
     var showTimePicker by remember { mutableStateOf(false) }
@@ -52,7 +53,7 @@ fun MedicationAlarmSection(
             .padding(10.dp)
     ) {
         Text(
-            text = stringResource(R.string.medication_setting_alarm),
+            text = title,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = PharmTheme.colors.onSurface,
@@ -121,6 +122,7 @@ private fun MedicationAlarmSectionPreview() {
             MedicationAlarmSection(
                 medicationIndex = 0,
                 form = MedicationFormState(),
+                title = stringResource(R.string.medication_setting_alarm),
                 onEvent = {}
             )
         }
