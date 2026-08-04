@@ -55,7 +55,6 @@ fun MedicationCreateScreen(
                 isLoading = uiState.isLoading,
                 isEditing = uiState.isEditing,
                 isPrescriptionReview = uiState.isPrescriptionReview,
-                isAiExtractionFailed = uiState.isAiExtractionFailed,
                 onEvent = viewModel::onEvent
             )
         }

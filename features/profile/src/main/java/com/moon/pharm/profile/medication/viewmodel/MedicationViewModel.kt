@@ -394,7 +394,6 @@ class MedicationViewModel @Inject constructor(
             it.copy(
                 medicationForms = newForms,
                 isPrescriptionReview = route?.isPrescriptionReview == true,
-                isAiExtractionFailed = route?.isAiExtractionFailed == true,
                 sharedMedicationDosage = newForms.firstOrNull()?.medicationDosage.orEmpty()
             )
         }

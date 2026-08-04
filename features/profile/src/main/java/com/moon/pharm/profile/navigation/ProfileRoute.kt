@@ -14,8 +14,7 @@ data object MedicationRoute
 data class MedicationCreateRoute(
     val scannedMedicationNames: List<String> = emptyList(),
     val medicationId: String? = null,
-    val isPrescriptionReview: Boolean = false,
-    val isAiExtractionFailed: Boolean = false
+    val isPrescriptionReview: Boolean = false
 )
 @Serializable
 data object MedicationHistoryRoute

@@ -72,22 +72,14 @@ class PrescriptionViewModelTest {
     }
 
     @Test
-    fun `AI 추출 네트워크 오류에도 직접 입력 가능한 검토 화면으로 이동한다`() = runTest(dispatcher) {
+    fun `AI 추출 네트워크 오류를 별도 오류 상태로 표시한다`() = runTest(dispatcher) {
         ddiRepository.extractResult = DataResourceResult.Failure(PrescriptionException.Network)
         val viewModel = createViewModel()
-        val event = async { viewModel.uiEvent.first() }
 
         viewModel.onTextRecognized("처방전 약 이름")
         advanceUntilIdle()
 
-        assertEquals(
-            PrescriptionUiEvent.NavigateToMedicationReview(
-                scannedMedicationNames = emptyList(),
-                isAiExtractionFailed = true
-            ),
-            event.await()
-        )
-        assertEquals(PrescriptionUiState.Idle, viewModel.uiState.value)
+        assertEquals(PrescriptionUiState.Error(PrescriptionError.NETWORK), viewModel.uiState.value)
         assertEquals(1, ddiRepository.extractCalls)
     }
 
@@ -103,21 +95,42 @@ class PrescriptionViewModelTest {
     }
 
     @Test
-    fun `빈 AI 추출 결과는 직접 입력 가능한 검토 화면으로 이동한다`() = runTest(dispatcher) {
+    fun `빈 AI 추출 결과를 별도 오류 상태로 표시한다`() = runTest(dispatcher) {
         ddiRepository.extractResult = DataResourceResult.Success(listOf(" ", ""))
+        val viewModel = createViewModel()
+
+        viewModel.onTextRecognized("처방전 약 이름")
+        advanceUntilIdle()
+
+        assertEquals(PrescriptionUiState.Error(PrescriptionError.EMPTY_RESULT), viewModel.uiState.value)
+    }
+
+    @Test
+    fun `부분 인식 결과는 비어 있는 항목과 중복을 제거해 검토 화면으로 이동한다`() = runTest(dispatcher) {
+        ddiRepository.extractResult = DataResourceResult.Success(listOf("타이레놀", " ", "타이레놀"))
         val viewModel = createViewModel()
         val event = async { viewModel.uiEvent.first() }
 
         viewModel.onTextRecognized("처방전 약 이름")
         advanceUntilIdle()
 
-        assertEquals(
-            PrescriptionUiEvent.NavigateToMedicationReview(
-                scannedMedicationNames = emptyList(),
-                isAiExtractionFailed = true
-            ),
-            event.await()
-        )
+        assertEquals(PrescriptionUiEvent.NavigateToMedicationReview(listOf("타이레놀")), event.await())
+    }
+
+    @Test
+    fun `네트워크 오류 후 다시 시도하면 검토 화면으로 이동한다`() = runTest(dispatcher) {
+        ddiRepository.extractResult = DataResourceResult.Failure(PrescriptionException.Network)
+        val viewModel = createViewModel()
+
+        viewModel.onTextRecognized("처방전 약 이름")
+        advanceUntilIdle()
+        ddiRepository.extractResult = DataResourceResult.Success(listOf("타이레놀"))
+        val event = async { viewModel.uiEvent.first() }
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(PrescriptionUiEvent.NavigateToMedicationReview(listOf("타이레놀")), event.await())
     }
 
     @Test
@@ -129,6 +142,7 @@ class PrescriptionViewModelTest {
         advanceUntilIdle()
 
         assertEquals(PrescriptionUiEvent.NavigateToMedicationReview(emptyList()), event.await())
+        assertEquals(PrescriptionUiState.Idle, viewModel.uiState.value)
     }
 
     private fun createViewModel(): PrescriptionViewModel = PrescriptionViewModel(

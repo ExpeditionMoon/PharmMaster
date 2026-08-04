@@ -59,6 +59,7 @@ class PrescriptionViewModel @Inject constructor(
     fun openManualMedicationReview() {
         viewModelScope.launch {
             _uiEvent.emit(PrescriptionUiEvent.NavigateToMedicationReview(emptyList()))
+            _uiState.value = PrescriptionUiState.Idle
         }
     }
 
@@ -80,38 +81,29 @@ class PrescriptionViewModel @Inject constructor(
                     .distinct()
 
                 if (medicationNames.isEmpty()) {
-                    navigateToMedicationReview(isAiExtractionFailed = true)
+                    _uiState.value = PrescriptionUiState.Error(PrescriptionError.EMPTY_RESULT)
                 } else {
                     navigateToMedicationReview(medicationNames)
                 }
             }
             is DataResourceResult.Failure -> {
-                if (result.exception == PrescriptionException.OcrNoText) {
-                    _uiState.value = PrescriptionUiState.Error(PrescriptionError.OCR)
-                } else {
-                    navigateToMedicationReview(isAiExtractionFailed = true)
-                }
+                _uiState.value = PrescriptionUiState.Error(result.exception.toPrescriptionError())
             }
             DataResourceResult.Loading -> Unit
         }
     }
 
-    private suspend fun navigateToMedicationReview(
-        medicationNames: List<String> = emptyList(),
-        isAiExtractionFailed: Boolean = false
-    ) {
+    private suspend fun navigateToMedicationReview(medicationNames: List<String> = emptyList()) {
         _uiEvent.emit(
-            PrescriptionUiEvent.NavigateToMedicationReview(
-                scannedMedicationNames = medicationNames,
-                isAiExtractionFailed = isAiExtractionFailed
-            )
+            PrescriptionUiEvent.NavigateToMedicationReview(scannedMedicationNames = medicationNames)
         )
         _uiState.value = PrescriptionUiState.Idle
     }
 
     private fun Throwable.toPrescriptionError(): PrescriptionError = when (this) {
+        PrescriptionException.Network -> PrescriptionError.NETWORK
+        PrescriptionException.DrugNameNotFound -> PrescriptionError.EMPTY_RESULT
         PrescriptionException.OcrNoText,
-        PrescriptionException.DrugNameNotFound,
         PrescriptionException.OcrFailed -> PrescriptionError.OCR
         else -> PrescriptionError.GEMINI
     }

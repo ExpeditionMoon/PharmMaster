@@ -56,16 +56,13 @@ import java.util.concurrent.Executors
 @Composable
 fun CameraPreviewRoute(
     viewModel: PrescriptionViewModel = hiltViewModel(),
-    onNavigateToMedicationReview: (List<String>, Boolean) -> Unit
+    onNavigateToMedicationReview: (List<String>) -> Unit
 ) {
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is PrescriptionUiEvent.NavigateToMedicationReview -> {
-                    onNavigateToMedicationReview(
-                        event.scannedMedicationNames,
-                        event.isAiExtractionFailed
-                    )
+                    onNavigateToMedicationReview(event.scannedMedicationNames)
                 }
             }
         }

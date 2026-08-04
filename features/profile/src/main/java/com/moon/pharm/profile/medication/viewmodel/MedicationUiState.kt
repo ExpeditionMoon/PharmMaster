@@ -14,7 +14,6 @@ data class MedicationUiState(
     val isMedicationCreated: Boolean = false,
     val isEditing: Boolean = false,
     val isPrescriptionReview: Boolean = false,
-    val isAiExtractionFailed: Boolean = false,
 
     val medicationList: List<TodayMedicationUiModel> = emptyList(),
     val weeklyTotalCount: Int = 0,

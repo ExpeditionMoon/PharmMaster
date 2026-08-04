@@ -34,7 +34,6 @@ fun MedicationCreateContent(
     isLoading: Boolean,
     isEditing: Boolean,
     isPrescriptionReview: Boolean,
-    isAiExtractionFailed: Boolean,
     onEvent: (MedicationUiEvent) -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -52,13 +51,7 @@ fun MedicationCreateContent(
 
         if (isPrescriptionReview) {
             PharmInfoCard(
-                message = stringResource(
-                    if (isAiExtractionFailed) {
-                        R.string.medication_review_ai_failure_notice
-                    } else {
-                        R.string.medication_review_notice
-                    }
-                ),
+                message = stringResource(R.string.medication_review_notice),
                 type = InfoCardType.NOTICE
             )
 
@@ -136,7 +129,6 @@ private fun MedicationCreateContentPreview() {
             isLoading = false,
             isEditing = false,
             isPrescriptionReview = false,
-            isAiExtractionFailed = false,
             onEvent = {}
         )
     }
