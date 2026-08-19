@@ -15,5 +15,10 @@ data class Medication(
     val schedules: List<MedicationSchedule>,
 
     val prescriptionImageUrl: String? = null,
+    /**
+     * Identifies medications that share one intake reminder. Null keeps legacy
+     * medications independent.
+     */
+    val intakeGroupId: String? = null,
     val isGrouped: Boolean = false
 )

@@ -7,7 +7,9 @@ object AlarmConstants {
     const val NOTIFICATION_CHANNEL_NAME = "복약 알림"
 
     const val EXTRA_MEDICATION_NAME = "key_medication_name"
+    const val EXTRA_GROUP_MEDICATION_NAMES = "key_group_medication_names"
     const val EXTRA_MEDICATION_ID = "key_medication_id"
+    const val EXTRA_INTAKE_GROUP_ID = "key_intake_group_id"
     const val EXTRA_REQUEST_CODE = "key_request_code"
     const val EXTRA_DOSAGE = "key_dosage"
     const val EXTRA_ALARM_TIME = "key_alarm_time"

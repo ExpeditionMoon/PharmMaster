@@ -21,6 +21,7 @@ import com.moon.pharm.designsystem.theme.PharmMasterTheme
 import com.moon.pharm.designsystem.theme.PharmTheme
 import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.medication.model.MedicationIntakeGroupOptionUiModel
 import com.moon.pharm.profile.medication.screen.section.MedicationAlarmSection
 import com.moon.pharm.profile.medication.screen.section.MedicationInfoSection
 import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
@@ -29,6 +30,7 @@ import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 @Composable
 fun MedicationCreateContent(
     forms: List<MedicationFormState>,
+    existingIntakeGroups: List<MedicationIntakeGroupOptionUiModel>,
     sharedMedicationDosage: String,
     isIndividualDosageEditorVisible: Boolean,
     isLoading: Boolean,
@@ -82,6 +84,21 @@ fun MedicationCreateContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        ExistingIntakeGroupSelector(
+            groups = existingIntakeGroups,
+            selectedGroupId = sharedForm.intakeGroupId,
+            onGroupSelected = { group ->
+                onEvent(
+                    MedicationUiEvent.JoinExistingIntakeGroup(
+                        index = if (isSingleMedication) 0 else -1,
+                        group = group
+                    )
+                )
+            }
+        )
+
+        if (existingIntakeGroups.isNotEmpty()) Spacer(modifier = Modifier.height(16.dp))
+
         MedicationAlarmSection(
             medicationIndex = if (isSingleMedication) 0 else -1,
             form = sharedForm,
@@ -124,6 +141,7 @@ private fun MedicationCreateContentPreview() {
                     medicationDosage = "1알"
                 )
             ),
+            existingIntakeGroups = emptyList(),
             sharedMedicationDosage = "",
             isIndividualDosageEditorVisible = false,
             isLoading = false,

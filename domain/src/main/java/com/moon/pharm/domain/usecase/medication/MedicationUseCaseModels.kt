@@ -13,6 +13,25 @@ enum class MealTimingInput {
     NONE
 }
 
+enum class MedicationScheduleBasisInput {
+    FIXED_TIME,
+    BEFORE_MEAL,
+    AFTER_MEAL,
+    AS_NEEDED
+}
+
+enum class MealSlotInput {
+    BREAKFAST,
+    LUNCH,
+    DINNER
+}
+
+enum class MealIntervalInput {
+    IMMEDIATELY,
+    THIRTY_MINUTES,
+    ONE_HOUR
+}
+
 enum class RepeatTypeInput {
     DAILY,
     WEEKLY,
@@ -23,7 +42,10 @@ data class MedicationScheduleCommand(
     val scheduleId: String? = null,
     val time: String,
     val dosage: String,
-    val mealTiming: MealTimingInput
+    val mealTiming: MealTimingInput,
+    val basis: MedicationScheduleBasisInput = MedicationScheduleBasisInput.FIXED_TIME,
+    val mealSlot: MealSlotInput? = null,
+    val mealInterval: MealIntervalInput = MealIntervalInput.IMMEDIATELY
 )
 
 data class SaveMedicationCommand(
@@ -36,7 +58,8 @@ data class SaveMedicationCommand(
     val repeatType: RepeatTypeInput,
     val weeklyDays: Set<Int> = emptySet(),
     val schedules: List<MedicationScheduleCommand>,
-    val isGrouped: Boolean,
+    val intakeGroupId: String? = null,
+    val isGrouped: Boolean = false,
     val isAlarmEnabled: Boolean = true,
     val status: MedicationStatusInput = MedicationStatusInput.ACTIVE
 )
@@ -54,6 +77,11 @@ data class ChangeMedicationStatusCommand(
     val changedAt: Long
 )
 
+data class DeleteMedicationCommand(
+    val userId: String,
+    val medicationId: String
+)
+
 data class ToggleIntakeCommand(
     val userId: String,
     val medicationId: String,
@@ -63,8 +91,21 @@ data class ToggleIntakeCommand(
     val takenTime: Long? = null
 )
 
+data class CompleteMedicationGroupCommand(
+    val userId: String,
+    val items: List<MedicationGroupIntakeItem>,
+    val recordDate: String,
+    val takenTime: Long
+)
+
+data class MedicationGroupIntakeItem(
+    val medicationId: String,
+    val scheduleId: String
+)
+
 data class MedicationScheduleItem(
     val medicationId: String,
+    val intakeGroupId: String? = null,
     val scheduleId: String,
     val name: String,
     val type: MedicationTypeInput,
@@ -73,7 +114,8 @@ data class MedicationScheduleItem(
     val dosage: String,
     val mealTiming: MealTimingInput,
     val isPaused: Boolean,
-    val isTaken: Boolean
+    val isTaken: Boolean,
+    val isAlarmEnabled: Boolean = true
 )
 
 data class MedicationHistoryItem(

@@ -4,8 +4,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.moon.pharm.domain.model.medication.MealInterval
+import com.moon.pharm.domain.model.medication.MealSlot
 import com.moon.pharm.domain.model.medication.MealTiming
 import com.moon.pharm.domain.model.medication.Medication
+import com.moon.pharm.domain.model.medication.MedicationScheduleBasis
 import com.moon.pharm.domain.model.medication.MedicationStatus
 import com.moon.pharm.domain.model.medication.MedicationType
 import com.moon.pharm.domain.model.medication.RepeatType
@@ -13,8 +16,12 @@ import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.medication.ChangeMedicationStatusCommand
 import com.moon.pharm.domain.usecase.medication.ChangeMedicationStatusUseCase
+import com.moon.pharm.domain.usecase.medication.CompleteMedicationGroupCommand
+import com.moon.pharm.domain.usecase.medication.CompleteMedicationGroupUseCase
+import com.moon.pharm.domain.usecase.medication.DeleteMedicationCommand
 import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
+import com.moon.pharm.domain.usecase.medication.MedicationGroupIntakeItem
 import com.moon.pharm.domain.usecase.medication.MedicationStatusInput
 import com.moon.pharm.domain.usecase.medication.ObserveTodayMedicationItemsUseCase
 import com.moon.pharm.domain.usecase.medication.ObserveWeeklyMedicationAdherenceUseCase
@@ -23,8 +30,12 @@ import com.moon.pharm.domain.usecase.medication.ToggleIntakeCheckUseCase
 import com.moon.pharm.domain.usecase.medication.ValidateMedicationEntryUseCase
 import com.moon.pharm.profile.medication.mapper.MedicationUiMapper
 import com.moon.pharm.profile.medication.mapper.toUiMessage
+import com.moon.pharm.profile.medication.model.MealIntervalUiModel
+import com.moon.pharm.profile.medication.model.MealSlotUiModel
 import com.moon.pharm.profile.medication.model.MealTimingUiModel
+import com.moon.pharm.profile.medication.model.MedicationIntakeGroupOptionUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
+import com.moon.pharm.profile.medication.model.MedicationScheduleBasisUiModel
 import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
 import com.moon.pharm.profile.medication.model.MedicationTypeUiModel
 import com.moon.pharm.profile.medication.model.MedicationUiMessage
@@ -44,6 +55,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -53,6 +65,7 @@ class MedicationViewModel @Inject constructor(
     private val observeWeeklyMedicationAdherenceUseCase: ObserveWeeklyMedicationAdherenceUseCase,
     private val saveMedicationUseCase: SaveMedicationUseCase,
     private val changeMedicationStatusUseCase: ChangeMedicationStatusUseCase,
+    private val completeMedicationGroupUseCase: CompleteMedicationGroupUseCase,
     private val deleteMedicationUseCase: DeleteMedicationUseCase,
     private val getMedicationsUseCase: GetMedicationsUseCase,
     private val toggleIntakeCheckUseCase: ToggleIntakeCheckUseCase,
@@ -70,8 +83,14 @@ class MedicationViewModel @Inject constructor(
         .map { state ->
             state.medicationList
                 .filter { state.selectedTab.includes(it.type) }
-                .groupBy { it.time }
-                .map { (time, items) -> MedicationTimeGroupUiModel(time = time, items = items) }
+                .groupBy { item -> "${item.intakeGroupId ?: item.medicationId}:${item.time}" }
+                .map { (id, items) ->
+                    MedicationTimeGroupUiModel(
+                        id = id,
+                        time = items.firstOrNull()?.time,
+                        items = items.sortedBy(TodayMedicationUiModel::name)
+                    )
+                }
                 .sortedBy { it.time }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -190,12 +209,53 @@ class MedicationViewModel @Inject constructor(
                 if (event.index == -1) {
                     _uiState.update { state ->
                         val newForms = state.medicationForms.map {
-                            it.copy(selectedMealTiming = event.timing)
+                            it.copy(selectedMealTiming = event.timing, intakeGroupId = null)
                         }
                         state.copy(medicationForms = newForms)
                     }
                 } else {
-                    updateForm(event.index) { it.copy(selectedMealTiming = event.timing) }
+                    updateForm(event.index) { it.copy(selectedMealTiming = event.timing, intakeGroupId = null) }
+                }
+            }
+            is MedicationUiEvent.UpdateScheduleBasis -> {
+                val update: (MedicationFormState) -> MedicationFormState = { form ->
+                    form.copy(
+                        scheduleBasis = event.basis,
+                        selectedMealTiming = event.basis.toMealTiming(),
+                        selectedMealSlots = if (event.basis.isMealBased()) form.selectedMealSlots else emptySet(),
+                        intakeGroupId = null,
+                        isAlarmEnabled = if (event.basis == MedicationScheduleBasisUiModel.AsNeeded) false else form.isAlarmEnabled
+                    )
+                }
+                if (event.index == -1) {
+                    _uiState.update { state -> state.copy(medicationForms = state.medicationForms.map(update)) }
+                } else {
+                    updateForm(event.index, update)
+                }
+            }
+            is MedicationUiEvent.ToggleMealSlot -> {
+                val update: (MedicationFormState) -> MedicationFormState = { form ->
+                    form.copy(
+                        selectedMealSlots = form.selectedMealSlots.toMutableSet().apply {
+                            if (!add(event.slot)) remove(event.slot)
+                        },
+                        intakeGroupId = null
+                    )
+                }
+                if (event.index == -1) {
+                    _uiState.update { state -> state.copy(medicationForms = state.medicationForms.map(update)) }
+                } else {
+                    updateForm(event.index, update)
+                }
+            }
+            is MedicationUiEvent.UpdateMealInterval -> {
+                val update: (MedicationFormState) -> MedicationFormState = {
+                    it.copy(mealInterval = event.interval, intakeGroupId = null)
+                }
+                if (event.index == -1) {
+                    _uiState.update { state -> state.copy(medicationForms = state.medicationForms.map(update)) }
+                } else {
+                    updateForm(event.index, update)
                 }
             }
 
@@ -205,44 +265,82 @@ class MedicationViewModel @Inject constructor(
                 if (event.index == -1) {
                     _uiState.update { state ->
                         val newForms = state.medicationForms.map {
-                            it.copy(selectedTime = newTime)
+                            it.copy(selectedTime = newTime, intakeGroupId = null)
                         }
                         state.copy(medicationForms = newForms)
                     }
                 } else {
-                    updateForm(event.index) { it.copy(selectedTime = newTime) }
+                    updateForm(event.index) { it.copy(selectedTime = newTime, intakeGroupId = null) }
                 }
             }
             is MedicationUiEvent.UpdateRepeatType -> {
                 if (event.index == -1) {
                     _uiState.update { state ->
                         val newForms = state.medicationForms.map {
-                            it.copy(selectedRepeatType = event.type)
+                            it.copy(selectedRepeatType = event.type, intakeGroupId = null)
                         }
                         state.copy(medicationForms = newForms)
                     }
                 } else {
-                    updateForm(event.index) { it.copy(selectedRepeatType = event.type) }
+                    updateForm(event.index) { it.copy(selectedRepeatType = event.type, intakeGroupId = null) }
                 }
             }
             is MedicationUiEvent.UpdateGroupedNotification -> {
-                if (event.index == -1) {
-                    _uiState.update { state ->
-                        val newForms = state.medicationForms.map {
-                            it.copy(isGrouped = event.enabled)
-                        }
-                        state.copy(medicationForms = newForms)
+                _uiState.update { state ->
+                    val update: (MedicationFormState) -> MedicationFormState = { form ->
+                        form.copy(
+                            isGrouped = event.enabled,
+                            intakeGroupId = when {
+                                !event.enabled -> null
+                                form.intakeGroupId != null -> form.intakeGroupId
+                                else -> state.existingIntakeGroups.firstOrNull { group -> form.matches(group) }?.id
+                            }
+                        )
                     }
-                } else {
-                    updateForm(event.index) { it.copy(isGrouped = event.enabled) }
+                    val forms = if (event.index == -1) {
+                        state.medicationForms.map(update)
+                    } else {
+                        state.medicationForms.mapIndexed { index, form ->
+                            if (index == event.index) update(form) else form
+                        }
+                    }
+                    state.copy(medicationForms = forms)
                 }
             }
-            is MedicationUiEvent.ToggleWeeklyDay -> updateForm(event.index) { form ->
-                form.copy(
-                    selectedWeeklyDays = form.selectedWeeklyDays.toMutableSet().apply {
-                        if (!add(event.day)) remove(event.day)
-                    }
-                )
+            is MedicationUiEvent.JoinExistingIntakeGroup -> {
+                val update: (MedicationFormState) -> MedicationFormState = { form ->
+                    form.copy(
+                        intakeGroupId = event.group.id,
+                        isGrouped = true,
+                        selectedTime = event.group.time,
+                        selectedMealTiming = event.group.mealTiming,
+                        scheduleBasis = event.group.scheduleBasis,
+                        selectedMealSlots = event.group.mealSlots,
+                        mealInterval = event.group.mealInterval,
+                        selectedRepeatType = event.group.repeatType,
+                        selectedWeeklyDays = event.group.weeklyDays
+                    )
+                }
+                if (event.index == -1) {
+                    _uiState.update { state -> state.copy(medicationForms = state.medicationForms.map(update)) }
+                } else {
+                    updateForm(event.index, update)
+                }
+            }
+            is MedicationUiEvent.ToggleWeeklyDay -> {
+                val update: (MedicationFormState) -> MedicationFormState = { form ->
+                    form.copy(
+                        selectedWeeklyDays = form.selectedWeeklyDays.toMutableSet().apply {
+                            if (!add(event.day)) remove(event.day)
+                        },
+                        intakeGroupId = null
+                    )
+                }
+                if (event.index == -1) {
+                    _uiState.update { state -> state.copy(medicationForms = state.medicationForms.map(update)) }
+                } else {
+                    updateForm(event.index, update)
+                }
             }
             is MedicationUiEvent.UpdateAlarmEnabled -> {
                 if (event.index == -1) {
@@ -263,6 +361,7 @@ class MedicationViewModel @Inject constructor(
                     }
                     val newForm = sharedForm.copy(
                         medicationId = null,
+                        intakeGroupId = null,
                         scheduleId = null,
                         medicationName = "",
                         medicationDosage = sharedDosage,
@@ -303,6 +402,7 @@ class MedicationViewModel @Inject constructor(
                 medicationId = event.medicationId,
                 scheduleId = event.scheduleId
             )
+            is MedicationUiEvent.CompleteGroup -> completeMedicationGroup(event.items)
 
             // 3. UI 상태 및 시스템 이벤트
             is MedicationUiEvent.SelectTab -> _uiState.update { it.copy(selectedTab = event.tab) }
@@ -348,6 +448,25 @@ class MedicationViewModel @Inject constructor(
         }
 
         observeWeeklyAdherence(userId, today)
+        observeExistingIntakeGroups(userId)
+    }
+
+    private fun observeExistingIntakeGroups(userId: String) {
+        viewModelScope.launch {
+            getMedicationsUseCase(userId).collectLatest { result ->
+                if (result is DataResourceResult.Success) {
+                    _uiState.update { state ->
+                        state.copy(
+                            existingIntakeGroups = result.resultData
+                                .filter { it.intakeGroupId != null }
+                                .groupBy { it.intakeGroupId.orEmpty() }
+                                .mapNotNull { (id, medications) -> medications.firstOrNull()?.toGroupOption(id) }
+                                .sortedBy(MedicationIntakeGroupOptionUiModel::representativeName)
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private fun observeWeeklyAdherence(userId: String, today: LocalDate) {
@@ -447,6 +566,18 @@ class MedicationViewModel @Inject constructor(
             return
         }
 
+        val existingGroups = _uiState.value.existingIntakeGroups.associateBy { it.id }
+        val hasMismatchedGroupSchedule = forms.any { form ->
+            form.intakeGroupId
+                ?.let(existingGroups::get)
+                ?.let { group -> !form.matches(group) }
+                ?: false
+        }
+        if (hasMismatchedGroupSchedule) {
+            _uiState.update { it.copy(userMessage = MedicationUiMessage.IntakeGroupScheduleMismatch) }
+            return
+        }
+
         val userId = getCurrentUserIdUseCase()
         if (userId == null) {
             _uiState.update { it.copy(userMessage = MedicationUiMessage.NotLoggedIn) }
@@ -457,9 +588,18 @@ class MedicationViewModel @Inject constructor(
             isSaving = true
             _uiState.update { it.copy(isLoading = true) }
             var isAllSuccess = true
+            val intakeGroupId = forms
+                .takeIf { it.size > 1 && it.all(MedicationFormState::isGrouped) }
+                ?.firstOrNull()
+                ?.intakeGroupId
+                ?: if (forms.size > 1 && forms.all(MedicationFormState::isGrouped)) UUID.randomUUID().toString() else null
 
             forms.forEach { form ->
-                val command = MedicationUiMapper.toSaveCommand(form, userId)
+                val command = MedicationUiMapper.toSaveCommand(
+                    form = form,
+                    userId = userId,
+                    intakeGroupId = if (form.isGrouped) intakeGroupId ?: form.intakeGroupId else null
+                )
 
                 val result = saveMedicationUseCase(command)
                     .filter { it !is DataResourceResult.Loading }
@@ -578,10 +718,18 @@ class MedicationViewModel @Inject constructor(
     }
 
     private fun deleteMedication(medicationId: String) {
+        val userId = getCurrentUserIdUseCase()
+        if (userId == null) {
+            _uiState.update { it.copy(userMessage = MedicationUiMessage.NotLoggedIn) }
+            return
+        }
+
         viewModelScope.launch {
             isSaving = true
             _uiState.update { it.copy(isLoading = true) }
-            val result = deleteMedicationUseCase(medicationId)
+            val result = deleteMedicationUseCase(
+                DeleteMedicationCommand(userId = userId, medicationId = medicationId)
+            )
                 .filter { it !is DataResourceResult.Loading }
                 .first()
 
@@ -618,6 +766,7 @@ class MedicationViewModel @Inject constructor(
         val schedule = schedules.firstOrNull()
         return MedicationFormState(
             medicationId = id,
+            intakeGroupId = intakeGroupId,
             scheduleId = schedule?.id,
             medicationName = name,
             medicationDosage = schedule?.dosage.orEmpty(),
@@ -626,6 +775,9 @@ class MedicationViewModel @Inject constructor(
             endDate = endDate,
             noEndDate = endDate == null,
             selectedMealTiming = schedule?.mealTiming?.toUiModel() ?: MealTimingUiModel.BeforeMeal,
+            scheduleBasis = schedule?.basis?.toUiModel() ?: MedicationScheduleBasisUiModel.FixedTime,
+            selectedMealSlots = schedules.mapNotNull { it.mealSlot?.toUiModel() }.toSet(),
+            mealInterval = schedule?.mealInterval?.toUiModel() ?: MealIntervalUiModel.Immediately,
             selectedTime = schedule?.time?.toMinuteOfDay(),
             selectedRepeatType = repeatType.toUiModel(),
             selectedWeeklyDays = weeklyDays,
@@ -634,6 +786,30 @@ class MedicationViewModel @Inject constructor(
             status = status.toInput()
         )
     }
+
+    private fun Medication.toGroupOption(groupId: String): MedicationIntakeGroupOptionUiModel? {
+        val primarySchedule = schedules.firstOrNull() ?: return null
+        return MedicationIntakeGroupOptionUiModel(
+            id = groupId,
+            representativeName = name,
+            time = primarySchedule.time.toMinuteOfDay(),
+            mealTiming = primarySchedule.mealTiming.toUiModel(),
+            scheduleBasis = primarySchedule.basis.toUiModel(),
+            mealSlots = schedules.mapNotNull { it.mealSlot?.toUiModel() }.toSet(),
+            mealInterval = primarySchedule.mealInterval.toUiModel(),
+            repeatType = repeatType.toUiModel(),
+            weeklyDays = weeklyDays
+        )
+    }
+
+    private fun MedicationFormState.matches(group: MedicationIntakeGroupOptionUiModel): Boolean =
+        selectedTime == group.time &&
+            selectedMealTiming == group.mealTiming &&
+            scheduleBasis == group.scheduleBasis &&
+            selectedMealSlots == group.mealSlots &&
+            mealInterval == group.mealInterval &&
+            selectedRepeatType == group.repeatType &&
+            selectedWeeklyDays == group.weeklyDays
 
     private fun MedicationType.toUiModel(): MedicationTypeUiModel = when (this) {
         MedicationType.PRESCRIPTION -> MedicationTypeUiModel.Prescription
@@ -646,6 +822,75 @@ class MedicationViewModel @Inject constructor(
         MealTiming.DURING_MEAL -> MealTimingUiModel.DuringMeal
         MealTiming.AFTER_MEAL -> MealTimingUiModel.AfterMeal
         MealTiming.NONE -> MealTimingUiModel.None
+    }
+
+    private fun MedicationScheduleBasisUiModel.toMealTiming(): MealTimingUiModel = when (this) {
+        MedicationScheduleBasisUiModel.BeforeMeal -> MealTimingUiModel.BeforeMeal
+        MedicationScheduleBasisUiModel.AfterMeal -> MealTimingUiModel.AfterMeal
+        MedicationScheduleBasisUiModel.FixedTime,
+        MedicationScheduleBasisUiModel.AsNeeded -> MealTimingUiModel.None
+    }
+
+    private fun MedicationScheduleBasisUiModel.isMealBased(): Boolean =
+        this == MedicationScheduleBasisUiModel.BeforeMeal || this == MedicationScheduleBasisUiModel.AfterMeal
+
+    private fun completeMedicationGroup(items: List<MedicationGroupIntakeItem>) {
+        val userId = getCurrentUserIdUseCase() ?: return
+        val untakenItems = items.filter { item ->
+            _uiState.value.medicationList.any {
+                it.medicationId == item.medicationId &&
+                    it.scheduleId == item.scheduleId &&
+                    !it.isTaken &&
+                    !it.isPaused
+            }
+        }
+        if (untakenItems.isEmpty()) return
+
+        viewModelScope.launch {
+            val result = completeMedicationGroupUseCase(
+                CompleteMedicationGroupCommand(
+                    userId = userId,
+                    items = untakenItems,
+                    recordDate = LocalDate.now().toString(),
+                    takenTime = System.currentTimeMillis()
+                )
+            ).filter { it !is DataResourceResult.Loading }.first()
+
+            _uiState.update { state ->
+                if (result is DataResourceResult.Success) {
+                    state.copy(
+                        medicationList = state.medicationList.map { medication ->
+                            if (untakenItems.any {
+                                    it.medicationId == medication.medicationId &&
+                                        it.scheduleId == medication.scheduleId
+                                }
+                            ) medication.copy(isTaken = true) else medication
+                        }
+                    )
+                } else {
+                    state.copy(userMessage = MedicationUiMessage.IntakeUpdateFailed)
+                }
+            }
+        }
+    }
+
+    private fun MedicationScheduleBasis.toUiModel(): MedicationScheduleBasisUiModel = when (this) {
+        MedicationScheduleBasis.FIXED_TIME -> MedicationScheduleBasisUiModel.FixedTime
+        MedicationScheduleBasis.BEFORE_MEAL -> MedicationScheduleBasisUiModel.BeforeMeal
+        MedicationScheduleBasis.AFTER_MEAL -> MedicationScheduleBasisUiModel.AfterMeal
+        MedicationScheduleBasis.AS_NEEDED -> MedicationScheduleBasisUiModel.AsNeeded
+    }
+
+    private fun MealSlot.toUiModel(): MealSlotUiModel = when (this) {
+        MealSlot.BREAKFAST -> MealSlotUiModel.Breakfast
+        MealSlot.LUNCH -> MealSlotUiModel.Lunch
+        MealSlot.DINNER -> MealSlotUiModel.Dinner
+    }
+
+    private fun MealInterval.toUiModel(): MealIntervalUiModel = when (this) {
+        MealInterval.IMMEDIATELY -> MealIntervalUiModel.Immediately
+        MealInterval.THIRTY_MINUTES -> MealIntervalUiModel.ThirtyMinutes
+        MealInterval.ONE_HOUR -> MealIntervalUiModel.OneHour
     }
 
     private fun RepeatType.toUiModel(): RepeatTypeUiModel = when (this) {

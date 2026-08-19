@@ -19,6 +19,7 @@ fun MedicationUiMessage.asString(): String {
         MedicationUiMessage.MedicationPaused -> stringResource(R.string.error_medication_paused)
         MedicationUiMessage.IntakeUpdateFailed -> stringResource(R.string.error_update_medication_intake)
         MedicationUiMessage.DeleteFailed -> stringResource(R.string.error_delete_medication)
+        MedicationUiMessage.IntakeGroupScheduleMismatch -> stringResource(R.string.error_medication_group_schedule_mismatch)
         MedicationUiMessage.NotLoggedIn -> stringResource(UiR.string.error_login_required)
     }
 }

@@ -35,6 +35,7 @@ import com.moon.pharm.domain.usecase.consult.ValidateConsultFormUseCase
 import com.moon.pharm.domain.usecase.ddi.AnalyzeDdiUseCase
 import com.moon.pharm.domain.usecase.drug.SearchDrugUseCase
 import com.moon.pharm.domain.usecase.medication.ChangeMedicationStatusUseCase
+import com.moon.pharm.domain.usecase.medication.CompleteMedicationGroupUseCase
 import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.GetDailyIntakeRecordsUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationHistoryItemsUseCase
@@ -188,6 +189,13 @@ object UseCaseModule {
     @Provides
     fun provideToggleIntakeCheckUseCase(medicationRepository: MedicationRepository): ToggleIntakeCheckUseCase {
         return ToggleIntakeCheckUseCase(medicationRepository)
+    }
+
+    @Provides
+    fun provideCompleteMedicationGroupUseCase(
+        medicationRepository: MedicationRepository
+    ): CompleteMedicationGroupUseCase {
+        return CompleteMedicationGroupUseCase(medicationRepository)
     }
 
     @Provides

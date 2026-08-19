@@ -16,7 +16,13 @@ class AlarmNotificationServiceImpl @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) : AlarmNotificationService {
 
-    override fun showMedicationAlarm(name: String, dosage: String, time: String, isGrouped: Boolean) {
+    override fun showMedicationAlarm(
+        name: String,
+        dosage: String,
+        time: String,
+        isGrouped: Boolean,
+        groupMedicationNames: List<String>
+    ) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val groupKey = if (isGrouped) {
@@ -28,7 +34,18 @@ class AlarmNotificationServiceImpl @Inject constructor(
         val notificationId = System.currentTimeMillis().toInt()
 
         val title = context.getString(R.string.notification_title)
-        val content = context.getString(R.string.notification_content, time, name, dosage)
+        val content = groupMedicationNames
+            .distinct()
+            .takeIf { isGrouped && it.size > 1 }
+            ?.let { names ->
+                context.getString(
+                    R.string.notification_group_content,
+                    time,
+                    names.first(),
+                    names.size - 1
+                )
+            }
+            ?: context.getString(R.string.notification_content, time, name, dosage)
 
         createNotificationChannel(notificationManager)
 

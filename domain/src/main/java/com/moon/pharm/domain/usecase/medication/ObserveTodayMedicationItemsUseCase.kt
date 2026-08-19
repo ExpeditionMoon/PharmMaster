@@ -47,6 +47,7 @@ class ObserveTodayMedicationItemsUseCase(
 
                 MedicationScheduleItem(
                     medicationId = medication.id,
+                    intakeGroupId = medication.intakeGroupId,
                     scheduleId = schedule.id,
                     name = medication.name,
                     type = medication.type.toInput(),
@@ -55,7 +56,8 @@ class ObserveTodayMedicationItemsUseCase(
                     dosage = schedule.dosage,
                     mealTiming = schedule.mealTiming.toInput(),
                     isPaused = medication.status == MedicationStatus.PAUSED,
-                    isTaken = record?.isTaken == true
+                    isTaken = record?.isTaken == true,
+                    isAlarmEnabled = medication.isAlarmEnabled
                 )
             }
         }.sortedBy { it.time }
