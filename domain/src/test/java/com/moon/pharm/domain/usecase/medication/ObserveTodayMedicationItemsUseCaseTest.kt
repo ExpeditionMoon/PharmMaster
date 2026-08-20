@@ -51,6 +51,35 @@ class ObserveTodayMedicationItemsUseCaseTest {
         assertEquals(emptyList<MedicationScheduleItem>(), result)
     }
 
+    @Test
+    fun `includes the completed intake time in today's medication item`() = runBlocking {
+        val date = LocalDate.of(2026, 8, 3)
+        val medication = endedMedication(date)
+        val useCase = ObserveTodayMedicationItemsUseCase(
+            repository = FakeMedicationRepository(
+                medications = listOf(medication),
+                records = listOf(
+                    IntakeRecord(
+                        id = "record-id",
+                        userId = "user-id",
+                        medicationId = medication.id,
+                        scheduleId = medication.schedules.single().id,
+                        recordDate = date.toString(),
+                        isTaken = true,
+                        takenTime = 1_754_260_800_000L
+                    )
+                )
+            )
+        )
+
+        val result = useCase("user-id", date)
+            .filterIsInstance<DataResourceResult.Success<List<MedicationScheduleItem>>>()
+            .first()
+            .resultData
+
+        assertEquals(1_754_260_800_000L, result.single().takenTime)
+    }
+
     private fun endedMedication(endDate: LocalDate) = Medication(
         id = "medication-id",
         userId = "user-id",
@@ -75,7 +104,8 @@ class ObserveTodayMedicationItemsUseCaseTest {
         atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
     private class FakeMedicationRepository(
-        private val medications: List<Medication>
+        private val medications: List<Medication>,
+        private val records: List<IntakeRecord> = emptyList()
     ) : MedicationRepository {
         override fun getMedications(userId: String): Flow<DataResourceResult<List<Medication>>> =
             flowOf(DataResourceResult.Success(medications))
@@ -87,7 +117,7 @@ class ObserveTodayMedicationItemsUseCaseTest {
         override fun getIntakeRecords(
             userId: String,
             date: String
-        ): Flow<DataResourceResult<List<IntakeRecord>>> = flowOf(DataResourceResult.Success(emptyList()))
+        ): Flow<DataResourceResult<List<IntakeRecord>>> = flowOf(DataResourceResult.Success(records))
 
         override fun getIntakeRecordsByRange(
             userId: String,

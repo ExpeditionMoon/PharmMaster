@@ -115,6 +115,7 @@ data class MedicationScheduleItem(
     val mealTiming: MealTimingInput,
     val isPaused: Boolean,
     val isTaken: Boolean,
+    val takenTime: Long? = null,
     val isAlarmEnabled: Boolean = true
 )
 

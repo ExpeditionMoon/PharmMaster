@@ -57,6 +57,7 @@ class ObserveTodayMedicationItemsUseCase(
                     mealTiming = schedule.mealTiming.toInput(),
                     isPaused = medication.status == MedicationStatus.PAUSED,
                     isTaken = record?.isTaken == true,
+                    takenTime = record?.takenTime,
                     isAlarmEnabled = medication.isAlarmEnabled
                 )
             }
