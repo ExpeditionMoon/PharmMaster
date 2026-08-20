@@ -1,5 +1,11 @@
 package com.moon.pharm.domain.alarm
 
 interface AlarmNotificationService {
-    fun showMedicationAlarm(name: String, dosage: String, time: String, isGrouped: Boolean)
+    fun showMedicationAlarm(
+        name: String,
+        dosage: String,
+        time: String,
+        isGrouped: Boolean,
+        groupMedicationNames: List<String>
+    )
 }

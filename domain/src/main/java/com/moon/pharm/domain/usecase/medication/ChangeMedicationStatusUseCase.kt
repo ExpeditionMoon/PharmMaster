@@ -36,7 +36,21 @@ class ChangeMedicationStatusUseCase(
                         when (updatedMedication.status) {
                             MedicationStatus.ACTIVE -> alarmScheduler.schedule(updatedMedication)
                             MedicationStatus.PAUSED,
-                            MedicationStatus.ENDED -> alarmScheduler.cancel(updatedMedication.id)
+                            MedicationStatus.ENDED -> {
+                                val groupId = updatedMedication.intakeGroupId
+                                val remainingGroupMember = groupId?.let { id ->
+                                    medicationsResult.resultData.firstOrNull { medication ->
+                                        medication.id != updatedMedication.id &&
+                                            medication.intakeGroupId == id &&
+                                            medication.status == MedicationStatus.ACTIVE
+                                    }
+                                }
+                                if (remainingGroupMember != null) {
+                                    alarmScheduler.schedule(remainingGroupMember)
+                                } else {
+                                    alarmScheduler.cancel(groupId ?: updatedMedication.id)
+                                }
+                            }
                         }
                     }
                 }

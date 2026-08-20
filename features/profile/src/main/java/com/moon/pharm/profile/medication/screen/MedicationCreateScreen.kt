@@ -50,6 +50,7 @@ fun MedicationCreateScreen(
         Box(modifier = Modifier.padding(innerPadding)) {
             MedicationCreateContent(
                 forms = uiState.medicationForms,
+                existingIntakeGroups = uiState.existingIntakeGroups,
                 sharedMedicationDosage = uiState.sharedMedicationDosage,
                 isIndividualDosageEditorVisible = uiState.isIndividualDosageEditorVisible,
                 isLoading = uiState.isLoading,

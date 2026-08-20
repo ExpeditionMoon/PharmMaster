@@ -44,16 +44,19 @@ import com.moon.pharm.designsystem.model.TopBarNavigationType
 import com.moon.pharm.designsystem.theme.PharmMasterTheme
 import com.moon.pharm.designsystem.theme.PharmTheme
 import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.home.viewmodel.HomeMedicationReminder
 import com.moon.pharm.home.viewmodel.HomeViewModel
 
 @Composable
 fun HomeMainScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToSearch: () -> Unit,
-    onNavigateToPrescriptionCapture: () -> Unit
+    onNavigateToPrescriptionCapture: () -> Unit,
+    onNavigateToMedication: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val nickname by viewModel.nickname.collectAsState()
+    val homeState by viewModel.uiState.collectAsState()
     val displayName = nickname.ifEmpty { "회원" }
 
     Scaffold(
@@ -96,9 +99,17 @@ fun HomeMainScreen(
                     color = PharmTheme.colors.onSurface
                 )
 
-                PharmNotice()
+                PharmNotice(
+                    reminder = homeState.nextMedicationReminder,
+                    remainingReminderCount = homeState.remainingReminderCount,
+                    onMoreClick = onNavigateToMedication
+                )
 
-                RateOfUse()
+                RateOfUse(
+                    weeklyAdherencePercent = homeState.weeklyAdherencePercent,
+                    todayMedicationCount = homeState.todayMedicationCount,
+                    todayCompletedCount = homeState.todayCompletedCount
+                )
 
                 PharmSafety()
 
@@ -109,7 +120,11 @@ fun HomeMainScreen(
 }
 
 @Composable
-fun PharmNotice() {
+fun PharmNotice(
+    reminder: HomeMedicationReminder?,
+    remainingReminderCount: Int,
+    onMoreClick: () -> Unit
+) {
     /* 나의 알림 */
     Column(
         modifier = Modifier
@@ -117,7 +132,8 @@ fun PharmNotice() {
             .padding(top = 10.dp)
     ) {
         SectionHeader(
-            title = "나의 알림"
+            title = "나의 알림",
+            onMoreClick = onMoreClick
         )
         Column(
             modifier = Modifier
@@ -154,13 +170,14 @@ fun PharmNotice() {
                 }
                 Column {
                     Text(
-                        text = "오후 12:30",
+                        text = reminder?.time?.toHomeTimeString() ?: "오늘 예정된 알림이 없어요",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
                         modifier = Modifier.padding(top = 10.dp),
-                        text = "점심약 복용 시간입니다",
+                        text = reminder?.let { "${it.displayName} 복용 시간입니다" }
+                            ?: "복약을 등록하면 다음 알림을 확인할 수 있어요",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Normal,
                         color = PharmTheme.colors.secondFont
@@ -171,7 +188,11 @@ fun PharmNotice() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 20.dp, bottom = 20.dp),
-                text = "총 2개 알림",
+                text = if (reminder == null) {
+                    "오늘 남은 알림 없음"
+                } else {
+                    "${reminder.medicationCount}개 약 · 오늘 남은 ${remainingReminderCount}개 알림"
+                },
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Medium,
                 color = PharmTheme.colors.onSurface.copy(alpha = 0.8f)
@@ -181,7 +202,11 @@ fun PharmNotice() {
 }
 
 @Composable
-fun RateOfUse() {
+fun RateOfUse(
+    weeklyAdherencePercent: Int,
+    todayMedicationCount: Int,
+    todayCompletedCount: Int
+) {
     /* 복용률 */
     Row(
         modifier = Modifier
@@ -213,7 +238,7 @@ fun RateOfUse() {
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = "95%",
+                text = "$weeklyAdherencePercent%",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = PharmTheme.colors.secondFont
@@ -225,13 +250,21 @@ fun RateOfUse() {
                 .padding(top = 10.dp)
         ) {
             Text(
-                text = "남은 약물 3일분 💊",
+                text = if (todayMedicationCount == 0) {
+                    "오늘 등록된 복약이 없어요"
+                } else {
+                    "오늘 복약 $todayCompletedCount/$todayMedicationCount 완료"
+                },
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
                 modifier = Modifier.padding(start = 10.dp),
-                text = "오전 8:00 아침약 복용 완료",
+                text = if (todayMedicationCount == 0) {
+                    "복약을 등록하면 완료 현황을 확인할 수 있어요"
+                } else {
+                    "오늘 복약 기록을 기준으로 표시합니다"
+                },
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Normal,
                 color = PharmTheme.colors.secondFont
@@ -239,6 +272,17 @@ fun RateOfUse() {
         }
     }
 }
+
+private fun String.toHomeTimeString(): String = runCatching {
+    val (hourText, minute) = split(":")
+    val hour = hourText.toInt()
+    val period = if (hour < 12) "오전" else "오후"
+    val displayHour = when (hour % 12) {
+        0 -> 12
+        else -> hour % 12
+    }
+    "$period $displayHour:$minute"
+}.getOrDefault(this)
 
 @Composable
 fun PharmSafety() {
@@ -396,9 +440,21 @@ private fun HomeMainScreenPreview() {
                         color = PharmTheme.colors.onSurface
                     )
 
-                    PharmNotice()
+                    PharmNotice(
+                        reminder = HomeMedicationReminder(
+                            time = "12:30",
+                            representativeName = "점심약",
+                            medicationCount = 2
+                        ),
+                        remainingReminderCount = 1,
+                        onMoreClick = {}
+                    )
 
-                    RateOfUse()
+                    RateOfUse(
+                        weeklyAdherencePercent = 95,
+                        todayMedicationCount = 3,
+                        todayCompletedCount = 1
+                    )
 
                     PharmSafety()
 

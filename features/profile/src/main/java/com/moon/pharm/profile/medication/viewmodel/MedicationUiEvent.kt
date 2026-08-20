@@ -1,7 +1,12 @@
 package com.moon.pharm.profile.medication.viewmodel
 
+import com.moon.pharm.domain.usecase.medication.MedicationGroupIntakeItem
+import com.moon.pharm.profile.medication.model.MealIntervalUiModel
+import com.moon.pharm.profile.medication.model.MealSlotUiModel
 import com.moon.pharm.profile.medication.model.MealTimingUiModel
+import com.moon.pharm.profile.medication.model.MedicationIntakeGroupOptionUiModel
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
+import com.moon.pharm.profile.medication.model.MedicationScheduleBasisUiModel
 import com.moon.pharm.profile.medication.model.MedicationTypeUiModel
 import com.moon.pharm.profile.medication.model.RepeatTypeUiModel
 
@@ -16,10 +21,17 @@ sealed interface MedicationUiEvent {
     data class UpdateEndDate(val index: Int = 0, val millis: Long?) : MedicationUiEvent
     data class UpdatePeriod(val index: Int = 0, val start: Long?, val end: Long?, val noEnd: Boolean) : MedicationUiEvent
     data class UpdateMealTiming(val index: Int = 0, val timing: MealTimingUiModel) : MedicationUiEvent
+    data class UpdateScheduleBasis(val index: Int = 0, val basis: MedicationScheduleBasisUiModel) : MedicationUiEvent
+    data class ToggleMealSlot(val index: Int = 0, val slot: MealSlotUiModel) : MedicationUiEvent
+    data class UpdateMealInterval(val index: Int = 0, val interval: MealIntervalUiModel) : MedicationUiEvent
     data class UpdateAlarmTime(val index: Int = 0, val hour: Int, val minute: Int) : MedicationUiEvent
     data class UpdateRepeatType(val index: Int = 0, val type: RepeatTypeUiModel) : MedicationUiEvent
     data class ToggleWeeklyDay(val index: Int = 0, val day: Int) : MedicationUiEvent
     data class UpdateGroupedNotification(val index: Int = 0, val enabled: Boolean) : MedicationUiEvent
+    data class JoinExistingIntakeGroup(
+        val index: Int = 0,
+        val group: MedicationIntakeGroupOptionUiModel
+    ) : MedicationUiEvent
     data class UpdateAlarmEnabled(val index: Int = 0, val enabled: Boolean) : MedicationUiEvent
     data object AddMedication : MedicationUiEvent
     data class RemoveMedication(val index: Int) : MedicationUiEvent
@@ -27,6 +39,7 @@ sealed interface MedicationUiEvent {
     // 2. 주요 비즈니스 로직 (Business Logic)
     object SaveAllMedications : MedicationUiEvent
     data class ToggleTaken(val medicationId: String, val scheduleId: String) : MedicationUiEvent
+    data class CompleteGroup(val items: List<MedicationGroupIntakeItem>) : MedicationUiEvent
     data class PauseMedication(val medicationId: String) : MedicationUiEvent
     data class ResumeMedication(val medicationId: String) : MedicationUiEvent
     data class EndMedication(val medicationId: String) : MedicationUiEvent

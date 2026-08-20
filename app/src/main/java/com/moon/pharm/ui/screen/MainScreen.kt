@@ -105,7 +105,16 @@ fun MainScreen(
             ) {
                 homeNavGraph(
                     onNavigateToSearch = { mainNavController.navigate(SearchRoute) },
-                    onNavigateToPrescriptionCapture = { mainNavController.navigate(PrescriptionCaptureRoute) }
+                    onNavigateToPrescriptionCapture = { mainNavController.navigate(PrescriptionCaptureRoute) },
+                    onNavigateToMedication = {
+                        mainNavController.navigate(MedicationRoute) {
+                            popUpTo(mainNavController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                 )
                 consultNavGraph(
                     navController = mainNavController,

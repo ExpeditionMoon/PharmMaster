@@ -16,6 +16,7 @@ import com.moon.pharm.designsystem.component.bar.PharmPrimaryTabRow
 import com.moon.pharm.designsystem.theme.PharmMasterTheme
 import com.moon.pharm.designsystem.theme.PharmTheme
 import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.domain.usecase.medication.MedicationGroupIntakeItem
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
 import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
@@ -34,7 +35,8 @@ fun MedicationHomeContent(
     onPauseClick: (String) -> Unit,
     onResumeClick: (String) -> Unit,
     onEndClick: (String) -> Unit,
-    onDeleteClick: (String) -> Unit
+    onDeleteClick: (String) -> Unit,
+    onCompleteGroup: (List<MedicationGroupIntakeItem>) -> Unit
 ) {
     val tabTitles = MedicationPrimaryTab.entries.map { it.title }
 
@@ -63,7 +65,7 @@ fun MedicationHomeContent(
                 )
             }
 
-            items(items = currentList, key = { it.time ?: "no-time" }) { group ->
+            items(items = currentList, key = MedicationTimeGroupUiModel::id) { group ->
                 MedicationGroupItem(
                     group = group,
                     onTakeClick = onTakeClick,
@@ -71,7 +73,8 @@ fun MedicationHomeContent(
                     onPauseClick = onPauseClick,
                     onResumeClick = onResumeClick,
                     onEndClick = onEndClick,
-                    onDeleteClick = onDeleteClick
+                    onDeleteClick = onDeleteClick,
+                    onCompleteGroup = onCompleteGroup
                 )
             }
 
@@ -97,7 +100,8 @@ private fun MedicationHomeContentPreview() {
             onPauseClick = {},
             onResumeClick = {},
             onEndClick = {},
-            onDeleteClick = {}
+            onDeleteClick = {},
+            onCompleteGroup = {}
         )
     }
 }

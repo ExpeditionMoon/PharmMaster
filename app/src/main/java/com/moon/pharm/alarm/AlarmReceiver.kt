@@ -33,7 +33,14 @@ class AlarmReceiver : BroadcastReceiver() {
         if (alarm != null && !MedicationAlarmNextTriggerCalculator.isActiveOn(alarm, LocalDate.now())) return
 
         alarm?.let(alarmScheduler::reschedule)
-        notificationService.showMedicationAlarm(name, dosage, time, isGrouped)
+        notificationService.showMedicationAlarm(
+            name = name,
+            dosage = dosage,
+            time = time,
+            isGrouped = isGrouped,
+            groupMedicationNames = alarm?.groupMedicationNames.orEmpty()
+                .ifEmpty { listOf(name) }
+        )
     }
 
     private fun Intent.toMedicationAlarmOrNull(): MedicationAlarm? {
@@ -44,7 +51,11 @@ class AlarmReceiver : BroadcastReceiver() {
         return MedicationAlarm(
             requestCode = requestCode,
             medicationId = medicationId,
+            intakeGroupId = getStringExtra(AlarmConstants.EXTRA_INTAKE_GROUP_ID),
             name = getStringExtra(AlarmConstants.EXTRA_MEDICATION_NAME).orEmpty(),
+            groupMedicationNames = getStringArrayListExtra(
+                AlarmConstants.EXTRA_GROUP_MEDICATION_NAMES
+            ).orEmpty(),
             dosage = getStringExtra(AlarmConstants.EXTRA_DOSAGE).orEmpty(),
             time = getStringExtra(AlarmConstants.EXTRA_ALARM_TIME).orEmpty(),
             isGrouped = getBooleanExtra(AlarmConstants.EXTRA_IS_GROUPED, false),

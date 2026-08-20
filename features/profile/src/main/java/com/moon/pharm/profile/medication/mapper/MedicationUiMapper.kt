@@ -1,16 +1,22 @@
 package com.moon.pharm.profile.medication.mapper
 
 import com.moon.pharm.designsystem.util.toScheduleTimeString
+import com.moon.pharm.domain.usecase.medication.MealIntervalInput
+import com.moon.pharm.domain.usecase.medication.MealSlotInput
 import com.moon.pharm.domain.usecase.medication.MealTimingInput
 import com.moon.pharm.domain.usecase.medication.MedicationHistoryItem
-import com.moon.pharm.domain.usecase.medication.MedicationScheduleCommand
+import com.moon.pharm.domain.usecase.medication.MedicationScheduleBasisInput
+import com.moon.pharm.domain.usecase.medication.MedicationScheduleCommandFactory
 import com.moon.pharm.domain.usecase.medication.MedicationScheduleItem
 import com.moon.pharm.domain.usecase.medication.MedicationTypeInput
 import com.moon.pharm.domain.usecase.medication.RepeatTypeInput
 import com.moon.pharm.domain.usecase.medication.SaveMedicationCommand
 import com.moon.pharm.domain.usecase.medication.ToggleIntakeCommand
 import com.moon.pharm.profile.medication.model.HistoryRecordUiModel
+import com.moon.pharm.profile.medication.model.MealIntervalUiModel
+import com.moon.pharm.profile.medication.model.MealSlotUiModel
 import com.moon.pharm.profile.medication.model.MealTimingUiModel
+import com.moon.pharm.profile.medication.model.MedicationScheduleBasisUiModel
 import com.moon.pharm.profile.medication.model.MedicationTypeUiModel
 import com.moon.pharm.profile.medication.model.RepeatTypeUiModel
 import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
@@ -18,7 +24,11 @@ import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
 import java.time.LocalDate
 
 object MedicationUiMapper {
-    fun toSaveCommand(form: MedicationFormState, userId: String): SaveMedicationCommand {
+    fun toSaveCommand(
+        form: MedicationFormState,
+        userId: String,
+        intakeGroupId: String? = form.intakeGroupId
+    ): SaveMedicationCommand {
         return SaveMedicationCommand(
             medicationId = form.medicationId,
             userId = userId,
@@ -28,14 +38,17 @@ object MedicationUiMapper {
             endDate = if (form.noEndDate) null else form.endDate,
             repeatType = form.selectedRepeatType.toInput(),
             weeklyDays = form.selectedWeeklyDays,
-            schedules = listOf(
-                MedicationScheduleCommand(
-                    scheduleId = form.scheduleId,
-                    time = form.selectedTime.toScheduleTimeString(),
-                    dosage = form.medicationDosage.orEmpty(),
-                    mealTiming = form.selectedMealTiming.toInput()
-                )
-            ),
+            schedules = MedicationScheduleCommandFactory.create(
+                dosage = form.medicationDosage.orEmpty(),
+                mealTiming = form.selectedMealTiming.toInput(),
+                basis = form.scheduleBasis.toInput(),
+                mealSlots = form.selectedMealSlots.map { it.toMealSlotInput() }.toSet(),
+                mealInterval = form.mealInterval.toInput(),
+                fixedTime = form.selectedTime.toScheduleTimeString()
+            ).mapIndexed { index, schedule ->
+                schedule.copy(scheduleId = if (index == 0) form.scheduleId else null)
+            },
+            intakeGroupId = intakeGroupId,
             isGrouped = form.isGrouped,
             isAlarmEnabled = form.isAlarmEnabled,
             status = form.status
@@ -90,6 +103,7 @@ object MedicationUiMapper {
     private fun MedicationScheduleItem.toUiModel(): TodayMedicationUiModel {
         return TodayMedicationUiModel(
             medicationId = medicationId,
+            intakeGroupId = intakeGroupId,
             scheduleId = scheduleId,
             name = name,
             type = type.toUiModel(),
@@ -138,6 +152,25 @@ object MedicationUiMapper {
             MealTimingUiModel.AfterMeal -> MealTimingInput.AFTER_MEAL
             MealTimingUiModel.None -> MealTimingInput.NONE
         }
+    }
+
+    private fun MedicationScheduleBasisUiModel.toInput(): MedicationScheduleBasisInput = when (this) {
+        MedicationScheduleBasisUiModel.FixedTime -> MedicationScheduleBasisInput.FIXED_TIME
+        MedicationScheduleBasisUiModel.BeforeMeal -> MedicationScheduleBasisInput.BEFORE_MEAL
+        MedicationScheduleBasisUiModel.AfterMeal -> MedicationScheduleBasisInput.AFTER_MEAL
+        MedicationScheduleBasisUiModel.AsNeeded -> MedicationScheduleBasisInput.AS_NEEDED
+    }
+
+    private fun MealSlotUiModel.toMealSlotInput(): MealSlotInput = when (this) {
+        MealSlotUiModel.Breakfast -> MealSlotInput.BREAKFAST
+        MealSlotUiModel.Lunch -> MealSlotInput.LUNCH
+        MealSlotUiModel.Dinner -> MealSlotInput.DINNER
+    }
+
+    private fun MealIntervalUiModel.toInput(): MealIntervalInput = when (this) {
+        MealIntervalUiModel.Immediately -> MealIntervalInput.IMMEDIATELY
+        MealIntervalUiModel.ThirtyMinutes -> MealIntervalInput.THIRTY_MINUTES
+        MealIntervalUiModel.OneHour -> MealIntervalInput.ONE_HOUR
     }
 
     private fun MealTimingInput.toUiModel(): MealTimingUiModel {

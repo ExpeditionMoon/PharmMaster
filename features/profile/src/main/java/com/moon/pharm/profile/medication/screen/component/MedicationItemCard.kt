@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moon.pharm.designsystem.component.dialog.PharmConfirmDialog
@@ -72,17 +73,21 @@ fun MedicationItemCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = item.name,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PharmTheme.colors.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = item.name,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PharmTheme.colors.onSurface
-                    )
-                    Text(
-                        text = " · ${stringResource(item.type.labelRes)}",
+                        text = stringResource(item.type.labelRes),
                         fontSize = 13.sp,
-                        color = PharmTheme.colors.secondFont
+                        color = PharmTheme.colors.secondFont,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     if (item.isPaused) {
                         Text(

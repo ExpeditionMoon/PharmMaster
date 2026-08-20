@@ -112,6 +112,9 @@ fun MedicationScreen(
                 },
                 onDeleteClick = { medicationId ->
                     viewModel.onEvent(MedicationUiEvent.DeleteMedication(medicationId))
+                },
+                onCompleteGroup = { items ->
+                    viewModel.onEvent(MedicationUiEvent.CompleteGroup(items))
                 }
             )
         }

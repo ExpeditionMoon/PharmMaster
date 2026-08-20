@@ -11,7 +11,6 @@ import com.moon.pharm.data.common.USER_COLLECTION
 import com.moon.pharm.data.datasource.UserDataSource
 import com.moon.pharm.data.datasource.remote.dto.UserDTO
 import com.moon.pharm.data.datasource.remote.dto.UserLifeStyleDTO
-import com.moon.pharm.domain.result.DataResourceResult
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
