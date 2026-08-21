@@ -70,6 +70,26 @@
     <string name="mypage_general_member">일반 회원</string>
     <string name="mypage_app_version_format">App Version v%s</string>
 
+    <!-- 앱 설정(settings) -->
+    <string name="settings_title">앱 설정</string>
+    <string name="settings_location_section_title">위치 권한</string>
+    <string name="settings_location_title">현재 위치</string>
+    <string name="settings_location_description">주변 약국을 찾을 때 사용합니다</string>
+    <string name="settings_notification_section_title">알림 권한</string>
+    <string name="settings_app_notification_title">앱 알림</string>
+    <string name="settings_app_notification_description">앱의 모든 알림을 받습니다</string>
+    <string name="settings_medication_notification_title">복약 알림</string>
+    <string name="settings_medication_notification_description">설정한 시간에 복약 알림을 받습니다</string>
+    <string name="settings_consult_notification_title">상담 알림</string>
+    <string name="settings_consult_notification_description">상담 답변과 새 상담 알림을 받습니다</string>
+    <string name="settings_status_precise_location">정확한 위치</string>
+    <string name="settings_status_approximate_location">대략적 위치</string>
+    <string name="settings_status_allowed">허용됨</string>
+    <string name="settings_status_not_allowed">허용 안 됨</string>
+    <string name="settings_system_notice_title">권한을 허용해 주세요</string>
+    <string name="settings_system_notice_description">시스템 설정에서 위치와 알림 권한을 변경할 수 있습니다.</string>
+    <string name="settings_open_system_settings">시스템 설정 열기</string>
+
     <!--  복약 관리(medication)  -->
     <string name="error_empty_medication_name">약 이름을 입력해주세요.</string>
     <string name="error_create_medication">복용 알림 등록 실패</string>

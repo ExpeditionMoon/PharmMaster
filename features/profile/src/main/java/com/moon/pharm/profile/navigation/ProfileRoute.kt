@@ -9,6 +9,8 @@ data object SignUpRoute
 @Serializable
 data object ProfileRoute
 @Serializable
+data object SettingsRoute
+@Serializable
 data object MedicationRoute
 @Serializable
 data class MedicationCreateRoute(
