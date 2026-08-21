@@ -1,9 +1,11 @@
 package com.moon.pharm.alarm
 
+import com.moon.pharm.domain.alarm.NotificationChannelIds
+
 object AlarmConstants {
     const val ACTION_MEDICATION_ALARM = "com.moon.pharm.action.MEDICATION_ALARM"
 
-    const val NOTIFICATION_CHANNEL_ID = "medication_alarm_channel"
+    const val NOTIFICATION_CHANNEL_ID = NotificationChannelIds.MEDICATION
     const val NOTIFICATION_CHANNEL_NAME = "복약 알림"
 
     const val EXTRA_MEDICATION_NAME = "key_medication_name"

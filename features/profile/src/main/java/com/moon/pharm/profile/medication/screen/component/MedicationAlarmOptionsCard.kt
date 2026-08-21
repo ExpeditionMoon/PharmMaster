@@ -34,7 +34,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -104,16 +103,6 @@ fun MedicationAlarmOptionsCard(
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
-
-    LaunchedEffect(form.isAlarmEnabled, isNotificationPermissionGranted, shouldOpenNotificationSettings) {
-        if (form.isAlarmEnabled &&
-            !isNotificationPermissionGranted &&
-            !shouldOpenNotificationSettings &&
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-        ) {
-            requestNotificationPermission(context, notificationPermissionLauncher)
-        }
     }
 
     Box(

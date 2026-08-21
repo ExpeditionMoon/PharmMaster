@@ -10,6 +10,7 @@ import com.moon.pharm.domain.repository.MedicationRepository
 import com.moon.pharm.domain.result.DataResourceResult
 import com.moon.pharm.domain.usecase.auth.GetCurrentUserIdUseCase
 import com.moon.pharm.domain.usecase.medication.ChangeMedicationStatusUseCase
+import com.moon.pharm.domain.usecase.medication.CompleteMedicationGroupUseCase
 import com.moon.pharm.domain.usecase.medication.DeleteMedicationUseCase
 import com.moon.pharm.domain.usecase.medication.GetMedicationsUseCase
 import com.moon.pharm.domain.usecase.medication.ObserveTodayMedicationItemsUseCase
@@ -95,6 +96,7 @@ class MedicationViewModelTest {
             observeWeeklyMedicationAdherenceUseCase = ObserveWeeklyMedicationAdherenceUseCase(medicationRepository),
             saveMedicationUseCase = SaveMedicationUseCase(medicationRepository, alarmScheduler),
             changeMedicationStatusUseCase = ChangeMedicationStatusUseCase(medicationRepository, alarmScheduler),
+            completeMedicationGroupUseCase = CompleteMedicationGroupUseCase(medicationRepository),
             deleteMedicationUseCase = DeleteMedicationUseCase(medicationRepository, alarmScheduler),
             getMedicationsUseCase = GetMedicationsUseCase(medicationRepository),
             toggleIntakeCheckUseCase = ToggleIntakeCheckUseCase(medicationRepository),
