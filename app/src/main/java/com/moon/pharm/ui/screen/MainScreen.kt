@@ -114,6 +114,9 @@ fun MainScreen(
                             launchSingleTop = true
                             restoreState = true
                         }
+                    },
+                    onNavigateToMedicationCreate = {
+                        mainNavController.navigate(MedicationCreateRoute())
                     }
                 )
                 consultNavGraph(

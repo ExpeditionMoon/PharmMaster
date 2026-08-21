@@ -7,14 +7,16 @@ import com.moon.pharm.home.screen.HomeMainScreen
 fun NavGraphBuilder.homeNavGraph(
     onNavigateToSearch: () -> Unit,
     onNavigateToPrescriptionCapture: () -> Unit,
-    onNavigateToMedication: () -> Unit
+    onNavigateToMedication: () -> Unit,
+    onNavigateToMedicationCreate: () -> Unit
 ) {
 
     composable<HomeRoute> {
         HomeMainScreen(
             onNavigateToSearch = onNavigateToSearch,
             onNavigateToPrescriptionCapture = onNavigateToPrescriptionCapture,
-            onNavigateToMedication = onNavigateToMedication
+            onNavigateToMedication = onNavigateToMedication,
+            onNavigateToMedicationCreate = onNavigateToMedicationCreate
         )
     }
 }
