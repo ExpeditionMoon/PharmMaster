@@ -28,29 +28,26 @@ import com.moon.pharm.profile.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MedicationProgressCard(total: Int, completed: Int) {
-    val progressValue = if (total > 0) completed.toFloat() / total.toFloat() else 0f
-
+fun MedicationProgressCard(
+    total: Int,
+    completed: Int,
+    weeklyTotal: Int,
+    weeklyCompleted: Int
+) {
     Card(
         colors = CardDefaults.cardColors(containerColor = PharmTheme.colors.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
-        ) {
+        Column(modifier = Modifier.padding(20.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(
-                        R.string.medication_progress_today,
-                        completed,
-                        total
-                    ),
+                    text = stringResource(R.string.medication_progress_today, completed, total),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = PharmTheme.colors.onSurface
@@ -69,14 +66,17 @@ fun MedicationProgressCard(total: Int, completed: Int) {
                 gapSize = 0.dp,
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                // TODO: 실제 데이터 기반 계산으로 변경
-                text = "이번 주 복용 준수율 94%",
-                fontSize = 13.sp,
-                color = PharmTheme.colors.secondFont
-            )
+            if (weeklyTotal > 0) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = stringResource(
+                        R.string.medication_progress_weekly,
+                        weeklyCompleted * 100 / weeklyTotal
+                    ),
+                    fontSize = 13.sp,
+                    color = PharmTheme.colors.secondFont
+                )
+            }
         }
     }
 }
@@ -86,7 +86,12 @@ fun MedicationProgressCard(total: Int, completed: Int) {
 private fun MedicationProgressCardPreview() {
     PharmMasterTheme {
         Box(modifier = Modifier.padding(16.dp)) {
-            MedicationProgressCard(total = 5, completed = 3)
+            MedicationProgressCard(
+                total = 5,
+                completed = 3,
+                weeklyTotal = 8,
+                weeklyCompleted = 6
+            )
         }
     }
 }

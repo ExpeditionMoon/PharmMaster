@@ -18,10 +18,12 @@ data class MedicationDTO(
     val repeatType: String = EMPTY_STRING,
     val weeklyDays: List<Int> = emptyList(),
     val isAlarmEnabled: Boolean = true,
+    val status: String = "ACTIVE",
     val memo: String? = null,
 
     val schedules: List<MedicationScheduleDTO> = emptyList(),
     val prescriptionImageUrl: String? = null,
+    val intakeGroupId: String? = null,
     val isGrouped: Boolean = false
 )
 
@@ -30,5 +32,8 @@ data class MedicationScheduleDTO(
     var id: String = EMPTY_STRING,
     var time: String = EMPTY_STRING,
     var dosage: String = EMPTY_STRING,
-    var mealTiming: String = EMPTY_STRING
+    var mealTiming: String = EMPTY_STRING,
+    var basis: String = "FIXED_TIME",
+    var mealSlot: String? = null,
+    var mealInterval: String = "IMMEDIATELY"
 )

@@ -12,6 +12,7 @@ import com.google.android.gms.maps.MapsInitializer
 import com.moon.pharm.common.AppConstants.CACHE_MEMORY_PERCENT
 import com.moon.pharm.common.AppConstants.CACHE_SIZE_BYTES
 import com.moon.pharm.common.AppConstants.DIR_IMAGE_CACHE
+import com.moon.pharm.notification.NotificationChannelInitializer
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -19,6 +20,7 @@ class PharmMasterApplication : Application(), SingletonImageLoader.Factory {
 
     override fun onCreate() {
         super.onCreate()
+        NotificationChannelInitializer.initialize(this)
         try {
             MapsInitializer.initialize(applicationContext, MapsInitializer.Renderer.LATEST, null)
         } catch (e: Exception) {

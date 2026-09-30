@@ -40,7 +40,19 @@ class FirestoreMedicationDataSourceImpl @Inject constructor(
     }
 
     override suspend fun deleteMedication(medicationId: String) {
-        medicationCollection.document(medicationId).delete().await()
+        val intakeReferences = intakeCollection
+            .whereEqualTo(FIELD_MEDICATION_ID, medicationId)
+            .get()
+            .await()
+            .documents
+            .map { it.reference }
+        val references = intakeReferences + medicationCollection.document(medicationId)
+
+        references.chunked(MAX_BATCH_SIZE).forEach { batchReferences ->
+            firestore.batch().apply {
+                batchReferences.forEach { reference -> delete(reference) }
+            }.commit().await()
+        }
     }
 
     override fun getIntakeRecords(userId: String, date: String): Flow<List<IntakeRecordDTO>> {
@@ -61,11 +73,15 @@ class FirestoreMedicationDataSourceImpl @Inject constructor(
     }
 
     override suspend fun saveIntakeRecord(record: IntakeRecordDTO) {
-        val docRef = if (record.id.isEmpty()) {
-            intakeCollection.document()
-        } else {
-            intakeCollection.document(record.id)
-        }
+        val existingRecord = intakeCollection
+            .whereEqualTo(FIELD_MEDICATION_ID, record.medicationId)
+            .whereEqualTo(FIELD_SCHEDULE_ID, record.scheduleId)
+            .whereEqualTo(FIELD_RECORD_DATE, record.recordDate)
+            .get()
+            .await()
+            .documents
+            .firstOrNull()
+        val docRef = existingRecord?.reference ?: intakeCollection.document()
         docRef.set(record.copy(id = docRef.id)).await()
     }
 
@@ -80,5 +96,9 @@ class FirestoreMedicationDataSourceImpl @Inject constructor(
         for (document in snapshot.documents) {
             document.reference.delete().await()
         }
+    }
+
+    private companion object {
+        const val MAX_BATCH_SIZE = 500
     }
 }

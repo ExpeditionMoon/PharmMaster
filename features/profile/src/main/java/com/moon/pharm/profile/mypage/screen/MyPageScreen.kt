@@ -57,6 +57,7 @@ import com.moon.pharm.designsystem.R as UiR
 fun MyPageRoute(
     onNavigateToMyConsultation: () -> Unit,
     onNavigateToMedicationHistory: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     onNavigateToLogin: () -> Unit,
     viewModel: MyPageViewModel = hiltViewModel()
 ) {
@@ -83,6 +84,7 @@ fun MyPageRoute(
         snackbarHostState = snackbarHostState,
         onNavigateToMyConsultation = onNavigateToMyConsultation,
         onNavigateToMedicationHistory = onNavigateToMedicationHistory,
+        onNavigateToSettings = onNavigateToSettings,
         onLogout = viewModel::logout,
         onUpdateNickname = viewModel::updateNickname,
         onRetryConsults = viewModel::retryConsults
@@ -95,6 +97,7 @@ fun MyPageScreen(
     snackbarHostState: SnackbarHostState,
     onNavigateToMyConsultation: () -> Unit,
     onNavigateToMedicationHistory: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     onLogout: () -> Unit,
     onUpdateNickname: (String) -> Unit,
     onRetryConsults: () -> Unit
@@ -119,7 +122,7 @@ fun MyPageScreen(
                     actions = listOf(
                         TopBarAction(
                             icon = Icons.Default.Settings,
-                            onClick = { /* 설정 화면 이동 */ }
+                            onClick = onNavigateToSettings
                         )
                     )
                 )
@@ -285,6 +288,7 @@ private fun MyPageScreenPreview() {
             snackbarHostState = SnackbarHostState(),
             onNavigateToMyConsultation = {},
             onNavigateToMedicationHistory = {},
+            onNavigateToSettings = {},
             onLogout = {},
             onUpdateNickname = {},
             onRetryConsults = {}

@@ -105,7 +105,19 @@ fun MainScreen(
             ) {
                 homeNavGraph(
                     onNavigateToSearch = { mainNavController.navigate(SearchRoute) },
-                    onNavigateToPrescriptionCapture = { mainNavController.navigate(PrescriptionCaptureRoute) }
+                    onNavigateToPrescriptionCapture = { mainNavController.navigate(PrescriptionCaptureRoute) },
+                    onNavigateToMedication = {
+                        mainNavController.navigate(MedicationRoute) {
+                            popUpTo(mainNavController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onNavigateToMedicationCreate = {
+                        mainNavController.navigate(MedicationCreateRoute())
+                    }
                 )
                 consultNavGraph(
                     navController = mainNavController,
@@ -117,7 +129,12 @@ fun MainScreen(
                     onNavigateToMyConsultation = { mainNavController.navigate(MyConsultListRoute) }
                 )
                 prescriptionNavGraph { scannedMedicationNames ->
-                    mainNavController.navigate(MedicationCreateRoute(scannedMedicationNames)) {
+                    mainNavController.navigate(
+                        MedicationCreateRoute(
+                            scannedMedicationNames = scannedMedicationNames,
+                            isPrescriptionReview = true
+                        )
+                    ) {
                         popUpTo(PrescriptionCaptureRoute) { inclusive = false }
                     }
                 }

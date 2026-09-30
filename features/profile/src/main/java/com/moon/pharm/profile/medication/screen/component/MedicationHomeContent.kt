@@ -16,6 +16,7 @@ import com.moon.pharm.designsystem.component.bar.PharmPrimaryTabRow
 import com.moon.pharm.designsystem.theme.PharmMasterTheme
 import com.moon.pharm.designsystem.theme.PharmTheme
 import com.moon.pharm.designsystem.util.ThemePreviews
+import com.moon.pharm.domain.usecase.medication.MedicationGroupIntakeItem
 import com.moon.pharm.profile.medication.model.MedicationPrimaryTab
 import com.moon.pharm.profile.medication.model.MedicationTimeGroupUiModel
 import com.moon.pharm.profile.medication.model.TodayMedicationUiModel
@@ -26,9 +27,16 @@ fun MedicationHomeContent(
     currentList: List<MedicationTimeGroupUiModel>,
     totalCount: Int,
     completedCount: Int,
+    weeklyTotalCount: Int,
+    weeklyCompletedCount: Int,
     onTabSelected: (MedicationPrimaryTab) -> Unit,
     onTakeClick: (TodayMedicationUiModel) -> Unit,
-    onDeleteClick: (String) -> Unit
+    onEditClick: (String) -> Unit,
+    onPauseClick: (String) -> Unit,
+    onResumeClick: (String) -> Unit,
+    onEndClick: (String) -> Unit,
+    onDeleteClick: (String) -> Unit,
+    onCompleteGroup: (List<MedicationGroupIntakeItem>) -> Unit
 ) {
     val tabTitles = MedicationPrimaryTab.entries.map { it.title }
 
@@ -49,11 +57,25 @@ fun MedicationHomeContent(
             modifier = Modifier.fillMaxSize()
         ) {
             item {
-                MedicationProgressCard(total = totalCount, completed = completedCount)
+                MedicationProgressCard(
+                    total = totalCount,
+                    completed = completedCount,
+                    weeklyTotal = weeklyTotalCount,
+                    weeklyCompleted = weeklyCompletedCount
+                )
             }
 
-            items(items = currentList, key = { it.time ?: "no-time" }) { group ->
-                MedicationGroupItem(group = group, onTakeClick = onTakeClick, onDeleteClick = onDeleteClick)
+            items(items = currentList, key = MedicationTimeGroupUiModel::id) { group ->
+                MedicationGroupItem(
+                    group = group,
+                    onTakeClick = onTakeClick,
+                    onEditClick = onEditClick,
+                    onPauseClick = onPauseClick,
+                    onResumeClick = onResumeClick,
+                    onEndClick = onEndClick,
+                    onDeleteClick = onDeleteClick,
+                    onCompleteGroup = onCompleteGroup
+                )
             }
 
             item { Spacer(modifier = Modifier.height(50.dp)) }
@@ -70,9 +92,16 @@ private fun MedicationHomeContentPreview() {
             currentList = emptyList(),
             totalCount = 3,
             completedCount = 1,
+            weeklyTotalCount = 8,
+            weeklyCompletedCount = 6,
             onTabSelected = {},
             onTakeClick = {},
-            onDeleteClick = {}
+            onEditClick = {},
+            onPauseClick = {},
+            onResumeClick = {},
+            onEndClick = {},
+            onDeleteClick = {},
+            onCompleteGroup = {}
         )
     }
 }

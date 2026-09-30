@@ -5,12 +5,12 @@ import androidx.navigation.compose.composable
 import com.moon.pharm.prescription.screen.PrescriptionScreen
 
 fun NavGraphBuilder.prescriptionNavGraph(
-    onNavigateToMedicationCreate: (List<String>) -> Unit
+    onNavigateToMedicationReview: (List<String>) -> Unit
 ) {
 
     composable<PrescriptionCaptureRoute> {
         PrescriptionScreen(
-            onNavigateToMedicationCreate = onNavigateToMedicationCreate
+            onNavigateToMedicationReview = onNavigateToMedicationReview
         )
     }
 }

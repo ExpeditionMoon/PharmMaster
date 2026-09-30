@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +33,8 @@ import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.designsystem.util.toDisplayString
 import com.moon.pharm.designsystem.util.toQueryString
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.medication.mapper.asString
+import com.moon.pharm.profile.medication.model.MedicationUiMessage
 import com.moon.pharm.profile.medication.screen.component.HistoryRecordItem
 import com.moon.pharm.profile.medication.screen.section.HistoryCalendarSection
 import com.moon.pharm.profile.medication.viewmodel.MedicationHistoryUiState
@@ -43,33 +48,39 @@ fun MedicationHistoryScreen(
     onBackClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val userMessage = uiState.userMessage as? MedicationUiMessage
+    val userMessageText = userMessage?.asString()
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchMonthlyRecords(uiState.selectedMonth)
+    LaunchedEffect(userMessageText) {
+        userMessageText?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.userMessageShown()
+        }
     }
 
     MedicationHistoryContent(
         uiState = uiState,
+        snackbarHostState = snackbarHostState,
         onBackClick = onBackClick,
         onMonthChanged = { viewModel.fetchMonthlyRecords(it) },
         onDateClick = { viewModel.onDateSelected(it) },
         onToggleRecord = { medId, schId, isTaken ->
             viewModel.toggleRecord(medId, schId, isTaken, uiState.selectedDate)
         },
-        onDeleteClick = { medicationId ->
-            viewModel.deleteMedication(medicationId)
-        }
+        onDeleteMedication = viewModel::deleteMedication
     )
 }
 
 @Composable
 fun MedicationHistoryContent(
     uiState: MedicationHistoryUiState,
+    snackbarHostState: SnackbarHostState,
     onBackClick: () -> Unit,
     onMonthChanged: (YearMonth) -> Unit,
     onDateClick: (LocalDate) -> Unit,
     onToggleRecord: (String, String, Boolean) -> Unit,
-    onDeleteClick: (String) -> Unit
+    onDeleteMedication: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -80,7 +91,8 @@ fun MedicationHistoryContent(
                     onNavigationClick = onBackClick
                 )
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -134,7 +146,7 @@ fun MedicationHistoryContent(
                                 !uiModel.isTaken
                             )
                         },
-                        onDeleteClick = { onDeleteClick(uiModel.medicationId) }
+                        onDeleteClick = { onDeleteMedication(uiModel.medicationId) }
                     )
                 }
             }
@@ -152,11 +164,12 @@ private fun MedicationHistoryContentPreview() {
                 selectedDate = LocalDate.now(),
                 recordsByDate = emptyMap()
             ),
+            snackbarHostState = remember { SnackbarHostState() },
             onBackClick = {},
             onMonthChanged = {},
             onDateClick = {},
             onToggleRecord = { _, _, _ -> },
-            onDeleteClick = {}
+            onDeleteMedication = {}
         )
     }
 }

@@ -1,7 +1,6 @@
 package com.moon.pharm.data.repository
 
 import com.google.firebase.FirebaseNetworkException
-import com.google.firebase.ai.type.FirebaseAIException
 import com.google.firebase.ai.type.RequestTimeoutException
 import com.moon.pharm.data.datasource.AiDataSource
 import com.moon.pharm.data.datasource.remote.ai.DdiAiResponse
@@ -53,20 +52,22 @@ class DdiAiRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun Exception.toDdiException(): DdiException = when (this) {
-        is FirebaseNetworkException,
-        is IOException,
-        is RequestTimeoutException -> DdiException.Network()
-        else -> DdiException.AnalysisFailed(message)
-    }
+    private fun Exception.toDdiException(): DdiException =
+        if (hasNetworkCause()) DdiException.Network() else DdiException.AnalysisFailed(message)
 
-    private fun Exception.toPrescriptionException(): PrescriptionException = when (this) {
-        is FirebaseNetworkException,
-        is IOException,
-        is RequestTimeoutException -> PrescriptionException.Network
-        is FirebaseAIException -> PrescriptionException.Gemini
-        else -> PrescriptionException.Gemini
-    }
+    private fun Exception.toPrescriptionException(): PrescriptionException =
+        if (hasNetworkCause()) {
+            PrescriptionException.Network
+        } else {
+            PrescriptionException.Gemini
+        }
+
+    private fun Throwable.hasNetworkCause(): Boolean = generateSequence(this) { it.cause }
+        .any { cause ->
+            cause is FirebaseNetworkException ||
+                cause is IOException ||
+                cause is RequestTimeoutException
+        }
 
     private fun String.normalizeJsonArray(): String {
         val trimmedResponse = trim()

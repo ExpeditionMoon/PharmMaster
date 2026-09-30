@@ -13,6 +13,7 @@ import com.moon.pharm.profile.medication.screen.MedicationHistoryScreen
 import com.moon.pharm.profile.medication.screen.MedicationScreen
 import com.moon.pharm.profile.medication.viewmodel.MedicationViewModel
 import com.moon.pharm.profile.mypage.screen.MyPageRoute
+import com.moon.pharm.profile.settings.screen.SettingsRoute as SettingsScreenRoute
 
 fun NavGraphBuilder.authNavGraph(rootNavController: NavController, onAuthenticated: () -> Unit) {
     composable<LoginRoute> {
@@ -50,10 +51,16 @@ fun NavGraphBuilder.profileNavGraph(
             onNavigateToMedicationHistory = {
                 navController.navigate(MedicationHistoryRoute)
             },
+            onNavigateToSettings = {
+                navController.navigate(SettingsRoute)
+            },
             onNavigateToLogin = {
                 onLogout()
             }
         )
+    }
+    composable<SettingsRoute> {
+        SettingsScreenRoute(onNavigateUp = { navController.popBackStack() })
     }
     composable<MedicationRoute> {
         val viewModel: MedicationViewModel = hiltViewModel()
@@ -64,6 +71,9 @@ fun NavGraphBuilder.profileNavGraph(
             },
             onNavigateToCreate = {
                 navController.navigate(MedicationCreateRoute())
+            },
+            onNavigateToEdit = { medicationId ->
+                navController.navigate(MedicationCreateRoute(medicationId = medicationId))
             }
         )
     }

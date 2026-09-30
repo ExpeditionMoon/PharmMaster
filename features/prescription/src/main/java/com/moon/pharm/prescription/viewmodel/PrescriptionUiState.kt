@@ -9,5 +9,6 @@ sealed interface PrescriptionUiState {
 enum class PrescriptionError {
     GEMINI,
     NETWORK,
+    EMPTY_RESULT,
     OCR
 }

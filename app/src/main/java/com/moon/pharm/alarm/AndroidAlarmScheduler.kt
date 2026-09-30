@@ -10,6 +10,7 @@ import com.moon.pharm.domain.alarm.AlarmScheduler
 import com.moon.pharm.domain.alarm.MedicationAlarm
 import com.moon.pharm.domain.alarm.MedicationAlarmNextTriggerCalculator
 import com.moon.pharm.domain.model.medication.Medication
+import com.moon.pharm.domain.model.medication.MedicationStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -22,24 +23,29 @@ class AndroidAlarmScheduler @Inject constructor(
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
 
-    override fun schedule(medication: Medication) {
-        cancel(medication.id)
-        if (!medication.isAlarmEnabled) return
+    override fun schedule(medication: Medication) = schedule(medication, listOf(medication.name))
+
+    override fun schedule(medication: Medication, groupMedicationNames: List<String>) {
+        val alarmOwnerId = medication.intakeGroupId ?: medication.id
+        cancel(alarmOwnerId)
+        if (!medication.isAlarmEnabled || medication.status != MedicationStatus.ACTIVE) return
 
         medication.schedules.forEach { schedule ->
             val alarm = MedicationAlarm(
                 requestCode = nextRequestCode(),
                 medicationId = medication.id,
+                intakeGroupId = medication.intakeGroupId,
                 name = medication.name,
+                groupMedicationNames = groupMedicationNames,
                 dosage = schedule.dosage,
                 time = schedule.time,
-                isGrouped = medication.isGrouped,
+                isGrouped = medication.intakeGroupId != null || medication.isGrouped,
                 repeatType = medication.repeatType,
                 weeklyDays = medication.weeklyDays,
                 startDate = medication.startDate,
                 endDate = medication.endDate
             )
-            if (scheduleNext(alarm)) register(medication.id, alarm.requestCode)
+            if (scheduleNext(alarm)) register(alarmOwnerId, alarm.requestCode)
         }
     }
 
@@ -51,8 +57,9 @@ class AndroidAlarmScheduler @Inject constructor(
     }
 
     override fun reschedule(alarm: MedicationAlarm) {
-        if (alarm.requestCode !in requestCodes(alarm.medicationId)) return
-        if (!scheduleNext(alarm)) unregister(alarm.medicationId, alarm.requestCode)
+        val alarmOwnerId = alarm.intakeGroupId ?: alarm.medicationId
+        if (alarm.requestCode !in requestCodes(alarmOwnerId)) return
+        if (!scheduleNext(alarm)) unregister(alarmOwnerId, alarm.requestCode)
     }
 
     private fun scheduleNext(alarm: MedicationAlarm): Boolean {
@@ -82,7 +89,12 @@ class AndroidAlarmScheduler @Inject constructor(
             action = AlarmConstants.ACTION_MEDICATION_ALARM
             putExtra(AlarmConstants.EXTRA_REQUEST_CODE, alarm.requestCode)
             putExtra(AlarmConstants.EXTRA_MEDICATION_ID, alarm.medicationId)
+            putExtra(AlarmConstants.EXTRA_INTAKE_GROUP_ID, alarm.intakeGroupId)
             putExtra(AlarmConstants.EXTRA_MEDICATION_NAME, alarm.name)
+            putStringArrayListExtra(
+                AlarmConstants.EXTRA_GROUP_MEDICATION_NAMES,
+                ArrayList(alarm.groupMedicationNames)
+            )
             putExtra(AlarmConstants.EXTRA_DOSAGE, alarm.dosage)
             putExtra(AlarmConstants.EXTRA_ALARM_TIME, alarm.time)
             putExtra(AlarmConstants.EXTRA_IS_GROUPED, alarm.isGrouped)

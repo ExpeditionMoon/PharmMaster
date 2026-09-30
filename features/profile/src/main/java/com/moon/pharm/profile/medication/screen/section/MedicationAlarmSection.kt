@@ -27,9 +27,10 @@ import com.moon.pharm.designsystem.theme.PharmTheme
 import com.moon.pharm.designsystem.util.ThemePreviews
 import com.moon.pharm.designsystem.util.toMinuteTimeUiString
 import com.moon.pharm.profile.R
+import com.moon.pharm.profile.medication.model.MedicationScheduleBasisUiModel
 import com.moon.pharm.profile.medication.model.RepeatTypeUiModel
 import com.moon.pharm.profile.medication.screen.component.AlarmOptionSelector
-import com.moon.pharm.profile.medication.screen.component.MealTimeChips
+import com.moon.pharm.profile.medication.screen.component.MealScheduleOptions
 import com.moon.pharm.profile.medication.screen.component.MedicationAlarmOptionsCard
 import com.moon.pharm.profile.medication.screen.component.WeeklyDaySelector
 import com.moon.pharm.profile.medication.viewmodel.MedicationFormState
@@ -40,6 +41,7 @@ import com.moon.pharm.profile.medication.viewmodel.MedicationUiEvent
 fun MedicationAlarmSection(
     medicationIndex: Int,
     form: MedicationFormState,
+    title: String,
     onEvent: (MedicationUiEvent) -> Unit
 ) {
     var showTimePicker by remember { mutableStateOf(false) }
@@ -52,26 +54,35 @@ fun MedicationAlarmSection(
             .padding(10.dp)
     ) {
         Text(
-            text = stringResource(R.string.medication_setting_alarm),
+            text = title,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = PharmTheme.colors.onSurface,
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
-        MealTimeChips(
-            selectedTimes = form.selectedMealTiming,
-            onTimeClick = { onEvent(MedicationUiEvent.UpdateMealTiming(index = medicationIndex, timing = it)) }
+        MealScheduleOptions(
+            basis = form.scheduleBasis,
+            selectedMealSlots = form.selectedMealSlots,
+            interval = form.mealInterval,
+            onBasisSelected = { onEvent(MedicationUiEvent.UpdateScheduleBasis(medicationIndex, it)) },
+            onMealSlotToggled = { onEvent(MedicationUiEvent.ToggleMealSlot(medicationIndex, it)) },
+            onIntervalSelected = { onEvent(MedicationUiEvent.UpdateMealInterval(medicationIndex, it)) }
         )
 
-        Spacer(modifier = Modifier.height(15.dp))
+        if (form.scheduleBasis == MedicationScheduleBasisUiModel.FixedTime ||
+            form.scheduleBasis == MedicationScheduleBasisUiModel.AsNeeded
+        ) {
+            Spacer(modifier = Modifier.height(15.dp))
+            TimeSettingCard(
+                time = form.selectedTime.toMinuteTimeUiString(),
+                onTimeClick = { showTimePicker = true }
+            )
+        }
 
-        TimeSettingCard(
-            time = form.selectedTime.toMinuteTimeUiString(),
-            onTimeClick = { showTimePicker = true }
-        )
-
-        if (showTimePicker) {
+        if (showTimePicker && (form.scheduleBasis == MedicationScheduleBasisUiModel.FixedTime ||
+                form.scheduleBasis == MedicationScheduleBasisUiModel.AsNeeded)
+        ) {
             TimePickerDialog(
                 title = stringResource(id = R.string.medication_alarm_time_dialog_title),
                 onConfirm = { state ->
@@ -121,6 +132,7 @@ private fun MedicationAlarmSectionPreview() {
             MedicationAlarmSection(
                 medicationIndex = 0,
                 form = MedicationFormState(),
+                title = stringResource(R.string.medication_setting_alarm),
                 onEvent = {}
             )
         }

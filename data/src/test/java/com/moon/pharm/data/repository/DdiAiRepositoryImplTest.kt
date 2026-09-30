@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.IOException
 
 class DdiAiRepositoryImplTest {
 
@@ -41,6 +42,26 @@ class DdiAiRepositoryImplTest {
 
         assertTrue(
             (result as DataResourceResult.Failure).exception is PrescriptionException.DrugNameNotFound
+        )
+    }
+
+    @Test
+    fun `감싸진 네트워크 원인이 있으면 네트워크 오류로 반환한다`() = runTest {
+        val repository = DdiAiRepositoryImpl(
+            aiDataSource = object : AiDataSource {
+                override suspend fun analyzeDdi(drugs: List<String>): String =
+                    throw AssertionError("Unexpected DDI analysis request")
+
+                override suspend fun extractDrugNames(safeOcrText: String): String =
+                    throw IllegalStateException(IOException())
+            },
+            moshi = Moshi.Builder().build()
+        )
+
+        val result = repository.extractDrugNamesFromText("prescription OCR text")
+
+        assertTrue(
+            (result as DataResourceResult.Failure).exception is PrescriptionException.Network
         )
     }
 

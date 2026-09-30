@@ -51,7 +51,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun PrescriptionScreen(
     viewModel: PrescriptionViewModel = hiltViewModel(),
-    onNavigateToMedicationCreate: (List<String>) -> Unit
+    onNavigateToMedicationReview: (List<String>) -> Unit
 ) {
     val context = LocalContext.current
     var showCamera by remember { mutableStateOf(false) }
@@ -62,8 +62,8 @@ fun PrescriptionScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collectLatest { event ->
             when (event) {
-                is PrescriptionUiEvent.NavigateToCreate -> {
-                    onNavigateToMedicationCreate(event.scannedMedicationNames)
+                is PrescriptionUiEvent.NavigateToMedicationReview -> {
+                    onNavigateToMedicationReview(event.scannedMedicationNames)
                 }
             }
         }
@@ -150,6 +150,11 @@ fun PrescriptionScreen(
                     text = stringResource(id = R.string.prescription_btn_retry),
                     onClick = viewModel::retry
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                PharmPrimaryButton(
+                    text = stringResource(id = R.string.prescription_btn_manual_entry),
+                    onClick = viewModel::openManualMedicationReview
+                )
             }
         }
     }
@@ -182,6 +187,7 @@ fun PrescriptionScreen(
 private fun PrescriptionError.messageResId(): Int = when (this) {
     PrescriptionError.GEMINI -> R.string.prescription_error_gemini
     PrescriptionError.NETWORK -> R.string.prescription_error_network
+    PrescriptionError.EMPTY_RESULT -> R.string.prescription_error_empty_result
     PrescriptionError.OCR -> R.string.prescription_error_ocr
 }
 

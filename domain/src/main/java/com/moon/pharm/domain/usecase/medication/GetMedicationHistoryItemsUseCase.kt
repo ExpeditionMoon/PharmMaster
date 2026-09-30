@@ -54,12 +54,13 @@ class GetMedicationHistoryItemsUseCase(
             medications.forEach { medication ->
                 if (medication.isActiveOn(currentDate)) {
                     medication.schedules.forEach { schedule ->
-                        val record = realRecords.find {
+                        val record = realRecords.firstOrNull {
                             it.medicationId == medication.id &&
                                     it.recordDate == dateKey &&
-                                    it.scheduleId == schedule.id &&
-                                    it.isTaken
-                        } ?: IntakeRecord(
+                                    it.scheduleId == schedule.id
+                        }
+
+                        val historyRecord = record ?: IntakeRecord(
                             id = "virtual_${medication.id}_${schedule.id}_$dateKey",
                             userId = medication.userId,
                             medicationId = medication.id,
@@ -71,12 +72,12 @@ class GetMedicationHistoryItemsUseCase(
 
                         dailyItems.add(
                             MedicationHistoryItem(
-                                recordId = record.id,
-                                medicationId = record.medicationId,
-                                scheduleId = record.scheduleId,
-                                recordDate = record.recordDate,
-                                isTaken = record.isTaken,
-                                takenTime = record.takenTime,
+                                recordId = historyRecord.id,
+                                medicationId = historyRecord.medicationId,
+                                scheduleId = historyRecord.scheduleId,
+                                recordDate = historyRecord.recordDate,
+                                isTaken = historyRecord.isTaken,
+                                takenTime = historyRecord.takenTime,
                                 medicationName = medication.name,
                                 time = schedule.time
                             )
